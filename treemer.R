@@ -1,57 +1,64 @@
-library(Rcpp)
 library(phangorn)
 library(seqinr)
 library(Rgraphviz)
-
-tree <- read.tree(
-  "/home/chengyang/PycharmProjects/FLUSITE/tests/dummy/RAxML_bestTree.mixed"
-)
-tipPath <- lapply(nodepath(tree), rev)
-
-aligns <- read.alignment(
-  "/home/chengyang/PycharmProjects/FLUSITE/tests/dummy/Alignment.fasta",
-  "fasta"
-)
-seqs <- strsplit(
-  sapply(aligns$seq, function(seq) {seq}), ""
-)[match(tree$tip.label, aligns$nam)]
-if (anyNA(seqs)) {
-  stop("Size not matched for tree tips and alignment")
-}
-
-seqsAR <- as.phyDat(aligns, "AA")
-fit = pml(tree, seqsAR)
-fit = optim.pml(fit, model = "JTT")
-anc.ml = ancestral.pml(fit, "ml")
-ancestral2phyDat <- function(x) {
-  eps <- 1.0e-5
-  contr <- attr(x, "contrast")
-  ind1 <- which( apply(contr, 1, function(x)sum(x > eps)) == 1L)
-  ind2 <- which( contr[ind1, ] > eps, arr.ind = TRUE)
-  pos <- ind2[match(seq_len(ncol(contr)),  ind2[,2]),1]
-  res <- lapply(x, function(x, pos) pos[max.col(x)], pos)
-  attributes(res) <- attributes(x)
-  return(res)
-}
-alignsAR <- phyDat2alignment(ancestral2phyDat(anc.ml))
-seqsAR <- strsplit(alignsAR$seq, "")
-
+library(ggtree)
+library(Rcpp)
 sourceCpp("treemer.cpp")
-grouping <- trimTree(tipPath, seqs, 0.95); length(grouping)
 
-mutations <- mutationPath(tipPath, seqsAR, 0.95)
+groupTips <- function(tree, align, similarity = 0.95) {
+  if (!is(tree, "phylo")) {
+    stop("object 'tree' is not of class 'phylo'")
+  } else if (!is(align, "alignment")) {
+    stop("object 'align' is not of class 'alignment")
+  }
+  tipPath <- lapply(nodepath(tree), rev)
+  seqs <- strsplit(
+    sapply(align$seq, function(seq) {seq}), ""
+  )[match(tree$tip.label, align$nam)]
+  if (anyNA(seqs)) {
+    stop("tree tips and alignment names are not matched")
+  }
+  return(trimTree(tipPath, seqs, similarity))
+}
 
-edgeLabels <- names(mutations)
-edges <- strsplit(edgeLabels, "~")
+ancestralMutations <- function(
+  tree, align, seqType, model,
+  similarity = 0.95
+) {
+  if (!is(tree, "phylo")) {
+    stop("object 'tree' is not of class 'phylo'")
+  } else if (!is(align, "alignment")) {
+    stop("object 'align' is not of class 'alignment")
+  } else if(!identical(sort(tree$tip.label), sort(align$nam))) {
+    stop("tree tips and alignment names are not matched")
+  }
+  tipPath <- lapply(nodepath(tree), rev)
+  seqsAR <- as.phyDat(align, seqType)
+  fit <- pml(tree, seqsAR)
+  fit <- optim.pml(fit, model = model)
+  anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
+  alignAR <- phyDat2alignment(anc.ml)
+  seqsAR <- strsplit(alignAR$seq, "")
+  mutations <- mutationPath(tipPath, seqsAR, similarity)
+  return(mutations)
+}
 
-g <- new(
-  "graphNEL",
-  nodes=unique(unlist(edges)),
-  edgemode="directed"
-)
+filterMutation <- function(mutations) {
+  
+}
 
-for (edge in edges) {g <- addEdge(edge[1], edge[2], g)}
-
-eAttrs <- list()
-eAttrs$label <- sapply(mutations, function(m) {paste(m, collapse = "\\\n")})
-plot(g, edgeAttrs=eAttrs)
+mutations2graphviz <- function(mutations) {
+  edges <- strsplit(names(mutations), "~")
+  g <- graphNEL(nodes = unique(unlist(edges)), edgemode = "directed")
+  for (edge in edges) {g <- addEdge(edge[1], edge[2], g)}
+  plot(
+    g, edgeAttrs = list(
+      label = sapply(mutations, function(m) {paste(m, collapse = ",")})
+    ),
+    attrs = list(
+      node=list(fillcolor="lightgreen"),
+      edge=list(color="cyan")
+      # graph=list(rankdir="LR")
+    )
+  )
+}

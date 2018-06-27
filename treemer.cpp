@@ -143,39 +143,57 @@ public:
     }
     return tipCluster;
   }
-  map<string, set<string> > getSitePath(
+  map< string, set<string> > getSitePath(
       ListOf<CharacterVector> ancestralSeqs
   ) {
     pruneTree();
-    map<string, set<string> > linkages;
-    string previousSite, currentSite, assumedLink;
+    map< string, set<string> > linkages;
+    string sitePos, previousSite, currentSite, assumedLink;
     int n, m, siteIndex, pathSize, 
     previousNode, currentNode, previousLinked, currentLinked;
-    vector<int> linkedNodes;
+    vector<int> linkedNodes, conserved;
+    vector< vector<int> > mutMode;
+    map< vector< vector<int> >, vector<string> > mutModeSum;
+    map< vector< vector<int> >, vector<string> >::iterator mutModeIt;
+    map< string, set<string> > siteMutSum;
     set<int> divPoints;
     deque<int> path;
     CharacterVector nodeSeq;
-    vector<deque<int> > evolPath = getEvolPath();
+    evolPath = getEvolPath();
     divPoints = getDivPoints(evolPath);
     for (n = 0; n < evolPath.size(); n++) {
       path = evolPath[n];
       linkedNodes.clear();
       for (siteIndex = 0; siteIndex < seqLen; siteIndex++) {
-        previousSite.clear();
         pathSize = path.size();
+        sitePos = to_string(siteIndex + 1);
         for (m = 0; m < pathSize; m++) {
           currentNode = path[m];
           currentSite = ancestralSeqs[currentNode][siteIndex];
+          siteMutSum[sitePos].insert(currentSite);
           if (!previousSite.empty() && currentSite != previousSite) {
+            mutMode.push_back(conserved);
+            conserved.clear();
             linkedNodes.push_back(previousNode);
             linkedNodes.push_back(currentNode);
             linkages[to_string(previousNode) + "~" + to_string(currentNode)].
-            insert(previousSite + to_string(siteIndex) + currentSite);
+            insert(previousSite + sitePos + currentSite);
           }
+          conserved.push_back(currentNode);
           previousSite = currentSite;
           previousNode = currentNode;
         }
+        mutMode.push_back(conserved);
+        mutModeSum[mutMode].push_back(sitePos);
+        previousSite.clear();
+        conserved.clear();
+        mutMode.clear();
       }
+      // for (mutModeIt = mutModeSum.begin(); mutModeIt != mutModeSum.end(); mutModeIt++) {
+      //   if (mutModeIt->first.size() == 2) {
+      //     
+      //   }
+      // }
       previousLinked = root;
       for (m = 1; m < pathSize; m++) {
         currentLinked = path[m];
@@ -199,7 +217,8 @@ private:
   vector<int> sites;
   map<pair<int, int>, float> compared;
   vector<TipSeqLinker*> linkerList;
-  map<int, deque<TipSeqLinker*> > clusters;
+  map< int, deque<TipSeqLinker*> > clusters;
+  vector< deque<int> > evolPath;
   bool qualified(deque<TipSeqLinker*> clstr) {
     float similarity;
     int i, j, length;
@@ -229,9 +248,9 @@ private:
   }
   void pruneTree() {
     bool exist;
-    map<int, deque<TipSeqLinker*> > oldCluster;
+    map< int, deque<TipSeqLinker*> > oldCluster;
     vector<TipSeqLinker*>::iterator it;
-    map<int, deque<TipSeqLinker*> >::iterator it1, it2;
+    map< int, deque<TipSeqLinker*> >::iterator it1, it2;
     deque<TipSeqLinker*>::iterator linker;
     while (true) {
       oldCluster = clusters;
@@ -299,6 +318,63 @@ private:
   }
 };
 
+// class MutationFilter {
+// public:
+//   virtual ~MutationFilter() {};
+//   virtual map<string, set<string> > getFiltered() = 0;
+// protected:
+//   int site;
+//   map<string, set<string> > linkages;
+//   void cleanUpLinkages() {
+//     for (it = linkages.begin(); it != linkages.end(); it++) {
+//       if (it->second.empty()) {
+//         unlinked.push_back(it->first);
+//       }
+//     }
+//     unlinkedNum = unlinked.size();
+//     for (i = 0; i < unlinkedNum; i++) {
+//       for (j = i + 1; j < unlinkedNum; j++) {
+//         continue;
+//       }
+//     }
+//   }
+// private:
+//   int i, j, unlinkedNum;
+//   string previousUnlinked, currentUnlinked;
+//   vector<string> unlinked;
+//   map<string, set<string> >::iterator it;
+// };
+// 
+// class Fixation: MutationFilter {
+// public:
+//   Fixation(map<string, set<string> > mutations) {
+//     linkages = mutations;
+//   }
+//   map<string, set<string> > getFiltered() {
+//     for (int i = 0; i < mutPath.size(); i++) {
+//       muts = mutPath[i];
+//       for (s = muts.begin(); s != muts.end(); s++) {
+//         site = stoi(as<string>(*s).substr(1, (*s).size()));
+//         mutSummary[site]++;
+//       }
+//     }
+//     for (l = links.begin(); l != links.end(); l++) {
+//       muts = mutPath[as<string>(*l)];
+//       set<string> qualified;
+//       for (s = muts.begin(); s != muts.end(); s++) {
+//         site = stoi(as<string>(*s).substr(1, (*s).size()));
+//         if (mutSummary[site] == 1) {
+//           qualified.insert(as<string>(*s));
+//         }
+//       }
+//       linkages[as<string>(*l)] = qualified;
+//     }
+//     return linkages;
+//   };
+// private:
+//   map<int, int> mutSummary;
+// };
+
 // [[Rcpp::export]]
 ListOf<IntegerVector> trimTree(
     ListOf<IntegerVector> tipPaths, 
@@ -313,10 +389,10 @@ ListOf<IntegerVector> trimTree(
 // [[Rcpp::export]]
 ListOf<CharacterVector> mutationPath(
     ListOf<IntegerVector> tipPaths,
-    ListOf<CharacterVector> alignment,
+    ListOf<CharacterVector> alignedSeqsAR,
     NumericVector similarity
 ) {
-  TreeAlignmentMatch match(tipPaths, alignment);
+  TreeAlignmentMatch match(tipPaths, alignedSeqsAR);
   match.setThreshold(as<float>(similarity));
-  return wrap(match.getSitePath(alignment));
+  return wrap(match.getSitePath(alignedSeqsAR));
 }
