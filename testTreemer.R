@@ -8,5 +8,5 @@ align <- read.alignment(
   "fasta"
 )
 grouping <- groupTips(tree, align)
-mutations <- ancestralMutations(tree, align, "AA", "JTT")
+mutations <- ancestralMutations(tree, align, "AA", "JTT", 1)
 mutations2graphviz(mutations)

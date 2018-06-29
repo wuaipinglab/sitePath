@@ -1,7 +1,6 @@
 library(phangorn)
 library(seqinr)
 library(Rgraphviz)
-library(ggtree)
 library(Rcpp)
 sourceCpp("treemer.cpp")
 
@@ -11,13 +10,13 @@ groupTips <- function(tree, align, similarity = 0.95) {
   } else if (!is(align, "alignment")) {
     stop("object 'align' is not of class 'alignment")
   }
-  tipPath <- lapply(nodepath(tree), rev)
   seqs <- strsplit(
     sapply(align$seq, function(seq) {seq}), ""
   )[match(tree$tip.label, align$nam)]
   if (anyNA(seqs)) {
     stop("tree tips and alignment names are not matched")
   }
+  tipPath <- lapply(nodepath(tree), rev)
   return(trimTree(tipPath, seqs, similarity))
 }
 
@@ -32,19 +31,15 @@ ancestralMutations <- function(
   } else if(!identical(sort(tree$tip.label), sort(align$nam))) {
     stop("tree tips and alignment names are not matched")
   }
-  tipPath <- lapply(nodepath(tree), rev)
   seqsAR <- as.phyDat(align, seqType)
   fit <- pml(tree, seqsAR)
   fit <- optim.pml(fit, model = model)
   anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
   alignAR <- phyDat2alignment(anc.ml)
   seqsAR <- strsplit(alignAR$seq, "")
+  tipPath <- lapply(nodepath(tree), rev)
   mutations <- mutationPath(tipPath, seqsAR, similarity)
   return(mutations)
-}
-
-filterMutation <- function(mutations) {
-  
 }
 
 mutations2graphviz <- function(mutations) {
