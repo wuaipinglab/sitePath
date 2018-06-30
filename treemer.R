@@ -48,7 +48,7 @@ mutations2graphviz <- function(mutations) {
   for (edge in edges) {g <- addEdge(edge[1], edge[2], g)}
   plot(
     g, edgeAttrs = list(
-      label = sapply(mutations, function(m) {paste(m, collapse = ",")})
+      label = sapply(mutations, function(m) {paste(m, collapse = " ")})
     ),
     attrs = list(
       node=list(fillcolor="lightgreen"),

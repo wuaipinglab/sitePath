@@ -290,23 +290,27 @@ public:
     vector<int> linked;
     map< string, set<string> > linkages;
     map< int, set< pair<int, int> > >::iterator p;
-    for (p = mutNodes.begin(); p != mutNodes.end(); p++) {
-      if ((*p).second.size() == 1) {
-        pos = (*p).first;
-        pNode = (*(*p).second.begin()).first;
-        node = (*(*p).second.begin()).second;
-        linked.push_back(pNode);
-        linked.push_back(node);
-        linkages[to_string(pNode) + "~" + to_string(node)].insert(
-          as<string>(ancestralSeqs[pNode - 1][pos]) + 
-            to_string(pos) +
-            as<string>(ancestralSeqs[node - 1][pos])
-        );
-      }
-    }
     int pLinked;
     string assumedLink;
     for (ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
+      for (p = mutNodes.begin(); p != mutNodes.end(); p++) {
+        pNode = (*(*p).second.begin()).first;
+        node = (*(*p).second.begin()).second;
+        if (
+            (*p).second.size() == 1 &&
+              find((*ePath).begin(), (*ePath).end(), pNode) != (*ePath).end() &&
+              find((*ePath).begin(), (*ePath).end(), node) != (*ePath).end()
+        ) {
+          pos = (*p).first;
+          linked.push_back(pNode);
+          linked.push_back(node);
+          linkages[to_string(pNode) + "~" + to_string(node)].insert(
+              as<string>(ancestralSeqs[pNode - 1][pos]) + 
+                to_string(pos) +
+                as<string>(ancestralSeqs[node - 1][pos])
+          );
+        }
+      }
       pLinked = root;
       for (cNode = (*ePath).begin() + 1; cNode != (*ePath).end(); cNode++) {
         if (
@@ -320,6 +324,7 @@ public:
           pLinked = *cNode;
         }
       }
+      linked.clear();
     }
     return linkages;
   }
