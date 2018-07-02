@@ -25,10 +25,10 @@ public:
       pIndex++;
     }
   };
-  float compare(TipSeqLinker *linker) {
+  float compare(TipSeqLinker &linker) {
     float match = 0, length = 0;
     for (
-        CharacterVector::iterator q = seq.begin(), s = linker->seq.begin();
+        CharacterVector::iterator q = seq.begin(), s = linker.seq.begin();
         q != seq.end(); q++, s++
     ) {
       if (*q == *s && *q != '-') {match++;}
@@ -36,7 +36,7 @@ public:
     }
     return match/length;
   };
-  vector<string> siteComp(vector<int> sites) {
+  vector<string> siteComp(vector<int> &sites) {
     vector<string> comp;
     for (
         vector<int>::iterator pos = sites.begin(); 
@@ -181,7 +181,7 @@ private:
   float sim;
   map<pair<int, int>, float> compared;
   vector<TipSeqLinker*>::iterator tsLinker2;
-  bool qualified(vector<TipSeqLinker*> clstr) {
+  bool qualified(vector<TipSeqLinker*> &clstr) {
     vector<string> qComp, sComp;
     pair<int, int> pairing;
     for (tsLinker = clstr.begin(); tsLinker != clstr.end(); tsLinker++) {
@@ -192,7 +192,7 @@ private:
         if (compared.find(pairing) != compared.end()) {
           sim = compared[pairing];
         } else {
-          sim = (*tsLinker)->compare(*tsLinker2);
+          sim = (*tsLinker)->compare(**tsLinker2);
           compared[pairing] = sim;
         }
         if (sim < simCut or qComp != sComp) {
@@ -255,6 +255,7 @@ public:
     }
     vector< deque<int> >::iterator ePath2;
     deque<int>::iterator cNode2;
+    map< int, set<string> > allele;
     for (ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
       for (ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
         for (
@@ -285,60 +286,88 @@ public:
       }
     }
   }
-  map< string, set<string> > fixedMutation() {
-    int node;
+  map< string, set<string> > getSitePath(int mode) {
     vector<int> linked;
     map< string, set<string> > linkages;
-    map< int, set< pair<int, int> > >::iterator p;
-    int pLinked;
+    switch (mode) {
+    case 0: fixedMutationFilter(linked, linkages);
+      break;
+    case 1: coSiteFilter(linked, linkages);
+      break;
+    }
     string assumedLink;
     for (ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
-      for (p = mutNodes.begin(); p != mutNodes.end(); p++) {
-        pNode = (*(*p).second.begin()).first;
-        node = (*(*p).second.begin()).second;
-        if (
-            (*p).second.size() == 1 &&
-              find((*ePath).begin(), (*ePath).end(), pNode) != (*ePath).end() &&
-              find((*ePath).begin(), (*ePath).end(), node) != (*ePath).end()
-        ) {
-          pos = (*p).first;
-          linked.push_back(pNode);
-          linked.push_back(node);
-          linkages[to_string(pNode) + "~" + to_string(node)].insert(
-              as<string>(ancestralSeqs[pNode - 1][pos]) + 
-                to_string(pos) +
-                as<string>(ancestralSeqs[node - 1][pos])
-          );
-        }
-      }
-      pLinked = root;
+      node = root;
       for (cNode = (*ePath).begin() + 1; cNode != (*ePath).end(); cNode++) {
         if (
             find(linked.begin(), linked.end(), *cNode) != linked.end() ||
               find(divPoints.begin(), divPoints.end(), *cNode) != divPoints.end()
         ) {
-          assumedLink = to_string(pLinked) + "~" + to_string(*cNode);
+          assumedLink = to_string(node) + "~" + to_string(*cNode);
           if (linkages.find(assumedLink) == linkages.end()) {
             linkages[assumedLink].clear();
           }
-          pLinked = *cNode;
+          node = *cNode;
         }
       }
-      linked.clear();
     }
     return linkages;
   }
 private:
-  int pos, pNode;
+  int pos, node, pNode;
   string sitePos, pSite, cSite;
   ListOf<CharacterVector> ancestralSeqs;
   vector< deque<int> > evolPath;
   vector< deque<int> >::iterator ePath;
   deque<int>::iterator cNode;
   set<int> divPoints;
-  map< int, set<string> > allele;
   map< int, set< pair<int, int> > > mutNodes;
   map< set< pair<int, int> >, vector<int> > coEvol;
+  void fixedMutationFilter(
+      vector<int> &linked,
+      map< string, set<string> > &linkages
+  ) {
+    map< int, set< pair<int, int> > >::iterator p;
+    for (p = mutNodes.begin(); p != mutNodes.end(); p++) {
+      if ((*p).second.size() == 1) {
+        pNode = (*(*p).second.begin()).first;
+        node = (*(*p).second.begin()).second;
+        pos = (*p).first;
+        linked.push_back(pNode);
+        linked.push_back(node);
+        linkages[to_string(pNode) + "~" + to_string(node)].insert(
+            as<string>(ancestralSeqs[pNode - 1][pos]) +
+              to_string(pos) +
+              as<string>(ancestralSeqs[node - 1][pos])
+        );
+      }
+    }
+  }
+  void coSiteFilter(
+      vector<int> &linked,
+      map< string, set<string> > &linkages
+  ) {
+    map< set< pair<int, int> >, vector<int> >::iterator m;
+    set< pair<int, int> >::iterator l;
+    vector<int>::iterator p;
+    for (m = coEvol.begin(); m != coEvol.end(); m++) {
+      if ((*m).second.size() > 1) {
+        for (p = (*m).second.begin(); p != (*m).second.end(); p++) {
+          for (l = (*m).first.begin(); l != (*m).first.end(); l++) {
+            pNode = (*l).first;
+            node = (*l).second;
+            linked.push_back(pNode);
+            linked.push_back(node);
+            linkages[to_string(pNode) + "~" + to_string(node)].insert(
+                as<string>(ancestralSeqs[pNode - 1][*p]) +
+                  to_string(*p) +
+                  as<string>(ancestralSeqs[node - 1][*p])
+            );
+          }
+        }
+      }
+    }
+  }
 };
 
 // [[Rcpp::export]]
@@ -361,5 +390,5 @@ ListOf<CharacterVector> mutationPath(
   SiteExplorer match(tipPaths, alignedSeqsAR);
   match.setThreshold(as<float>(similarity));
   match.getEvolPath();
-  return wrap(match.fixedMutation());
+  return wrap(match.getSitePath(1));
 }

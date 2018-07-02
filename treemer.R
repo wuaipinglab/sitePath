@@ -4,6 +4,26 @@ library(Rgraphviz)
 library(Rcpp)
 sourceCpp("treemer.cpp")
 
+setClass(
+  "TreeAlignMatch",
+  slots = list(tree = "phylo", align = "alignment")
+)
+
+readTreeAlign <- function(
+  treeFile, treeFormat = c("beast", "others"),
+  alignFile, alignFormat
+) {
+  if (treeFormat == "beast") {
+    tree <- ggtree::read.beast(treeFile)@phylo
+  } else {
+    tree <- read.tree(treeFile)
+  }
+  align <- read.alignment(alignFile, alignFormat)
+  if(!identical(sort(tree$tip.label), sort(align$nam))) {
+    stop("tree tips and alignment names are not matched")
+  }
+}
+
 groupTips <- function(tree, align, similarity = 0.95) {
   if (!is(tree, "phylo")) {
     stop("object 'tree' is not of class 'phylo'")
@@ -16,7 +36,7 @@ groupTips <- function(tree, align, similarity = 0.95) {
   if (anyNA(seqs)) {
     stop("tree tips and alignment names are not matched")
   }
-  tipPath <- lapply(nodepath(tree), rev)
+  tipPath <- lapply(ape::nodepath(tree), rev)
   return(trimTree(tipPath, seqs, similarity))
 }
 
@@ -37,7 +57,7 @@ ancestralMutations <- function(
   anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
   alignAR <- phyDat2alignment(anc.ml)
   seqsAR <- strsplit(alignAR$seq, "")
-  tipPath <- lapply(nodepath(tree), rev)
+  tipPath <- lapply(ape::nodepath(tree), rev)
   mutations <- mutationPath(tipPath, seqsAR, similarity)
   return(mutations)
 }
