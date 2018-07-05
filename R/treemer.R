@@ -1,3 +1,5 @@
+#' @title ReadTreeAlign
+#' @description Read tree and its matched alignment file
 #' @param treeFile Path to the file stored tree string
 #' @param treeFormat Specify tree format
 #' @param alignFile Path to the file stored sequence alignment
@@ -25,6 +27,8 @@ readTreeAlign <- function(
   ))
 }
 
+#' @title Group Tips
+#' @description Group tree tips by their sequence similarity
 #' @param tree a phylo object
 #' @param align an alignment object
 #' @param similarity similarity threshold for tree trimming
@@ -39,6 +43,9 @@ groupTips <- function(tree, align, similarity) {
   ))
 }
 
+#' @title Ancestral Mutations
+#' @description 
+#' Find the mutations in predicted ancestral sequence and corresponding clades
 #' @param tree a phylo object
 #' @param align an alignment object
 #' @param similarity similarity threshold for tree trimming
@@ -66,6 +73,8 @@ ancestralMutations <- function(
   ))
 }
 
+#' @title Get tip names
+#' @description Find the tips before and after mutation point
 #' @param tree a phylo object
 #' @param mutations the return of \code{ancestralMutations} function
 #' @return clade and corresponding tips
@@ -86,6 +95,7 @@ mutations2tips <- function(tree, mutations) {
   return(res)
 }
 
+#' @title Mutation map
 #' @param mutations the return of \code{ancestralMutations} function
 #' @description plot the linked clades and mutations
 #' @return NULL
@@ -109,3 +119,7 @@ mutations2graphviz <- function(mutations) {
     )
   }
 }
+
+#' @useDynLib sitePath
+#' @importFrom Rcpp sourceCpp
+NULL
