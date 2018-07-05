@@ -7,7 +7,7 @@
 mutations2graphviz(mutations)
 }
 \arguments{
-\item{mutations}{the return of \code{ancestralMutations} function}
+\item{mutations}{the return of \code{\link{ancestralMutations}} function}
 }
 \description{
 plot the linked clades and mutations

@@ -2,6 +2,7 @@
 
 export(ancestralMutations)
 export(groupTips)
+export(mutations2graphviz)
 export(mutations2tips)
 export(readTreeAlign)
 importFrom(Rcpp,sourceCpp)

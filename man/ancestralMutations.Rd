@@ -5,7 +5,7 @@
 \title{Ancestral Mutations}
 \usage{
 ancestralMutations(tree, align, similarity, seqType = c("DNA", "AA"),
-  model = NULL, siteMode = c(1, 2))
+  model = NULL, siteMode = c(1, 2, 3))
 }
 \arguments{
 \item{tree}{a phylo object}

@@ -36,11 +36,15 @@ readTreeAlign <- function(
 #' @export
 
 groupTips <- function(tree, align, similarity) {
-  return(trimTree(
+  grouping <- trimTree(
     lapply(nodepath(tree), rev),
     strsplit(unlist(align$seq), "")[match(tree$tip.label, align$nam)], 
     similarity
-  ))
+  )
+  res <- lapply(grouping, function(g) {
+    return(tree$tip.label[g])
+  })
+  return(res)
 }
 
 #' @title Ancestral Mutations
@@ -57,7 +61,7 @@ groupTips <- function(tree, align, similarity) {
 
 ancestralMutations <- function(
   tree, align, similarity, seqType = c("DNA", "AA"),
-  model = NULL, siteMode = c(1, 2)
+  model = NULL, siteMode = c(1, 2, 3)
 ) {
   fit <- pml(tree, as.phyDat(align, seqType))
   if (is.null(model)) {
@@ -65,6 +69,9 @@ ancestralMutations <- function(
   }
   fit <- optim.pml(fit, model = model)
   anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
+  if (length(anc.ml) < length(tree$tip.label) + tree$Nnode) {
+    stop("The tree might be unrooted yet. Use ape::root() function to root.")
+  }
   alignAR <- phyDat2alignment(anc.ml)
   return(mutationPath(
     lapply(nodepath(tree), rev),
@@ -73,32 +80,49 @@ ancestralMutations <- function(
   ))
 }
 
-#' @title Get tip names
-#' @description Find the tips before and after mutation point
+#' @title Format conversion
+#' @description Reformat the return from \code{\link{ancestralMutations}}
 #' @param tree a phylo object
-#' @param mutations the return of \code{ancestralMutations} function
+#' @param mutations the return of \code{\link{ancestralMutations}} function
 #' @return clade and corresponding tips
 #' @export
 
 mutations2tips <- function(tree, mutations) {
   res <- lapply(mutations, function(m) {
-    edges <- lapply(strsplit(names(m), "~"), function(e) {
-      tips <- lapply(as.integer(e), function(n) {
-        return(Descendants(tree, n, "tips"))
-      })
-      names(tips) <- e
-      return(tips)
-    })
-    names(edges) <- names(m)
-    return(edges)
+    branch2Site(tree, m)
   })
   return(res)
 }
 
+branch2Site <- function(tree, mutations) {
+  res <- list()
+  for (link in names(mutations)) {
+    muts <- mutations[[link]]
+    if (length(muts) != 0){
+      nodes <- unlist(strsplit(link, "~"))
+      for (m in muts) {
+        len <- nchar(m)
+        mfrom <- substr(m, 1, 1)
+        mto <- substr(m, len, len)
+        pos <- substr(m, 2, len - 1)
+        alleles <- c(mfrom, mto)
+        names(alleles) <- nodes
+        if (length(res[[pos]]) == 0) {
+          res[[pos]] <- alleles
+        } else {
+          res[[pos]] <- c(res[[pos]], alleles)
+        }
+      }
+    }
+  }
+  return(res)
+}
+
 #' @title Mutation map
-#' @param mutations the return of \code{ancestralMutations} function
+#' @param mutations the return of \code{\link{ancestralMutations}} function
 #' @description plot the linked clades and mutations
 #' @return NULL
+#' @export
 
 mutations2graphviz <- function(mutations) {
   for (name in names(mutations)) {
@@ -106,15 +130,16 @@ mutations2graphviz <- function(mutations) {
     g <- graph::graphNEL(nodes = unique(unlist(edges)), edgemode = "directed")
     for (edge in edges) {g <- graph::addEdge(edge[1], edge[2], g)}
     Rgraphviz::plot(
-      g, edgeAttrs = list(
+      g, main = name,
+      edgeAttrs = list(
         label = sapply(mutations[[name]], function(m) {
           paste(m, collapse = " ")
         })
       ),
       attrs = list(
-        node=list(fillcolor="lightgreen"),
-        edge=list(color="cyan")
-        # graph=list(rankdir="LR")
+        node = list(fillcolor = "lightblue"),
+        edge = list(color = "cyan")
+        # graph = list(rankdir = "LD")
       )
     )
   }

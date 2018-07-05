@@ -2,18 +2,18 @@
 % Please edit documentation in R/treemer.R
 \name{mutations2tips}
 \alias{mutations2tips}
-\title{Get tip names}
+\title{Format conversion}
 \usage{
 mutations2tips(tree, mutations)
 }
 \arguments{
 \item{tree}{a phylo object}
 
-\item{mutations}{the return of \code{ancestralMutations} function}
+\item{mutations}{the return of \code{\link{ancestralMutations}} function}
 }
 \value{
 clade and corresponding tips
 }
 \description{
-Find the tips before and after mutation point
+Reformat the return from \code{\link{ancestralMutations}}
 }
