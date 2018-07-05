@@ -226,6 +226,7 @@ public:
 };
 
 class SiteExplorer: public TreeAlignmentMatch {
+  typedef vector< deque<int> >::iterator ep;
 public:
   SiteExplorer(
     ListOf<IntegerVector> tipPaths, 
@@ -234,59 +235,8 @@ public:
     ancestralSeqs = alignedSeqs;
     divPoints.insert(root);
   }
-  void getEvolPath() {
-    for (tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
-      evolPath.push_back((*tsLinker)->getPath());
-    }
-    if (simCut != 1) {
-      pruneTree();
-      map<deque<int>, int> pn;
-      for (tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
-        pn[(*tsLinker)->getPath()]++;
-      }
-      if (pn.size() != linkers.size()) {
-        evolPath.clear();
-        for (map<deque<int>, int>::iterator vp = pn.begin(); vp != pn.end(); vp++) {
-          if (vp->first.size() != 1 && vp->second > 1) {
-            evolPath.push_back(vp->first);
-          }
-        }
-      }
-    }
-    vector< deque<int> >::iterator ePath2;
-    deque<int>::iterator cNode2;
-    map< int, set<string> > allele;
-    for (ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
-      for (ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
-        for (
-            cNode = (*ePath).begin(), cNode2 = (*ePath2).begin();
-            (*cNode) == (*cNode2); cNode++, cNode2++
-        ) continue;
-        if (cNode != (*ePath).begin()) divPoints.insert(*(cNode - 1));
-      }
-      for (pos = 0; pos < seqLen; pos++) {
-        for (cNode = (*ePath).begin(); cNode != (*ePath).end(); cNode++) {
-          cSite = ancestralSeqs[(*cNode) - 1][pos];
-          allele[pos].insert(cSite);
-          if (!pSite.empty() && cSite != pSite) {
-            mutNodes[pos].insert(make_pair(pNode, *cNode));
-          }
-          pSite = cSite;
-          pNode = *cNode;
-        }
-        pSite.clear();
-      }
-    }
-    for (pos = 0; pos < seqLen; pos++) {
-      if (allele[pos].size() == 1) {
-        allele.erase(pos);
-        mutNodes.erase(pos);
-      } else {
-        coEvol[mutNodes[pos]].push_back(pos);
-      }
-    }
-  }
   map< string, set<string> > getSitePath(int mode) {
+    if (!pruned) {getEvolPath();}
     vector<int> linked;
     map< string, set<string> > linkages;
     switch (mode) {
@@ -368,6 +318,58 @@ private:
       }
     }
   }
+  void getEvolPath() {
+    for (tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+      evolPath.push_back((*tsLinker)->getPath());
+    }
+    if (simCut != 1) {
+      pruneTree();
+      map<deque<int>, int> pn;
+      for (tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+        pn[(*tsLinker)->getPath()]++;
+      }
+      if (pn.size() != linkers.size()) {
+        evolPath.clear();
+        for (map<deque<int>, int>::iterator vp = pn.begin(); vp != pn.end(); vp++) {
+          if (vp->first.size() != 1 && vp->second > 1) {
+            evolPath.push_back(vp->first);
+          }
+        }
+      }
+    }
+    vector< deque<int> >::iterator ePath2;
+    deque<int>::iterator cNode2;
+    map< int, set<string> > allele;
+    for (ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
+      for (ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
+        for (
+            cNode = (*ePath).begin(), cNode2 = (*ePath2).begin();
+            (*cNode) == (*cNode2); cNode++, cNode2++
+        ) continue;
+        if (cNode != (*ePath).begin()) divPoints.insert(*cNode);
+      }
+      for (pos = 0; pos < seqLen; pos++) {
+        for (cNode = (*ePath).begin(); cNode != (*ePath).end(); cNode++) {
+          cSite = ancestralSeqs[(*cNode) - 1][pos];
+          allele[pos].insert(cSite);
+          if (!pSite.empty() && cSite != pSite) {
+            mutNodes[pos].insert(make_pair(pNode, *cNode));
+          }
+          pSite = cSite;
+          pNode = *cNode;
+        }
+        pSite.clear();
+      }
+    }
+    for (pos = 0; pos < seqLen; pos++) {
+      if (allele[pos].size() == 1) {
+        allele.erase(pos);
+        mutNodes.erase(pos);
+      } else {
+        coEvol[mutNodes[pos]].push_back(pos);
+      }
+    }
+  }
 };
 
 // [[Rcpp::export]]
@@ -382,13 +384,23 @@ ListOf<IntegerVector> trimTree(
 }
 
 // [[Rcpp::export]]
-ListOf<CharacterVector> mutationPath(
+ListOf< ListOf<CharacterVector> > mutationPath(
     ListOf<IntegerVector> tipPaths,
     ListOf<CharacterVector> alignedSeqsAR,
-    NumericVector similarity
+    NumericVector similarity,
+    IntegerVector siteMode
 ) {
   SiteExplorer match(tipPaths, alignedSeqsAR);
   match.setThreshold(as<float>(similarity));
-  match.getEvolPath();
-  return wrap(match.getSitePath(1));
+  map< string, map< string, set<string> > > res;
+  for (IntegerVector::iterator m = siteMode.begin(); m != siteMode.end(); ++m) {
+    switch (*m) {
+    case 1: res["fixed"] = match.getSitePath(0);
+      break;
+    case 2: res["coevolve"] = match.getSitePath(1);
+      break;
+    default: throw invalid_argument("Invalid siteMode argument");
+    }
+  }
+  return wrap(res);
 }
