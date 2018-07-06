@@ -9,7 +9,7 @@ public:
     ListOf<IntegerVector> tipPaths, 
     ListOf<CharacterVector> alignedSeqs
   );
-  std::map< std::string, std::vector<int> > groupTips ();
+  std::map< int, std::vector<int> > groupTips ();
 };
 
 #endif

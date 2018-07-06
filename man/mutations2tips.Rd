@@ -4,12 +4,12 @@
 \alias{mutations2tips}
 \title{Format conversion}
 \usage{
-mutations2tips(treeAlignMatch)
+mutations2tips(mutations)
 }
 \arguments{
-\item{tree}{a phylo object}
-
 \item{mutations}{the return of \code{\link{ancestralMutations}} function}
+
+\item{tree}{a phylo object}
 }
 \value{
 clade and corresponding tips

@@ -58,6 +58,7 @@ group <- function(tree, align, similarity) {
   res <- lapply(grouping, function(g) {
     return(tree$tip.label[g])
   })
+  attr(res, "tree") <- tree
   return(res)
 }
 
@@ -98,6 +99,7 @@ ancestralMutations <- function(
     strsplit(alignAR$seq, ""),
     similarity, siteMode
   )
+  attr(res, "tree") <- treeAlignMatch$tree
   return(res)
 }
 
@@ -108,9 +110,9 @@ ancestralMutations <- function(
 #' @return clade and corresponding tips
 #' @export
 
-mutations2tips <- function(treeAlignMatch) {
-  res <- lapply(treeAlignMatch$mutations, function(m) {
-    branch2Site(treeAlignMatch$tree, m)
+mutations2tips <- function(mutations) {
+  res <- lapply(mutations, function(m) {
+    branch2Site(attr(mutations, "tree"), m)
   })
   return(res)
 }
