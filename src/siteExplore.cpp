@@ -137,7 +137,7 @@ void SiteExplorer::getEvolPath() {
       if (cNode != (*ePath).begin()) divPoints.insert(*cNode);
     }
     for (int pos = 0; pos < seqLen; pos++) {
-      int pNode;
+      int pNode = root;
       std::string pSite, cSite;
       for (std::deque<int>::iterator cNode = (*ePath).begin(); cNode != (*ePath).end(); cNode++) {
         cSite = ancestralSeqs[(*cNode) - 1][pos];
