@@ -4,13 +4,11 @@
 \alias{ancestralMutations}
 \title{Ancestral Mutations}
 \usage{
-ancestralMutations(tree, align, similarity, seqType = c("DNA", "AA"),
+ancestralMutations(treeAlignMatch, similarity, seqType = c("DNA", "AA"),
   model = NULL, siteMode = c(1, 2, 3))
 }
 \arguments{
-\item{tree}{a phylo object}
-
-\item{align}{an alignment object}
+\item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
 
 \item{similarity}{similarity threshold for tree trimming}
 
@@ -25,4 +23,12 @@ Linked clades and the mutations
 }
 \description{
 Find the mutations in predicted ancestral sequence and corresponding clades
+}
+\examples{
+\dontrun{
+treeFile <- system.file("test.tree", package = "sitePath")
+alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+mutations <- ancestralMutations(matched, 0.95, "DNA")
+}
 }

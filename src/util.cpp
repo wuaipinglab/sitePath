@@ -28,13 +28,13 @@ const float TipSeqLinker::compare(TipSeqLinker *linker) {
   return match/length;
 };
 
-const vector<string> TipSeqLinker::siteComp(vector<int> &sites) {
-  vector<string> comp;
+const std::vector<std::string> TipSeqLinker::siteComp(std::vector<int> &sites) {
+  std::vector<std::string> comp;
   for (
-      vector<int>::iterator pos = sites.begin(); 
+      std::vector<int>::iterator pos = sites.begin(); 
       pos != sites.end(); pos++
   ) {
-    comp.push_back(as<string>(seq[*pos]));
+    comp.push_back(as<std::string>(seq[*pos]));
   }
   return comp;
 }
@@ -61,8 +61,8 @@ const int TipSeqLinker::getSeqLen() {
   return seq.size();
 }
 
-deque<int> TipSeqLinker::getPath() {
-  deque<int> tPath;
+std::deque<int> TipSeqLinker::getPath() {
+  std::deque<int> tPath;
   for (IntegerVector::iterator node = path.begin() + pIndex; node != path.end(); node++) {
     tPath.push_front(*node);
   }
@@ -87,18 +87,18 @@ TreeAlignmentMatch::TreeAlignmentMatch(
       root = linker->getRoot();
       seqLen = linker->getSeqLen();
     } else if (linker->getRoot() != root) {
-      throw invalid_argument("Root in tree path not equal");
+      throw std::invalid_argument("Root in tree path not equal");
     } else if (linker->getSeqLen() != seqLen) {
-      throw invalid_argument("Sequene length not equal");
+      throw std::invalid_argument("Sequene length not equal");
     }
   }
 }
 
 void TreeAlignmentMatch::setThreshold(const float sim = 0.9) {
   if (sim <= 0) {
-    throw invalid_argument("Similarity cannot be lower or equal to 0");
+    throw std::invalid_argument("Similarity cannot be lower or equal to 0");
   } else if (sim > 1) {
-    throw invalid_argument("Similarity cannot be greater than 1");
+    throw std::invalid_argument("Similarity cannot be greater than 1");
   } else {
     simCut = sim;
   }
@@ -108,9 +108,9 @@ void TreeAlignmentMatch::setSites(IntegerVector rSites = IntegerVector::create()
   sites.clear();
   for (IntegerVector::iterator site = rSites.begin(); site != rSites.end(); site++) {
     if ((*site) <= 0) {
-      throw invalid_argument("Site can't be negative");
+      throw std::invalid_argument("Site can't be negative");
     } else if ((*site) > seqLen) {
-      throw invalid_argument("Site out of index");
+      throw std::invalid_argument("Site out of index");
     } else {
       sites.push_back((*site) - 1);
     }
@@ -119,14 +119,14 @@ void TreeAlignmentMatch::setSites(IntegerVector rSites = IntegerVector::create()
 
 void TreeAlignmentMatch::pruneTree() {
   if (pruned) {
-    throw runtime_error("A tree can't be pruned twice");
+    throw std::runtime_error("A tree can't be pruned twice");
   }
   bool exist;
-  map< int, vector<TipSeqLinker*> > oldCluster;
+  std::map< int, std::vector<TipSeqLinker*> > oldCluster;
   while (true) {
     oldCluster = clusters;
     clusters.clear();
-    for (vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+    for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
       clusters[(*tsLinker)->nextClade()].push_back(*tsLinker);
     }
     if (clusters.size() == oldCluster.size()) {
@@ -134,9 +134,9 @@ void TreeAlignmentMatch::pruneTree() {
       pruned = true;
       break;
     }
-    for (map< int, vector<TipSeqLinker*> >::iterator it = clusters.begin(); it != clusters.end(); it++) {
+    for (std::map< int, std::vector<TipSeqLinker*> >::iterator it = clusters.begin(); it != clusters.end(); it++) {
       exist = false;
-      for (map< int, vector<TipSeqLinker*> >::iterator it2 = oldCluster.begin(); it2 != oldCluster.end(); it2++) {
+      for (std::map< int, std::vector<TipSeqLinker*> >::iterator it2 = oldCluster.begin(); it2 != oldCluster.end(); it2++) {
         if (it->second == it2->second) {
           exist = true;
           oldCluster.erase(it2);
@@ -144,7 +144,7 @@ void TreeAlignmentMatch::pruneTree() {
         }
       }
       if (!exist && qualified(it->second)) {
-        for (vector<TipSeqLinker*>::iterator tsLinker = it->second.begin(); tsLinker != it->second.end(); tsLinker++) {
+        for (std::vector<TipSeqLinker*>::iterator tsLinker = it->second.begin(); tsLinker != it->second.end(); tsLinker++) {
           (*tsLinker)->proceed();
         }
       }
@@ -152,15 +152,15 @@ void TreeAlignmentMatch::pruneTree() {
   }
 }
 
-const bool TreeAlignmentMatch::qualified(vector<TipSeqLinker*> &clstr) {
+const bool TreeAlignmentMatch::qualified(std::vector<TipSeqLinker*> &clstr) {
   float sim;
-  vector<string> qComp, sComp;
-  pair<int, int> pairing;
-  for (vector<TipSeqLinker*>::iterator tsLinker = clstr.begin(); tsLinker != clstr.end(); tsLinker++) {
+  std::vector<std::string> qComp, sComp;
+  std::pair<int, int> pairing;
+  for (std::vector<TipSeqLinker*>::iterator tsLinker = clstr.begin(); tsLinker != clstr.end(); tsLinker++) {
     qComp = (*tsLinker)->siteComp(sites);
-    for (vector<TipSeqLinker*>::iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
+    for (std::vector<TipSeqLinker*>::iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
       sComp = (*tsLinker2)->siteComp(sites);
-      pairing = make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
+      pairing = std::make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
       if (compared.find(pairing) != compared.end()) {
         sim = compared[pairing];
       } else {

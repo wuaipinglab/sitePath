@@ -29,13 +29,27 @@ readTreeAlign <- function(
 
 #' @title Group Tips
 #' @description Group tree tips by their sequence similarity
-#' @param tree a phylo object
-#' @param align an alignment object
+#' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
 #' @param similarity similarity threshold for tree trimming
 #' @return grouping of tips
 #' @export
+#' @examples
+#' \dontrun{
+#' treeFile <- system.file("test.tree", package = "sitePath")
+#' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+#' matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+#' grouping <- groupTips(matched, 0.95)
+#' }
 
-groupTips <- function(tree, align, similarity) {
+groupTips <- function(treeAlignMatch, similarity) {
+  return(group(
+    treeAlignMatch$tree,
+    treeAlignMatch$align,
+    similarity
+  ))
+}
+
+group <- function(tree, align, similarity) {
   grouping <- trimTree(
     lapply(nodepath(tree), rev),
     strsplit(unlist(align$seq), "")[match(tree$tip.label, align$nam)], 
@@ -50,34 +64,41 @@ groupTips <- function(tree, align, similarity) {
 #' @title Ancestral Mutations
 #' @description 
 #' Find the mutations in predicted ancestral sequence and corresponding clades
-#' @param tree a phylo object
-#' @param align an alignment object
+#' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
 #' @param similarity similarity threshold for tree trimming
 #' @param seqType specify sequence type ("DNA", "AA")
 #' @param model substitution model for reconstruction ancestral sequence
 #' @param siteMode specify the mutational mode of return
 #' @return Linked clades and the mutations
 #' @export
+#' @examples
+#' \dontrun{
+#' treeFile <- system.file("test.tree", package = "sitePath")
+#' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+#' matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+#' mutations <- ancestralMutations(matched, 0.95, "DNA")
+#' }
 
 ancestralMutations <- function(
-  tree, align, similarity, seqType = c("DNA", "AA"),
+  treeAlignMatch, similarity, seqType = c("DNA", "AA"),
   model = NULL, siteMode = c(1, 2, 3)
 ) {
-  fit <- pml(tree, as.phyDat(align, seqType))
+  fit <- pml(treeAlignMatch$tree, as.phyDat(treeAlignMatch$align, seqType))
   if (is.null(model)) {
     model <- switch (seqType, DNA = "GTR", AA = "JTT")
   }
   fit <- optim.pml(fit, model = model)
   anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
-  if (length(anc.ml) < length(tree$tip.label) + tree$Nnode) {
+  if (length(anc.ml) < max(treeAlignMatch$tree$edge[,1])) {
     stop("The tree might be unrooted yet. Use ape::root() function to root.")
   }
   alignAR <- phyDat2alignment(anc.ml)
-  return(mutationPath(
-    lapply(nodepath(tree), rev),
+  res <- mutationPath(
+    lapply(nodepath(treeAlignMatch$tree), rev),
     strsplit(alignAR$seq, ""),
     similarity, siteMode
-  ))
+  )
+  return(res)
 }
 
 #' @title Format conversion
@@ -87,9 +108,9 @@ ancestralMutations <- function(
 #' @return clade and corresponding tips
 #' @export
 
-mutations2tips <- function(tree, mutations) {
-  res <- lapply(mutations, function(m) {
-    branch2Site(tree, m)
+mutations2tips <- function(treeAlignMatch) {
+  res <- lapply(treeAlignMatch$mutations, function(m) {
+    branch2Site(treeAlignMatch$tree, m)
   })
   return(res)
 }

@@ -6,21 +6,20 @@
 #include <string>
 #include <iostream>
 #include <Rcpp.h>
-using namespace std;
 using namespace Rcpp;
 
 class TipSeqLinker {
 public:
   TipSeqLinker(CharacterVector sequence, IntegerVector tipPath);
   void proceed();
-  const vector<string> siteComp(vector<int> &sites);
+  const std::vector<std::string> siteComp(std::vector<int> &sites);
   const float compare(TipSeqLinker *linker);
   const int nextClade();
   const int currentClade();
   const int getTip();
   const int getRoot();
   const int getSeqLen();
-  deque<int> getPath();
+  std::deque<int> getPath();
 private:
   CharacterVector seq;
   IntegerVector path;
@@ -40,13 +39,13 @@ protected:
   bool pruned;
   float simCut;
   int root, seqLen;
-  vector<int> sites;
-  vector<TipSeqLinker*> linkers;
-  map< int, vector<TipSeqLinker*> > clusters;
+  std::vector<int> sites;
+  std::vector<TipSeqLinker*> linkers;
+  std::map< int, std::vector<TipSeqLinker*> > clusters;
   void pruneTree();
 private:
-  map<pair<int, int>, float> compared;
-  const bool qualified(vector<TipSeqLinker*> &clstr);
+  std::map<std::pair<int, int>, float> compared;
+  const bool qualified(std::vector<TipSeqLinker*> &clstr);
 };
 
 #endif

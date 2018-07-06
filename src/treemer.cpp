@@ -21,7 +21,7 @@ ListOf< ListOf<CharacterVector> > mutationPath(
 ) {
   SiteExplorer match(tipPaths, alignedSeqsAR);
   match.setThreshold(as<float>(similarity));
-  map< string, map< string, set<string> > > res;
+  std::map< std::string, std::map< std::string, std::set<std::string> > > res;
   for (IntegerVector::iterator m = siteMode.begin(); m != siteMode.end(); ++m) {
     switch (*m) {
     case 1: res["fixed"] = match.getSitePath(0);
@@ -30,7 +30,7 @@ ListOf< ListOf<CharacterVector> > mutationPath(
       break;
     case 3: res["coevolve"] = match.getSitePath(2);
       break;
-    default: throw invalid_argument("Invalid siteMode argument");
+    default: throw std::invalid_argument("Invalid siteMode argument");
     }
   }
   return wrap(res);

@@ -4,12 +4,10 @@
 \alias{groupTips}
 \title{Group Tips}
 \usage{
-groupTips(tree, align, similarity)
+groupTips(treeAlignMatch, similarity)
 }
 \arguments{
-\item{tree}{a phylo object}
-
-\item{align}{an alignment object}
+\item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
 
 \item{similarity}{similarity threshold for tree trimming}
 }
@@ -18,4 +16,12 @@ grouping of tips
 }
 \description{
 Group tree tips by their sequence similarity
+}
+\examples{
+\dontrun{
+treeFile <- system.file("test.tree", package = "sitePath")
+alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+grouping <- groupTips(matched, 0.95)
+}
 }

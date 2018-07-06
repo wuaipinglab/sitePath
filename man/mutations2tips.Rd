@@ -4,7 +4,7 @@
 \alias{mutations2tips}
 \title{Format conversion}
 \usage{
-mutations2tips(tree, mutations)
+mutations2tips(treeAlignMatch)
 }
 \arguments{
 \item{tree}{a phylo object}
