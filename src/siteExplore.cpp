@@ -1,5 +1,12 @@
 #include "siteExplorer.h"
 #include <algorithm>
+#include <sstream>
+
+std::string itos(int num) {
+  std::stringstream ss;
+  ss << num;
+  return ss.str();
+}
 
 SiteExplorer::SiteExplorer(
   ListOf<IntegerVector> tipPaths,
@@ -30,7 +37,7 @@ std::map< std::string, std::set<std::string> > SiteExplorer::getSitePath(int mod
           std::find(linked.begin(), linked.end(), *cNode) != linked.end() ||
             std::find(divPoints.begin(), divPoints.end(), *cNode) != divPoints.end()
       ) {
-        assumedLink = std::to_string(node) + "~" + std::to_string(*cNode);
+        assumedLink = itos(node) + "~" + itos(*cNode);
         if (linkages.find(assumedLink) == linkages.end()) {
           linkages[assumedLink].clear();
         }
@@ -94,9 +101,9 @@ void SiteExplorer::addToLinkage(
 ) {
   linked.push_back(node1);
   linked.push_back(node2);
-  linkages[std::to_string(node1) + "~" + std::to_string(node2)].insert(
+  linkages[itos(node1) + "~" + itos(node2)].insert(
       as<std::string>(ancestralSeqs[node1 - 1][siteIndex]) +
-        std::to_string(siteIndex) +
+        itos(siteIndex) +
         as<std::string>(ancestralSeqs[node2 - 1][siteIndex])
   );
 }
