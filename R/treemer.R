@@ -105,22 +105,21 @@ ancestralMutations <- function(
 
 #' @title Format conversion
 #' @description Reformat the return from \code{\link{ancestralMutations}}
-#' @param tree a phylo object
 #' @param mutations the return of \code{\link{ancestralMutations}} function
-#' @return clade and corresponding tips
+#' @return site and corresponding nodes
 #' @export
 
-mutations2tips <- function(mutations) {
+mutations2Nodes <- function(mutations) {
   res <- lapply(mutations, function(m) {
     branch2Site(attr(mutations, "tree"), m)
   })
   return(res)
 }
 
-branch2Site <- function(tree, mutations) {
+branch2Site <- function(tree, sites) {
   res <- list()
-  for (link in names(mutations)) {
-    muts <- mutations[[link]]
+  for (link in names(sites)) {
+    muts <- sites[[link]]
     if (length(muts) != 0){
       nodes <- unlist(strsplit(link, "~"))
       for (m in muts) {
@@ -138,6 +137,48 @@ branch2Site <- function(tree, mutations) {
       }
     }
   }
+  return(res)
+}
+
+#' @title Format conversion
+#' @description Reformat the return from \code{\link{ancestralMutations}}
+#' @param mutations the return of \code{\link{ancestralMutations}} function
+#' @return site and corresponding tips
+#' @export
+
+mutations2Tips <- function(mutations) {
+  tree <- attr(mutations, "tree")
+  res <- lapply(mutations, function(m) {
+    sites <- branch2Site(tree, m)
+    grouping <- lapply(sites, function(nodes) {
+      g <- list()
+      expandPath <- lapply(attr(mutations, "evolPath"), function(p) {
+        mp <- character(0)
+        for (n in seq(1, length(nodes), 2)) {
+          if (all(as.numeric(names(nodes[n:n + 1])) %in% p)) {
+            mp <- c(mp, nodes[n:n + 1])
+          }
+        }
+        return(mp)
+      })
+      g[[names(expandPath[1])]] <- setdiff(
+        tree$tip.label,
+        tree$tip.label[unlist(Descendants(
+          tree, as.numeric(expandPath[[1]]), type = "tips")
+        )]
+      )
+      for (n in seq(2, length(expandPath) - 1, 2)) {
+        pNode <- expandPath[n - 1]
+        cNode <- expandPath[n]
+        nNode <- expandPath[n + 1]
+      }
+      g[[names(expandPath[length(expandPath)])]] <- tree$tip.label[unlist(Descendants(
+        tree, as.numeric(expandPath[[length(expandPath)]]), type = "tips"
+      ))]
+      return(g)
+    })
+    return(grouping)
+  })
   return(res)
 }
 

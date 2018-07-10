@@ -9,6 +9,7 @@ Description: Find sites with evolutionary siginficance
 License: GPL (>= 2)
 Depends:
   R (>= 3.2.0),
+  igraph (>= 1.0),
   phangorn (>= 2.4.0),
   seqinr (>= 3.4-5)
 Imports:

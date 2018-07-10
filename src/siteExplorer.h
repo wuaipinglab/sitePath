@@ -9,8 +9,11 @@ public:
     ListOf<IntegerVector> tipPaths,
     ListOf<CharacterVector> alignedSeqs
   );
-  std::map< std::string, std::set<std::string> > getSitePath(int mode);
+  std::set<int> const getDivPoints();
+  std::vector< std::deque<int> > const getPath();
+  std::map< std::string, std::set<std::string> > const getSitePath(const int mode);
 private:
+  bool rootDivTrue;
   ListOf<CharacterVector> ancestralSeqs;
   std::vector< std::deque<int> > evolPath;
   std::set<int> divPoints;

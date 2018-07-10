@@ -12,7 +12,7 @@ class TipSeqLinker {
 public:
   TipSeqLinker(CharacterVector sequence, IntegerVector tipPath);
   void proceed();
-  const std::vector<std::string> siteComp(std::vector<int> &sites);
+  const std::vector<std::string> siteComp(const std::vector<int> &sites);
   const float compare(TipSeqLinker *linker);
   const int nextClade();
   const int currentClade();
@@ -24,7 +24,7 @@ private:
   CharacterVector seq;
   IntegerVector path;
   int pIndex;
-  int maxIndex;
+  const int maxIndex;
 };
 
 class TreeAlignmentMatch {
@@ -38,14 +38,14 @@ public:
 protected:
   bool pruned;
   float simCut;
-  int root, seqLen;
+  const int root, seqLen;
   std::vector<int> sites;
   std::vector<TipSeqLinker*> linkers;
   std::map< int, std::vector<TipSeqLinker*> > clusters;
   void pruneTree();
 private:
   std::map<std::pair<int, int>, float> compared;
-  const bool qualified(std::vector<TipSeqLinker*> &clstr);
+  const bool qualified(const std::vector<TipSeqLinker*> &clstr);
 };
 
 #endif

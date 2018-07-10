@@ -3,10 +3,7 @@
 TipSeqLinker::TipSeqLinker(
   CharacterVector sequence,
   IntegerVector tipPath
-) {
-  seq = sequence;
-  path = tipPath;
-  maxIndex = tipPath.size() - 1;
+): seq(sequence), path(tipPath), maxIndex(tipPath.size() - 1) {
   pIndex = 0;
 }
 
@@ -28,10 +25,10 @@ const float TipSeqLinker::compare(TipSeqLinker *linker) {
   return match/length;
 };
 
-const std::vector<std::string> TipSeqLinker::siteComp(std::vector<int> &sites) {
+const std::vector<std::string> TipSeqLinker::siteComp(const std::vector<int> &sites) {
   std::vector<std::string> comp;
   for (
-      std::vector<int>::iterator pos = sites.begin(); 
+      std::vector<int>::const_iterator pos = sites.begin(); 
       pos != sites.end(); pos++
   ) {
     comp.push_back(as<std::string>(seq[*pos]));
@@ -72,21 +69,15 @@ std::deque<int> TipSeqLinker::getPath() {
 TreeAlignmentMatch::TreeAlignmentMatch(
   ListOf<IntegerVector> tipPaths, 
   ListOf<CharacterVector> alignedSeqs
-) {
+): root(*(tipPaths[0].end() - 1)), seqLen(alignedSeqs[0].size()) {
   TipSeqLinker *linker;
   simCut = 0.9;
   pruned = false;
   for (int i = 0; i < tipPaths.size(); i++) {
-    linker = new TipSeqLinker(
-      alignedSeqs[i],
-                 tipPaths[i]
-    );
+    linker = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
     linkers.push_back(linker);
     clusters[linker->getTip()].push_back(linker);
-    if (i == 0) {
-      root = linker->getRoot();
-      seqLen = linker->getSeqLen();
-    } else if (linker->getRoot() != root) {
+    if (linker->getRoot() != root) {
       throw std::invalid_argument("Root in tree path not equal");
     } else if (linker->getSeqLen() != seqLen) {
       throw std::invalid_argument("Sequene length not equal");
@@ -152,13 +143,13 @@ void TreeAlignmentMatch::pruneTree() {
   }
 }
 
-const bool TreeAlignmentMatch::qualified(std::vector<TipSeqLinker*> &clstr) {
+const bool TreeAlignmentMatch::qualified(const std::vector<TipSeqLinker*> &clstr) {
   float sim;
   std::vector<std::string> qComp, sComp;
   std::pair<int, int> pairing;
-  for (std::vector<TipSeqLinker*>::iterator tsLinker = clstr.begin(); tsLinker != clstr.end(); tsLinker++) {
+  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = clstr.begin(); tsLinker != clstr.end(); tsLinker++) {
     qComp = (*tsLinker)->siteComp(sites);
-    for (std::vector<TipSeqLinker*>::iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
+    for (std::vector<TipSeqLinker*>::const_iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
       sComp = (*tsLinker2)->siteComp(sites);
       pairing = std::make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
       if (compared.find(pairing) != compared.end()) {
