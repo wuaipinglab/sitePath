@@ -35,7 +35,7 @@ ListOf< ListOf<CharacterVector> > mutationPath(
   }
   List res = wrap(sitePath);
   res.attr("class") = "phyloMutations";
-  res.attr("divPoints") = wrap(match.getDivPoints());
   res.attr("evolPath") = wrap(match.getPath());
+  res.attr("divPoints") = wrap(match.getDivPoints());
   return res;
 }

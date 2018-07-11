@@ -18,15 +18,6 @@ SiteExplorer::SiteExplorer(
 
 std::vector< std::deque<int> > const SiteExplorer::getPath() {
   if (!pruned) {getEvolPath();}
-  // std::vector< std::deque<int> > filteredPath = evolPath;
-  // for (pathIter p = filteredPath.begin(); p != filteredPath.end(); p++) {
-  //   for (std::deque<int>::iterator n = p->begin(); n != p->end(); n++) {
-  //     if (divPoints.find(*n) != divPoints.end()) {
-  //       p->erase(n);
-  //     }
-  //   }
-  //   p->push_front(root);
-  // }
   return evolPath;
 }
 

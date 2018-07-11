@@ -37,7 +37,7 @@ readTreeAlign <- function(
 #' \dontrun{
 #' treeFile <- system.file("test.tree", package = "sitePath")
 #' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-#' matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+#' matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
 #' grouping <- groupTips(matched, 0.95)
 #' }
 
@@ -76,8 +76,8 @@ group <- function(tree, align, similarity) {
 #' \dontrun{
 #' treeFile <- system.file("test.tree", package = "sitePath")
 #' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-#' matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
-#' mutations <- ancestralMutations(matched, 0.95, "DNA")
+#' matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+#' mutations <- ancestralMutations(matched, 0.95, "AA")
 #' }
 
 ancestralMutations <- function(
@@ -110,8 +110,9 @@ ancestralMutations <- function(
 #' @export
 
 mutations2Nodes <- function(mutations) {
-  res <- lapply(mutations, function(m) {
-    branch2Site(attr(mutations, "tree"), m)
+  res <- lapply(mutations, function(sites) {
+    linksAsList <- branch2Site(attr(mutations, "tree"), sites)
+    return(lapply(linksAsList, unlist))
   })
   return(res)
 }
@@ -130,9 +131,9 @@ branch2Site <- function(tree, sites) {
         alleles <- c(mfrom, mto)
         names(alleles) <- nodes
         if (length(res[[pos]]) == 0) {
-          res[[pos]] <- alleles
+          res[[pos]] <- list(alleles)
         } else {
-          res[[pos]] <- c(res[[pos]], alleles)
+          res[[pos]] <- c(res[[pos]], list(alleles))
         }
       }
     }
@@ -148,36 +149,49 @@ branch2Site <- function(tree, sites) {
 
 mutations2Tips <- function(mutations) {
   tree <- attr(mutations, "tree")
-  res <- lapply(mutations, function(m) {
-    sites <- branch2Site(tree, m)
-    grouping <- lapply(sites, function(nodes) {
-      g <- list()
-      expandPath <- lapply(attr(mutations, "evolPath"), function(p) {
-        mp <- character(0)
-        for (n in seq(1, length(nodes), 2)) {
-          if (all(as.numeric(names(nodes[n:n + 1])) %in% p)) {
-            mp <- c(mp, nodes[n:n + 1])
+  root <- getRoot(tree)
+  endNodes <- sapply(attr(mutations, "evolPath"), function(ep) {
+    return(ep[length(ep)])
+  })
+  res <- lapply(mutations, function(sites) {
+    groupings <- lapply(branch2Site(tree, sites), function(linkList) {
+      links <- unlist(linkList)
+      nodes <- as.integer(names(links))
+      keepTos <- c(nodes[seq(1, length(links) - 1, 2)], endNodes)
+      segPath <- list()
+      for (keepTo in keepTos) {
+        segPath <- c(segPath, list(nodepath(tree, root, keepTo)))
+        for (m in seq(2, length(links), 2)) {
+          keepFrom <- nodes[m]
+          segPath <- c(segPath, list(nodepath(tree, keepFrom, keepTo)))
+        }
+      }
+      allSegPoint <- c(root, nodes, endNodes)
+      qualified <- list()
+      for (seg in segPath) {
+        if (length(intersect(allSegPoint, seg)) <= 2 && !list(seg) %in% linkList) {
+          qualified <- c(qualified, list(seg))
+        }
+      }
+      combined <- list(qualified[[1]])
+      for (seg in qualified[2:length(qualified)]) {
+        found <- FALSE
+        for (i in 1:length(combined)) {
+          g <- combined[[i]]
+          if (length(intersect(g, seg) != 0)) {
+            combined[[i]] <- union(g, seg)
+            found <- TRUE
+            break
           }
         }
-        return(mp)
-      })
-      g[[names(expandPath[1])]] <- setdiff(
-        tree$tip.label,
-        tree$tip.label[unlist(Descendants(
-          tree, as.numeric(expandPath[[1]]), type = "tips")
-        )]
-      )
-      for (n in seq(2, length(expandPath) - 1, 2)) {
-        pNode <- expandPath[n - 1]
-        cNode <- expandPath[n]
-        nNode <- expandPath[n + 1]
+        if (!found) {
+          combined <- c(combined, list(seg))
+        }
       }
-      g[[names(expandPath[length(expandPath)])]] <- tree$tip.label[unlist(Descendants(
-        tree, as.numeric(expandPath[[length(expandPath)]]), type = "tips"
-      ))]
-      return(g)
+      grouping <- list()
+      return(segPath)
     })
-    return(grouping)
+    return(groupings)
   })
   return(res)
 }
@@ -186,6 +200,14 @@ mutations2Tips <- function(mutations) {
 #' @param mutations the return of \code{\link{ancestralMutations}} function
 #' @description plot the linked clades and mutations
 #' @return NULL
+#' @examples 
+#' \dontrun{
+#' treeFile <- system.file("test.tree", package = "sitePath")
+#' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+#' matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+#' mutations <- ancestralMutations(matched, 0.95, "AA")
+#' mutations2graphviz(mutations)
+#' }
 #' @export
 
 mutations2graphviz <- function(mutations) {
@@ -203,10 +225,21 @@ mutations2graphviz <- function(mutations) {
       attrs = list(
         node = list(fillcolor = "lightblue"),
         edge = list(color = "cyan")
-        # graph = list(rankdir = "LD")
       )
     )
   }
+}
+
+#' @title Internal node plot
+#' @param mutations the return of \code{\link{ancestralMutations}} function
+#' @description plot tree with its internal numbering
+#' @return NULL
+#' @export
+
+nodePlot <- function(mutations) {
+  p <- ggtree(attr(mutations, "tree")) + 
+    geom_text2(aes(subset=!isTip, label=node), hjust=-.1)
+  return(p)
 }
 
 #' @useDynLib sitePath

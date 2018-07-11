@@ -12,3 +12,12 @@ mutations2graphviz(mutations)
 \description{
 plot the linked clades and mutations
 }
+\examples{
+\dontrun{
+treeFile <- system.file("test.tree", package = "sitePath")
+alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+mutations <- ancestralMutations(matched, 0.95, "AA")
+mutations2graphviz(mutations)
+}
+}

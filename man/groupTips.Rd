@@ -21,7 +21,7 @@ Group tree tips by their sequence similarity
 \dontrun{
 treeFile <- system.file("test.tree", package = "sitePath")
 alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
+matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
 grouping <- groupTips(matched, 0.95)
 }
 }

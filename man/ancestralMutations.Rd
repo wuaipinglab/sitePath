@@ -28,7 +28,7 @@ Find the mutations in predicted ancestral sequence and corresponding clades
 \dontrun{
 treeFile <- system.file("test.tree", package = "sitePath")
 alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-matched <- readTreeAlign(treeFile, "nexus", alignFile, "fasta")
-mutations <- ancestralMutations(matched, 0.95, "DNA")
+matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+mutations <- ancestralMutations(matched, 0.95, "AA")
 }
 }
