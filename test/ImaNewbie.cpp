@@ -8,6 +8,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 IntegerVector timesTwo() {
+  int *a = nullptr;
   std::vector<int> z;
   std::map<int, int> x;
   int y = 1;

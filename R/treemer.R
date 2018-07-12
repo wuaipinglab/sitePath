@@ -153,23 +153,27 @@ mutations2Tips <- function(mutations) {
   endNodes <- sapply(attr(mutations, "evolPath"), function(ep) {
     return(ep[length(ep)])
   })
+  pathNodes <- unlist(attr(mutations, "evolPath"))
   res <- lapply(mutations, function(sites) {
     groupings <- lapply(branch2Site(tree, sites), function(linkList) {
       links <- unlist(linkList)
+      linkList <- lapply(linkList, function(l) {
+        as.integer(names(l))
+      })
       nodes <- as.integer(names(links))
       keepTos <- c(nodes[seq(1, length(links) - 1, 2)], endNodes)
+      keepFroms <- c(nodes[seq(2, length(links), 2)], endNodes)
       segPath <- list()
       for (keepTo in keepTos) {
         segPath <- c(segPath, list(nodepath(tree, root, keepTo)))
-        for (m in seq(2, length(links), 2)) {
-          keepFrom <- nodes[m]
+        for (keepFrom in keepFroms) {
           segPath <- c(segPath, list(nodepath(tree, keepFrom, keepTo)))
         }
       }
       allSegPoint <- c(root, nodes, endNodes)
       qualified <- list()
       for (seg in segPath) {
-        if (length(intersect(allSegPoint, seg)) <= 2 && !list(seg) %in% linkList) {
+        if (length(intersect(allSegPoint, seg)) <= 2 && !list(sort(seg)) %in% linkList) {
           qualified <- c(qualified, list(seg))
         }
       }
@@ -188,8 +192,22 @@ mutations2Tips <- function(mutations) {
           combined <- c(combined, list(seg))
         }
       }
-      grouping <- list()
-      return(segPath)
+      grouping <- lapply(combined, function(seg) {
+        tips <- integer(0)
+        for (n in seg) {
+          for (child in Children(tree, n)) {
+            if (!child %in% pathNodes) {
+              if (child <= length(tree$tip.label)) {
+                tips <- c(tips, child)
+              } else {
+                tips <- c(tips, unlist(Descendants(tree, child, type = "tips")))
+              }
+            }
+          }
+        }
+        return(tree$tip.label[tips])
+      })
+      return(grouping)
     })
     return(groupings)
   })

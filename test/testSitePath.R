@@ -7,4 +7,5 @@ matched <- readTreeAlign(
 grouping <- groupTips(matched, 0.95)
 mutations <- ancestralMutations(matched, 0.95, "AA")
 nodeName <- mutations2Nodes(mutations)
+tipName <- mutations2Tips(mutations)
 mutations2graphviz(mutations)
