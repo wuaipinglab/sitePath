@@ -255,8 +255,8 @@ mutations2graphviz <- function(mutations) {
 #' @export
 
 nodePlot <- function(mutations) {
-  p <- ggtree(attr(mutations, "tree")) + 
-    geom_text2(aes(subset=!isTip, label=node), hjust=-.1)
+  p <- ggtree::ggtree(attr(mutations, "tree")) + 
+    ggtree::geom_text2(ggplot2::aes(subset=!isTip, label=node), hjust=-.1)
   return(p)
 }
 
