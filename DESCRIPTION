@@ -9,13 +9,13 @@ Description: Find sites with evolutionary siginficance
 License: GPL (>= 2)
 Depends:
   R (>= 3.2.0),
-  igraph (>= 1.0),
   phangorn (>= 2.4.0),
-  seqinr (>= 3.4-5)
+  seqinr (>= 3.4-5),
+  ggtree (>= 1.6.11),
+  Rgraphviz (>= 2.18.0)
 Imports:
   Rcpp (>= 0.12.14)
 Suggests:
-  ggtree (>= 1.6.11),
-  Rgraphviz (>= 2.18.0)
+  igraph (>= 1.0)
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
