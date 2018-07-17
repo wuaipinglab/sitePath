@@ -15,13 +15,20 @@ groupTips(treeAlignMatch, similarity)
 grouping of tips
 }
 \description{
-Group tree tips by their sequence similarity
+Group tree tips by their sequence similarity.
+The function constrains the descendants of a node within a similarity threshold.
+Similarity between two tips is derived from their multiple sequence alignment.
+The site doesn't count into total length if both are gap.
+So similarity is calculated as number of matched divided by revised total length
 }
 \examples{
 \dontrun{
 treeFile <- system.file("test.tree", package = "sitePath")
 alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta", "AA")
 grouping <- groupTips(matched, 0.95)
 }
+}
+\seealso{
+\code{\link{phyloMutations}}
 }

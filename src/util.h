@@ -23,8 +23,8 @@ public:
 private:
   CharacterVector seq;
   IntegerVector path;
-  int pIndex;
   const int maxIndex;
+  int pIndex;
 };
 
 class TreeAlignmentMatch {

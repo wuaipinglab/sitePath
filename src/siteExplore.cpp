@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <sstream>
 
-std::string itos(const int num) {
+std::string const itos(const int num) {
   std::stringstream ss;
   ss << num;
   return ss.str();
