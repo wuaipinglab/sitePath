@@ -15,6 +15,9 @@ IntegerVector timesTwo() {
   x[1] = y;
   x[3] = 4;
   x[5] = 6;
+  for (auto &i: x) {
+    std::cout << i.first << std::endl;
+  }
   return wrap(x);
 }
 

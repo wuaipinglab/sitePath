@@ -1,12 +1,10 @@
-library(sitePath)
-
 matched <- readTreeAlign(
-  system.file("test.tree", package = "sitePath"), "newick",
-  system.file("test.aligned.fasta", package = "sitePath"), "fasta"
+  system.file("m.trees", package = "sitePath"), "beast",
+  system.file("m.aligned.fasta", package = "sitePath"), "fasta",
+  "AA"
 )
 grouping <- groupTips(matched, 0.95)
-mutations <- ancestralMutations(matched, 0.95, "AA")
-nodeName <- mutations2Nodes(mutations)
-tipName <- mutations2Tips(mutations)
-mutations2graphviz(mutations)
+mutations <- phyloMutations(matched, 0.95)
+tipName <- toTips(mutations)
+plot(mutations)
 nodePlot(mutations)
