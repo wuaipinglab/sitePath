@@ -15,8 +15,8 @@ groupTips(treeAlignMatch, similarity)
 grouping of tips
 }
 \description{
-Group tree tips by their sequence similarity.
-The function constrains the descendants of a node within a similarity threshold.
+Tree tips are grouped by their sequence similarity and members in a group
+are constrained to share a same ancestral node.
 Similarity between two tips is derived from their multiple sequence alignment.
 The site doesn't count into total length if both are gap.
 So similarity is calculated as number of matched divided by revised total length

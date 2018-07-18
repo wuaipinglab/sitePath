@@ -1,7 +1,7 @@
 #' @title Group Tips
 #' @description
-#' Group tree tips by their sequence similarity.
-#' The function constrains the descendants of a node within a similarity threshold.
+#' Tree tips are grouped by their sequence similarity and members in a group
+#' are constrained to share a same ancestral node.
 #' Similarity between two tips is derived from their multiple sequence alignment.
 #' The site doesn't count into total length if both are gap.
 #' So similarity is calculated as number of matched divided by revised total length
@@ -47,7 +47,7 @@ groupTips <- function(treeAlignMatch, similarity) {
 #' @param similarity similarity threshold for tree trimming
 #' @param model substitution model for reconstruction ancestral sequence
 #' @param siteMode specify the mutational mode of return
-#' @seealso \code{\link{groupTips}}
+#' @seealso \code{\link{groupTips}}, \code{\link{pml}}
 #' @return a phyloMutations object
 #' @export
 #' @examples
@@ -59,16 +59,10 @@ groupTips <- function(treeAlignMatch, similarity) {
 #' }
 
 phyloMutations <- function(
-  treeAlignMatch, similarity, model = NULL, siteMode = c(1, 2, 3)
+  treeAlignMatch, similarity, siteMode = c(1, 2, 3), ...
 ) {
-  fit <- pml(treeAlignMatch$tree, treeAlignMatch$align)
-  if (is.null(model)) {
-    model <- switch (
-      attr(treeAlignMatch$align, "type"),
-      DNA = "GTR", AA = "JTT"
-    )
-  }
-  fit <- optim.pml(fit, model = model)
+  fit <- pml(treeAlignMatch$tree, treeAlignMatch$align, ...)
+  fit <- optim.pml(fit, ...)
   anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
   if (length(anc.ml) < max(treeAlignMatch$tree$edge[,1])) {
     stop("The tree needs to be rooted")

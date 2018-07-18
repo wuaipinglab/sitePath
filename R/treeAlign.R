@@ -20,7 +20,7 @@ readTreeAlign <- function(
     treeFormat,
     nexus = read.nexus(file = treeFile),
     newick = read.tree(file = treeFile),
-    beast = ggtree::read.beast(file = treeFile)@phylo
+    beast = treeio::read.beast(file = treeFile)@phylo
   )
   align <- read.phyDat(
     file = alignFile,
@@ -60,7 +60,11 @@ treeAlignMatch <- function(tree, align, outgroup = NULL) {
       Descendants(tree, mrChildren, type = "tips"),
       length
     ))]
-    tree <- root.phylo(tree, node = rootNode)
+    if (rootNode > length(tree$tip.label))  {
+      tree <- root.phylo(tree, node = rootNode)
+    } else {
+      tree <- unroot(tree)
+    }
   } else {
     tree <- root.phylo(tree, outgroup = outgroup)
   }

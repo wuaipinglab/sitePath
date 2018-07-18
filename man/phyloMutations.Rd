@@ -4,17 +4,16 @@
 \alias{phyloMutations}
 \title{Ancestral Mutations}
 \usage{
-phyloMutations(treeAlignMatch, similarity, model = NULL, siteMode = c(1, 2,
-  3))
+phyloMutations(treeAlignMatch, similarity, siteMode = c(1, 2, 3), ...)
 }
 \arguments{
 \item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
 
 \item{similarity}{similarity threshold for tree trimming}
 
-\item{model}{substitution model for reconstruction ancestral sequence}
-
 \item{siteMode}{specify the mutational mode of return}
+
+\item{model}{substitution model for reconstruction ancestral sequence}
 }
 \value{
 a phyloMutations object
@@ -39,5 +38,5 @@ mutations <- phyloMutations(matched, 0.95)
 }
 }
 \seealso{
-\code{\link{groupTips}}
+\code{\link{groupTips}}, \code{\link{pml}}
 }
