@@ -26,9 +26,13 @@ Common ancestral nodes of each group become the new terminals.
 The tip stays as terminal if it's the only member in the group.
 With new terminals, skeleton of the new tree describes the main evolution path.
 Mutation events that happened on the main path are collected and
+<<<<<<< HEAD
 are categorized as (alternate, coevolve, fixed). In each category is a list.
 The names are the node number where mutation detected, linked by "~" while
 the corresponding mutations are under the name.
+=======
+can be categorized as (coevolve, fixation, )
+>>>>>>> 4fc91b8988eb3242b10614652bc1ae4addd75380
 }
 \examples{
 \dontrun{
