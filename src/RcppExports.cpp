@@ -32,10 +32,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mutationList
+ListOf<CharacterVector> mutationList(ListOf<IntegerVector> tipPaths, ListOf<CharacterVector> alignedSeqsAR, NumericVector similarity);
+RcppExport SEXP _sitePath_mutationList(SEXP tipPathsSEXP, SEXP alignedSeqsARSEXP, SEXP similaritySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type tipPaths(tipPathsSEXP);
+    Rcpp::traits::input_parameter< ListOf<CharacterVector> >::type alignedSeqsAR(alignedSeqsARSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type similarity(similaritySEXP);
+    rcpp_result_gen = Rcpp::wrap(mutationList(tipPaths, alignedSeqsAR, similarity));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 3},
     {"_sitePath_mutationPath", (DL_FUNC) &_sitePath_mutationPath, 4},
+    {"_sitePath_mutationList", (DL_FUNC) &_sitePath_mutationList, 3},
     {NULL, NULL, 0}
 };
 

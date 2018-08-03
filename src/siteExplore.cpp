@@ -2,23 +2,77 @@
 #include <algorithm>
 #include <sstream>
 
-std::string const itos(const int num) {
+std::string static const itos(const int num) {
   std::stringstream ss;
   ss << num;
   return ss.str();
 }
 
+MutationExplorer::MutationExplorer(
+  ListOf<IntegerVector> tipPaths,
+  ListOf<CharacterVector> alignedSeqs
+): TreeAlignmentMatch(tipPaths, alignedSeqs), ancestralSeqs(alignedSeqs) {}
+
+std::set<int> const MutationExplorer::getDivPoints() {
+  if (simCut != 1) {
+    pruneTree();
+    std::map<std::deque<int>, int> pn;
+    for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+      pn[(*tsLinker)->getPath()]++;
+    }
+    if (pn.size() != linkers.size()) {
+      evolPath.clear();
+      for (std::map<std::deque<int>, int>::iterator vp = pn.begin(); vp != pn.end(); vp++) {
+        if (vp->first.size() != 1 && vp->second > 1) {
+          evolPath.push_back(vp->first);
+        }
+      }
+    }
+  }
+  for (std::vector< std::deque<int> >::iterator ePath = evolPath.begin(); ePath != evolPath.end() - 1; ePath++) {
+    for (std::vector< std::deque<int> >::iterator ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
+      std::deque<int>::iterator cNode, cNode2;
+      for (cNode = ePath->begin(), cNode2 = ePath2->begin(); *cNode == *cNode2; cNode++, cNode2++) {continue;}
+      if (cNode - 1 != ePath->begin()) {
+        divPoints.insert(*(cNode - 1));
+      } else {
+        rootDivTrue = true;
+      }
+    }
+  }
+  if (rootDivTrue) {
+    return divPoints;
+  } else {
+    std::set<int> noRoot = divPoints;
+    noRoot.erase(noRoot.begin());
+    return noRoot;
+  }
+}
+
+std::vector< std::set<std::string> > const MutationExplorer::getMutationList() {
+  if (pruned) {throw std::runtime_error("Retrieving full mutation list after pruning is not possible.");}
+  std::vector< std::set<std::string> > mutations(ancestralSeqs.size());
+  for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+    evolPath.push_back((*tsLinker)->getPath());
+    for (int pos = 0; pos < seqLen; pos++) {
+      std::string pSite, cSite;
+      for (std::deque<int>::iterator cNode = evolPath.back().begin(); cNode != evolPath.back().end(); cNode++) {
+        cSite = ancestralSeqs[(*cNode) - 1][pos];
+        if (!pSite.empty() && cSite != pSite) {
+          mutations[(*cNode) - 1].insert(pSite + itos(pos + 1) + cSite);
+        }
+        pSite = cSite;
+      }
+    }
+  }
+  return mutations;
+}
+
 SiteExplorer::SiteExplorer(
   ListOf<IntegerVector> tipPaths,
   ListOf<CharacterVector> alignedSeqs
-): TreeAlignmentMatch(tipPaths, alignedSeqs), ancestralSeqs(alignedSeqs) {
+): TreeAlignmentMatch(tipPaths, alignedSeqs), ancestralSeqs(alignedSeqs), rootDivTrue(false) {
   divPoints.insert(root);
-  rootDivTrue = false;
-}
-
-std::vector< std::deque<int> > const SiteExplorer::getPath() {
-  if (!pruned) {getEvolPath();}
-  return evolPath;
 }
 
 std::set<int> const SiteExplorer::getDivPoints(){
@@ -30,6 +84,11 @@ std::set<int> const SiteExplorer::getDivPoints(){
     noRoot.erase(noRoot.begin());
     return noRoot;
   }
+}
+
+std::vector< std::deque<int> > const SiteExplorer::getPath() {
+  if (!pruned) {getEvolPath();}
+  return evolPath;
 }
 
 std::map< std::string, std::set<std::string> > const SiteExplorer::getSitePath(const int mode) {
@@ -46,7 +105,7 @@ std::map< std::string, std::set<std::string> > const SiteExplorer::getSitePath(c
   }
   int node;
   std::string assumedLink;
-  for (pathIter ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
+  for (std::vector< std::deque<int> >::iterator ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
     node = root;
     for (std::deque<int>::iterator cNode = ePath->begin() + 1; cNode != ePath->end(); cNode++) {
       if (
@@ -68,7 +127,7 @@ void SiteExplorer::fixedMutationFilter(
     std::vector<int> &linked,
     std::map< std::string, std::set<std::string> > &linkages
 ) {
-  for (modeIter p = mutNodes.begin(); p != mutNodes.end(); p++) {
+  for (std::map< int, std::set< std::pair<int, int> > >::iterator p = mutNodes.begin(); p != mutNodes.end(); p++) {
     if (p->second.size() == 1) {
       addToLinkage(
         linked, linkages,
@@ -99,7 +158,7 @@ void SiteExplorer::nonFixedFilter(
     std::vector<int> &linked,
     std::map< std::string, std::set<std::string> > &linkages
 ) {
-  for (modeIter p = mutNodes.begin(); p != mutNodes.end(); p++) {
+  for (std::map< int, std::set< std::pair<int, int> > >::iterator p = mutNodes.begin(); p != mutNodes.end(); p++) {
     if (p->second.size() > 1 && allele[p->first].size() == 2) {
       for (std::set< std::pair<int, int> >::iterator l = p->second.begin(); l != p->second.end(); l++) {
         addToLinkage(linked, linkages, l->first, l->second, p->first);
@@ -143,8 +202,8 @@ void SiteExplorer::getEvolPath() {
       }
     }
   }
-  for (pathIter ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
-    for (pathIter ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
+  for (std::vector< std::deque<int> >::iterator ePath = evolPath.begin(); ePath != evolPath.end(); ePath++) {
+    for (std::vector< std::deque<int> >::iterator ePath2 = ePath + 1; ePath2 != evolPath.end(); ePath2++) {
       std::deque<int>::iterator cNode, cNode2;
       for (cNode = ePath->begin(), cNode2 = ePath2->begin(); *cNode == *cNode2; cNode++, cNode2++) {continue;}
       if (cNode - 1 != ePath->begin()) {

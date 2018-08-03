@@ -34,8 +34,20 @@ ListOf< ListOf<CharacterVector> > mutationPath(
     }
   }
   List res = wrap(sitePath);
-  res.attr("class") = "phyloMutations";
   res.attr("evolPath") = wrap(match.getPath());
+  res.attr("divPoints") = wrap(match.getDivPoints());
+  return res;
+}
+
+// [[Rcpp::export]]
+ListOf<CharacterVector> mutationList(
+    ListOf<IntegerVector> tipPaths,
+    ListOf<CharacterVector> alignedSeqsAR,
+    NumericVector similarity
+) {
+  MutationExplorer match(tipPaths, alignedSeqsAR);
+  match.setThreshold(as<float>(similarity));
+  List res = wrap(match.getMutationList());
   res.attr("divPoints") = wrap(match.getDivPoints());
   return res;
 }

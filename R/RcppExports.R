@@ -9,3 +9,7 @@ mutationPath <- function(tipPaths, alignedSeqsAR, similarity, siteMode) {
     .Call('_sitePath_mutationPath', PACKAGE = 'sitePath', tipPaths, alignedSeqsAR, similarity, siteMode)
 }
 
+mutationList <- function(tipPaths, alignedSeqsAR, similarity) {
+    .Call('_sitePath_mutationList', PACKAGE = 'sitePath', tipPaths, alignedSeqsAR, similarity)
+}
+

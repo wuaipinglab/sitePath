@@ -20,6 +20,7 @@ public:
   const int getRoot();
   const int getSeqLen();
   std::deque<int> getPath();
+  std::deque<int> getFullPath();
 private:
   CharacterVector seq;
   IntegerVector path;

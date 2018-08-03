@@ -51,9 +51,11 @@ const int TipSeqLinker::currentClade() {
 const int TipSeqLinker::getTip() {
   return path[0];
 }
+
 const int TipSeqLinker::getRoot() {
   return path[maxIndex];
 }
+
 const int TipSeqLinker::getSeqLen() {
   return seq.size();
 }

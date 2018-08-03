@@ -11,8 +11,7 @@
 #' plot(mutations)
 #' }
 #' @export
-
-plot.phyloMutations <- function(mutations) {
+mutationMap <- function(mutations) {
   for (name in names(mutations)) {
     edges <- strsplit(names(mutations[[name]]), "~")
     g <- graph::graphNEL(nodes = unique(unlist(edges)), edgemode = "directed")
@@ -37,7 +36,6 @@ plot.phyloMutations <- function(mutations) {
 #' @description plot tree with its internal numbering
 #' @return NULL
 #' @export
-
 nodePlot <- function(mutations) {
   p <- ggtree::ggtree(attr(mutations, "tree")) + 
     ggtree::geom_text2(ggplot2::aes(subset=!isTip, label=node), hjust=-.1)

@@ -6,14 +6,16 @@
 #' @seealso \code{\link{toTips}}
 #' @return site and corresponding nodes
 #' @export
-
-toNodes <- function(mutations) {
+toNodes.phyloMutations <- function(mutations) {
   res <- lapply(mutations, function(sites) {
     linksAsList <- branch2Site(attr(mutations, "tree"), sites)
     return(lapply(linksAsList, unlist))
   })
   return(res)
 }
+
+#' @export
+toNodes <- function(x, ...) UseMethod("toNodes")
 
 branch2Site <- function(tree, sites) {
   res <- list()
@@ -48,8 +50,7 @@ branch2Site <- function(tree, sites) {
 #' @param mutations A \code{\link{phyloMutations}} object
 #' @return site and corresponding tips
 #' @export
-
-toTips <- function(mutations) {
+toTips.phyloMutations <- function(mutations) {
   tree <- attr(mutations, "tree")
   root <- getRoot(tree)
   endNodes <- sapply(attr(mutations, "evolPath"), function(ep) {
@@ -114,4 +115,24 @@ toTips <- function(mutations) {
     return(groupings)
   })
   return(res)
+}
+
+#' @export
+toTips <- function(x, ...) UseMethod("toTips")
+
+#' @title Plot mutation
+#' @param mutations the return of \code{\link{phyloMutations}} function
+#' @description plot the tree annotated with mutation
+#' @return NULL
+#' @examples 
+#' \dontrun{
+#' treeFile <- system.file("test.tree", package = "sitePath")
+#' alignFile <- system.file("test.aligned.fasta", package = "sitePath")
+#' matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta")
+#' mutations <- phyloMutations(matched, 0.95, "AA")
+#' plot(mutations)
+#' }
+#' @export
+plot.phyloMutations <- function(mutations, site) {
+  
 }

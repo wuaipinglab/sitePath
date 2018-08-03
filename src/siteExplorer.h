@@ -1,9 +1,22 @@
 #include "util.h"
 #include <set>
 
+class MutationExplorer: public TreeAlignmentMatch {
+public:
+  MutationExplorer(
+    ListOf<IntegerVector> tipPaths,
+    ListOf<CharacterVector> alignedSeqs
+  );
+  std::set<int> const getDivPoints();
+  std::vector< std::set<std::string> > const getMutationList();
+private:
+  bool rootDivTrue;
+  std::set<int> divPoints;
+  ListOf<CharacterVector> ancestralSeqs;
+  std::vector< std::deque<int> > evolPath;
+};
+
 class SiteExplorer: public TreeAlignmentMatch {
-  typedef std::vector< std::deque<int> >::iterator pathIter;
-  typedef std::map< int, std::set< std::pair<int, int> > >::iterator modeIter;
 public:
   SiteExplorer(
     ListOf<IntegerVector> tipPaths,

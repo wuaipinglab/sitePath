@@ -10,7 +10,6 @@
 #' @param outgroup The name of tree outgroup in order to root tree
 #' @return a \code{\link{treeAlignMatch}} object
 #' @export
-
 readTreeAlign <- function(
   treeFile, treeFormat = c("nexus", "newick", "beast"),
   alignFile, alignFormat = c("fasta", "clustal", "phylip", "mase", "msf"),
@@ -45,7 +44,6 @@ readTreeAlign <- function(
 #' If \code{outgroup == NULL}, the \code{midpoint} tree will be used.
 #' @return a treeAlignMatch object 
 #' @export
-
 treeAlignMatch <- function(tree, align, outgroup = NULL) {
   if (!is(tree, "phylo")) {
     stop("tree is not a phylo object")
@@ -72,4 +70,10 @@ treeAlignMatch <- function(tree, align, outgroup = NULL) {
     list(tree = tree, align = subset(align, tree$tip.label)), 
     class = "treeAlignMatch"
   ))
+}
+
+#' @export
+print.treeAlignMatch <- function(matched) {
+  print(matched$align)
+  print(matched$tree)
 }

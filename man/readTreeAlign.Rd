@@ -4,9 +4,9 @@
 \alias{readTreeAlign}
 \title{Tree and Alignment}
 \usage{
-readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"), alignFile,
-  alignFormat = c("fasta", "clustal", "phylip", "mase", "msf"),
-  seqType = c("DNA", "AA"), outgroup = NULL)
+readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"),
+  alignFile, alignFormat = c("fasta", "clustal", "phylip", "mase",
+  "msf"), seqType = c("DNA", "AA"), outgroup = NULL)
 }
 \arguments{
 \item{treeFile}{Path to the file stored phylogenetic tree}

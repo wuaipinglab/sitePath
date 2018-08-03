@@ -2,7 +2,7 @@
 % Please edit documentation in R/treemer.R
 \name{phyloMutations}
 \alias{phyloMutations}
-\title{Ancestral Mutations}
+\title{Predicted mutations on main path}
 \usage{
 phyloMutations(treeAlignMatch, similarity, siteMode = c(1, 2, 3), ...)
 }
@@ -27,15 +27,7 @@ With new terminals, skeleton of the new tree describes the main evolution path.
 Mutation events that happened on the main path are collected and
 are categorized as (alternate, coevolve, fixed). In each category is a list.
 The names are the node number where mutation detected, linked by "~" while
-the corresponding mutations are under the name.
-}
-\examples{
-\dontrun{
-treeFile <- system.file("test.tree", package = "sitePath")
-alignFile <- system.file("test.aligned.fasta", package = "sitePath")
-matched <- readTreeAlign(treeFile, "newick", alignFile, "fasta", "AA")
-mutations <- phyloMutations(matched, 0.95)
-}
+the corresponding mutations are under each name.
 }
 \seealso{
 \code{\link{groupTips}}, \code{\link{pml}}
