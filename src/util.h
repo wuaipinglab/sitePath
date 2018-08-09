@@ -1,51 +1,46 @@
-#ifndef TIL_H
-#define TIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <map>
-#include <deque>
 #include <string>
 #include <iostream>
 #include <Rcpp.h>
+
 using namespace Rcpp;
 
 class TipSeqLinker {
 public:
   TipSeqLinker(CharacterVector sequence, IntegerVector tipPath);
   void proceed();
-  const std::vector<std::string> siteComp(const std::vector<int> &sites);
   const float compare(TipSeqLinker *linker);
   const int nextClade();
   const int currentClade();
   const int getTip();
   const int getRoot();
   const int getSeqLen();
-  std::deque<int> getPath();
-  std::deque<int> getFullPath();
+  IntegerVector getPath();
 private:
-  CharacterVector seq;
+  std::string seq;
   IntegerVector path;
-  const int maxIndex;
-  int pIndex;
+  const int tipIndex;
+  int cIndex;
 };
 
 class TreeAlignmentMatch {
 public:
   TreeAlignmentMatch(
     ListOf<IntegerVector> tipPaths, 
-    ListOf<CharacterVector> alignedSeqs
+    ListOf<CharacterVector> alignedSeqs,
+    const float simThreshold
   );
-  void setThreshold(const float sim);
-  void setSites(IntegerVector rSites);
 protected:
-  bool pruned;
-  float simCut;
+  const float simCut;
   const int root, seqLen;
-  std::vector<int> sites;
   std::vector<TipSeqLinker*> linkers;
   std::map< int, std::vector<TipSeqLinker*> > clusters;
-  void pruneTree();
 private:
   std::map<std::pair<int, int>, float> compared;
+  void pruneTree();
   const bool qualified(const std::vector<TipSeqLinker*> &clstr);
 };
 

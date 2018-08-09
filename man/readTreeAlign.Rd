@@ -6,7 +6,7 @@
 \usage{
 readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"),
   alignFile, alignFormat = c("fasta", "clustal", "phylip", "mase",
-  "msf"), seqType = c("DNA", "AA"), outgroup = NULL)
+  "msf"), seqType = c("DNA", "AA"))
 }
 \arguments{
 \item{treeFile}{Path to the file stored phylogenetic tree}
@@ -18,8 +18,6 @@ readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"),
 \item{alignFormat}{Specify alignment format ("fasta", "clustal", "phylip", "mase", "msf")}
 
 \item{seqType}{Sequence type ("DNA", "AA")}
-
-\item{outgroup}{The name of tree outgroup in order to root tree}
 }
 \value{
 a \code{\link{treeAlignMatch}} object

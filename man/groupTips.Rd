@@ -4,7 +4,7 @@
 \alias{groupTips}
 \title{Group Tips}
 \usage{
-groupTips(treeAlignMatch, similarity)
+groupTips(treeAlignMatch, similarity, tipnames = TRUE)
 }
 \arguments{
 \item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
@@ -20,7 +20,4 @@ are constrained to share a same ancestral node.
 Similarity between two tips is derived from their multiple sequence alignment.
 The site doesn't count into total length if both are gap.
 So similarity is calculated as number of matched divided by revised total length
-}
-\seealso{
-\code{\link{phyloMutations}}
 }

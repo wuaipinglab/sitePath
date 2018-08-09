@@ -1,53 +1,35 @@
 #include "pruner.h"
-#include "siteExplorer.h"
 
 // [[Rcpp::export]]
-ListOf<IntegerVector> trimTree(
+SEXP trimTree(
     ListOf<IntegerVector> tipPaths, 
     ListOf<CharacterVector> alignedSeqs,
-    NumericVector similarity
+    NumericVector similarity,
+    LogicalVector getTips
 ) {
-  Pruner match(tipPaths, alignedSeqs);
-  match.setThreshold(as<float>(similarity));
-  return wrap(match.groupTips());
+  Pruner match(tipPaths, alignedSeqs, as<float>(similarity));
+  if (as<bool>(getTips)) {
+    return wrap(match.getTips());
+  } else {
+    return wrap(match.getPaths());
+  }
 }
 
 // [[Rcpp::export]]
-ListOf< ListOf<CharacterVector> > mutationPath(
-    ListOf<IntegerVector> tipPaths,
-    ListOf<CharacterVector> alignedSeqsAR,
-    NumericVector similarity,
-    IntegerVector siteMode
-) {
-  SiteExplorer match(tipPaths, alignedSeqsAR);
-  match.setThreshold(as<float>(similarity));
-  std::map< std::string, std::map< std::string, std::set<std::string> > > sitePath;
-  for (IntegerVector::iterator m = siteMode.begin(); m != siteMode.end(); ++m) {
-    switch (*m) {
-    case 1: sitePath["fixed"] = match.getSitePath(0);
-      break;
-    case 2: sitePath["alternate"] = match.getSitePath(1);
-      break;
-    case 3: sitePath["coevolve"] = match.getSitePath(2);
-      break;
-    default: throw std::invalid_argument("Invalid siteMode argument");
+ListOf<IntegerVector> divergentNode(ListOf<IntegerVector> paths) {
+  std::vector<IntegerVector> divPoints;
+  for (int i = 0; i < paths.size() - 1; i++) {
+    IntegerVector query = paths[i];
+    for (int j = i + 1; j < paths.size(); j++) {
+      IntegerVector subject = paths[j];
+      IntegerVector::iterator q, s;
+      for (q = query.begin(), s = subject.begin(); *q == *s; q++, s++) {
+        continue;
+      }
+      if (q - 1 != query.begin()) {
+        divPoints.push_back(IntegerVector(query.begin(), q));
+      }
     }
   }
-  List res = wrap(sitePath);
-  res.attr("evolPath") = wrap(match.getPath());
-  res.attr("divPoints") = wrap(match.getDivPoints());
-  return res;
-}
-
-// [[Rcpp::export]]
-ListOf<CharacterVector> mutationList(
-    ListOf<IntegerVector> tipPaths,
-    ListOf<CharacterVector> alignedSeqsAR,
-    NumericVector similarity
-) {
-  MutationExplorer match(tipPaths, alignedSeqsAR);
-  match.setThreshold(as<float>(similarity));
-  List res = wrap(match.getMutationList());
-  res.attr("divPoints") = wrap(match.getDivPoints());
-  return res;
+  return wrap(divPoints);
 }

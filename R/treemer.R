@@ -11,94 +11,39 @@ NULL
 #' So similarity is calculated as number of matched divided by revised total length
 #' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
 #' @param similarity similarity threshold for tree trimming
-#' @seealso \code{\link{phyloMutations}}
 #' @return grouping of tips
 #' @export
-groupTips <- function(treeAlignMatch, similarity) {
-  align <- phyDat2alignment(treeAlignMatch$align)
+groupTips <- function(treeAlignMatch, similarity, tipnames = TRUE) {
   grouping <- trimTree(
-    lapply(nodepath(treeAlignMatch$tree), rev),
-    strsplit(align$seq, ""), 
-    similarity
+    ape::nodepath(treeAlignMatch$tree),
+    treeAlignMatch$align$seq,
+    similarity, TRUE
   )
-  res <- lapply(grouping, function(g) {
-    return(treeAlignMatch$tree$tip.label[g])
-  })
-  attr(res, "tree") <- treeAlignMatch$tree
-  return(res)
+  if (tipnames) {
+    return(lapply(grouping, function(g) {
+      treeAlignMatch$tree$tip.label[g]
+    }))
+  } else {
+    return(grouping)
+  }
 }
 
-#' @title Predicted mutations on nodes
+#' @title Get sitePath
 #' @description 
 #' Under development
 #' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
 #' @param similarity similarity threshold for tree trimming
-#' @return an ancestralMutation object
+#' @return path represent by tip names
 #' @export
-ancestralMutations <- function(treeAlignMatch, similarity, ...) {
-  fit <- pml(treeAlignMatch$tree, treeAlignMatch$align, ...)
-  fit <- optim.pml(fit, ...)
-  anc.ml <- ancestral.pml(fit, return = "phyDat", ...)
-  if (length(anc.ml) < max(treeAlignMatch$tree$edge[,1])) {
-    stop("The tree needs to be rooted")
-  }
-  alignAR <- phyDat2alignment(anc.ml)
-  res <- mutationList(
-    lapply(nodepath(treeAlignMatch$tree), rev),
-    strsplit(alignAR$seq, ""), similarity
+getSitePath <- function(treeAlignMatch, similarity) {
+  paths <- trimTree(
+    ape::nodepath(treeAlignMatch$tree),
+    treeAlignMatch$align$seq,
+    similarity, FALSE
   )
-  attr(res, "tree") <- treeAlignMatch$tree
-  attr(res, "class") <- "ancestralMutations"
-  return(res)
-}
-
-#' @export
-print.ancestralMutations <- function(mutations) {
-  cat(sum(lengths(mutations)), "mutations on", length(mutations), "nodes.")
-}
-
-#' @export
-
-
-#' @title Predicted mutations on main path
-#' @description
-#' Sequence of each anchestral node is predict by \code{phangorn}.
-#' The tips are grouping by similarity in the same way as \code{\link{groupTips}} does.
-#' Common ancestral nodes of each group become the new terminals.
-#' The tip stays as terminal if it's the only member in the group.
-#' With new terminals, skeleton of the new tree describes the main evolution path.
-#' Mutation events that happened on the main path are collected and
-#' are categorized as (alternate, coevolve, fixed). In each category is a list.
-#' The names are the node number where mutation detected, linked by "~" while
-#' the corresponding mutations are under each name.
-#' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
-#' @param similarity similarity threshold for tree trimming
-#' @param model substitution model for reconstruction ancestral sequence
-#' @param siteMode specify the mutational mode of return
-#' @seealso \code{\link{groupTips}}, \code{\link{pml}}
-#' @return a phyloMutations object
-#' @export
-phyloMutations <- function(
-  treeAlignMatch, similarity, siteMode = c(1, 2, 3), ...
-) {
-  fit <- pml(treeAlignMatch$tree, treeAlignMatch$align, ...)
-  fit <- optim.pml(fit, ...)
-  anc.ml <- ancestral.pml(fit, type = "ml", return = "phyDat")
-  if (length(anc.ml) < max(treeAlignMatch$tree$edge[,1])) {
-    stop("The tree needs to be rooted")
-  }
-  alignAR <- phyDat2alignment(anc.ml)
-  res <- mutationPath(
-    lapply(nodepath(treeAlignMatch$tree), rev),
-    strsplit(alignAR$seq, ""), similarity, siteMode
-  )
-  attr(res, "tree") <- treeAlignMatch$tree
-  attr(res, "class") <- "phyloMutations"
-  return(res)
-}
-
-#' @export
-print.phyloMutations <- function(mutations) {
-  cat("Mutation mode(s):", paste(names(mutations), collapse = ", "), "\n")
-  print(attr(mutations, "tree"))
+  paths <- lapply(unique(paths), function(p) p[1:(length(p) - 1)])
+  paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
+  paths <- unique(divergentNode(paths))
+  endNodes <- sapply(paths, tail, 1)
+  return(paths)
 }

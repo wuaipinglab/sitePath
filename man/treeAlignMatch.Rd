@@ -4,15 +4,12 @@
 \alias{treeAlignMatch}
 \title{Tree and Alignment}
 \usage{
-treeAlignMatch(tree, align, outgroup = NULL)
+treeAlignMatch(tree, align)
 }
 \arguments{
 \item{tree}{an object of \code{phylo}}
 
 \item{align}{an object of \code{phyDat}}
-
-\item{outgroup}{The name of tree outgroup to root tree. 
-If \code{outgroup == NULL}, the \code{midpoint} tree will be used.}
 }
 \value{
 a treeAlignMatch object
