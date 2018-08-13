@@ -16,20 +16,29 @@ SEXP trimTree(
 }
 
 // [[Rcpp::export]]
-ListOf<IntegerVector> divergentNode(ListOf<IntegerVector> paths) {
-  std::vector<IntegerVector> divPoints;
+IntegerVector terminalNode(ListOf<IntegerVector> paths) {
+  std::map<int, int> res;
+  for (int i = 0; i < paths.size(); i++) {
+    if (res.find(paths[i].end()[-2]) == res.end()) {
+      res[paths[i].end()[-2]] = paths[i].end()[-1];
+    } else {
+      res[paths[i].end()[-2]] = paths[i].end()[-2];
+    }
+  }
+  return wrap(res);
+}
+
+// [[Rcpp::export]]
+ListOf<IntegerVector> pathBeforeDivergence(ListOf<IntegerVector> paths) {
+  std::vector<IntegerVector> res;
   for (int i = 0; i < paths.size() - 1; i++) {
-    IntegerVector query = paths[i];
     for (int j = i + 1; j < paths.size(); j++) {
-      IntegerVector subject = paths[j];
-      IntegerVector::iterator q, s;
-      for (q = query.begin(), s = subject.begin(); *q == *s; q++, s++) {
-        continue;
-      }
-      if (q - 1 != query.begin()) {
-        divPoints.push_back(IntegerVector(query.begin(), q));
+      IntegerVector::iterator q  = paths[i].begin(), s = paths[j].begin();
+      while (*q == *s) {q++, s++;}
+      if (q - 1 != paths[i].begin()) {
+        res.push_back(IntegerVector(paths[i].begin(), q));
       }
     }
   }
-  return wrap(divPoints);
+  return wrap(res);
 }

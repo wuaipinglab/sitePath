@@ -9,13 +9,13 @@ treeAlignMatch(tree, align)
 \arguments{
 \item{tree}{an object of \code{phylo}}
 
-\item{align}{an object of \code{phyDat}}
+\item{align}{an object of \code{alignment}}
 }
 \value{
 a treeAlignMatch object
 }
 \description{
-Assembly a phylo and a phyDat object into a treeAlignMatch object.
-The \code{tip.label} of phylo and \code{names} of phyDat should be matched
+Assembly a phylo and an alignment object into a treeAlignMatch object.
+The \code{tip.label} of phylo and \code{nam} of alignment should be matched
 one by one
 }

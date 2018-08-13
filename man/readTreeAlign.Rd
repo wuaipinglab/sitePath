@@ -5,8 +5,8 @@
 \title{Tree and Alignment}
 \usage{
 readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"),
-  alignFile, alignFormat = c("fasta", "clustal", "phylip", "mase",
-  "msf"), seqType = c("DNA", "AA"))
+  alignFile, alignFormat = c("fasta", "clustal", "interleaved",
+  "sequential"))
 }
 \arguments{
 \item{treeFile}{Path to the file stored phylogenetic tree}
@@ -15,9 +15,7 @@ readTreeAlign(treeFile, treeFormat = c("nexus", "newick", "beast"),
 
 \item{alignFile}{Path to the file stored sequence alignment}
 
-\item{alignFormat}{Specify alignment format ("fasta", "clustal", "phylip", "mase", "msf")}
-
-\item{seqType}{Sequence type ("DNA", "AA")}
+\item{alignFormat}{Specify alignment format ("fasta", "clustal", "interleaved", "sequential")}
 }
 \value{
 a \code{\link{treeAlignMatch}} object

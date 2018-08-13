@@ -14,7 +14,7 @@ Depends:
 Imports:
   Rcpp (>= 0.12.14)
 Suggests:
-  phangorn,
+  ape,
   seqinr,
   ggplot2,
   ggtree

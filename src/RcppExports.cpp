@@ -19,21 +19,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// divergentNode
-ListOf<IntegerVector> divergentNode(ListOf<IntegerVector> paths);
-RcppExport SEXP _sitePath_divergentNode(SEXP pathsSEXP) {
+// terminalNode
+IntegerVector terminalNode(ListOf<IntegerVector> paths);
+RcppExport SEXP _sitePath_terminalNode(SEXP pathsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type paths(pathsSEXP);
-    rcpp_result_gen = Rcpp::wrap(divergentNode(paths));
+    rcpp_result_gen = Rcpp::wrap(terminalNode(paths));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pathBeforeDivergence
+ListOf<IntegerVector> pathBeforeDivergence(ListOf<IntegerVector> paths);
+RcppExport SEXP _sitePath_pathBeforeDivergence(SEXP pathsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type paths(pathsSEXP);
+    rcpp_result_gen = Rcpp::wrap(pathBeforeDivergence(paths));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 4},
-    {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
+    {"_sitePath_terminalNode", (DL_FUNC) &_sitePath_terminalNode, 1},
+    {"_sitePath_pathBeforeDivergence", (DL_FUNC) &_sitePath_pathBeforeDivergence, 1},
     {NULL, NULL, 0}
 };
 
