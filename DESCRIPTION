@@ -17,6 +17,7 @@ Suggests:
   ape,
   seqinr,
   ggplot2,
-  ggtree
+  ggtree,
+    testthat
 LinkingTo: Rcpp
 RoxygenNote: 6.1.0

@@ -30,7 +30,7 @@ groupTips <- function(treeAlignMatch, similarity, tipnames = TRUE) {
 }
 
 #' @title Get sitePath
-#' @description 
+#' @description
 #' Under development
 #' @param treeAlignMatch a \code{\link{treeAlignMatch}} object
 #' @param similarity similarity threshold for tree trimming
@@ -39,16 +39,24 @@ groupTips <- function(treeAlignMatch, similarity, tipnames = TRUE) {
 #' @return path represent by tip names
 #' @export
 getSitePath <- function(treeAlignMatch, similarity) {
-  # trimTree gets the nodepath after trimming
-  paths <- trimTree(
+  # get the nodepath after trimming
+  trimmedPaths <- unique(trimTree(
     nodepath(treeAlignMatch$tree),
     treeAlignMatch$align,
     similarity, FALSE
-  )
-  # nodepath after trimming is redundant
-  paths <- unique(paths)
-  # nodeTips are the tips which were trimmed
-  nodeTips <- lapply(terminalNode(paths), function(node) {
+  ))
+  # Get the bifurcated nodes and their path to the root in a trimmed tree
+  # Those paths are the so-called sitePaths
+  paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
+  paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
+  paths <- lapply(paths, function(p) {
+    class(p) <- "isolated"
+    return(p)
+  })
+  # add fused paths
+  paths <- c(paths, pathBeforeDivergence(paths))
+  # children nodes of nodes on sitePaths
+  attr(paths, "nodeTips") <- lapply(terminalNode(trimmedPaths), function(node) {
     childrenTips <- unlist(Descendants(
       x = treeAlignMatch$tree, node = node, type = "tips"
     ))
@@ -56,20 +64,24 @@ getSitePath <- function(treeAlignMatch, similarity) {
     names(res) <- treeAlignMatch$tree$tip.label[childrenTips]
     return(res)
   })
-  # Get the bifurcated nodes and their path to the root in a trimmed tree
-  # Those paths are the so-called sitePaths
-  paths <- lapply(paths, function(p) p[1:(length(p) - 1)])
-  paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
-  # fuse the paths
-  fusedPaths <- unique(pathBeforeDivergence(paths))
-  paths <- list(isolated = paths, fused = fusedPaths)
-  attr(paths, "nodeTips") <- nodeTips
   attr(paths, "class") <- "sitePath"
   return(paths)
 }
 
 #' @export
 print.sitePath <- function(sitePath) {
-  cat(length(sitePath[["isolated"]]), "isolated paths\n")
-  cat(length(sitePath[["fused"]]), "fused paths\n")
+  cat(length(which(sapply(sitePath, class) == "isolated")), "isolated paths\n")
+  cat(length(which(sapply(sitePath, class) == "fused")), "fused paths\n")
+}
+
+#' @export
+print.isolated <- function(isolated) {
+  class(isolated) <- NULL
+  print(isolated)
+}
+
+#' @export
+print.fused <- function(fused) {
+  class(fused) <- NULL
+  print(fused)
 }

@@ -20,7 +20,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // terminalNode
-IntegerVector terminalNode(ListOf<IntegerVector> paths);
+ListOf<IntegerVector> terminalNode(ListOf<IntegerVector> paths);
 RcppExport SEXP _sitePath_terminalNode(SEXP pathsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
