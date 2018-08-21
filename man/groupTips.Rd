@@ -4,12 +4,16 @@
 \alias{groupTips}
 \title{Group Tips}
 \usage{
-groupTips(treeAlignMatch, similarity, tipnames = TRUE)
+groupTips(tree, align, similarity, tipnames = TRUE)
 }
 \arguments{
-\item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
+\item{tree}{a \code{phylo} object}
+
+\item{align}{an \code{alignment} object}
 
 \item{similarity}{similarity threshold for tree trimming}
+
+\item{tipnames}{return tip as names or node number}
 }
 \value{
 grouping of tips

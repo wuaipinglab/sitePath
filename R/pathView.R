@@ -1,75 +1,41 @@
+#' @title Find sites
+#' @description
+#' To find site in sitePath
+#' @param paths a \code{sitePath} object
+#' @param n the index of the target path
+#' @param allseq reconstructed sequences
+#' @importFrom ape nodepath
+#' @importFrom phangorn Descendants phyDat2alignment
+#' @return sites and tip names
 #' @export
-findSites.sitePath <- function(paths, n) {
-  fixed <- findFixed(paths[[n]], paths, attr(paths, "nodeTips"))
-  return(fixed)
+findSites.sitePath <- function(paths, n, allseq) {
+  tree <- attr(paths, "tree")
+  attr(paths, "tree") <- NULL
+  if (!is(allseq, "phyDat")) {
+    stop("allseq is not a class of phyDat")
+  }
+  allseq <- toupper(phyDat2alignment(allseq)$seq)
+  fixed <- lapply(paths[[n]], function(node) {
+    tips <- unlist(Descendants(x = tree, node = node, type = "tips"))
+    ancestors <- strsplit(allseq[nodepath(phy = tree, from = paths[[n]][1], to = node)], "")
+    children <- strsplit(allseq[tips], "")
+    mutations <- character(0)
+    for (i in 1:length(children[[1]])) {
+      a <- unique(sapply(ancestors, "[[", i))
+      c <- unique(sapply(children, "[[", i))
+      if (length(a) == 1 && length(c) == 1 && a != "-" && c != "-" && a != c) {
+        mutations <- c(mutations, paste(a, i, c, sep = ""))
+      }
+    }
+    if (length(mutations) == 0) {
+      return(character(0))
+    } else {
+      return(list(tips = tree$tip.label[tips], mutations = mutations))
+    }
+  })
+  names(fixed) <- paths[[n]]
+  return(fixed[which(lengths(fixed) != 0)])
 }
 
 #' @export
 findSites <- function(x, ...) UseMethod("findSites")
-
-findFixed.isolated <- function(path, paths, nodeTips) {
-  findMutation <- function(index, path, nodeTips) {
-    before <- nodeTips[as.character(path[1:(index - 1)])]
-    if (all(is.na(names(before)))) return(character(0))
-    before <- before[!is.na(names(before))]
-    names(before) <- NULL
-    before <- strsplit(unlist(before), "")
-    
-    after <- nodeTips[as.character(path[index:length(path)])]
-    if (all(is.na(names(after)))) return(character(0))
-    after <- after[!is.na(names(after))]
-    names(after) <- NULL
-    after <- strsplit(unlist(after), "")
-    
-    mutations <- character(0)
-    for (i in 1:length(before[[1]])) {
-      b <- unique(sapply(before, "[[", i))
-      a <- unique(sapply(after, "[[", i))
-      if (length(b) == 1 && length(a) == 1 && a != b) {
-        mutations <- c(mutations, paste(b, i, a, sep = ""))
-      }
-    }
-    if (length(mutations) == 0) {
-      return(character(0))
-    } else {
-      return(list(from  = names(before), to = names(after), mutations = mutations))
-    }
-  }
-  res <- lapply(1:length(path), findMutation, path, attr(paths, "nodeTips"))
-  names(res) <- path
-  return(res[which(lengths(res) != 0)])
-}
-
-findFixed.fused <- function(path, paths, nodeTips) {
-  findMutation <- function(index, path, nodeTips) {
-    before <- nodeTips[as.character(path[1:(index - 1)])]
-    if (all(is.na(names(before)))) return(character(0))
-    before <- before[!is.na(names(before))]
-    names(before) <- NULL
-    before <- strsplit(unlist(before), "")
-    
-    after <- nodeTips[as.character(c(path[index:length(path)], attr(path, "endNodes")))]
-    after <- after[!is.na(names(after))]
-    names(after) <- NULL
-    after <- strsplit(unlist(after), "")
-    
-    mutations <- character(0)
-    for (i in 1:length(before[[1]])) {
-      b <- unique(sapply(before, "[[", i))
-      a <- unique(sapply(after, "[[", i))
-      if (length(b) == 1 && length(a) == 1 && a != b) {
-        mutations <- c(mutations, paste(b, i, a, sep = ""))
-      }
-    }
-    if (length(mutations) == 0) {
-      return(character(0))
-    } else {
-      return(list(from  = names(before), to = names(after), mutations = mutations))
-    }
-  }
-  res <- lapply(1:length(path), findMutation, path, attr(paths, "nodeTips"))
-  names(res) <- path
-  return(res[which(lengths(res) != 0)])
-}
-
-findFixed <- function(x, ...) UseMethod("findFixed")

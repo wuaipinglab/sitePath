@@ -5,11 +5,7 @@ trimTree <- function(tipPaths, alignedSeqs, similarity, getTips) {
     .Call('_sitePath_trimTree', PACKAGE = 'sitePath', tipPaths, alignedSeqs, similarity, getTips)
 }
 
-terminalNode <- function(paths) {
-    .Call('_sitePath_terminalNode', PACKAGE = 'sitePath', paths)
-}
-
-pathBeforeDivergence <- function(paths) {
-    .Call('_sitePath_pathBeforeDivergence', PACKAGE = 'sitePath', paths)
+divergentNode <- function(paths) {
+    .Call('_sitePath_divergentNode', PACKAGE = 'sitePath', paths)
 }
 

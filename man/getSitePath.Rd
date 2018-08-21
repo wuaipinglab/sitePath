@@ -4,15 +4,17 @@
 \alias{getSitePath}
 \title{Get sitePath}
 \usage{
-getSitePath(treeAlignMatch, similarity)
+getSitePath(tree, align, similarity)
 }
 \arguments{
-\item{treeAlignMatch}{a \code{\link{treeAlignMatch}} object}
+\item{tree}{a \code{phylo} object}
+
+\item{align}{an \code{alignment} object}
 
 \item{similarity}{similarity threshold for tree trimming}
 }
 \value{
-path represent by tip names
+path as node numbers
 }
 \description{
 Under development
