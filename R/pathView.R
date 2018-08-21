@@ -23,7 +23,7 @@ findSites.sitePath <- function(paths, n, allseq) {
     for (i in 1:length(children[[1]])) {
       a <- unique(sapply(ancestors, "[[", i))
       c <- unique(sapply(children, "[[", i))
-      if (length(a) == 1 && length(c) == 1 && a != "-" && c != "-" && a != c) {
+      if (length(a) == 1 && length(c) == 1 && a != c) {
         mutations <- c(mutations, paste(a, i, c, sep = ""))
       }
     }
