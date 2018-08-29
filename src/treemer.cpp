@@ -4,11 +4,10 @@
 SEXP trimTree(
     ListOf<IntegerVector> tipPaths, 
     ListOf<CharacterVector> alignedSeqs,
-    NumericVector similarity,
-    LogicalVector getTips
+    float similarity, bool getTips
 ) {
-  Pruner match(tipPaths, alignedSeqs, as<float>(similarity));
-  if (as<bool>(getTips)) {
+  Pruner match(tipPaths, alignedSeqs, similarity);
+  if (getTips) {
     return wrap(match.getTips());
   } else {
     return wrap(match.getPaths());
@@ -16,18 +15,35 @@ SEXP trimTree(
 }
 
 // [[Rcpp::export]]
-IntegerVector divergentNode(ListOf<IntegerVector> paths) {
+IntegerVector getReference(std::string refSeq, char gapChar) {
   std::vector<int> res;
-  for (int i = 0; i < paths.size() - 1; i++) {
-    for (int j = i + 1; j < paths.size(); j++) {
-      IntegerVector::iterator q = paths[i].begin(), s = paths[j].begin();
-      while (*q == *s) {q++, s++;}
-      if (--q != paths[i].begin()) res.push_back(*q);
+  for (int i = 0; i < refSeq.size(); i++) {
+    if (refSeq[i] != gapChar) {
+      res.push_back(i + 1);
     }
   }
   return wrap(res);
 }
 
+/*
+ * The following functions might be useful in the future
+ * regarding the match.getPath() output from trimTree function
+ * but are not relevant for now so commented out
+ */
+
+// // [[Rcpp::export]]
+// IntegerVector divergentNode(ListOf<IntegerVector> paths) {
+//   std::vector<int> res;
+//   for (int i = 0; i < paths.size() - 1; i++) {
+//     for (int j = i + 1; j < paths.size(); j++) {
+//       IntegerVector::iterator q = paths[i].begin(), s = paths[j].begin();
+//       while (*q == *s) {q++, s++;}
+//       if (--q != paths[i].begin()) res.push_back(*q);
+//     }
+//   }
+//   return wrap(res);
+// }
+// 
 // // [[Rcpp::export]]
 // ListOf<IntegerVector> terminalNode(ListOf<IntegerVector> paths) {
 //   std::map< int, std::vector<int> > res;

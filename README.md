@@ -23,24 +23,15 @@ Unable to install from github so far
 Example
 -------
 ```
-library(phangorn)
 library(sitePath)
 
-tree <- ggtree::read.beast(
-  system.file("m.trees", package = "sitePath")
-)@phylo
-tree <- ape::root.phylo(tree, 115)
-
+tree <- ape::read.tree(
+  system.file("zika.tree", package = "sitePath")
+)
 align <- seqinr::read.alignment(
-  system.file("m.aligned.fasta", package = "sitePath"),
-  format = "fasta", forceToLower = FALSE
+  system.file("zika.fasta", package = "sitePath"), "fasta"
 )
 
-sitePath <- getSitePath(tree, align, 0.98)
-
-fit <- pml(tree = tree, data = as.phyDat(align))
-fit <- optim.pml(fit)
-anc.ml <- ancestral.pml(fit, return = "phyDat")
-
-fixedSites <- findSites(sitePath, 2, anc.ml)
+sitePath <- getSitePath(tree, align, 0.996)
+mutations <- findFixed(sitePath)
 ```
