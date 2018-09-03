@@ -7,7 +7,7 @@ Installation
 To install the package from github:
 ```
 install.packages("devtools")
-devtools::install_github("Takkoona/sitePath")
+devtools::install_github("Takkoona/sitePath", ref = "ancestor")
 ```
 To use plotting function and read annotated nexus file (from beast). [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) is needed.
 
@@ -23,17 +23,15 @@ Unable to install from github so far
 Example
 -------
 ```
-tree <- ggtree::read.beast(
-  system.file("m.trees", package = "sitePath")
-)@phylo
+library(sitePath)
 
+tree <- ape::read.tree(
+  system.file("zika.tree", package = "sitePath")
+)
 align <- seqinr::read.alignment(
-  system.file("m.aligned.fasta", package = "sitePath"),
-  format = "fasta", forceToLower = FALSE
+  system.file("zika.fasta", package = "sitePath"), "fasta"
 )
 
-matched <- treeAlignMatch(tree, align)
-grouping <- groupTips(matched, 0.98)
-sitePath <- getSitePath(matched, 0.98)
-findSites(sitePath, 1)
+sitePath <- getSitePath(tree, align, 0.996)
+mutations <- findFixed(sitePath)
 ```

@@ -31,7 +31,7 @@ public:
   TreeAlignmentMatch(
     ListOf<IntegerVector> tipPaths, 
     ListOf<CharacterVector> alignedSeqs,
-    const float simThreshold
+    const float similarity
   );
 protected:
   const float simCut;

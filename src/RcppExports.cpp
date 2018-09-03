@@ -6,46 +6,35 @@
 using namespace Rcpp;
 
 // trimTree
-SEXP trimTree(ListOf<IntegerVector> tipPaths, ListOf<CharacterVector> alignedSeqs, NumericVector similarity, LogicalVector getTips);
+SEXP trimTree(ListOf<IntegerVector> tipPaths, ListOf<CharacterVector> alignedSeqs, float similarity, bool getTips);
 RcppExport SEXP _sitePath_trimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< ListOf<CharacterVector> >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type similarity(similaritySEXP);
-    Rcpp::traits::input_parameter< LogicalVector >::type getTips(getTipsSEXP);
+    Rcpp::traits::input_parameter< float >::type similarity(similaritySEXP);
+    Rcpp::traits::input_parameter< bool >::type getTips(getTipsSEXP);
     rcpp_result_gen = Rcpp::wrap(trimTree(tipPaths, alignedSeqs, similarity, getTips));
     return rcpp_result_gen;
 END_RCPP
 }
-// terminalNode
-ListOf<IntegerVector> terminalNode(ListOf<IntegerVector> paths);
-RcppExport SEXP _sitePath_terminalNode(SEXP pathsSEXP) {
+// getReference
+IntegerVector getReference(std::string refSeq, char gapChar);
+RcppExport SEXP _sitePath_getReference(SEXP refSeqSEXP, SEXP gapCharSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type paths(pathsSEXP);
-    rcpp_result_gen = Rcpp::wrap(terminalNode(paths));
-    return rcpp_result_gen;
-END_RCPP
-}
-// pathBeforeDivergence
-ListOf<IntegerVector> pathBeforeDivergence(ListOf<IntegerVector> paths);
-RcppExport SEXP _sitePath_pathBeforeDivergence(SEXP pathsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type paths(pathsSEXP);
-    rcpp_result_gen = Rcpp::wrap(pathBeforeDivergence(paths));
+    Rcpp::traits::input_parameter< std::string >::type refSeq(refSeqSEXP);
+    Rcpp::traits::input_parameter< char >::type gapChar(gapCharSEXP);
+    rcpp_result_gen = Rcpp::wrap(getReference(refSeq, gapChar));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 4},
-    {"_sitePath_terminalNode", (DL_FUNC) &_sitePath_terminalNode, 1},
-    {"_sitePath_pathBeforeDivergence", (DL_FUNC) &_sitePath_pathBeforeDivergence, 1},
+    {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {NULL, NULL, 0}
 };
 
