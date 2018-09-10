@@ -58,11 +58,11 @@ IntegerVector TipSeqLinker::getPath() {
 TreeAlignmentMatch::TreeAlignmentMatch(
   ListOf<IntegerVector> tipPaths, 
   ListOf<CharacterVector> alignedSeqs,
-  const float similarity
+  const float simThreshold
 ):
-  simCut(similarity),
   root(*(tipPaths[0].begin())),
-  seqLen((as<std::string>(alignedSeqs[0])).size()) {
+  seqLen((as<std::string>(alignedSeqs[0])).size()),
+  simCut(simThreshold) {
   if (simCut <= 0) {
     throw std::invalid_argument("Similarity cannot be lower or equal to 0");
   } else if (simCut > 1) {

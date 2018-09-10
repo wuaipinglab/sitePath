@@ -2,19 +2,17 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' @name trimTree
-#' @rdname trimTree
 #' @title Trim Tree
 #' @description
 #' Tree tips are grouped by their sequence similarity and members in a group
 #' are constrained to share a same ancestral node.
 #' Similarity between two tips is derived from their multiple sequence alignment.
-#' The site doesn't contribute to total length if both are gap.
+#' The site doesn't count into total length if both are gap.
 #' So similarity is calculated as number of matched divided by revised total length
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
-#' @param tipnames return tip as names or node number
+#' @param tipnames if return as tipnames
 #' @importFrom ape nodepath
 #' @return grouping of tips
 #' @export
@@ -24,41 +22,78 @@ groupTips <- function(tree, align, similarity, tipnames = TRUE) {
     similarity, TRUE
   )
   if (tipnames) {
-    return(lapply(grouping, function(g) {
-      tree$tip.label[g]
-    }))
+    return(lapply(grouping, function(g) {tree$tip.label[g]}))
   } else {
     return(grouping)
   }
 }
 
-#' @rdname trimTree
-#' @importFrom ape nodepath
-#' @return path as node numbers
+#' @title Get sitePath
+#' @description
+#' Under development
+#' @param tree a \code{phylo} object
+#' @param align an \code{alignment} object
+#' @param similarity similarity threshold for tree trimming
+#' @importFrom ape nodepath getMRCA
+#' @return path represent by tip names
 #' @export
 getSitePath <- function(tree, align, similarity) {
   align <- checkMatched(tree, align)
-  # Get the nodepath after trimming
-  paths <- unique(trimTree(
-    nodepath(tree), align,
-    similarity, FALSE
-  ))
-  # Get the bifurcated nodes and their path to the root in a trimmed tree
-  # Those paths are the so-called sitePaths
-  paths <- lapply(paths, function(p) p[1:(length(p) - 1)])
+  # nodepath after trimming
+  trimmedPaths <- unique(trimTree(nodepath(tree), align, similarity, FALSE))
+  # get the bifurcated nodes and their path to the root in a trimmed tree
+  # those paths are the so-called sitePaths (isolated)
+  paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
-  if (length(paths) == 1) {
-    stop("Similarity threshold is too low")
-  }
-  attr(paths, "tree") <- tree
-  attr(paths, "align") <- align
+  paths <- lapply(paths, function(p) {class(p) <- "isolated"; return(p)})
+  # fuse sitePaths and add them to result
+  paths <- c(paths, pathBeforeDivergence(paths))
+  # children nodes of nodes on sitePaths
+  root <- getMRCA(tree, tree$tip.label)
+  attr(paths, "nodeTips") <- lapply(terminalNode(trimmedPaths), function(node) {
+    childrenTips <- ChildrenTips(tree, node = node)
+    res <- align[childrenTips]
+    names(res) <- tree$tip.label[childrenTips]
+    return(res)
+  })
   attr(paths, "class") <- "sitePath"
   return(paths)
 }
 
 #' @export
 print.sitePath <- function(sitePath) {
-  cat(length(sitePath), "paths\n")
+  cat(length(which(sapply(sitePath, class) == "isolated")), "isolated paths\n")
+  cat(length(which(sapply(sitePath, class) == "fused")), "fused paths\n")
+}
+
+#' @export
+print.isolated <- function(isolated) {
+  class(isolated) <- NULL
+  print(isolated)
+}
+
+#' @export
+print.fused <- function(fused) {
+  class(fused) <- NULL
+  print(fused)
+}
+
+
+ChildrenTips <- function(tree, node) {
+  maxTip <- length(tree$tip.label)
+  if (all(node <= maxTip)) return(node)
+  children <- integer(0)
+  getChildren <- function(edges, parent) {
+    i <- which(edges[, 1] %in% parent)
+    if (length(i) == 0L) {
+      return(children)
+    } else {
+      parent <- edges[i, 2]
+      children <<- c(children, parent[which(parent <= maxTip)])
+      return(getChildren(edges, parent))
+    }
+  }
+  return(getChildren(tree$edge, node))
 }
 
 checkMatched <- function(tree, align) {
@@ -73,11 +108,6 @@ checkMatched <- function(tree, align) {
   } else if (length(unique(nchar(align))) > 1) {
     stop("Sequence lengths are not the same in alignment")
   }
-  class(align) <- "matchedAlignment"
   return(align)
 }
 
-#' @export
-print.matchedAlignment <- function(x) {
-  cat(length(x), "aligned sequences with a length of", nchar(x[[1]]))
-}
