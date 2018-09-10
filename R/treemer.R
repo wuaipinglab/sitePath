@@ -34,10 +34,10 @@ groupTips <- function(tree, align, similarity, tipnames = TRUE) {
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
-#' @importFrom ape nodepath getMRCA
+#' @importFrom ape nodepath
 #' @return path represent by tip names
 #' @export
-getSitePath <- function(tree, align, similarity) {
+sitePath <- function(tree, align, similarity) {
   align <- checkMatched(tree, align)
   # nodepath after trimming
   trimmedPaths <- unique(trimTree(nodepath(tree), align, similarity, FALSE))
@@ -45,55 +45,19 @@ getSitePath <- function(tree, align, similarity) {
   # those paths are the so-called sitePaths (isolated)
   paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
-  paths <- lapply(paths, function(p) {class(p) <- "isolated"; return(p)})
-  # fuse sitePaths and add them to result
-  paths <- c(paths, pathBeforeDivergence(paths))
-  # children nodes of nodes on sitePaths
-  root <- getMRCA(tree, tree$tip.label)
-  attr(paths, "nodeTips") <- lapply(terminalNode(trimmedPaths), function(node) {
-    childrenTips <- ChildrenTips(tree, node = node)
-    res <- align[childrenTips]
-    names(res) <- tree$tip.label[childrenTips]
-    return(res)
-  })
+  if (length(paths) == 0) {
+    stop("Similarity threshold is too low")
+  }
+  attr(paths, "divNodes") <- unique(divergentNode(paths))
+  attr(paths, "tree") <- tree
+  attr(paths, "align") <- align
   attr(paths, "class") <- "sitePath"
   return(paths)
 }
 
 #' @export
 print.sitePath <- function(sitePath) {
-  cat(length(which(sapply(sitePath, class) == "isolated")), "isolated paths\n")
-  cat(length(which(sapply(sitePath, class) == "fused")), "fused paths\n")
-}
-
-#' @export
-print.isolated <- function(isolated) {
-  class(isolated) <- NULL
-  print(isolated)
-}
-
-#' @export
-print.fused <- function(fused) {
-  class(fused) <- NULL
-  print(fused)
-}
-
-
-ChildrenTips <- function(tree, node) {
-  maxTip <- length(tree$tip.label)
-  if (all(node <= maxTip)) return(node)
-  children <- integer(0)
-  getChildren <- function(edges, parent) {
-    i <- which(edges[, 1] %in% parent)
-    if (length(i) == 0L) {
-      return(children)
-    } else {
-      parent <- edges[i, 2]
-      children <<- c(children, parent[which(parent <= maxTip)])
-      return(getChildren(edges, parent))
-    }
-  }
-  return(getChildren(tree$edge, node))
+  cat(length(sitePath), "paths\n")
 }
 
 checkMatched <- function(tree, align) {
@@ -110,4 +74,3 @@ checkMatched <- function(tree, align) {
   }
   return(align)
 }
-

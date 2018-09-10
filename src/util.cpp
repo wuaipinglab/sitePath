@@ -24,7 +24,7 @@ const float TipSeqLinker::compare(TipSeqLinker *linker) {
       if (*q == *s) {match++;}
     }
   }
-  return match/length;
+  return match / length;
 }
 
 const int TipSeqLinker::currentClade() {
@@ -113,11 +113,10 @@ void TreeAlignmentMatch::pruneTree() {
 }
 
 const bool TreeAlignmentMatch::qualified(const std::vector<TipSeqLinker*> &clstr) {
-  float sim;
-  std::pair<int, int> pairing;
   for (std::vector<TipSeqLinker*>::const_iterator tsLinker = clstr.begin(); tsLinker != clstr.end() - 1; tsLinker++) {
     for (std::vector<TipSeqLinker*>::const_iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
-      pairing = std::make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
+      std::pair<int, int> pairing = std::make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
+      float sim;
       if (compared.find(pairing) != compared.end()) {
         sim = compared[pairing];
       } else {

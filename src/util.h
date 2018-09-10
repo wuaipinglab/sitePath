@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <iostream>
 #include <Rcpp.h>
 
