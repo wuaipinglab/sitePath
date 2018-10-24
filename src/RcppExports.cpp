@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// compare
+const float compare(const std::string& query, const std::string& subject);
+RcppExport SEXP _sitePath_compare(SEXP querySEXP, SEXP subjectSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type query(querySEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type subject(subjectSEXP);
+    rcpp_result_gen = Rcpp::wrap(compare(query, subject));
+    return rcpp_result_gen;
+END_RCPP
+}
 // trimTree
 SEXP trimTree(ListOf<IntegerVector> tipPaths, ListOf<CharacterVector> alignedSeqs, const float& similarity, const bool& getTips);
 RcppExport SEXP _sitePath_trimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
@@ -56,6 +68,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_sitePath_compare", (DL_FUNC) &_sitePath_compare, 2},
     {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 4},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},

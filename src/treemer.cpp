@@ -1,5 +1,20 @@
 #include "pruner.h"
 
+//[[Rcpp::export]]
+const float compare(const std::string &query, const std::string &subject) {
+  float match = 0.0, length = 0.0;
+  for (
+      std::string::const_iterator q = query.begin(), s = subject.begin();
+      q != query.end(); ++q, ++s
+  ) {
+    if (*q != '-' && *s != '-') {
+      length++;
+      if (*q == *s) match++;
+    }
+  }
+  return match / length;
+}
+
 // [[Rcpp::export]]
 SEXP trimTree(
     ListOf<IntegerVector> tipPaths, 
@@ -50,10 +65,10 @@ ListOf<IntegerVector> ancestralPaths(ListOf<IntegerVector> paths, const int &n) 
 }
 
 /*
-* The following functions might be useful
-* regarding the match.getPath() output from trimTree() function
-* but are not relevant for now so commented out
-*/
+ * The following functions might be useful
+ * regarding the match.getPath() output from trimTree() function
+ * but are not relevant for now so commented out
+ */
 
 // // [[Rcpp::export]]
 // ListOf<IntegerVector> terminalNode(ListOf<IntegerVector> paths) {

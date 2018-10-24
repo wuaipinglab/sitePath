@@ -5,7 +5,8 @@
 \alias{findFixed.sitePath}
 \title{Find Mutations}
 \usage{
-\method{findFixed}{sitePath}(paths, reference = NULL, gapChar = "-")
+\method{findFixed}{sitePath}(paths, tolerance = 0, reference = NULL,
+  gapChar = "-")
 }
 \arguments{
 \item{paths}{a \code{sitePath} object}

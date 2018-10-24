@@ -46,9 +46,8 @@ sitePath <- function(tree, align, similarity) {
   paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
   if (length(paths) == 0) {
-    stop("Similarity threshold is too low")
+    stop("Similarity threshold is too low resulting in no sitePath")
   }
-  attr(paths, "divNodes") <- unique(divergentNode(paths))
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align
   attr(paths, "class") <- "sitePath"
