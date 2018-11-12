@@ -5,8 +5,9 @@
 \alias{sneakPeek}
 \title{Pre-assessment}
 \usage{
-sneakPeek(tree, align, step = NULL)
+sneakPeek(tree, align, simMatrix = NULL, step = NULL, maxPath = NULL)
 }
 \description{
-Under development
+Under development.This function is intended to plot similarity as a threshold
+against number of output sitePath
 }

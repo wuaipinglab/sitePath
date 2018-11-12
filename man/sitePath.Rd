@@ -4,7 +4,7 @@
 \alias{sitePath}
 \title{Get sitePath}
 \usage{
-sitePath(tree, align, similarity)
+sitePath(tree, align, similarity, simMatrix = NULL)
 }
 \arguments{
 \item{tree}{a \code{phylo} object}

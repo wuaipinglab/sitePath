@@ -1,132 +1,73 @@
 #include "util.h"
 
+const float compare(const std::string &query, const std::string &subject) {
+  // Get the similarity between two aligned sequences.
+  // Site is skipped for total length if both are gaps in alignment
+  float match = 0.0, length = 0.0;
+  for (
+      std::string::const_iterator q = query.begin(), s = subject.begin();
+      q != query.end(); ++q, ++s
+  ) {
+    if (*q != '-' && *s != '-') {
+      length++;
+      if (*q == *s) match++;
+    }
+  }
+  return match / length;
+}
+
 TipSeqLinker::TipSeqLinker(
   CharacterVector sequence,
   IntegerVector tipPath
 ):
   seq(as<std::string>(sequence)),
   path(tipPath),
-  tipIndex(tipPath.size() - 1),
+  tipIndex(tipPath.size() - 1), // last node of a path is the tip node
   cIndex(tipIndex) {}
 
 void TipSeqLinker::proceed() {
+  // Proceed towards the root node along the path
+  // as the current index should decrement.
+  // An index of 0 means reaching the root node.
   if (cIndex > 0) {cIndex--;}
-};
-
-const float TipSeqLinker::compare(TipSeqLinker *linker) {
-  float match = 0, length = 0;
-  for (
-      std::string::iterator q = seq.begin(), s = linker->seq.begin();
-      q != seq.end(); q++, s++
-  ) {
-    if (*q != '-' && *s != '-') {
-      length++;
-      if (*q == *s) {match++;}
-    }
-  }
-  return match / length;
 }
 
-const int TipSeqLinker::currentClade() {
+const int TipSeqLinker::currentClade() const {
+  // Current clade is the node at the current index of path
   return path[cIndex];
 }
 
-const int TipSeqLinker::nextClade() {
+const int TipSeqLinker::nextClade() const {
+  // Look up the immediate ancestral node 
   if (cIndex > 0) {
     return path[cIndex - 1];
   } else {
-    return currentClade();
+    return currentClade(); // The current clade would be root
   }
 }
 
-const int TipSeqLinker::getTip() {
+const int TipSeqLinker::getTip() const {
+  // Tip node is the last node in the path
   return path[tipIndex];
 }
 
-const int TipSeqLinker::getRoot() {
+const int TipSeqLinker::getRoot() const {
+  // Root node is the first node in the path
   return path[0];
 }
 
-const int TipSeqLinker::getSeqLen() {
+const int TipSeqLinker::getSeqLen() const {
+  // The length of the aligned sequence
+  // This is going to be done for every sequence to make sure they're aligned
   return seq.size();
 }
 
-IntegerVector TipSeqLinker::getPath() {
+IntegerVector TipSeqLinker::getPath() const {
+  // The path from current clade towards root node
   return path[Range(0, cIndex)];
 }
 
-TreeAlignmentMatch::TreeAlignmentMatch(
-  ListOf<IntegerVector> tipPaths, 
-  ListOf<CharacterVector> alignedSeqs,
-  const float simThreshold
-):
-  root(*(tipPaths[0].begin())),
-  seqLen((as<std::string>(alignedSeqs[0])).size()),
-  simCut(simThreshold) {
-  if (simCut <= 0) {
-    throw std::invalid_argument("Similarity cannot be lower or equal to 0");
-  } else if (simCut > 1) {
-    throw std::invalid_argument("Similarity cannot be greater than 1");
-  }
-  TipSeqLinker *linker;
-  for (int i = 0; i < tipPaths.size(); i++) {
-    linker = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
-    linkers.push_back(linker);
-    clusters[linker->getTip()].push_back(linker);
-    if (linker->getRoot() != root) {
-      throw std::invalid_argument("Root in tree path not equal");
-    } else if (linker->getSeqLen() != seqLen) {
-      throw std::invalid_argument("Sequene length not equal");
-    }
-  }
-  if (simCut != 1) {pruneTree();}
-}
-
-void TreeAlignmentMatch::pruneTree() {
-  std::map< int, std::vector<TipSeqLinker*> > oldCluster;
-  while (true) {
-    oldCluster = clusters;
-    clusters.clear();
-    for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
-      clusters[(*tsLinker)->nextClade()].push_back(*tsLinker);
-    }
-    if (clusters.size() == oldCluster.size()) {
-      clusters.clear();
-      break;
-    }
-    for (std::map< int, std::vector<TipSeqLinker*> >::iterator it = clusters.begin(); it != clusters.end(); it++) {
-      bool exist = false;
-      for (std::map< int, std::vector<TipSeqLinker*> >::iterator it2 = oldCluster.begin(); it2 != oldCluster.end(); it2++) {
-        if (it->second == it2->second) {
-          exist = true;
-          oldCluster.erase(it2);
-          break;
-        }
-      }
-      if (!exist && qualified(it->second)) {
-        for (std::vector<TipSeqLinker*>::iterator tsLinker = it->second.begin(); tsLinker != it->second.end(); tsLinker++) {
-          (*tsLinker)->proceed();
-        }
-      }
-    }
-  }
-}
-
-const bool TreeAlignmentMatch::qualified(const std::vector<TipSeqLinker*> &clstr) {
-  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = clstr.begin(); tsLinker != clstr.end() - 1; tsLinker++) {
-    for (std::vector<TipSeqLinker*>::const_iterator tsLinker2 = tsLinker + 1; tsLinker2 != clstr.end(); tsLinker2++) {
-      std::pair<int, int> pairing = std::make_pair((*tsLinker)->getTip(), (*tsLinker2)->getTip());
-      float sim;
-      if (compared.find(pairing) != compared.end()) {
-        sim = compared[pairing];
-      } else {
-        sim = (*tsLinker)->compare(*tsLinker2);
-        compared[pairing] = sim;
-      }
-      if (sim < simCut) {
-        return false;
-      }
-    }
-  }
-  return true;
+std::string TipSeqLinker::getSeq() const {
+  // The aligned sequence
+  return seq;
 }

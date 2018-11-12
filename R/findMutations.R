@@ -1,44 +1,65 @@
+#' @title Similarity Matrix
+#' @description 
+#' To calculate similarity between aligned sequences
+#' @param tree a \code{phylo} object
+#' @param align an \code{alignment} object
+#' @export
+getSimMatrix <- function(tree, align) {
+  if (!inherits(tree, "phylo")) {
+    stop("tree must be of class phylo")
+  } else if (!is(align, "alignment")) {
+    stop("align must be of class alignment")
+  }
+  sim <- matrix(
+    NA,
+    ncol = length(tree$tip.label),
+    nrow = length(tree$tip.label),
+    dimnames = list(tree$tip.label, tree$tip.label)
+  )
+  align <- checkMatched(tree, align)
+  return(similarityMatrix(align, sim))
+}
+
 #' @name SimilarityPlot
 #' @rdname Pre-assessment
 #' @title Pre-assessment
 #' @description
-#' Under development
-#' @importFrom ape cophenetic.phylo
+#' Under development.This function is intended to plot similarity as a threshold
+#' against number of output sitePath
+#' @param tree a \code{phylo} object
+#' @param align an \code{alignment} object
 #' @export
-sneakPeek <- function(tree, align, step = NULL) {
-  distances <- cophenetic(tree)
-  mostDist <- which(distances == max(distances), arr.ind = TRUE)
-  mostDist <- compare(align$seq[[mostDist[1, 1]]], align$seq[[mostDist[1, 2]]])
+sneakPeek <- function(tree, align, simMatrix = NULL, step = NULL, maxPath = NULL) {
+  if (is.null(simMatrix)) {
+    simMatrix <- getSimMatrix(tree, align)
+  } else {
+    simMatrix <- sortSimMatrix(tree, simMatrix)
+  }
+  minSim <- min(simMatrix)
   if (is.null(step)) {
-    step <- round(1 - mostDist, 3) / 50
+    step <- round(minSim - 1, 3) / 50
+  }
+  if (is.null(maxPath)) {
+    maxPath <- length(tree$tip.label) / 20
+  } else {
+    if (maxPath <= 0) {
+      stop("Maximum path number should be set greater than 0")
+    }
   }
   similarity <- numeric(0)
   pathNum <- integer(0)
-  for (s in seq(mostDist, 1, step)) {
+  for (s in seq(1, minSim, step)) {
+    paths <- sitePath(tree, align, s, simMatrix)
+    if (maxPath < length(paths)) {
+      next
+    }
     similarity <- c(similarity, s)
-    paths <- sitePath(tree, align, s)
     pathNum <- c(pathNum, length(paths))
+    if (length(paths) == 0) {
+      break
+    }
   }
   plot(similarity, pathNum)
-}
-
-#' @export
-sneakPeek2 <- function(tree, align, step = NULL) {
-  distances <- cophenetic(tree)
-  mostDist <- which(distances == max(distances), arr.ind = TRUE)
-  mostDist <- compare(align$seq[[mostDist[1, 1]]], align$seq[[mostDist[1, 2]]])
-  if (is.null(step)) {
-    step <- round(1 - mostDist, 3) / 50
-  }
-  similarity <- numeric(0)
-  mutationNum <- integer(0)
-  for (s in seq(mostDist, 1, step)) {
-    similarity <- c(similarity, s)
-    paths <- sitePath(tree, align, s)
-    mutations <- findFixed(paths)
-    mutationNum <- c(mutationNum, sum(lengths(sapply(mutations, tail, 1))))
-  }
-  plot(similarity, mutationNum)
 }
 
 #' @name findMutations

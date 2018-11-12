@@ -1,6 +1,6 @@
 sitePath
 ========
-An R package for weird phylogenetic analysis
+An R package for finding lineage-dependent site fixation
 
 Installation
 ------------
@@ -23,17 +23,15 @@ Unable to install from github so far
 Example
 -------
 ```
-tree <- ggtree::read.beast(
-  system.file("m.trees", package = "sitePath")
-)@phylo
-
+library(sitePath)
 align <- seqinr::read.alignment(
-  system.file("m.aligned.fasta", package = "sitePath"),
-  format = "fasta", forceToLower = FALSE
+  system.file("dengue_E.fasta", package = "sitePath"), "fasta"
 )
 
-matched <- treeAlignMatch(tree, align)
-grouping <- groupTips(matched, 0.98)
-sitePath <- getSitePath(matched, 0.98)
-findSites(sitePath, 1)
+tree <- ape::read.tree(
+  system.file("dengue_E.tree", package = "sitePath")
+)
+
+(sitePath <- sitePath(tree, align, 0.98))
+mutations <- findFixed(sitePath)
 ```

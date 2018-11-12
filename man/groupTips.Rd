@@ -4,7 +4,7 @@
 \alias{groupTips}
 \title{Trim Tree}
 \usage{
-groupTips(tree, align, similarity, tipnames = TRUE)
+groupTips(tree, align, similarity, simMatrix = NULL, tipnames = TRUE)
 }
 \arguments{
 \item{tree}{a \code{phylo} object}

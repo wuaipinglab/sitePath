@@ -16,10 +16,11 @@ NULL
 #' @importFrom ape nodepath
 #' @return grouping of tips
 #' @export
-groupTips <- function(tree, align, similarity, tipnames = TRUE) {
+groupTips <- function(tree, align, similarity, simMatrix = NULL, tipnames = TRUE) {
+  simMatrix <- sortSimMatrix(tree, simMatrix)
   grouping <- trimTree(
     nodepath(tree), checkMatched(tree, align),
-    similarity, TRUE
+    simMatrix, similarity, TRUE
   )
   if (tipnames) {
     return(lapply(grouping, function(g) {tree$tip.label[g]}))
@@ -37,16 +38,17 @@ groupTips <- function(tree, align, similarity, tipnames = TRUE) {
 #' @importFrom ape nodepath
 #' @return path represent by tip names
 #' @export
-sitePath <- function(tree, align, similarity) {
+sitePath <- function(tree, align, similarity, simMatrix = NULL) {
+  simMatrix <- sortSimMatrix(tree, simMatrix)
   align <- checkMatched(tree, align)
   # nodepath after trimming
-  trimmedPaths <- unique(trimTree(nodepath(tree), align, similarity, FALSE))
-  # get the bifurcated nodes and their path to the root in a trimmed tree
+  trimmedPaths <- unique(trimTree(nodepath(tree), align, simMatrix, similarity, FALSE))
+  # get the bifurcated pre-terminal nodes and their path to the root in a trimmed tree
   # those paths are the so-called sitePaths (isolated)
   paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
   if (length(paths) == 0) {
-    stop("Similarity threshold is too low resulting in no sitePath")
+    warning(paste0("Similarity threshold (", similarity, ") is too low resulting in no sitePath"))
   }
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align
@@ -60,9 +62,7 @@ print.sitePath <- function(sitePath) {
 }
 
 checkMatched <- function(tree, align) {
-  if (!inherits(tree, "phylo")) {
-    stop("tree must be of class phylo")
-  } else if (!is(align, "alignment")) {
+  if (!is(align, "alignment")) {
     stop("align must be of class alignment")
   }
   align <- toupper(align$seq[match(tree$tip.label, align$nam)])
@@ -72,4 +72,21 @@ checkMatched <- function(tree, align) {
     stop("Sequence lengths are not the same in alignment")
   }
   return(align)
+}
+
+sortSimMatrix <- function(tree, simMatrix) {
+  if (!inherits(tree, "phylo")) {
+    stop("tree must be of class phylo")
+  }
+  colMatch <- match(tree$tip.label, colnames(simMatrix))
+  rowMatch <- match(tree$tip.label, rownames(simMatrix))
+  if (is.null(simMatrix)) {
+    return(matrix(
+      NA,
+      ncol = length(tree$tip.label),
+      nrow = length(tree$tip.label)
+    ))
+  } else {
+    return(simMatrix[rowMatch, colMatch])
+  }
 }

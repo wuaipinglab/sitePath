@@ -1,27 +1,45 @@
 #include "pruner.h"
 
-//[[Rcpp::export]]
-const float compare(const std::string &query, const std::string &subject) {
-  float match = 0.0, length = 0.0;
-  for (
-      std::string::const_iterator q = query.begin(), s = subject.begin();
-      q != query.end(); ++q, ++s
-  ) {
-    if (*q != '-' && *s != '-') {
-      length++;
-      if (*q == *s) match++;
+// [[Rcpp::export]]
+NumericMatrix similarityMatrix(
+    ListOf<CharacterVector> alignedSeqs,
+    NumericMatrix simMatrixInput
+) {
+  int nrow = simMatrixInput.nrow();
+  int ncol = simMatrixInput.ncol();
+  for (int i = 0; i < nrow; ++i) {
+    for (int j = i; j < ncol; ++j) {
+      if (i == j) {
+        simMatrixInput(i, j) = 1;
+      } else {
+        simMatrixInput(j, i) = simMatrixInput(i, j) = compare(
+          as<std::string>(alignedSeqs[i]),
+          as<std::string>(alignedSeqs[j])
+        );
+      }
     }
   }
-  return match / length;
+  return simMatrixInput;
 }
 
 // [[Rcpp::export]]
 SEXP trimTree(
     ListOf<IntegerVector> tipPaths, 
     ListOf<CharacterVector> alignedSeqs,
+    NumericMatrix simMatrixInput,
     const float &similarity, const bool &getTips
 ) {
-  Pruner match(tipPaths, alignedSeqs, similarity);
+  std::map<std::pair<int, int>, float> simMatrix = std::map<std::pair<int, int>, float>();
+  int nrow = simMatrixInput.nrow();
+  int ncol = simMatrixInput.ncol();
+  for (int i = 0; i < nrow; ++i) {
+    for (int j = 0; j < ncol; ++j) {
+      if (!R_IsNA(simMatrixInput(i, j))) {
+        simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
+      }
+    }
+  }
+  Pruner match(tipPaths, alignedSeqs, similarity, simMatrix);
   if (getTips) {
     return wrap(match.getTips());
   } else {
@@ -43,9 +61,9 @@ IntegerVector divergentNode(ListOf<IntegerVector> paths) {
 }
 
 // [[Rcpp::export]]
-IntegerVector getReference(std::string refSeq, const char &gapChar) {
+IntegerVector getReference(const std::string &refSeq, const char &gapChar) {
   std::vector<int> res;
-  for (int i = 0; i < refSeq.size(); i++) {
+  for (unsigned int i = 0; i < refSeq.size(); i++) {
     if (refSeq[i] != gapChar) {
       res.push_back(i + 1);
     }
