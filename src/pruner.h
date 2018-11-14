@@ -8,23 +8,24 @@
 class TreeAlignmentMatch {
 public:
   TreeAlignmentMatch(
-    ListOf<IntegerVector> tipPaths, 
-    ListOf<CharacterVector> alignedSeqs
+    const ListOf<IntegerVector> &tipPaths, 
+    const ListOf<CharacterVector> &alignedSeqs
   );
   virtual ~TreeAlignmentMatch() {}
 protected:
-  const int root, seqLen;
   std::vector<TipSeqLinker*> linkers;
   std::map< int, std::vector<TipSeqLinker*> > clusters;
   void pruneTree();
   virtual const bool qualified(const std::vector<TipSeqLinker*> &clstr) = 0;
+private:
+  const int root, seqLen;
 };
 
 class Pruner: public TreeAlignmentMatch {
 public:
   Pruner(
-    ListOf<IntegerVector> tipPaths, 
-    ListOf<CharacterVector> alignedSeqs,
+    const ListOf<IntegerVector> &tipPaths, 
+    const ListOf<CharacterVector> &alignedSeqs,
     const float simThreshold,
     std::map<std::pair<int, int>, float> &simMatrix
   );

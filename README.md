@@ -1,11 +1,11 @@
 sitePath
 ========
-An R package for finding lineage-dependent site fixation
+An R package for finding site with lineage-dependent fixation in RNA virus
 
 Installation
 ------------
 To install the package from github:
-```
+```r
 install.packages("devtools")
 devtools::install_github("Takkoona/sitePath")
 ```
@@ -22,16 +22,16 @@ Unable to install from github so far
 
 Example
 -------
-```
+```r
 library(sitePath)
 align <- seqinr::read.alignment(
-  system.file("dengue_E.fasta", package = "sitePath"), "fasta"
+  system.file("zika_genome.fasta", package = "sitePath"), "fasta"
 )
 
 tree <- ape::read.tree(
-  system.file("dengue_E.tree", package = "sitePath")
+  system.file("zika_genome.tree", package = "sitePath")
 )
 
-(sitePath <- sitePath(tree, align, 0.98))
+(sitePath <- sitePath(tree, align, 0.996))
 mutations <- findFixed(sitePath)
 ```

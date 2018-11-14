@@ -12,6 +12,8 @@ sitePath(tree, align, similarity, simMatrix = NULL)
 \item{align}{an \code{alignment} object}
 
 \item{similarity}{similarity threshold for tree trimming}
+
+\item{simMatrix}{a diagonal matrix of similarity between sequences}
 }
 \value{
 path represent by tip names

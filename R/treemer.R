@@ -12,6 +12,7 @@ NULL
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
+#' @param simMatrix a diagonal matrix of similarity between sequences
 #' @param tipnames if return as tipnames
 #' @importFrom ape nodepath
 #' @return grouping of tips
@@ -31,10 +32,11 @@ groupTips <- function(tree, align, similarity, simMatrix = NULL, tipnames = TRUE
 
 #' @title Get sitePath
 #' @description
-#' Under development
+#' Find the sitePath of a phylogenetic tree providing the corresponding sequence alignment.
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
+#' @param simMatrix a diagonal matrix of similarity between sequences
 #' @importFrom ape nodepath
 #' @return path represent by tip names
 #' @export
@@ -48,7 +50,7 @@ sitePath <- function(tree, align, similarity, simMatrix = NULL) {
   paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
   if (length(paths) == 0) {
-    warning(paste0("Similarity threshold (", similarity, ") is too low resulting in no sitePath"))
+    warning(paste0(similarity, " is too low of a cutoff resulting in no sitePath"))
   }
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align

@@ -1,8 +1,8 @@
 #include "pruner.h"
 
 TreeAlignmentMatch::TreeAlignmentMatch(
-  ListOf<IntegerVector> tipPaths, 
-  ListOf<CharacterVector> alignedSeqs
+  const ListOf<IntegerVector> &tipPaths,
+  const ListOf<CharacterVector> &alignedSeqs
 ):
   root(*(tipPaths[0].begin())),
   seqLen((as<std::string>(alignedSeqs[0])).size()) {
@@ -50,8 +50,8 @@ void TreeAlignmentMatch::pruneTree() {
 }
 
 Pruner::Pruner(
-  ListOf<IntegerVector> tipPaths, 
-  ListOf<CharacterVector> alignedSeqs,
+  const ListOf<IntegerVector> &tipPaths,
+  const ListOf<CharacterVector> &alignedSeqs,
   const float simThreshold,
   std::map<std::pair<int, int>, float> &simMatrix
 ):

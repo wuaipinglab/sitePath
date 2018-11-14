@@ -17,8 +17,8 @@ const float compare(const std::string &query, const std::string &subject) {
 }
 
 TipSeqLinker::TipSeqLinker(
-  CharacterVector sequence,
-  IntegerVector tipPath
+  const CharacterVector &sequence,
+  const IntegerVector &tipPath
 ):
   seq(as<std::string>(sequence)),
   path(tipPath),

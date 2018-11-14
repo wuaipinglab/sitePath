@@ -13,6 +13,8 @@ groupTips(tree, align, similarity, simMatrix = NULL, tipnames = TRUE)
 
 \item{similarity}{similarity threshold for tree trimming}
 
+\item{simMatrix}{a diagonal matrix of similarity between sequences}
+
 \item{tipnames}{if return as tipnames}
 }
 \value{

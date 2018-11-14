@@ -1,8 +1,10 @@
+#' @rdname Pre-assessment
 #' @title Similarity Matrix
 #' @description 
 #' To calculate similarity between aligned sequences
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
+#' @return a diagonal matrix of similarity between sequences
 #' @export
 getSimMatrix <- function(tree, align) {
   if (!inherits(tree, "phylo")) {
@@ -10,31 +12,24 @@ getSimMatrix <- function(tree, align) {
   } else if (!is(align, "alignment")) {
     stop("align must be of class alignment")
   }
-  sim <- matrix(
-    NA,
-    ncol = length(tree$tip.label),
-    nrow = length(tree$tip.label),
-    dimnames = list(tree$tip.label, tree$tip.label)
-  )
-  align <- checkMatched(tree, align)
-  return(similarityMatrix(align, sim))
+  sim <- similarityMatrix(checkMatched(tree, align))
+  dimnames(sim) <- list(tree$tip.label, tree$tip.label)
+  return(sim)
 }
 
 #' @name SimilarityPlot
 #' @rdname Pre-assessment
 #' @title Pre-assessment
 #' @description
-#' Under development.This function is intended to plot similarity as a threshold
-#' against number of output sitePath
+#' This function is intended to plot similarity as a threshold
+#' against number of output sitePath. This plot is intended to give user
+#' a feel of how many sitePaths they should expect from the similarity threshold
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
+#' @param maxPath maximum number of path to show in the plot
 #' @export
-sneakPeek <- function(tree, align, simMatrix = NULL, step = NULL, maxPath = NULL) {
-  if (is.null(simMatrix)) {
-    simMatrix <- getSimMatrix(tree, align)
-  } else {
-    simMatrix <- sortSimMatrix(tree, simMatrix)
-  }
+sneakPeek <- function(tree, align, step = NULL, maxPath = NULL) {
+  simMatrix <- getSimMatrix(tree, align)
   minSim <- min(simMatrix)
   if (is.null(step)) {
     step <- round(minSim - 1, 3) / 50
@@ -52,12 +47,11 @@ sneakPeek <- function(tree, align, simMatrix = NULL, step = NULL, maxPath = NULL
     paths <- sitePath(tree, align, s, simMatrix)
     if (maxPath < length(paths)) {
       next
+    } else if (length(paths) == 0) {
+      break
     }
     similarity <- c(similarity, s)
     pathNum <- c(pathNum, length(paths))
-    if (length(paths) == 0) {
-      break
-    }
   }
   plot(similarity, pathNum)
 }
@@ -66,20 +60,30 @@ sneakPeek <- function(tree, align, simMatrix = NULL, step = NULL, maxPath = NULL
 #' @rdname findMutations
 #' @title Find Mutations
 #' @description
-#' Under development
+#' After finding the \code{\link{sitePath}} of a phylogenetic tree, we can use the result to find
+#' those sites that have fixed on some sitePath but do not show fixation on the tree as a whole.
 #' @param paths a \code{sitePath} object
+#' @param minSize minimum number of seuqence involved before or after mutation
+#' @param reference name of reference for site numbering. The default uses the intrinsic alignment numbering
+#' @param gapChar the character to indicate gap.
+#' @param tolerance maximum number of allowed sequence with a different amino acid
 #' @export
-findFixed.sitePath <- function(paths, tolerance = 0, reference = NULL, gapChar = '-') {
+findFixed.sitePath <- function(paths, minSize = 10, reference = NULL, gapChar = '-', tolerance = 0) {
   tree <- attr(paths, "tree")
   align <- attr(paths, "align")
-  divNodes <- unique(divergentNode(paths))
-  if (!is.null(reference)) {
-    reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
-  } else {
-    reference <- 1:nchar(align[1])
+  if (minSize <= 0 || minSize >= length(tree$tip.label)) {
+    stop("minSize can't be negative, zero or greater than total number of sequence")
   }
-  findMutation <- function(path) {
+  if (is.null(reference)) {
+    reference <- 1:nchar(align[1])
+  } else {
+    reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
+  }
+  findMutation <- function(path, divNodes) {
     afterTips <- ChildrenTips(tree, tail(path, 1))
+    if (length(afterTips) < minSize) {
+      return(NULL)
+    }
     pathBefore <- path[1:(length(path) - 1)]
     excludedTips <- sapply(pathBefore[which(pathBefore %in% divNodes)], function(node) {
       children <- tree$edge[which(tree$edge[, 1] == node), 2]
@@ -87,6 +91,9 @@ findFixed.sitePath <- function(paths, tolerance = 0, reference = NULL, gapChar =
       return(ChildrenTips(tree, children))
     })
     beforeTips <- which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
+    if (length(beforeTips) < minSize) {
+      return(NULL)
+    }
     after <- strsplit(align[afterTips], "")
     before <- strsplit(align[beforeTips], "")
     mutations <- character(0)
@@ -100,18 +107,17 @@ findFixed.sitePath <- function(paths, tolerance = 0, reference = NULL, gapChar =
       }
     }
     if (length(mutations) == 0) {
-      return(character(0))
+      return(NULL)
     } else {
-      return(list(from  = tree$tip.label[beforeTips], to = tree$tip.label[afterTips], mutations = mutations))
+      return(list(from = tree$tip.label[beforeTips], to = tree$tip.label[afterTips], mutations = mutations))
     }
   }
   res <- list()
   for (n in 2:max(lengths(paths))) {
-    ancestralPaths <- unique(ancestralPaths(paths, n))
-    mutations <- lapply(ancestralPaths, findMutation)
-    res <- c(res, mutations)
+    mutations <- lapply(unique(ancestralPaths(paths, n)), findMutation, unique(divergentNode(paths)))
+    res <- c(res, mutations[which(lengths(mutations) != 0)])
   }
-  return(res[which(lengths(res) != 0)])
+  return(res)
 }
 
 #' @export

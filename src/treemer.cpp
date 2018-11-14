@@ -1,32 +1,29 @@
 #include "pruner.h"
 
 // [[Rcpp::export]]
-NumericMatrix similarityMatrix(
-    ListOf<CharacterVector> alignedSeqs,
-    NumericMatrix simMatrixInput
-) {
-  int nrow = simMatrixInput.nrow();
-  int ncol = simMatrixInput.ncol();
-  for (int i = 0; i < nrow; ++i) {
-    for (int j = i; j < ncol; ++j) {
+NumericMatrix similarityMatrix(const ListOf<CharacterVector> &alignedSeqs) {
+  int dim = alignedSeqs.size();
+  NumericMatrix simMatrix(dim, dim);
+  for (int i = 0; i < dim; ++i) {
+    for (int j = i; j < dim; ++j) {
       if (i == j) {
-        simMatrixInput(i, j) = 1;
+        simMatrix(i, j) = 1;
       } else {
-        simMatrixInput(j, i) = simMatrixInput(i, j) = compare(
+        simMatrix(j, i) = simMatrix(i, j) = compare(
           as<std::string>(alignedSeqs[i]),
           as<std::string>(alignedSeqs[j])
         );
       }
     }
   }
-  return simMatrixInput;
+  return simMatrix;
 }
 
 // [[Rcpp::export]]
 SEXP trimTree(
-    ListOf<IntegerVector> tipPaths, 
-    ListOf<CharacterVector> alignedSeqs,
-    NumericMatrix simMatrixInput,
+    const ListOf<IntegerVector> &tipPaths, 
+    const ListOf<CharacterVector> &alignedSeqs,
+    NumericMatrix &simMatrixInput,
     const float &similarity, const bool &getTips
 ) {
   std::map<std::pair<int, int>, float> simMatrix = std::map<std::pair<int, int>, float>();
@@ -48,11 +45,11 @@ SEXP trimTree(
 }
 
 // [[Rcpp::export]]
-IntegerVector divergentNode(ListOf<IntegerVector> paths) {
+IntegerVector divergentNode(const ListOf<IntegerVector> &paths) {
   std::vector<int> res;
   for (int i = 0; i < paths.size() - 1; i++) {
     for (int j = i + 1; j < paths.size(); j++) {
-      IntegerVector::iterator q  = paths[i].begin(), s = paths[j].begin();
+      IntegerVector::const_iterator q  = paths[i].begin(), s = paths[j].begin();
       do {q++, s++;} while (*q == *s);
       if (--q != paths[i].begin()) res.push_back(*q);
     }
@@ -72,7 +69,7 @@ IntegerVector getReference(const std::string &refSeq, const char &gapChar) {
 }
 
 // [[Rcpp::export]]
-ListOf<IntegerVector> ancestralPaths(ListOf<IntegerVector> paths, const int &n) {
+ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const int &n) {
   std::vector<IntegerVector> res;
   for (int i = 0; i < paths.size(); ++i) {
     if (paths[i].size() >= n) {

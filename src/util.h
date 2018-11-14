@@ -11,7 +11,7 @@ const float compare(const std::string &query, const std::string &subject);
 
 class TipSeqLinker {
 public:
-  TipSeqLinker(CharacterVector sequence, IntegerVector tipPath);
+  TipSeqLinker(const CharacterVector &sequence, const IntegerVector &tipPath);
   void proceed();
   const int nextClade() const;
   const int currentClade() const;

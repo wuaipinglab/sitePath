@@ -1,8 +1,8 @@
 Package: sitePath
 Type: Package
-Title: Semi-conservative site
+Title: Lineage-dependent fixation
 Version: 0.0.1
-Date: 2018-07-05
+Date: 2018-11-14
 Author:
   Chengyang Ji
   Aiping Wu

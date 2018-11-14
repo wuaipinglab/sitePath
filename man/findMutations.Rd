@@ -5,12 +5,21 @@
 \alias{findFixed.sitePath}
 \title{Find Mutations}
 \usage{
-\method{findFixed}{sitePath}(paths, tolerance = 0, reference = NULL,
-  gapChar = "-")
+\method{findFixed}{sitePath}(paths, minSize = 10, reference = NULL,
+  gapChar = "-", tolerance = 0)
 }
 \arguments{
 \item{paths}{a \code{sitePath} object}
+
+\item{minSize}{minimum number of seuqence involved before or after mutation}
+
+\item{reference}{name of reference for site numbering. The default uses the intrinsic alignment numbering}
+
+\item{gapChar}{the character to indicate gap.}
+
+\item{tolerance}{maximum number of allowed sequence with a different amino acid}
 }
 \description{
-Under development
+After finding the \code{\link{sitePath}} of a phylogenetic tree, we can use the result to find
+those sites that have fixed on some sitePath but do not show fixation on the tree as a whole.
 }
