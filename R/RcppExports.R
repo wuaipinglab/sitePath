@@ -17,7 +17,7 @@ getReference <- function(refSeq, gapChar) {
     .Call('_sitePath_getReference', PACKAGE = 'sitePath', refSeq, gapChar)
 }
 
-ancestralPaths <- function(paths, n) {
-    .Call('_sitePath_ancestralPaths', PACKAGE = 'sitePath', paths, n)
+ancestralPaths <- function(paths, minLen) {
+    .Call('_sitePath_ancestralPaths', PACKAGE = 'sitePath', paths, minLen)
 }
 

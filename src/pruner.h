@@ -29,8 +29,8 @@ public:
     const float simThreshold,
     std::map<std::pair<int, int>, float> &simMatrix
   );
-  std::map< int, std::vector<int> > getTips();
-  std::vector<IntegerVector> getPaths();
+  std::map< int, std::vector<int> > getTips() const;
+  std::vector<IntegerVector> getPaths() const;
 private:
   const float simCut;
   std::map<std::pair<int, int>, float> compared;

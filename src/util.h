@@ -21,8 +21,8 @@ public:
   IntegerVector getPath() const;
   std::string getSeq() const;
 private:
-  std::string seq;
-  IntegerVector path;
+  const std::string seq;
+  const IntegerVector path;
   const int tipIndex;
   int cIndex;
 };

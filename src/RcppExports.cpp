@@ -17,7 +17,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // trimTree
-SEXP trimTree(const ListOf<IntegerVector>& tipPaths, const ListOf<CharacterVector>& alignedSeqs, NumericMatrix& simMatrixInput, const float& similarity, const bool& getTips);
+SEXP trimTree(const ListOf<IntegerVector>& tipPaths, const ListOf<CharacterVector>& alignedSeqs, NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
 RcppExport SEXP _sitePath_trimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -25,8 +25,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< const ListOf<CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
     Rcpp::traits::input_parameter< NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
-    Rcpp::traits::input_parameter< const float& >::type similarity(similaritySEXP);
-    Rcpp::traits::input_parameter< const bool& >::type getTips(getTipsSEXP);
+    Rcpp::traits::input_parameter< const float >::type similarity(similaritySEXP);
+    Rcpp::traits::input_parameter< const bool >::type getTips(getTipsSEXP);
     rcpp_result_gen = Rcpp::wrap(trimTree(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips));
     return rcpp_result_gen;
 END_RCPP
@@ -43,26 +43,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // getReference
-IntegerVector getReference(const std::string& refSeq, const char& gapChar);
+IntegerVector getReference(const std::string& refSeq, const char gapChar);
 RcppExport SEXP _sitePath_getReference(SEXP refSeqSEXP, SEXP gapCharSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type refSeq(refSeqSEXP);
-    Rcpp::traits::input_parameter< const char& >::type gapChar(gapCharSEXP);
+    Rcpp::traits::input_parameter< const char >::type gapChar(gapCharSEXP);
     rcpp_result_gen = Rcpp::wrap(getReference(refSeq, gapChar));
     return rcpp_result_gen;
 END_RCPP
 }
 // ancestralPaths
-ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector>& paths, const int& n);
-RcppExport SEXP _sitePath_ancestralPaths(SEXP pathsSEXP, SEXP nSEXP) {
+ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector>& paths, const int minLen);
+RcppExport SEXP _sitePath_ancestralPaths(SEXP pathsSEXP, SEXP minLenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type paths(pathsSEXP);
-    Rcpp::traits::input_parameter< const int& >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(ancestralPaths(paths, n));
+    Rcpp::traits::input_parameter< const int >::type minLen(minLenSEXP);
+    rcpp_result_gen = Rcpp::wrap(ancestralPaths(paths, minLen));
     return rcpp_result_gen;
 END_RCPP
 }

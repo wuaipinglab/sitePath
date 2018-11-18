@@ -79,43 +79,44 @@ findFixed.sitePath <- function(paths, minSize = 10, reference = NULL, gapChar = 
   } else {
     reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
   }
-  findMutation <- function(path, divNodes) {
-    afterTips <- ChildrenTips(tree, tail(path, 1))
-    if (length(afterTips) < minSize) {
-      return(NULL)
-    }
-    pathBefore <- path[1:(length(path) - 1)]
-    excludedTips <- sapply(pathBefore[which(pathBefore %in% divNodes)], function(node) {
-      children <- tree$edge[which(tree$edge[, 1] == node), 2]
-      children <- children[which(children > length(tree$tip.label) & !children %in% path)]
-      return(ChildrenTips(tree, children))
-    })
-    beforeTips <- which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
-    if (length(beforeTips) < minSize) {
-      return(NULL)
-    }
-    after <- strsplit(align[afterTips], "")
-    before <- strsplit(align[beforeTips], "")
-    mutations <- character(0)
-    for (i in 1:length(reference)) {
-      bsum <- table(sapply(before, "[[", reference[i]))
-      asum <- table(sapply(after, "[[", reference[i]))
-      b <- names(bsum[1])
-      a <- names(asum[1])
-      if (sum(c(bsum[-1], asum[-1])) <= tolerance && b != a) {
-        mutations <- c(mutations, paste(b, i, a, sep = ""))
-      }
-    }
-    if (length(mutations) == 0) {
-      return(NULL)
-    } else {
-      return(list(from = tree$tip.label[beforeTips], to = tree$tip.label[afterTips], mutations = mutations))
-    }
-  }
+  divNodes <- unique(divergentNode(paths))
   res <- list()
-  for (n in 2:max(lengths(paths))) {
-    mutations <- lapply(unique(ancestralPaths(paths, n)), findMutation, unique(divergentNode(paths)))
-    res <- c(res, mutations[which(lengths(mutations) != 0)])
+  for (minLen in 2:max(lengths(paths))) { # literate all sitePath at the same time
+    mutations <- lapply(unique(ancestralPaths(paths, minLen)), function(path) {
+      afterTips <- ChildrenTips(tree, tail(path, 1))
+      if (length(afterTips) < minSize) {
+        return(NULL)
+      }
+      pathBefore <- path[1:(length(path) - 1)]
+      excludedTips <- sapply(pathBefore[which(pathBefore %in% divNodes)], function(node) {
+        children <- tree$edge[which(tree$edge[, 1] == node), 2]
+        children <- children[which(children > length(tree$tip.label) & !children %in% path)]
+        return(ChildrenTips(tree, children))
+      })
+      beforeTips <- which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
+      if (length(beforeTips) < minSize) {
+        return(NULL)
+      }
+      after <- strsplit(align[afterTips], "")
+      before <- strsplit(align[beforeTips], "")
+      mutations <- character(0)
+      for (i in 1:length(reference)) {
+        bsum <- table(sapply(before, "[[", reference[i]))
+        asum <- table(sapply(after, "[[", reference[i]))
+        b <- names(bsum[1])
+        a <- names(asum[1])
+        if (sum(c(bsum[-1], asum[-1])) <= tolerance && b != a) {
+          mutations <- c(mutations, paste(b, i, a, sep = ""))
+        }
+      }
+      if (length(mutations) == 0) {
+        return(NULL)
+      } else {
+        return(list(from = tree$tip.label[beforeTips], to = tree$tip.label[afterTips], mutations = mutations))
+      }
+    })
+    mutations <- mutations[which(lengths(mutations) != 0)]
+    if (length(mutations) != 0) {res <- c(res, mutations)}
   }
   return(res)
 }

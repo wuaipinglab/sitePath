@@ -24,7 +24,7 @@ SEXP trimTree(
     const ListOf<IntegerVector> &tipPaths, 
     const ListOf<CharacterVector> &alignedSeqs,
     NumericMatrix &simMatrixInput,
-    const float &similarity, const bool &getTips
+    const float similarity, const bool getTips
 ) {
   std::map<std::pair<int, int>, float> simMatrix = std::map<std::pair<int, int>, float>();
   int nrow = simMatrixInput.nrow();
@@ -58,7 +58,7 @@ IntegerVector divergentNode(const ListOf<IntegerVector> &paths) {
 }
 
 // [[Rcpp::export]]
-IntegerVector getReference(const std::string &refSeq, const char &gapChar) {
+IntegerVector getReference(const std::string &refSeq, const char gapChar) {
   std::vector<int> res;
   for (unsigned int i = 0; i < refSeq.size(); i++) {
     if (refSeq[i] != gapChar) {
@@ -69,11 +69,11 @@ IntegerVector getReference(const std::string &refSeq, const char &gapChar) {
 }
 
 // [[Rcpp::export]]
-ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const int &n) {
+ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const int minLen) {
   std::vector<IntegerVector> res;
   for (int i = 0; i < paths.size(); ++i) {
-    if (paths[i].size() >= n) {
-      res.push_back(paths[i][Range(0, n - 1)]);
+    if (paths[i].size() >= minLen) {
+      res.push_back(paths[i][Range(0, minLen - 1)]);
     }
   }
   return wrap(res);

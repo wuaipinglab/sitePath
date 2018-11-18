@@ -14,7 +14,7 @@ TreeAlignmentMatch::TreeAlignmentMatch(
     if (linker->getRoot() != root) {
       throw std::invalid_argument("Root in tree path not equal");
     } else if (linker->getSeqLen() != seqLen) {
-      throw std::invalid_argument("Sequene length not equal");
+      throw std::invalid_argument("Sequence length not equal");
     }
   }
 }
@@ -66,17 +66,17 @@ Pruner::Pruner(
   if (simCut != 1) {pruneTree();}
 }
 
-std::map< int, std::vector<int> > Pruner::getTips() {
+std::map< int, std::vector<int> > Pruner::getTips() const {
   std::map< int, std::vector<int> > tipCluster;
-  for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
     tipCluster[(*tsLinker)->currentClade()].push_back((*tsLinker)->getTip());
   }
   return tipCluster;
 }
 
-std::vector<IntegerVector> Pruner::getPaths() {
+std::vector<IntegerVector> Pruner::getPaths() const {
   std::vector<IntegerVector> paths;
-  for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
     paths.push_back((*tsLinker)->getPath());
   }
   return paths;

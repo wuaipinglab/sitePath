@@ -19,5 +19,5 @@ sitePath(tree, align, similarity, simMatrix = NULL)
 path represent by tip names
 }
 \description{
-Under development
+Find the sitePath of a phylogenetic tree providing the corresponding sequence alignment.
 }
