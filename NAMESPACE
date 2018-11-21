@@ -2,6 +2,7 @@
 
 S3method(findFixed,sitePath)
 S3method(print,sitePath)
+export(SNPsite)
 export(findFixed)
 export(getSimMatrix)
 export(groupTips)

@@ -5,19 +5,24 @@
 \alias{findFixed.sitePath}
 \title{Find Mutations}
 \usage{
-\method{findFixed}{sitePath}(paths, minSize = 10, reference = NULL,
-  gapChar = "-", tolerance = 0)
+\method{findFixed}{sitePath}(paths, reference = NULL, gapChar = "-",
+  minSizeBefore = 10, minSizeAfter = 10, toleranceBefore = 2,
+  toleranceAfter = 2)
 }
 \arguments{
 \item{paths}{a \code{sitePath} object}
-
-\item{minSize}{minimum number of seuqence involved before or after mutation}
 
 \item{reference}{name of reference for site numbering. The default uses the intrinsic alignment numbering}
 
 \item{gapChar}{the character to indicate gap.}
 
-\item{tolerance}{maximum number of allowed sequence with a different amino acid}
+\item{minSizeBefore}{minimum number of seuqence involved before mutation}
+
+\item{minSizeAfter}{minimum number of seuqence involved after mutation}
+
+\item{toleranceBefore}{maximum number of allowed sequence with a different amino acid before mutation}
+
+\item{toleranceAfter}{maximum number of allowed sequence with a different amino acid after mutation}
 }
 \description{
 After finding the \code{\link{sitePath}} of a phylogenetic tree, we can use the result to find

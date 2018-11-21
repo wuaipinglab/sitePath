@@ -2,11 +2,14 @@
 % Please edit documentation in R/findMutations.R
 \name{getSimMatrix}
 \alias{getSimMatrix}
+\alias{SNPsite}
 \alias{SimilarityPlot}
 \alias{sneakPeek}
 \title{Similarity Matrix}
 \usage{
 getSimMatrix(tree, align)
+
+SNPsite(tree, align, minSNP = NULL, reference = NULL, gapChar = "-")
 
 sneakPeek(tree, align, step = NULL, maxPath = NULL)
 }
@@ -15,7 +18,13 @@ sneakPeek(tree, align, step = NULL, maxPath = NULL)
 
 \item{align}{an \code{alignment} object}
 
+\item{minSNP}{minimum number of amino acid to be a SNP}
+
 \item{maxPath}{maximum number of path to show in the plot}
+
+\item{tree}{a \code{phylo} object}
+
+\item{align}{an \code{alignment} object}
 
 \item{tree}{a \code{phylo} object}
 
@@ -23,9 +32,13 @@ sneakPeek(tree, align, step = NULL, maxPath = NULL)
 }
 \value{
 a diagonal matrix of similarity between sequences
+
+a list of qualified site
 }
 \description{
 To calculate similarity between aligned sequences
+
+Test whether the frequency of amino acids in each site is enough to be an SNP
 
 This function is intended to plot similarity as a threshold
 against number of output sitePath. This plot is intended to give user

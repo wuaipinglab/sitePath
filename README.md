@@ -34,4 +34,7 @@ tree <- ape::read.tree(
 
 (sitePath <- sitePath(tree, align, 0.996))
 mutations <- findFixed(sitePath)
+(predSites <- as.numeric(sapply(
+  names(mutations), function(m) {substr(m, 2, nchar(m) - 1)}
+)))
 ```

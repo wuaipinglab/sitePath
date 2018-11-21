@@ -52,6 +52,15 @@ sitePath <- function(tree, align, similarity, simMatrix = NULL) {
   if (length(paths) == 0) {
     warning(paste0(similarity, " is too low of a cutoff resulting in no sitePath"))
   }
+  paths <- lapply(paths, function(p) {
+    sn <- p[length(p)]
+    extended <- lapply(ChildrenTips(tree, sn), function(t) nodepath(tree, sn, t))
+    el <- lengths(extended)
+    ml <- max(el)
+    longest <- extended[which(el == ml)]
+    extended <- lapply(1:ml, function(i) unique(sapply(longest, "[[", i)))
+    c(p, unlist(extended[which(lengths(extended) == 1)]))
+  })
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align
   attr(paths, "class") <- "sitePath"
@@ -91,4 +100,20 @@ sortSimMatrix <- function(tree, simMatrix) {
   } else {
     return(simMatrix[rowMatch, colMatch])
   }
+}
+
+ChildrenTips <- function(tree, node) {
+  maxTip <- length(tree$tip.label)
+  children <- integer(0)
+  getChildren <- function(edges, parent) {
+    children <<- c(children, parent[which(parent <= maxTip)])
+    i <- which(edges[, 1] %in% parent)
+    if (length(i) == 0L) {
+      return(children)
+    } else {
+      parent <- edges[i, 2]
+      return(getChildren(edges, parent))
+    }
+  }
+  return(getChildren(tree$edge, node))
 }

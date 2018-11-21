@@ -17,6 +17,38 @@ getSimMatrix <- function(tree, align) {
   return(sim)
 }
 
+#' @rdname Pre-assessment
+#' @title Site with SNP
+#' @description 
+#' Test whether the frequency of amino acids in each site is enough to be an SNP
+#' @param tree a \code{phylo} object
+#' @param align an \code{alignment} object
+#' @param minSNP minimum number of amino acid to be a SNP
+#' @return a list of qualified site
+#' @export
+SNPsite <- function(tree, align, minSNP = NULL, reference = NULL, gapChar = '-') {
+  if (is.null(minSNP)) {
+    minSNP <- length(tree$tip.label) / 10
+  }
+  alignedSeq <- toupper(align$seq)
+  if (is.null(reference)) {
+    reference <- 1:nchar(alignedSeq[1])
+  } else {
+    reference <- getReference(alignedSeq[which(tree$tip.label == reference)], gapChar)
+  }
+  seqLen <- unique(nchar(alignedSeq))
+  if (length(seqLen) != 1) stop("Sequence length not equal")
+  qualified <- integer(0)
+  alignedSeq <- strsplit(alignedSeq, "")
+  for (i in  1:length(reference)) {
+    SNP <- table(sapply(alignedSeq, "[[", reference[i]))
+    if (sum(SNP > minSNP) >= 2) {
+      qualified <- c(qualified, i)
+    }
+  }
+  return(qualified)
+}
+
 #' @name SimilarityPlot
 #' @rdname Pre-assessment
 #' @title Pre-assessment
@@ -63,29 +95,35 @@ sneakPeek <- function(tree, align, step = NULL, maxPath = NULL) {
 #' After finding the \code{\link{sitePath}} of a phylogenetic tree, we can use the result to find
 #' those sites that have fixed on some sitePath but do not show fixation on the tree as a whole.
 #' @param paths a \code{sitePath} object
-#' @param minSize minimum number of seuqence involved before or after mutation
 #' @param reference name of reference for site numbering. The default uses the intrinsic alignment numbering
 #' @param gapChar the character to indicate gap.
-#' @param tolerance maximum number of allowed sequence with a different amino acid
+#' @param minSizeBefore minimum number of seuqence involved before mutation
+#' @param minSizeAfter minimum number of seuqence involved after mutation
+#' @param toleranceBefore maximum number of allowed sequence with a different amino acid before mutation
+#' @param toleranceAfter maximum number of allowed sequence with a different amino acid after mutation
 #' @export
-findFixed.sitePath <- function(paths, minSize = 10, reference = NULL, gapChar = '-', tolerance = 0) {
+findFixed.sitePath <- function(
+  paths, reference = NULL, gapChar = '-',
+  minSizeBefore = 10, minSizeAfter = 10,
+  toleranceBefore = 2, toleranceAfter = 2
+) {
   tree <- attr(paths, "tree")
   align <- attr(paths, "align")
-  if (minSize <= 0 || minSize >= length(tree$tip.label)) {
-    stop("minSize can't be negative, zero or greater than total number of sequence")
+  if (minSizeBefore <= 0 || minSizeBefore >= length(tree$tip.label)) {
+    stop("minSizeBefore can't be negative, zero or greater than total number of sequence")
+  } else if (minSizeAfter <= 0 || minSizeAfter >= length(tree$tip.label)) {
+    stop("minSizeAfter can't be negative, zero or greater than total number of sequence")
   }
-  if (is.null(reference)) {
-    reference <- 1:nchar(align[1])
-  } else {
+  if (is.null(reference)) {reference <- 1:nchar(align[1])} else {
     reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
   }
   divNodes <- unique(divergentNode(paths))
-  res <- list()
+  mutations <- list()
   for (minLen in 2:max(lengths(paths))) { # literate all sitePath at the same time
-    mutations <- lapply(unique(ancestralPaths(paths, minLen)), function(path) {
+    for (path in unique(ancestralPaths(paths, minLen))) {
       afterTips <- ChildrenTips(tree, tail(path, 1))
-      if (length(afterTips) < minSize) {
-        return(NULL)
+      if (length(afterTips) < minSizeAfter) {
+        next
       }
       pathBefore <- path[1:(length(path) - 1)]
       excludedTips <- sapply(pathBefore[which(pathBefore %in% divNodes)], function(node) {
@@ -94,48 +132,29 @@ findFixed.sitePath <- function(paths, minSize = 10, reference = NULL, gapChar = 
         return(ChildrenTips(tree, children))
       })
       beforeTips <- which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
-      if (length(beforeTips) < minSize) {
-        return(NULL)
+      if (length(beforeTips) < minSizeBefore && length(excludedTips) == 0) {
+        next
       }
       after <- strsplit(align[afterTips], "")
       before <- strsplit(align[beforeTips], "")
-      mutations <- character(0)
       for (i in 1:length(reference)) {
         bsum <- table(sapply(before, "[[", reference[i]))
         asum <- table(sapply(after, "[[", reference[i]))
         b <- names(bsum[1])
         a <- names(asum[1])
-        if (sum(c(bsum[-1], asum[-1])) <= tolerance && b != a) {
-          mutations <- c(mutations, paste(b, i, a, sep = ""))
+        if (sum(bsum[-1]) <= toleranceBefore && sum(asum[-1]) <= toleranceAfter && b != a) {
+          mut <- paste(b, i, a, sep = "")
+          from <- tree$tip.label[beforeTips]
+          to <- tree$tip.label[afterTips]
+          if (!mut %in% names(mutations) || length(to) > length(mutations[[mut]]$to)) {
+            mutations[[mut]] <- list(from = from, to = to)
+          }
         }
       }
-      if (length(mutations) == 0) {
-        return(NULL)
-      } else {
-        return(list(from = tree$tip.label[beforeTips], to = tree$tip.label[afterTips], mutations = mutations))
-      }
-    })
-    mutations <- mutations[which(lengths(mutations) != 0)]
-    if (length(mutations) != 0) {res <- c(res, mutations)}
+    }
   }
-  return(res)
+  return(mutations)
 }
 
 #' @export
 findFixed <- function(x, ...) UseMethod("findFixed")
-
-ChildrenTips <- function(tree, node) {
-  maxTip <- length(tree$tip.label)
-  children <- integer(0)
-  getChildren <- function(edges, parent) {
-    children <<- c(children, parent[which(parent <= maxTip)])
-    i <- which(edges[, 1] %in% parent)
-    if (length(i) == 0L) {
-      return(children)
-    } else {
-      parent <- edges[i, 2]
-      return(getChildren(edges, parent))
-    }
-  }
-  return(getChildren(tree$edge, node))
-}
