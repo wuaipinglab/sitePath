@@ -1,32 +1,83 @@
 #' @rdname Pre-assessment
-#' @title Similarity Matrix
-#' @description 
-#' To calculate similarity between aligned sequences
+#' @name Pre-assessment
+#' @title Things can be done before the analysis
+#' @description \code{similarityMatrix} calculates similarity between aligned sequences
+#' The similarity matrix can be used in \code{\link{groupTips}} or \code{\link{sitePath}}
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
-#' @return a diagonal matrix of similarity between sequences
+#' @return \code{similarityMatrix} returns a diagonal matrix of similarity between sequences
 #' @export
-getSimMatrix <- function(tree, align) {
+similarityMatrix <- function(tree, align) {
   if (!inherits(tree, "phylo")) {
-    stop("tree must be of class phylo")
+    stop("tree is not class phylo")
   } else if (!is(align, "alignment")) {
-    stop("align must be of class alignment")
+    stop("align is not class alignment")
   }
-  sim <- similarityMatrix(checkMatched(tree, align))
+  sim <- getSimilarityMatrix(checkMatched(tree, align))
   dimnames(sim) <- list(tree$tip.label, tree$tip.label)
   return(sim)
 }
 
 #' @rdname Pre-assessment
-#' @title Site with SNP
+#' @description
+#' \code{sneakPeek} is intended to plot similarity as a threshold
+#' against number of output sitePath. This plot is intended to give user
+#' a feel about how many sitePaths they should expect from the similarity threshold.
+#' The number of sitePath should not be too many or too few. The result excludes
+#' where the number of sitePath is greater than number of tips divided by 20 or
+#' self-defined maxPath. The zero sitePath result will also be excluded
+#' @param step the similarity window
+#' @param maxPath maximum number of path to show in the plot
+#' @param makePlot whether make a dot plot when return
+#' @return \code{sneakPeek} return the similarity threhold against number of sitePath
+#' @export
+sneakPeek <- function(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE) {
+  simMatrix <- similarityMatrix(tree, align)
+  minSim <- min(simMatrix)
+  if (is.null(step)) {
+    step <- round(minSim - 1, 3) / 50
+  }
+  if (is.null(maxPath)) {
+    maxPath <- length(tree$tip.label) / 20
+  } else {
+    if (maxPath <= 0) {
+      stop("Maximum path number is not greater than 0")
+    }
+  }
+  similarity <- numeric(0)
+  pathNum <- integer(0)
+  for (s in seq(1, minSim, step)) {
+    paths <- sitePath(tree, align, s, simMatrix)
+    if (maxPath < length(paths)) {
+      next
+    } else if (length(paths) == 0) {
+      break
+    }
+    similarity <- c(similarity, s)
+    pathNum <- c(pathNum, length(paths))
+  }
+  if (makePlot) {plot(similarity, pathNum)}
+  return(data.frame(similarity, pathNum))
+}
+
+#' @rdname findSites
+#' @name findSites
+#' @title Finding sites with variation
 #' @description 
-#' Test whether the frequency of amino acids in each site is enough to be an SNP
+#' Single nucleotide polymorphism (SNP) in the whole package refers to variation of amino acid.
+#' \code{findSNPsite} will try to find SNP in the multiple sequence alignment. A reference sequence
+#' and gap character may be specified to number the site. This us irrelevant to the intended analysis
+#' but might be helpful to evaluate the performance of \code{fixationSites}
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
-#' @param minSNP minimum number of amino acid to be a SNP
-#' @return a list of qualified site
+#' @param reference name of reference for site numbering. 
+#' The name has to be one of the sequences' name. The default uses the intrinsic alignment numbering
+#' @param gapChar the character to indicate gap.
+#' The numbering will skip the gapChar if reference sequence if specified.
+#' @param minSNP minimum number of amino acid variation to be a SNP
+#' @return \code{findSNPsite} returns a list of qualified SNP site
 #' @export
-SNPsite <- function(tree, align, minSNP = NULL, reference = NULL, gapChar = '-') {
+SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL) {
   if (is.null(minSNP)) {
     minSNP <- length(tree$tip.label) / 10
   }
@@ -49,60 +100,24 @@ SNPsite <- function(tree, align, minSNP = NULL, reference = NULL, gapChar = '-')
   return(qualified)
 }
 
-#' @name SimilarityPlot
-#' @rdname Pre-assessment
-#' @title Pre-assessment
+#' @rdname findSites
+#' @name fixationSites
 #' @description
-#' This function is intended to plot similarity as a threshold
-#' against number of output sitePath. This plot is intended to give user
-#' a feel of how many sitePaths they should expect from the similarity threshold
-#' @param tree a \code{phylo} object
-#' @param align an \code{alignment} object
-#' @param maxPath maximum number of path to show in the plot
-#' @export
-sneakPeek <- function(tree, align, step = NULL, maxPath = NULL) {
-  simMatrix <- getSimMatrix(tree, align)
-  minSim <- min(simMatrix)
-  if (is.null(step)) {
-    step <- round(minSim - 1, 3) / 50
-  }
-  if (is.null(maxPath)) {
-    maxPath <- length(tree$tip.label) / 20
-  } else {
-    if (maxPath <= 0) {
-      stop("Maximum path number should be set greater than 0")
-    }
-  }
-  similarity <- numeric(0)
-  pathNum <- integer(0)
-  for (s in seq(1, minSim, step)) {
-    paths <- sitePath(tree, align, s, simMatrix)
-    if (maxPath < length(paths)) {
-      next
-    } else if (length(paths) == 0) {
-      break
-    }
-    similarity <- c(similarity, s)
-    pathNum <- c(pathNum, length(paths))
-  }
-  plot(similarity, pathNum)
-}
-
-#' @name findMutations
-#' @rdname findMutations
-#' @title Find Mutations
-#' @description
-#' After finding the \code{\link{sitePath}} of a phylogenetic tree, we can use the result to find
-#' those sites that have fixed on some sitePath but do not show fixation on the tree as a whole.
+#' After finding the \code{\link{sitePath}} of a phylogenetic tree, we use the result to find
+#' those sites that show fixation on some if not all sitePath. Parallel evolution is relatively
+#' common in RNA virus. There is chance that some site be fixed in one lineage but does not show
+#' fixation because of different sequence context.
 #' @param paths a \code{sitePath} object
-#' @param reference name of reference for site numbering. The default uses the intrinsic alignment numbering
-#' @param gapChar the character to indicate gap.
-#' @param minSizeBefore minimum number of seuqence involved before mutation
-#' @param minSizeAfter minimum number of seuqence involved after mutation
-#' @param toleranceBefore maximum number of allowed sequence with a different amino acid before mutation
-#' @param toleranceAfter maximum number of allowed sequence with a different amino acid after mutation
+#' @param minSizeBefore minimum tree tips involved before mutation
+#' @param minSizeAfter minimum tree tips involved after mutation
+#' @param toleranceBefore maximum amino acid variation before mutation
+#' @param toleranceAfter maximum amino acid variation after mutation
+#' @return 
+#' \code{fixationSites} returns a list of mutations with names of the tips involved.
+#' The name of each list element is the discovered mutation. A mutation has two vectors of
+#' tip names: 'from' before the fixation and 'to' after the fixation.
 #' @export
-findFixed.sitePath <- function(
+fixationSites.sitePath <- function(
   paths, reference = NULL, gapChar = '-',
   minSizeBefore = 10, minSizeAfter = 10,
   toleranceBefore = 2, toleranceAfter = 2
@@ -114,6 +129,7 @@ findFixed.sitePath <- function(
   } else if (minSizeAfter <= 0 || minSizeAfter >= length(tree$tip.label)) {
     stop("minSizeAfter can't be negative, zero or greater than total number of sequence")
   }
+  refSeqName <- reference
   if (is.null(reference)) {reference <- 1:nchar(align[1])} else {
     reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
   }
@@ -153,8 +169,45 @@ findFixed.sitePath <- function(
       }
     }
   }
+  attr(mutations, "tree") <- tree
+  attr(mutations, "align") <- align
+  attr(mutations, "reference") <- reference
+  attr(mutations, "refSeqName") <- refSeqName
+  class(mutations) <- "fixationSites"
   return(mutations)
 }
 
 #' @export
-findFixed <- function(x, ...) UseMethod("findFixed")
+fixationSites <- function(x, ...) UseMethod("fixationSites")
+
+#' @export
+print.fixationSites <- function(fixationSites) {
+  # for (m in names(fixationSites)) {
+  #   cat(m)
+  #   cat("\n")
+  #   from <- fixationSites[[m]]$from
+  #   nfrom <- length(from)
+  #   cat(" from ", nfrom, " tips", sep = "")
+  #   if (nfrom >= 6) {
+  #     cat(": ", paste(from[1:5], collapse = ", "), " ...\n", sep = "")
+  #   } else {
+  #     cat(": ", paste(from, collapse = ", "), "\n", sep = "")
+  #   }
+  #   to <- fixationSites[[m]]$to
+  #   nto <- length(to)
+  #   cat(" to ", nto, " tips", sep = "")
+  #   if (nto >= 6) {
+  #     cat(":", paste(to[1:5], collapse = ", "), " ...\n", sep = "")
+  #   } else {
+  #     cat(":", paste(to, collapse = ", "), "\n", sep = "")
+  #   }
+  #   cat("\n")
+  # }
+  cat(paste(names(fixationSites), collapse = " "))
+  refSeqName <- attr(fixationSites, "refSeqName")
+  if (is.null(refSeqName)) {
+    cat("\nNo reference sequence specified. Using alignment numbering\n")
+  } else {
+    cat("\nReference sequence: ", refSeqName, "\n", sep = "")
+  }
+}

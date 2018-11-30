@@ -5,14 +5,14 @@
 
 using namespace Rcpp;
 
-// similarityMatrix
-NumericMatrix similarityMatrix(const ListOf<CharacterVector>& alignedSeqs);
-RcppExport SEXP _sitePath_similarityMatrix(SEXP alignedSeqsSEXP) {
+// getSimilarityMatrix
+NumericMatrix getSimilarityMatrix(const ListOf<CharacterVector>& alignedSeqs);
+RcppExport SEXP _sitePath_getSimilarityMatrix(SEXP alignedSeqsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const ListOf<CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    rcpp_result_gen = Rcpp::wrap(similarityMatrix(alignedSeqs));
+    rcpp_result_gen = Rcpp::wrap(getSimilarityMatrix(alignedSeqs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -68,7 +68,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_sitePath_similarityMatrix", (DL_FUNC) &_sitePath_similarityMatrix, 1},
+    {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
     {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 5},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},

@@ -1,7 +1,7 @@
 #include "pruner.h"
 
 // [[Rcpp::export]]
-NumericMatrix similarityMatrix(const ListOf<CharacterVector> &alignedSeqs) {
+NumericMatrix getSimilarityMatrix(const ListOf<CharacterVector> &alignedSeqs) {
   int dim = alignedSeqs.size();
   NumericMatrix simMatrix(dim, dim);
   for (int i = 0; i < dim; ++i) {

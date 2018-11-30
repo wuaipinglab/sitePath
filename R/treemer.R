@@ -2,13 +2,19 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' @title Trim Tree
+#' @rdname treemer
+#' @name treemer
+#' @title Topology-dependent tree trimming
 #' @description
-#' Tree tips are grouped by their sequence similarity and members in a group
-#' are constrained to share a same ancestral node.
+#' \code{groupTips} uses sequence similarity to group tree tips. Members in a group
+#' are always constrained to share a same ancestral node.
 #' Similarity between two tips is derived from their multiple sequence alignment.
-#' The site doesn't count into total length if both are gap.
-#' So similarity is calculated as number of matched divided by revised total length
+#' The site will not be counted into total length if both are gap.
+#' Similarity is calculated as number of matched divided by the corrected total length.
+#' So far the detection of divergence is based on one simple rule: the similarity between
+#' two most distant sequence. The two branches are decided to be divergent if the similarity
+#' is lower than the threshold. (Other more statistical involved approaches 
+#' such as Kolmogorov-Smirnov Tests among pair-wise distance could be introduced in the future)
 #' @param tree a \code{phylo} object
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
@@ -30,15 +36,16 @@ groupTips <- function(tree, align, similarity, simMatrix = NULL, tipnames = TRUE
   }
 }
 
-#' @title Get sitePath
+#' @rdname treemer
 #' @description
-#' Find the sitePath of a phylogenetic tree providing the corresponding sequence alignment.
-#' @param tree a \code{phylo} object
-#' @param align an \code{alignment} object
-#' @param similarity similarity threshold for tree trimming
-#' @param simMatrix a diagonal matrix of similarity between sequences
+#' \code{sitePath} finds the sitePath of a phylogenetic tree providing the corresponding sequence alignment.
+#' This is done by trimming the tree to the ancestor node of tips in each group and then
+#' find the the bifurcated terminals of the trimmed tree. The \code{\link{nodepath}} between root node and
+#' the bifurcated terminals is the sitePath. In order to extend the search of mutational site. The sitePath
+#' will tag some of its trailing nodes. Here nodes up to the ancestor of the tips with
+#' the longest \code{\link{nodepath}} are added.
 #' @importFrom ape nodepath
-#' @return path represent by tip names
+#' @return path represent by node number
 #' @export
 sitePath <- function(tree, align, similarity, simMatrix = NULL) {
   simMatrix <- sortSimMatrix(tree, simMatrix)
@@ -74,7 +81,7 @@ print.sitePath <- function(sitePath) {
 
 checkMatched <- function(tree, align) {
   if (!is(align, "alignment")) {
-    stop("align must be of class alignment")
+    stop("align is not class alignment")
   }
   align <- toupper(align$seq[match(tree$tip.label, align$nam)])
   if (any(is.na(align))) {
@@ -87,7 +94,7 @@ checkMatched <- function(tree, align) {
 
 sortSimMatrix <- function(tree, simMatrix) {
   if (!inherits(tree, "phylo")) {
-    stop("tree must be of class phylo")
+    stop("tree is not class phylo")
   }
   colMatch <- match(tree$tip.label, colnames(simMatrix))
   rowMatch <- match(tree$tip.label, rownames(simMatrix))
