@@ -19,28 +19,49 @@ TreeAlignmentMatch::TreeAlignmentMatch(
   }
 }
 
+std::map< int, std::vector<int> > TreeAlignmentMatch::getTips() const {
+  std::map< int, std::vector<int> > tipCluster;
+  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+    tipCluster[(*tsLinker)->currentClade()].push_back((*tsLinker)->getTip());
+  }
+  return tipCluster;
+}
+
+std::vector<IntegerVector> TreeAlignmentMatch::getPaths() const {
+  std::vector<IntegerVector> paths;
+  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
+    paths.push_back((*tsLinker)->getPath());
+  }
+  return paths;
+}
+
 void TreeAlignmentMatch::pruneTree() {
   std::map< int, std::vector<TipSeqLinker*> > oldCluster;
   while (true) {
     oldCluster = clusters;
     clusters.clear();
+    // look down one more node (fake 'proceed') for each tip after 'proceed' and group tips by that node
     for (std::vector<TipSeqLinker*>::iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
       clusters[(*tsLinker)->nextClade()].push_back(*tsLinker);
     }
+    // if no more group 'kissed' each other by a common ancestral node, then pruning is done
     if (clusters.size() == oldCluster.size()) {
       clusters.clear();
       break;
     }
+    // only 'kissed' group can do real 'proceed'
+    // if a grouping can't be found in oldCluster then all tips in that group can 'proceed'
     for (std::map< int, std::vector<TipSeqLinker*> >::iterator it = clusters.begin(); it != clusters.end(); it++) {
-      bool exist = false;
+      bool kissed = true;
       for (std::map< int, std::vector<TipSeqLinker*> >::iterator it2 = oldCluster.begin(); it2 != oldCluster.end(); it2++) {
         if (it->second == it2->second) {
-          exist = true;
-          oldCluster.erase(it2);
+          kissed = false;
+          oldCluster.erase(it2); // same grouping won't appear twice so 'non-kissed' group is deleted
           break;
         }
       }
-      if (!exist && qualified(it->second)) {
+      // candidate group needs to pass some requirement to be 'kissed'
+      if (kissed && qualified(it->second)) {
         for (std::vector<TipSeqLinker*>::iterator tsLinker = it->second.begin(); tsLinker != it->second.end(); tsLinker++) {
           (*tsLinker)->proceed();
         }
@@ -64,22 +85,6 @@ Pruner::Pruner(
     throw std::invalid_argument("Similarity cannot be greater than 1");
   }
   if (simCut != 1) {pruneTree();}
-}
-
-std::map< int, std::vector<int> > Pruner::getTips() const {
-  std::map< int, std::vector<int> > tipCluster;
-  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
-    tipCluster[(*tsLinker)->currentClade()].push_back((*tsLinker)->getTip());
-  }
-  return tipCluster;
-}
-
-std::vector<IntegerVector> Pruner::getPaths() const {
-  std::vector<IntegerVector> paths;
-  for (std::vector<TipSeqLinker*>::const_iterator tsLinker = linkers.begin(); tsLinker != linkers.end(); tsLinker++) {
-    paths.push_back((*tsLinker)->getPath());
-  }
-  return paths;
 }
 
 const bool Pruner::qualified(const std::vector<TipSeqLinker*> &clstr) {

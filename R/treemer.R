@@ -19,16 +19,24 @@ NULL
 #' @param align an \code{alignment} object
 #' @param similarity similarity threshold for tree trimming
 #' @param simMatrix a diagonal matrix of similarity between sequences
+#' @param nontrivial does not allow trivial trimming
 #' @param tipnames if return as tipnames
 #' @importFrom ape nodepath
 #' @return grouping of tips
 #' @export
-groupTips <- function(tree, align, similarity, simMatrix = NULL, tipnames = TRUE) {
+groupTips <- function(
+  tree, align, similarity, 
+  simMatrix = NULL, forbidTrivial = TRUE,
+  tipnames = TRUE
+) {
   simMatrix <- sortSimMatrix(tree, simMatrix)
   grouping <- trimTree(
     nodepath(tree), checkMatched(tree, align),
     simMatrix, similarity, TRUE
   )
+  if (length(grouping) == 1 && forbidTrivial) {
+    warning(paste0(similarity, " is too low of a cutoff resulting in trivial trimming"))
+  }
   if (tipnames) {
     return(lapply(grouping, function(g) {tree$tip.label[g]}))
   } else {
@@ -47,7 +55,7 @@ groupTips <- function(tree, align, similarity, simMatrix = NULL, tipnames = TRUE
 #' @importFrom ape nodepath
 #' @return path represent by node number
 #' @export
-sitePath <- function(tree, align, similarity, simMatrix = NULL) {
+sitePath <- function(tree, align, similarity, simMatrix = NULL, forbidTrivial = TRUE) {
   simMatrix <- sortSimMatrix(tree, simMatrix)
   align <- checkMatched(tree, align)
   # nodepath after trimming
@@ -56,18 +64,9 @@ sitePath <- function(tree, align, similarity, simMatrix = NULL) {
   # those paths are the so-called sitePaths (isolated)
   paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
-  if (length(paths) == 0) {
-    warning(paste0(similarity, " is too low of a cutoff resulting in no sitePath"))
+  if (length(paths) == 0 && forbidTrivial) {
+    warning(paste0(similarity, " is too low of a cutoff resulting in trivial trimming"))
   }
-  paths <- lapply(paths, function(p) {
-    sn <- p[length(p)]
-    extended <- lapply(ChildrenTips(tree, sn), function(t) nodepath(tree, sn, t))
-    el <- lengths(extended)
-    ml <- max(el)
-    longest <- extended[which(el == ml)]
-    extended <- lapply(1:ml, function(i) unique(sapply(longest, "[[", i)))
-    c(p, unlist(extended[which(lengths(extended) == 1)]))
-  })
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align
   attr(paths, "class") <- "sitePath"

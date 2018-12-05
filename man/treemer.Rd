@@ -6,9 +6,11 @@
 \alias{sitePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, align, similarity, simMatrix = NULL, tipnames = TRUE)
+groupTips(tree, align, similarity, simMatrix = NULL,
+  forbidTrivial = TRUE, tipnames = TRUE)
 
-sitePath(tree, align, similarity, simMatrix = NULL)
+sitePath(tree, align, similarity, simMatrix = NULL,
+  forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{a \code{phylo} object}
@@ -20,6 +22,8 @@ sitePath(tree, align, similarity, simMatrix = NULL)
 \item{simMatrix}{a diagonal matrix of similarity between sequences}
 
 \item{tipnames}{if return as tipnames}
+
+\item{nontrivial}{does not allow trivial trimming}
 }
 \value{
 grouping of tips

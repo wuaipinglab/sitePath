@@ -11,7 +11,7 @@ SNPsites(tree, align, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{sitePath}(paths, reference = NULL,
   gapChar = "-", minSizeBefore = 10, minSizeAfter = 10,
-  toleranceBefore = 2, toleranceAfter = 2)
+  toleranceBefore = 2, toleranceAfter = 2, extendedSearch = TRUE)
 }
 \arguments{
 \item{tree}{a \code{phylo} object}
@@ -35,6 +35,8 @@ The numbering will skip the gapChar if reference sequence if specified.}
 \item{toleranceBefore}{maximum amino acid variation before mutation}
 
 \item{toleranceAfter}{maximum amino acid variation after mutation}
+
+\item{extendedSearch}{whether to extend the search}
 }
 \value{
 \code{findSNPsite} returns a list of qualified SNP site

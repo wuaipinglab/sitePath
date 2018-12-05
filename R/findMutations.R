@@ -41,13 +41,13 @@ sneakPeek <- function(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
     maxPath <- length(tree$tip.label) / 20
   } else {
     if (maxPath <= 0) {
-      stop("Maximum path number is not greater than 0")
+      stop("Invalid maxPath")
     }
   }
   similarity <- numeric(0)
   pathNum <- integer(0)
   for (s in seq(1, minSim, step)) {
-    paths <- sitePath(tree, align, s, simMatrix)
+    paths <- sitePath(tree, align, s, simMatrix, FALSE)
     if (maxPath < length(paths)) {
       next
     } else if (length(paths) == 0) {
@@ -112,6 +112,7 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 #' @param minSizeAfter minimum tree tips involved after mutation
 #' @param toleranceBefore maximum amino acid variation before mutation
 #' @param toleranceAfter maximum amino acid variation after mutation
+#' @param extendedSearch whether to extend the search
 #' @return 
 #' \code{fixationSites} returns a list of mutations with names of the tips involved.
 #' The name of each list element is the discovered mutation. A mutation has two vectors of
@@ -120,7 +121,8 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 fixationSites.sitePath <- function(
   paths, reference = NULL, gapChar = '-',
   minSizeBefore = 10, minSizeAfter = 10,
-  toleranceBefore = 2, toleranceAfter = 2
+  toleranceBefore = 2, toleranceAfter = 2,
+  extendedSearch = TRUE
 ) {
   tree <- attr(paths, "tree")
   align <- attr(paths, "align")
@@ -134,6 +136,17 @@ fixationSites.sitePath <- function(
     reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
   }
   divNodes <- unique(divergentNode(paths))
+  if (extendedSearch) {
+    paths <- lapply(paths, function(p) {
+      sn <- p[length(p)]
+      extended <- lapply(ChildrenTips(tree, sn), function(t) nodepath(tree, sn, t)[-1])
+      el <- lengths(extended)
+      ml <- max(el)
+      longest <- extended[which(el == ml)]
+      extended <- lapply(1:ml, function(i) unique(sapply(longest, "[[", i)))
+      c(p, unlist(extended[which(lengths(extended) == 1)]))
+    })
+  }
   mutations <- list()
   for (minLen in 2:max(lengths(paths))) { # literate all sitePath at the same time
     for (path in unique(ancestralPaths(paths, minLen))) {

@@ -12,6 +12,8 @@ public:
     const ListOf<CharacterVector> &alignedSeqs
   );
   virtual ~TreeAlignmentMatch() {}
+  std::map< int, std::vector<int> > getTips() const;
+  std::vector<IntegerVector> getPaths() const;
 protected:
   std::vector<TipSeqLinker*> linkers;
   std::map< int, std::vector<TipSeqLinker*> > clusters;
@@ -29,8 +31,6 @@ public:
     const float simThreshold,
     std::map<std::pair<int, int>, float> &simMatrix
   );
-  std::map< int, std::vector<int> > getTips() const;
-  std::vector<IntegerVector> getPaths() const;
 private:
   const float simCut;
   std::map<std::pair<int, int>, float> compared;

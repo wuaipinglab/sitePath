@@ -8,7 +8,7 @@ Author:
   Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
 Description: Find sites with evolutionary siginficance in virus sequence 
-License: GPL (>= 2)
+License: MIT + file LICENSE
 Depends:
   R (>= 3.0.0)
 Imports:
@@ -17,7 +17,8 @@ Suggests:
   ape,
   seqinr,
   ggplot2,
-  ggtree
+  ggtree,
+    testthat
 LinkingTo: Rcpp
 RoxygenNote: 6.1.0
 Encoding: UTF-8
