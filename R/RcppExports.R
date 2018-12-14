@@ -9,6 +9,10 @@ trimTree <- function(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
     .Call('_sitePath_trimTree', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
 }
 
+customTrimTree <- function(tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips) {
+    .Call('_sitePath_customTrimTree', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips)
+}
+
 divergentNode <- function(paths) {
     .Call('_sitePath_divergentNode', PACKAGE = 'sitePath', paths)
 }

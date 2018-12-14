@@ -29,7 +29,8 @@ void TipSeqLinker::proceed() {
   // Proceed towards the root node along the path
   // as the current index should decrement.
   // An index of 0 means reaching the root node.
-  if (cIndex > 0) {cIndex--;}
+  // Setting index greater than 1 is to prevent trivial trimming
+  if (cIndex > 1) {cIndex--;}
 }
 
 const int TipSeqLinker::currentClade() const {
@@ -39,7 +40,8 @@ const int TipSeqLinker::currentClade() const {
 
 const int TipSeqLinker::nextClade() const {
   // Look up the immediate ancestral node 
-  if (cIndex > 0) {
+  // aka fake 'proceed'
+  if (cIndex > 1) {
     return path[cIndex - 1];
   } else {
     return currentClade(); // The current clade would be root

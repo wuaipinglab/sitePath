@@ -4,6 +4,8 @@
 \alias{treemer}
 \alias{groupTips}
 \alias{sitePath}
+\alias{customGroupTips}
+\alias{customSitePath}
 \title{Topology-dependent tree trimming}
 \usage{
 groupTips(tree, align, similarity, simMatrix = NULL,
@@ -11,11 +13,20 @@ groupTips(tree, align, similarity, simMatrix = NULL,
 
 sitePath(tree, align, similarity, simMatrix = NULL,
   forbidTrivial = TRUE)
+
+customGroupTips(tree, align, pvalue = 0.05, forbidTrivial = TRUE,
+  tipnames = TRUE)
+
+customSitePath(tree, align, pvalue = 0.05, forbidTrivial = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object}
+\item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
+in \code{ape} or \code{ggtree}
+All the \code{tip.label} should be found in the alignment}
 
-\item{align}{an \code{alignment} object}
+\item{align}{an \code{alignment} object. This commonly can be from sequence parsing function
+in \code{ape} or \code{seqinr} and many others
+Sequence names in the alignment should include all \code{tip.label} in the tree}
 
 \item{similarity}{similarity threshold for tree trimming}
 

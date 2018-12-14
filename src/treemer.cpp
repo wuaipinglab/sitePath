@@ -26,7 +26,7 @@ SEXP trimTree(
     NumericMatrix &simMatrixInput,
     const float similarity, const bool getTips
 ) {
-  std::map<std::pair<int, int>, float> simMatrix = std::map<std::pair<int, int>, float>();
+  std::map<std::pair<int, int>, float> simMatrix;
   int nrow = simMatrixInput.nrow();
   int ncol = simMatrixInput.ncol();
   for (int i = 0; i < nrow; ++i) {
@@ -37,6 +37,37 @@ SEXP trimTree(
     }
   }
   Pruner match(tipPaths, alignedSeqs, similarity, simMatrix);
+  if (getTips) {
+    return wrap(match.getTips());
+  } else {
+    return wrap(match.getPaths());
+  }
+}
+
+// [[Rcpp::export]]
+SEXP customTrimTree(
+    const ListOf<IntegerVector> &tipPaths, 
+    const ListOf<CharacterVector> &alignedSeqs,
+    NumericMatrix &simMatrixInput,
+    const NumericMatrix &treeEdge,
+    const Function &customQualifyFunc,
+    const bool getTips
+) {
+  std::map<std::pair<int, int>, float> simMatrix;
+  int nrow = simMatrixInput.nrow();
+  int ncol = simMatrixInput.ncol();
+  for (int i = 0; i < nrow; ++i) {
+    for (int j = 0; j < ncol; ++j) {
+      if (!R_IsNA(simMatrixInput(i, j))) {
+        simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
+      }
+    }
+  }
+  std::map< int, std::vector<int> > nodeLink;
+  for (int i = 0; i < treeEdge.nrow(); ++i) {
+    nodeLink[treeEdge(i, 0)].push_back(treeEdge(i, 1));
+  }
+  CustomizablePruner match(tipPaths, alignedSeqs, nodeLink, simMatrix, customQualifyFunc);
   if (getTips) {
     return wrap(match.getTips());
   } else {

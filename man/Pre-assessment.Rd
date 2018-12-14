@@ -11,20 +11,27 @@ similarityMatrix(tree, align)
 sneakPeek(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object}
+\item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
+in \code{ape} or \code{ggtree}}
 
-\item{align}{an \code{alignment} object}
+\item{align}{an \code{alignment} object. This commonly can be from sequence parsing function
+in \code{ape} or \code{seqinr} and many others}
 
-\item{step}{the similarity window}
+\item{step}{the similarity window for calculating and ploting}
 
-\item{maxPath}{maximum number of path to show in the plot}
+\item{maxPath}{maximum number of path to show in the plot. The number of path 
+in the raw tree can be far greater than trimmed tree. To better 
+see the impact of chaning threshold on path number. This should be
+specified. The default is one 20th of tree tip number.}
 
 \item{makePlot}{whether make a dot plot when return}
 }
 \value{
 \code{similarityMatrix} returns a diagonal matrix of similarity between sequences
 
-\code{sneakPeek} return the similarity threhold against number of sitePath
+\code{sneakPeek} return the similarity threhold against number of sitePath.
+There will be a simple dot plot between threshold and path number if
+\code{makePlot} is TRUE.
 }
 \description{
 \code{similarityMatrix} calculates similarity between aligned sequences

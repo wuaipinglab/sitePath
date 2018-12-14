@@ -3,8 +3,12 @@
 #' @title Things can be done before the analysis
 #' @description \code{similarityMatrix} calculates similarity between aligned sequences
 #' The similarity matrix can be used in \code{\link{groupTips}} or \code{\link{sitePath}}
-#' @param tree a \code{phylo} object
-#' @param align an \code{alignment} object
+#' @param tree 
+#' a \code{phylo} object. This commonly can be from tree paring function 
+#' in \code{ape} or \code{ggtree}
+#' @param align 
+#' an \code{alignment} object. This commonly can be from sequence parsing function
+#' in \code{ape} or \code{seqinr} and many others
 #' @return \code{similarityMatrix} returns a diagonal matrix of similarity between sequences
 #' @export
 similarityMatrix <- function(tree, align) {
@@ -26,10 +30,17 @@ similarityMatrix <- function(tree, align) {
 #' The number of sitePath should not be too many or too few. The result excludes
 #' where the number of sitePath is greater than number of tips divided by 20 or
 #' self-defined maxPath. The zero sitePath result will also be excluded
-#' @param step the similarity window
-#' @param maxPath maximum number of path to show in the plot
+#' @param step the similarity window for calculating and ploting
+#' @param maxPath 
+#' maximum number of path to show in the plot. The number of path 
+#' in the raw tree can be far greater than trimmed tree. To better 
+#' see the impact of chaning threshold on path number. This should be
+#' specified. The default is one 20th of tree tip number.
 #' @param makePlot whether make a dot plot when return
-#' @return \code{sneakPeek} return the similarity threhold against number of sitePath
+#' @return 
+#' \code{sneakPeek} return the similarity threhold against number of sitePath.
+#' There will be a simple dot plot between threshold and path number if
+#' \code{makePlot} is TRUE.
 #' @export
 sneakPeek <- function(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE) {
   simMatrix <- similarityMatrix(tree, align)
@@ -68,8 +79,12 @@ sneakPeek <- function(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
 #' \code{findSNPsite} will try to find SNP in the multiple sequence alignment. A reference sequence
 #' and gap character may be specified to number the site. This us irrelevant to the intended analysis
 #' but might be helpful to evaluate the performance of \code{fixationSites}
-#' @param tree a \code{phylo} object
-#' @param align an \code{alignment} object
+#' @param tree 
+#' a \code{phylo} object. This commonly can be from tree paring function 
+#' in \code{ape} or \code{ggtree}
+#' @param align 
+#' an \code{alignment} object. This commonly can be from sequence parsing function
+#' in \code{ape} or \code{seqinr} and many others
 #' @param reference name of reference for site numbering. 
 #' The name has to be one of the sequences' name. The default uses the intrinsic alignment numbering
 #' @param gapChar the character to indicate gap.
@@ -107,12 +122,24 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 #' those sites that show fixation on some if not all sitePath. Parallel evolution is relatively
 #' common in RNA virus. There is chance that some site be fixed in one lineage but does not show
 #' fixation because of different sequence context.
-#' @param paths a \code{sitePath} object
-#' @param minSizeBefore minimum tree tips involved before mutation
-#' @param minSizeAfter minimum tree tips involved after mutation
-#' @param toleranceBefore maximum amino acid variation before mutation
-#' @param toleranceAfter maximum amino acid variation after mutation
-#' @param extendedSearch whether to extend the search
+#' @param paths a \code{sitePath} object returned from \code{\link{sitePath}} function
+#' @param minSizeBefore 
+#' minimum tree tips involved before mutation. 
+#' Otherwise the mutation will not be counted into return
+#' @param minSizeAfter 
+#' minimum tree tips involved after mutation
+#' Otherwise the mutation will not be counted into return
+#' @param toleranceBefore 
+#' maximum amino acid variation before mutation 
+#' Otherwise the mutation will not be counted into return
+#' @param toleranceAfter 
+#' maximum amino acid variation after mutation
+#' Otherwise the mutation will not be counted into return
+#' @param extendedSearch 
+#' whether to extend the search. The terminal of each \code{sitePath} is
+#' a cluster of tips. To look for the fixation mutation in the cluster, 
+#' the common ancestral node of farthest tips (at least two) will be
+#' the new terminal search point.
 #' @return 
 #' \code{fixationSites} returns a list of mutations with names of the tips involved.
 #' The name of each list element is the discovered mutation. A mutation has two vectors of
@@ -176,7 +203,7 @@ fixationSites.sitePath <- function(
           from <- tree$tip.label[beforeTips]
           to <- tree$tip.label[afterTips]
           if (!mut %in% names(mutations) || length(to) > length(mutations[[mut]]$to)) {
-            mutations[[mut]] <- list(from = from, to = to)
+            mutations[[mut]] <- list(ancestral = from, descendant = to)
           }
         }
       }

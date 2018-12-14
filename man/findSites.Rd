@@ -14,9 +14,11 @@ SNPsites(tree, align, reference = NULL, gapChar = "-", minSNP = NULL)
   toleranceBefore = 2, toleranceAfter = 2, extendedSearch = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object}
+\item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
+in \code{ape} or \code{ggtree}}
 
-\item{align}{an \code{alignment} object}
+\item{align}{an \code{alignment} object. This commonly can be from sequence parsing function
+in \code{ape} or \code{seqinr} and many others}
 
 \item{reference}{name of reference for site numbering. 
 The name has to be one of the sequences' name. The default uses the intrinsic alignment numbering}
@@ -26,17 +28,24 @@ The numbering will skip the gapChar if reference sequence if specified.}
 
 \item{minSNP}{minimum number of amino acid variation to be a SNP}
 
-\item{paths}{a \code{sitePath} object}
+\item{paths}{a \code{sitePath} object returned from \code{\link{sitePath}} function}
 
-\item{minSizeBefore}{minimum tree tips involved before mutation}
+\item{minSizeBefore}{minimum tree tips involved before mutation. 
+Otherwise the mutation will not be counted into return}
 
-\item{minSizeAfter}{minimum tree tips involved after mutation}
+\item{minSizeAfter}{minimum tree tips involved after mutation
+Otherwise the mutation will not be counted into return}
 
-\item{toleranceBefore}{maximum amino acid variation before mutation}
+\item{toleranceBefore}{maximum amino acid variation before mutation 
+Otherwise the mutation will not be counted into return}
 
-\item{toleranceAfter}{maximum amino acid variation after mutation}
+\item{toleranceAfter}{maximum amino acid variation after mutation
+Otherwise the mutation will not be counted into return}
 
-\item{extendedSearch}{whether to extend the search}
+\item{extendedSearch}{whether to extend the search. The terminal of each \code{sitePath} is
+a cluster of tips. To look for the fixation mutation in the cluster, 
+the common ancestral node of farthest tips (at least two) will be
+the new terminal search point.}
 }
 \value{
 \code{findSNPsite} returns a list of qualified SNP site

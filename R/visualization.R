@@ -55,8 +55,8 @@ plot.fixationSites <- function(fixationSites, site) {
       list(excluded = setdiff(tree$tip.label, unlist(fixationSites[[site]])))
     )
     groupCols <- c("#d3d3d3", "#ff0000", "#3F51B5")
-    names(groupCols) <- c("excluded", "from", "to")
-    return(plotColoredTree(tree, group, groupCols, site))
+    names(groupCols) <- c("excluded", "ancestral", "descendant")
+    return(plotColoredTree(tree, group, groupCols, site, "Lineage"))
   } else if (is.numeric(site)) {
     align <- attr(fixationSites, "align")
     align <- strsplit(tolower(align), "")
@@ -79,13 +79,13 @@ plot.fixationSites <- function(fixationSites, site) {
     }
     names(group) <- AA_FULL_NAMES[names(group)]
     groupCols <- AA_COLORS[names(group)]
-    return(plotColoredTree(tree, group, groupCols, site))
+    return(plotColoredTree(tree, group, groupCols, site, "Amino acid"))
   } else {
     stop("site is neither numeric nor integer type")
   }
 }
 
-plotColoredTree <- function(tree, group, groupCols, title) {
+plotColoredTree <- function(tree, group, groupCols, title, legendTitle) {
   p <- ggtree(groupOTU(tree, group), aes(color = group)) +
     scale_color_manual(values = c('white', groupCols)) +
     ggtitle(title) +
@@ -93,7 +93,7 @@ plotColoredTree <- function(tree, group, groupCols, title) {
     guides(
       color = guide_legend(
         override.aes = list(size = 3),
-        title = "Amino acid"
+        title = legendTitle
       )
     )
   return(p)

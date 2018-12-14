@@ -15,8 +15,14 @@ NULL
 #' two most distant sequence. The two branches are decided to be divergent if the similarity
 #' is lower than the threshold. (Other more statistical involved approaches 
 #' such as Kolmogorov-Smirnov Tests among pair-wise distance could be introduced in the future)
-#' @param tree a \code{phylo} object
-#' @param align an \code{alignment} object
+#' @param tree 
+#' a \code{phylo} object. This commonly can be from tree paring function 
+#' in \code{ape} or \code{ggtree}
+#' All the \code{tip.label} should be found in the alignment
+#' @param align 
+#' an \code{alignment} object. This commonly can be from sequence parsing function
+#' in \code{ape} or \code{seqinr} and many others
+#' Sequence names in the alignment should include all \code{tip.label} in the tree
 #' @param similarity similarity threshold for tree trimming
 #' @param simMatrix a diagonal matrix of similarity between sequences
 #' @param nontrivial does not allow trivial trimming
@@ -66,6 +72,54 @@ sitePath <- function(tree, align, similarity, simMatrix = NULL, forbidTrivial = 
   paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
   if (length(paths) == 0 && forbidTrivial) {
     warning(paste0(similarity, " is too low of a cutoff resulting in trivial trimming"))
+  }
+  attr(paths, "tree") <- tree
+  attr(paths, "align") <- align
+  attr(paths, "class") <- "sitePath"
+  return(paths)
+}
+
+#' @rdname treemer
+#' @importFrom ape cophenetic.phylo
+#' @export
+customGroupTips <- function(
+  tree, align, pvalue = 0.05, forbidTrivial = TRUE, tipnames = TRUE
+) {
+  qualifyFunc <- function(x, y) {
+    return(ks.test(x, y)$p.value > pvalue)
+  }
+  grouping <- customTrimTree(
+    nodepath(tree), checkMatched(tree, align),
+    cophenetic.phylo(tree), tree$edge, qualifyFunc, TRUE
+  )
+  if (length(grouping) == 1 && forbidTrivial) {
+    warning(paste0(pvalue, " is too low of a cutoff resulting in trivial trimming"))
+  }
+  if (tipnames) {
+    return(lapply(grouping, function(g) {tree$tip.label[g]}))
+  } else {
+    return(grouping)
+  }
+}
+
+#' @rdname treemer
+#' @importFrom ape cophenetic.phylo
+#' @export
+customSitePath <- function(tree, align, pvalue = 0.05, forbidTrivial = TRUE) {
+  qualifyFunc <- function(x, y) {
+    return(ks.test(x, y)$p.value > pvalue)
+  }
+  # nodepath after trimming
+  trimmedPaths <- unique(customTrimTree(
+    nodepath(tree), align <- checkMatched(tree, align),
+    cophenetic.phylo(tree), tree$edge, qualifyFunc, FALSE
+  ))
+  # get the bifurcated pre-terminal nodes and their path to the root in a trimmed tree
+  # those paths are the so-called sitePaths (isolated)
+  paths <- lapply(trimmedPaths, function(p) p[1:(length(p) - 1)])
+  paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
+  if (length(paths) == 0 && forbidTrivial) {
+    warning(paste0(pvalue, " is too low of a cutoff resulting in trivial trimming"))
   }
   attr(paths, "tree") <- tree
   attr(paths, "align") <- align

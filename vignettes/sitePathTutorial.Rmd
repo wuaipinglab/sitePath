@@ -1,0 +1,150 @@
+---
+title: "Tutorial on using sitePath"
+author: "Chengyang Ji"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+This is a tutorial on using `sitePath`. The `sitePath` package does hierarchical search for fixation events of **amino acid substution** given multiple sequence alignment and phylogenetic tree. These fixation events can be specific to a phylogenetic lineages or shared by multiple lineages. This is achieved by three major steps:
+
+1. Import tree and sequence alignment
+2. Resolve phylogenetic lineages
+3. Hierarchical search for lineage-dependent fixation events
+
+## 1. Import tree and sequence alignment
+
+There're various R packages for parsing phylogenetic tree and multiple sequence alignment files. For now, functions in `sitepath` accept `phylo` object and `alignment` object.
+
+### 1.1 Parsing tree
+
+The [S3 phylo class](https://cran.r-project.org/web/views/Phylogenetics.html) is a common data structure for phylogenetic analysis in R. 
+The CRAN package [ape](https://cran.r-project.org/web/packages/ape/index.html) provides basic parsing function for reading tree file
+
+```{r}
+library(ape)
+tree <- read.tree(system.file("ZIKV.newick", package = "sitePath"))
+```
+
+The Bioconductor package [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) provides more comprehensive parsing utilities
+
+```{r}
+suppressPackageStartupMessages(library(ggtree))
+tree <- read.tree(system.file("ZIKV.newick", package = "sitePath"))
+```
+
+Tree should be rooted before further analysis
+
+```{r}
+outgroup <- readLines(system.file("ZIKV_outgroup.txt", package = "sitePath"))
+print(outgroup)
+tree <- ape::root(tree, outgroup)
+```
+
+### 1.2 Parsing sequence alignment
+
+There is no readily usable function in `ape` to read protein sequence file, although `ape` is able to read DNA sequence and output S3 alignment class. This class can also be found in the CRAN package [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html)
+
+```{r}
+suppressPackageStartupMessages(library(seqinr))
+align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
+```
+
+Getting S3 alignment object is also possible from the CRAN package [phangorn](https://cran.r-project.org/web/packages/phangorn/index.html). But it's not so direct this way.
+
+```{r}
+suppressPackageStartupMessages(library(phangorn))
+align <- read.phyDat(system.file("ZIKV.fasta", package = "sitePath"), format = "fasta", type = "AA")
+align <- phyDat2alignment(align)
+```
+
+### 1.3 Recommanded parsing methods
+
+Tree reading function from `ggtree` and alignment reading function from `seqinr` are able to handle most formats. They are suggested to be used for pasring files needed for downstream anaylsis. Occasionally you may get S4 phylo4 class, use the `@` symbol to get the S3 phylo object from it
+
+```{r}
+treeS4 <- read.beast(system.file("extdata/BEAST", "beast_mcc.tree", package="ggtree"))
+treeS3 <- treeS4@phylo
+```
+
+## 2. Resolve phylogenetic lineages
+
+To resolve phylogenetic lineage, you will need to provide S3 phylo object and a matching S3 alignment object. This basically requires that the name of tree tips all has a corresponding sequence in the alignment. The fundamental approach in identifying phylogenetic lineages is trimming tree leaves/tips to expose the major branches. But to find a set of putative phylogenetic lineages, there involves a few pre-assess steps to evalute the impact of threshold on result.
+
+### 2.1 Choosing the threshold
+
+In the current version, the resolving function only takes one threshold which is sequence similarity. The impact of threshold is topology-dependent hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can be of great help in choosing the threshold.*
+
+```{r, fig.width=6, fig.height=4}
+library(sitePath)
+preassessment <- sneakPeek(tree, align)
+```
+
+There is one point where the number of resulting paths **drops drastically** and that is the preferable similarity threshold. In this case 0.996 is the reasonable choice as the major branches are exposed. You can use the function `sitePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis.
+
+```{r}
+paths <- sitePath(tree, align, 0.996)
+paths
+```
+
+### 2.2 Just using the trimming function
+
+This section is a bit irrelevant to finding fixation events, you may skip the part if you wish. The function `groupTips` applies the same operation as the function`sitePath` does but it outputs clusters of tree tips instead of paths
+
+```{r}
+grouping <- groupTips(tree, align, 0.996)
+```
+
+## 3. Hierarchical search for fixation events
+
+It's ready to find fixation events after phylogenetic lineages are identified. A function to predict SNP is provided to give a overview across amino acid composition of each site. There could be intersect between fixed sites and SNP sites. If the Bioconductor package `ggtree` is installed, both of the result can be visualized.
+
+### 3.1 Fixation mutations
+
+The hierarchical search is done by `fixationSites` function. The function outputs a list of mutations with the sequences involved before and after the fixation.
+
+```{r}
+fixations <- fixationSites(paths)
+fixations
+```
+
+Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized
+
+```{r}
+plot(fixations, "S139N")
+```
+
+Because the `names` of the `fixationSites` are the mutation name, you can also use one of the `names` as function input
+
+```{r}
+plot(fixations, names(fixations)[6])
+```
+
+If you just input the number of the site, the function will plot distribution of amino acid on the tree
+
+```{r, fig.show="hold"}
+plot(fixations, 139)
+plot(fixations, 763)
+```
+
+### 3.2 SNP sites
+
+An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP site and the result could be what you'll expect to be fixation mutation.
+
+```{r, fig.show="hold"}
+snps <- SNPsites(tree, align)
+plot(fixations, snps[4])
+plot(fixations, snps[5])
+```

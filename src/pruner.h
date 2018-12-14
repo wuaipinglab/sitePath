@@ -17,8 +17,11 @@ public:
 protected:
   std::vector<TipSeqLinker*> linkers;
   std::map< int, std::vector<TipSeqLinker*> > clusters;
+  std::map< int, std::vector<TipSeqLinker*> > trueCluster;
   void pruneTree();
-  virtual const bool qualified(const std::vector<TipSeqLinker*> &clstr) = 0;
+  virtual const bool qualified(
+      const std::map< int, std::vector<TipSeqLinker*> >::iterator candidate
+  ) = 0;
 private:
   const int root, seqLen;
 };
@@ -34,7 +37,27 @@ public:
 private:
   const float simCut;
   std::map<std::pair<int, int>, float> compared;
-  const bool qualified(const std::vector<TipSeqLinker*> &clstr);
+  const bool qualified(
+      const std::map< int, std::vector<TipSeqLinker*> >::iterator candidate
+  );
+};
+
+class CustomizablePruner: public TreeAlignmentMatch {
+public:
+  CustomizablePruner(
+    const ListOf<IntegerVector> &tipPaths, 
+    const ListOf<CharacterVector> &alignedSeqs,
+    const std::map< int, std::vector<int> > &treeEdge,
+    std::map<std::pair<int, int>, float> &simMatrix,
+    const Function &customQualifyFunc
+  );
+private:
+  std::map< int, std::vector<int> > nodeLink;
+  std::map<std::pair<int, int>, float> compared;
+  Function qualifyFunc;
+  const bool qualified(
+      const std::map< int, std::vector<TipSeqLinker*> >::iterator candidate
+  );
 };
 
 #endif // SITEPATH_PRUNER_H

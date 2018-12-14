@@ -9,7 +9,7 @@ To install the package from github:
 install.packages("devtools")
 devtools::install_github("Takkoona/sitePath")
 ```
-To use plotting function and read annotated nexus file (from beast). [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) is needed.
+To use plotting function and read annotated nexus file (from beast),  [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) is needed.
 
 ### Linux
 Use the code above to install
@@ -24,16 +24,17 @@ Example
 -------
 ```r
 library(sitePath)
-align <- seqinr::read.alignment(
-  system.file("zika_genome.fasta", package = "sitePath"), "fasta"
-)
-
 tree <- ape::read.tree(
-  system.file("zika_genome.tree", package = "sitePath")
+  system.file("ZIKV.newick", package = "sitePath")
 )
-
-(sitePath <- sitePath(tree, align, 0.996))
-mutations <- findFixed(sitePath)
+outgroup <- readLines(system.file("ZIKV_outgroup.txt", package = "sitePath"))
+tree <- ape::root(tree, outgroup)
+align <- seqinr::read.alignment(
+  system.file("ZIKV.fasta", package = "sitePath"),
+  format = "fasta"
+)
+(paths <- sitePath(tree, align, 0.996))
+mutations <- fixationSites(paths)
 (predSites <- as.numeric(sapply(
   names(mutations), function(m) {substr(m, 2, nchar(m) - 1)}
 )))
