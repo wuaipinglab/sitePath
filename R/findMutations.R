@@ -61,7 +61,7 @@ sneakPeek <- function(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
     paths <- sitePath(tree, align, s, simMatrix, FALSE)
     if (maxPath < length(paths)) {
       next
-    } else if (length(paths) == 0) {
+    } else if (length(paths) <= 1) {
       break
     }
     similarity <- c(similarity, s)
@@ -123,20 +123,20 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 #' common in RNA virus. There is chance that some site be fixed in one lineage but does not show
 #' fixation because of different sequence context.
 #' @param paths a \code{sitePath} object returned from \code{\link{sitePath}} function
-#' @param minSizeBefore 
-#' minimum tree tips involved before mutation. 
-#' Otherwise the mutation will not be counted into return
-#' @param minSizeAfter 
-#' minimum tree tips involved after mutation
-#' Otherwise the mutation will not be counted into return
-#' @param toleranceBefore 
-#' maximum amino acid variation before mutation 
-#' Otherwise the mutation will not be counted into return
-#' @param toleranceAfter 
-#' maximum amino acid variation after mutation
-#' Otherwise the mutation will not be counted into return
+#' @param tolerance
+#' A vector of two integers to specify maximum amino acid variation before/after mutation. 
+#' Otherwise the mutation will not be counted into the return.
+#' If more than one number is given, the ancestral takes the first and
+#' descendant takes the second as the maximum.
+#' If only given one number, it's the maximum for both ancestral and descendant.
+#' @param minEffectiveSize
+#' A vector of two integers to specifiy minimum tree tips involved before/after mutation. 
+#' Otherwise the mutation will not be counted into the return.
+#' If more than one number is given, the ancestral takes the first and
+#' descendant takes the second as the minimum.
+#' If only given one number, it's the minimum for both ancestral and descendant. 
 #' @param extendedSearch 
-#' whether to extend the search. The terminal of each \code{sitePath} is
+#' Whether to extend the search. The terminal of each \code{sitePath} is
 #' a cluster of tips. To look for the fixation mutation in the cluster, 
 #' the common ancestral node of farthest tips (at least two) will be
 #' the new terminal search point.
@@ -147,20 +147,40 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 #' @export
 fixationSites.sitePath <- function(
   paths, reference = NULL, gapChar = '-',
-  minSizeBefore = 10, minSizeAfter = 10,
-  toleranceBefore = 2, toleranceAfter = 2,
+  tolerance = c(0, 0), minEffectiveSize = NULL,
   extendedSearch = TRUE
 ) {
   tree <- attr(paths, "tree")
   align <- attr(paths, "align")
-  if (minSizeBefore <= 0 || minSizeBefore >= length(tree$tip.label)) {
-    stop("minSizeBefore can't be negative, zero or greater than total number of sequence")
-  } else if (minSizeAfter <= 0 || minSizeAfter >= length(tree$tip.label)) {
-    stop("minSizeAfter can't be negative, zero or greater than total number of sequence")
-  }
   refSeqName <- reference
   if (is.null(reference)) {reference <- 1:nchar(align[1])} else {
+    if (!is.character(gapChar) || nchar(gapChar) != 1 || length(gapChar) != 1) {
+      stop("gapChar only accepts one single character")
+    }
     reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
+  }
+  if (!is.numeric(tolerance)) {
+    stop("tolerance only accepts numeric")
+  } else {
+    toleranceAnc <- tolerance[1]
+    if (length(tolerance) == 1) {
+      toleranceDesc <- toleranceAnc
+    } else {
+      toleranceDesc <- tolerance[2]
+    }
+  }
+  if (is.null(minEffectiveSize)) {
+    minAnc <- length(tree$tip.label) / 10
+    minDesc <- length(tree$tip.label) / 10
+  } else if (!is.numeric(minEffectiveSize)) {
+    stop("minEffectiveSize only accepts numeric")
+  } else {
+    minAnc <- minEffectiveSize
+    if (length(minEffectiveSize) == 1) {
+      minDesc <- minAnc
+    } else {
+      minDesc <- minEffectiveSize[2]
+    }
   }
   divNodes <- unique(divergentNode(paths))
   if (extendedSearch) {
@@ -178,7 +198,7 @@ fixationSites.sitePath <- function(
   for (minLen in 2:max(lengths(paths))) { # literate all sitePath at the same time
     for (path in unique(ancestralPaths(paths, minLen))) {
       afterTips <- ChildrenTips(tree, tail(path, 1))
-      if (length(afterTips) < minSizeAfter) {
+      if (length(afterTips) < minDesc) {
         next
       }
       pathBefore <- path[1:(length(path) - 1)]
@@ -188,7 +208,7 @@ fixationSites.sitePath <- function(
         return(ChildrenTips(tree, children))
       })
       beforeTips <- which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
-      if (length(beforeTips) < minSizeBefore && length(excludedTips) == 0) {
+      if (length(beforeTips) < minAnc && length(excludedTips) == 0) {
         next
       }
       after <- strsplit(align[afterTips], "")
@@ -198,7 +218,7 @@ fixationSites.sitePath <- function(
         asum <- table(sapply(after, "[[", reference[i]))
         b <- names(bsum[1])
         a <- names(asum[1])
-        if (sum(bsum[-1]) <= toleranceBefore && sum(asum[-1]) <= toleranceAfter && b != a) {
+        if (sum(bsum[-1]) <= toleranceAnc && sum(asum[-1]) <= toleranceDesc && b != a) {
           mut <- paste(b, i, a, sep = "")
           from <- tree$tip.label[beforeTips]
           to <- tree$tip.label[afterTips]
@@ -219,6 +239,27 @@ fixationSites.sitePath <- function(
 
 #' @export
 fixationSites <- function(x, ...) UseMethod("fixationSites")
+
+#' @export
+as.data.frame.fixationSites <- function(mutations) {
+  tree <- attr(mutations, "tree")
+  reference <- attr(mutations, "reference")
+  res <- as.data.frame(matrix(
+    nrow = length(tree$tip.label),
+    ncol = length(reference),
+    dimnames = list(tree$tip.label, 1:length(reference))
+  ))
+  for (m in names(mutations)) {
+    site <- as.integer(substr(m, 2, nchar(m) - 1))
+    fixedAA <- substr(m, nchar(m), nchar(m))
+    for (desc in mutations[[m]][[2]]) {
+      res[desc, site] <- AA_FULL_NAMES[tolower(fixedAA)]
+    }
+  }
+  whichNA <- is.na(res)
+  res <- res[rowSums(whichNA) < ncol(res), colSums(whichNA) < nrow(res)]
+  return(res)
+}
 
 #' @export
 print.fixationSites <- function(fixationSites) {

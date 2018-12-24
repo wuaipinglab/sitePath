@@ -10,8 +10,8 @@
 SNPsites(tree, align, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{sitePath}(paths, reference = NULL,
-  gapChar = "-", minSizeBefore = 10, minSizeAfter = 10,
-  toleranceBefore = 2, toleranceAfter = 2, extendedSearch = TRUE)
+  gapChar = "-", tolerance = c(0, 0), minEffectiveSize = NULL,
+  extendedSearch = TRUE)
 }
 \arguments{
 \item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
@@ -30,19 +30,19 @@ The numbering will skip the gapChar if reference sequence if specified.}
 
 \item{paths}{a \code{sitePath} object returned from \code{\link{sitePath}} function}
 
-\item{minSizeBefore}{minimum tree tips involved before mutation. 
-Otherwise the mutation will not be counted into return}
+\item{tolerance}{A vector of two integers to specify maximum amino acid variation before/after mutation. 
+Otherwise the mutation will not be counted into the return.
+If more than one number is given, the ancestral takes the first and
+descendant takes the second as the maximum.
+If only given one number, it's the maximum for both ancestral and descendant.}
 
-\item{minSizeAfter}{minimum tree tips involved after mutation
-Otherwise the mutation will not be counted into return}
+\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved before/after mutation. 
+Otherwise the mutation will not be counted into the return.
+If more than one number is given, the ancestral takes the first and
+descendant takes the second as the minimum.
+If only given one number, it's the minimum for both ancestral and descendant.}
 
-\item{toleranceBefore}{maximum amino acid variation before mutation 
-Otherwise the mutation will not be counted into return}
-
-\item{toleranceAfter}{maximum amino acid variation after mutation
-Otherwise the mutation will not be counted into return}
-
-\item{extendedSearch}{whether to extend the search. The terminal of each \code{sitePath} is
+\item{extendedSearch}{Whether to extend the search. The terminal of each \code{sitePath} is
 a cluster of tips. To look for the fixation mutation in the cluster, 
 the common ancestral node of farthest tips (at least two) will be
 the new terminal search point.}
