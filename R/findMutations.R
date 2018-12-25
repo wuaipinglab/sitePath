@@ -163,11 +163,12 @@ fixationSites.sitePath <- function(
     stop("tolerance only accepts numeric")
   } else {
     toleranceAnc <- tolerance[1]
-    if (length(tolerance) == 1) {
-      toleranceDesc <- toleranceAnc
-    } else {
-      toleranceDesc <- tolerance[2]
-    }
+    toleranceDesc <- if (length(tolerance) == 1) toleranceAnc else tolerance[2]
+    # if (length(tolerance) == 1) {
+    #   toleranceDesc <- toleranceAnc
+    # } else {
+    #   toleranceDesc <- tolerance[2]
+    # }
   }
   if (is.null(minEffectiveSize)) {
     minAnc <- length(tree$tip.label) / 10
@@ -176,11 +177,12 @@ fixationSites.sitePath <- function(
     stop("minEffectiveSize only accepts numeric")
   } else {
     minAnc <- minEffectiveSize
-    if (length(minEffectiveSize) == 1) {
-      minDesc <- minAnc
-    } else {
-      minDesc <- minEffectiveSize[2]
-    }
+    minDesc <- if (length(minEffectiveSize) == 1) minAnc else minEffectiveSize[2]
+    # if (length(minEffectiveSize) == 1) {
+    #   minDesc <- minAnc
+    # } else {
+    #   minDesc <- minEffectiveSize[2]
+    # }
   }
   divNodes <- unique(divergentNode(paths))
   if (extendedSearch) {

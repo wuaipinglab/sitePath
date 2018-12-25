@@ -12,15 +12,15 @@ License: MIT + file LICENSE
 Depends:
   R (>= 3.0.0)
 Imports:
-  Rcpp (>= 0.12.14)
-Suggests:
   ape,
   seqinr,
   ggplot2,
+  Rcpp
+Suggests:
   ggtree,
-    testthat,
-    knitr,
-    rmarkdown
+  testthat,
+  knitr,
+  rmarkdown
 LinkingTo: Rcpp
 RoxygenNote: 6.1.0
 Encoding: UTF-8

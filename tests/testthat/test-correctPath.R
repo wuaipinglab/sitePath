@@ -4,10 +4,7 @@ test_that("Topology-dependent trimming", {
   tree <- ape::read.tree(
     system.file("ZIKV.newick", package = "sitePath")
   )
-  outgroup <- readLines(
-    system.file("ZIKV_outgroup.txt", package = "sitePath")
-  )
-  tree <- ape::root(tree, outgroup)
+  tree <- ape::root(tree, "ANK57896")
   align <- seqinr::read.alignment(
     system.file("ZIKV.fasta", package = "sitePath"),
     format = "fasta"

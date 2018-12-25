@@ -31,8 +31,11 @@ NULL
 #' @return grouping of tips
 #' @export
 groupTips <- function(
-  tree, align, similarity, 
-  simMatrix = NULL, forbidTrivial = TRUE,
+  tree,
+  align,
+  similarity, 
+  simMatrix = NULL,
+  forbidTrivial = TRUE,
   tipnames = TRUE
 ) {
   simMatrix <- sortSimMatrix(tree, simMatrix)
@@ -61,7 +64,13 @@ groupTips <- function(
 #' @importFrom ape nodepath
 #' @return path represent by node number
 #' @export
-sitePath <- function(tree, align, similarity, simMatrix = NULL, forbidTrivial = TRUE) {
+sitePath <- function(
+  tree,
+  align,
+  similarity,
+  simMatrix = NULL,
+  forbidTrivial = TRUE
+) {
   simMatrix <- sortSimMatrix(tree, simMatrix)
   align <- checkMatched(tree, align)
   # nodepath after trimming
@@ -83,7 +92,11 @@ sitePath <- function(tree, align, similarity, simMatrix = NULL, forbidTrivial = 
 #' @importFrom ape cophenetic.phylo
 #' @export
 customGroupTips <- function(
-  tree, align, pvalue = 0.05, forbidTrivial = TRUE, tipnames = TRUE
+  tree,
+  align,
+  pvalue = 0.05,
+  forbidTrivial = TRUE,
+  tipnames = TRUE
 ) {
   qualifyFunc <- function(x, y) {
     return(ks.test(x, y)$p.value > pvalue)
@@ -105,7 +118,12 @@ customGroupTips <- function(
 #' @rdname treemer
 #' @importFrom ape cophenetic.phylo
 #' @export
-customSitePath <- function(tree, align, pvalue = 0.05, forbidTrivial = TRUE) {
+customSitePath <- function(
+  tree,
+  align,
+  pvalue = 0.05,
+  forbidTrivial = TRUE
+) {
   qualifyFunc <- function(x, y) {
     return(ks.test(x, y)$p.value > pvalue)
   }
@@ -136,13 +154,16 @@ checkMatched <- function(tree, align) {
   if (!is(align, "alignment")) {
     stop("align is not class alignment")
   }
-  align <- toupper(align$seq[match(tree$tip.label, align$nam)])
-  if (any(is.na(align))) {
+  m <- match(tree$tip.label, align$nam)
+  if (any(is.na(m))) {
     stop("tree tips and alignment names are not matched")
-  } else if (length(unique(nchar(align))) > 1) {
-    stop("Sequence lengths are not the same in alignment")
+  } else {
+    align <- align$seq[m]
+    if (length(unique(nchar(align))) > 1) {
+      stop("Sequence lengths are not the same in alignment")
+    }
   }
-  return(align)
+  return(toupper(align))
 }
 
 sortSimMatrix <- function(tree, simMatrix) {

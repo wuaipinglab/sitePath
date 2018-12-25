@@ -20,22 +20,6 @@ Use the code above to install
 ### Mac
 Unable to install from github so far
 
-Example
+Tutorial
 -------
-```r
-library(sitePath)
-tree <- ape::read.tree(
-  system.file("ZIKV.newick", package = "sitePath")
-)
-outgroup <- readLines(system.file("ZIKV_outgroup.txt", package = "sitePath"))
-tree <- ape::root(tree, outgroup)
-align <- seqinr::read.alignment(
-  system.file("ZIKV.fasta", package = "sitePath"),
-  format = "fasta"
-)
-(paths <- sitePath(tree, align, 0.996))
-mutations <- fixationSites(paths)
-(predSites <- as.numeric(sapply(
-  names(mutations), function(m) {substr(m, 2, nchar(m) - 1)}
-)))
-```
+[Here](http://htmlpreview.github.io/?https://github.com/Takkoona/sitePath/blob/master/vignettes/sitePathTutorial.html) is a tutorial on how to use sitePath

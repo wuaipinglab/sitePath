@@ -4,34 +4,29 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ------------------------------------------------------------------------
+## ----message=FALSE-------------------------------------------------------
 library(ape)
-tree <- read.tree(system.file("ZIKV.newick", package = "sitePath"))
+library(ggtree)
+
+zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
+tree <- read.tree(zikv_tree)
 
 ## ------------------------------------------------------------------------
-suppressPackageStartupMessages(library(ggtree))
-tree <- read.tree(system.file("ZIKV.newick", package = "sitePath"))
+tree <- root(tree, "ANK57896")
 
 ## ------------------------------------------------------------------------
-outgroup <- readLines(system.file("ZIKV_outgroup.txt", package = "sitePath"))
-print(outgroup)
-tree <- ape::root(tree, outgroup)
-
-## ------------------------------------------------------------------------
-suppressPackageStartupMessages(library(seqinr))
-align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
-
-## ------------------------------------------------------------------------
-suppressPackageStartupMessages(library(phangorn))
-align <- read.phyDat(system.file("ZIKV.fasta", package = "sitePath"), format = "fasta", type = "AA")
-align <- phyDat2alignment(align)
-
-## ------------------------------------------------------------------------
-treeS4 <- read.beast(system.file("extdata/BEAST", "beast_mcc.tree", package="ggtree"))
+beast_file <- system.file("beast_mcc.tree", package="sitePath")
+treeS4 <- read.beast(beast_file)
 treeS3 <- treeS4@phylo
+
+## ----message=FALSE-------------------------------------------------------
+library(seqinr)
+
+align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
 
 ## ---- fig.width=6, fig.height=4------------------------------------------
 library(sitePath)
+
 preassessment <- sneakPeek(tree, align)
 
 ## ------------------------------------------------------------------------
@@ -45,10 +40,8 @@ grouping <- groupTips(tree, align, 0.996)
 fixations <- fixationSites(paths)
 fixations
 
-## ------------------------------------------------------------------------
+## ---- fig.show="hold"----------------------------------------------------
 plot(fixations, "S139N")
-
-## ------------------------------------------------------------------------
 plot(fixations, names(fixations)[6])
 
 ## ---- fig.show="hold"----------------------------------------------------
