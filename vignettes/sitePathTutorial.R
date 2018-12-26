@@ -1,55 +1,61 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include=FALSE------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----message=FALSE-------------------------------------------------------
+## ----set_margin----------------------------------------------------------
+knitr::opts_knit$set(global.par = TRUE)
+
+## ----import_tree, message=FALSE------------------------------------------
 library(ape)
 library(ggtree)
 
 zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
 tree <- read.tree(zikv_tree)
 
-## ------------------------------------------------------------------------
+## ----root_tree-----------------------------------------------------------
 tree <- root(tree, "ANK57896")
 
-## ------------------------------------------------------------------------
+## ----S4phylo-------------------------------------------------------------
 beast_file <- system.file("beast_mcc.tree", package="sitePath")
 treeS4 <- read.beast(beast_file)
 treeS3 <- treeS4@phylo
 
-## ----message=FALSE-------------------------------------------------------
+## ----read_alignment, message=FALSE---------------------------------------
 library(seqinr)
 
 align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
 
-## ---- fig.width=6, fig.height=4------------------------------------------
+## ----sneakPeek_plot, fig.width=6, fig.height=4---------------------------
 library(sitePath)
 
 preassessment <- sneakPeek(tree, align)
 
-## ------------------------------------------------------------------------
+## ----get_sitePath--------------------------------------------------------
 paths <- sitePath(tree, align, 0.996)
 paths
 
-## ------------------------------------------------------------------------
-grouping <- groupTips(tree, align, 0.996)
-
-## ------------------------------------------------------------------------
+## ----find_fixations------------------------------------------------------
 fixations <- fixationSites(paths)
 fixations
 
-## ---- fig.show="hold"----------------------------------------------------
+## ---- plot_fixations, fig.show="hold"------------------------------------
+par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])
 
-## ---- fig.show="hold"----------------------------------------------------
+## ----group_tips----------------------------------------------------------
+grouping <- groupTips(tree, align, 0.996)
+
+## ----plot_sites, fig.show="hold"-----------------------------------------
+par(mar = c(1,1,1,1))
 plot(fixations, 139)
 plot(fixations, 763)
 
-## ---- fig.show="hold"----------------------------------------------------
+## ----find_SNP, fig.show="hold"-------------------------------------------
 snps <- SNPsites(tree, align)
+par(mar = c(1,1,1,1))
 plot(fixations, snps[4])
 plot(fixations, snps[5])
 

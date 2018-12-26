@@ -4,17 +4,17 @@
 \alias{plot.fixationSites}
 \title{Color the tree by a single site}
 \usage{
-plot.fixationSites(fixationSites, site)
+\method{plot}{fixationSites}(fixation, site)
 }
 \arguments{
-\item{fixationSites}{a \code{fixationSites} object from \code{\link{fixationSites}}}
-
 \item{site}{One of the mutations in the \code{\link{fixationSites}} object. It should be from 
 the \code{\link{names}} of the object.Or an integer indicating a site could be provide.
 The numbering is consistent with the reference defined at \code{\link{fixationSites}}.}
+
+\item{fixationSites}{a \code{fixationSites} object from \code{\link{fixationSites}}}
 }
 \value{
-a ggtree plot
+plot and color the tree
 }
 \description{
 The result of \code{\link{fixationSites}} can be visualized using the funciton.
