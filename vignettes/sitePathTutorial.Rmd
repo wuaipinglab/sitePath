@@ -16,10 +16,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r set_margin}
-knitr::opts_knit$set(global.par = TRUE)
-```
-
 ## Introduction
 
 The `sitePath` package does hierarchical search for fixation events given multiple sequence alignment and phylogenetic tree. These fixation events can be specific to a phylogenetic lineages or shared by multiple lineages. This is achieved by three major steps:
@@ -117,7 +113,7 @@ plot(fixations, names(fixations)[6])
 
 ## Additional functions
 
-The tutorial has already ended. This part is extra and experimental. You
+The above concluded the tutorial. This part is extra and experimental. You
 may stop here if you wish.
 
 ### Just using the trimming function

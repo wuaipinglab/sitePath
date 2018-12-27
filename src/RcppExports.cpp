@@ -82,6 +82,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tip2colorEdge
+CharacterVector tip2colorEdge(CharacterVector& colorEdge, const std::string& color, const IntegerMatrix& treeEdge, const IntegerVector& tips, const int rootNode);
+RcppExport SEXP _sitePath_tip2colorEdge(SEXP colorEdgeSEXP, SEXP colorSEXP, SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector& >::type colorEdge(colorEdgeSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type color(colorSEXP);
+    Rcpp::traits::input_parameter< const IntegerMatrix& >::type treeEdge(treeEdgeSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type tips(tipsSEXP);
+    Rcpp::traits::input_parameter< const int >::type rootNode(rootNodeSEXP);
+    rcpp_result_gen = Rcpp::wrap(tip2colorEdge(colorEdge, color, treeEdge, tips, rootNode));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
@@ -90,6 +105,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
+    {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
     {NULL, NULL, 0}
 };
 

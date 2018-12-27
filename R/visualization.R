@@ -53,10 +53,8 @@ plot.fixationSites <- function(fixation, site) {
       }
     )
     color <- rep("#d3d3d3", length(tree$edge.length))
-    descEdges <- tip2edge(tree, match(fixation[[site]][[2]], tree$tip.label), rootNode)
-    color[descEdges] <- rep("#3F51B5", length(descEdges))
-    ancEdges <- tip2edge(tree, match(fixation[[site]][[1]], tree$tip.label), rootNode)
-    color[ancEdges] <- rep("#ff0000", length(ancEdges))
+    color <- tip2colorEdge(color, "#3F51B5", tree$edge, match(fixation[[site]][[2]], tree$tip.label), rootNode)
+    color <- tip2colorEdge(color, "#ff0000", tree$edge, match(fixation[[site]][[1]], tree$tip.label), rootNode)
     plot(tree, show.tip.label = F, edge.col = color, main = site)
     legend(
       "topleft", title = "Lineages",
@@ -86,8 +84,7 @@ plot.fixationSites <- function(fixation, site) {
     AAnames <- AA_FULL_NAMES[names(group)]
     names(group) <- AA_COLORS[AAnames]
     for (g in names(group)) {
-      e <- tip2edge(tree, group[[g]], rootNode)
-      color[e] <- rep(g, length(e))
+      tip2colorEdge(color, g, tree$edge, group[[g]], rootNode)
     }
     plot(tree, show.tip.label = F, edge.col = color, main = site)
     legend(
@@ -99,19 +96,6 @@ plot.fixationSites <- function(fixation, site) {
   } else {
     stop("site is neither numeric nor integer type")
   }
-} 
-
-tip2edge <- function(tree, tips, rootNode) {
-  res <- lapply(tips, function(t) {
-    p <- nodepath(tree, from = rootNode, to = t)
-    e <- lapply(1:(length(p) - 1), function(i) p[i:(i + 1)])
-    res <- apply(tree$edge, 1, function(i) {
-      if (list(i) %in% e) return(TRUE) else return(FALSE)
-    })
-    which(res)
-  })
-  res <- unique(unlist(res))
-  return(res)
 }
 
 # plot.fixationSites <- function(mutations, site) {

@@ -4,9 +4,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----set_margin----------------------------------------------------------
-knitr::opts_knit$set(global.par = TRUE)
-
 ## ----import_tree, message=FALSE------------------------------------------
 library(ape)
 library(ggtree)
@@ -40,7 +37,7 @@ paths
 fixations <- fixationSites(paths)
 fixations
 
-## ---- plot_fixations, fig.show="hold"------------------------------------
+## ---- plot_fixations, fig.show="hold", fig.width=4-----------------------
 par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])
@@ -48,12 +45,12 @@ plot(fixations, names(fixations)[6])
 ## ----group_tips----------------------------------------------------------
 grouping <- groupTips(tree, align, 0.996)
 
-## ----plot_sites, fig.show="hold"-----------------------------------------
+## ----plot_sites, fig.show="hold", fig.width=4----------------------------
 par(mar = c(1,1,1,1))
 plot(fixations, 139)
 plot(fixations, 763)
 
-## ----find_SNP, fig.show="hold"-------------------------------------------
+## ----find_SNP, fig.show="hold", fig.width=4------------------------------
 snps <- SNPsites(tree, align)
 par(mar = c(1,1,1,1))
 plot(fixations, snps[4])

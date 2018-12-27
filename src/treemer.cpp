@@ -109,3 +109,28 @@ ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const i
   }
   return wrap(res);
 }
+
+// [[Rcpp::export]]
+CharacterVector tip2colorEdge(
+    CharacterVector &colorEdge,
+    const std::string &color,
+    const IntegerMatrix &treeEdge,
+    const IntegerVector &tips,
+    const int rootNode
+) {
+  std::map< int, std::pair<int, int> > nodeLink;
+  for (int i = 0; i < treeEdge.nrow(); ++i) {
+    nodeLink[treeEdge(i, 1)].first = treeEdge(i, 0);
+    nodeLink[treeEdge(i, 1)].second = i;
+  }
+  for (int i = 0; i < tips.size(); ++i) {
+    int cn, an;
+    cn = tips[i];
+    do {
+      an = nodeLink[cn].first;
+      colorEdge[nodeLink[cn].second] = color;
+      cn = an;
+    } while (an != rootNode);
+  }
+  return colorEdge;
+}
