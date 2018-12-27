@@ -34,7 +34,7 @@ The numbering will skip the gapChar if reference sequence if specified.}
 Otherwise the mutation will not be counted into the return.
 If more than one number is given, the ancestral takes the first and
 descendant takes the second as the maximum.
-If only given one number, it's the maximum for both ancestral and descendant.}
+If only given one number, it' <- s the maximum for both ancestral and descendant.}
 
 \item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved before/after mutation. 
 Otherwise the mutation will not be counted into the return.

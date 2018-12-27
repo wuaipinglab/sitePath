@@ -10,14 +10,12 @@ Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
 Description: Find sites with evolutionary siginficance in viral protein sequence 
 License: MIT + file LICENSE
 Depends:
-  R (>= 3.0.0)
+  R (>= 3.3.3)
 Imports:
   ape,
-  seqinr,
-  ggplot2,
   Rcpp
 Suggests:
-  ggtree,
+  seqinr,
   testthat,
   knitr,
   rmarkdown

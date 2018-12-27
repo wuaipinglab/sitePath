@@ -82,6 +82,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// summarizeAA
+CharacterVector summarizeAA(const CharacterVector& seqs, const int siteIndex, const float tolerance);
+RcppExport SEXP _sitePath_summarizeAA(SEXP seqsSEXP, SEXP siteIndexSEXP, SEXP toleranceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const CharacterVector& >::type seqs(seqsSEXP);
+    Rcpp::traits::input_parameter< const int >::type siteIndex(siteIndexSEXP);
+    Rcpp::traits::input_parameter< const float >::type tolerance(toleranceSEXP);
+    rcpp_result_gen = Rcpp::wrap(summarizeAA(seqs, siteIndex, tolerance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tip2colorEdge
 CharacterVector tip2colorEdge(CharacterVector& colorEdge, const std::string& color, const IntegerMatrix& treeEdge, const IntegerVector& tips, const int rootNode);
 RcppExport SEXP _sitePath_tip2colorEdge(SEXP colorEdgeSEXP, SEXP colorSEXP, SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
@@ -105,6 +118,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
+    {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 3},
     {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
     {NULL, NULL, 0}
 };

@@ -111,6 +111,43 @@ ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const i
 }
 
 // [[Rcpp::export]]
+CharacterVector summarizeAA(
+    const CharacterVector &seqs, 
+    const int siteIndex, 
+    const float tolerance
+) {
+  int nseq = seqs.size();
+  std::map<char, int> aaSummary;
+  for (int i = 0; i < nseq; ++i) {
+    aaSummary[seqs[i][siteIndex]]++;
+  }
+  int currentMax = 0;
+  char maxArg;
+  for (std::map<char, int>::iterator i = aaSummary.begin(); i != aaSummary.end(); ++i) {
+    if (i->second > currentMax) {
+      currentMax = i->second;
+      maxArg = i->first;
+    }
+  }
+  int tt;
+  if (tolerance < 0) {
+    std::invalid_argument("tolerance can only be positive numeric");
+  } else if (tolerance < 0.5) {
+    tt = tolerance * nseq;
+  } else if (tolerance < 1) {
+    tt = nseq - tolerance * nseq;
+  } else {
+    tt = tolerance;
+  }
+  nseq -= currentMax;
+  if (nseq > tt) {
+    return NA_STRING;
+  } else {
+    return wrap(maxArg);
+  }
+}
+
+// [[Rcpp::export]]
 CharacterVector tip2colorEdge(
     CharacterVector &colorEdge,
     const std::string &color,

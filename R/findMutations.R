@@ -128,7 +128,7 @@ SNPsites <- function(tree, align, reference = NULL, gapChar = '-', minSNP = NULL
 #' Otherwise the mutation will not be counted into the return.
 #' If more than one number is given, the ancestral takes the first and
 #' descendant takes the second as the maximum.
-#' If only given one number, it's the maximum for both ancestral and descendant.
+#' If only given one number, it' <- s the maximum for both ancestral and descendant.
 #' @param minEffectiveSize
 #' A vector of two integers to specifiy minimum tree tips involved before/after mutation. 
 #' Otherwise the mutation will not be counted into the return.
@@ -164,11 +164,6 @@ fixationSites.sitePath <- function(
   } else {
     toleranceAnc <- tolerance[1]
     toleranceDesc <- if (length(tolerance) == 1) toleranceAnc else tolerance[2]
-    # if (length(tolerance) == 1) {
-    #   toleranceDesc <- toleranceAnc
-    # } else {
-    #   toleranceDesc <- tolerance[2]
-    # }
   }
   if (is.null(minEffectiveSize)) {
     minAnc <- length(tree$tip.label) / 10
@@ -178,11 +173,6 @@ fixationSites.sitePath <- function(
   } else {
     minAnc <- minEffectiveSize
     minDesc <- if (length(minEffectiveSize) == 1) minAnc else minEffectiveSize[2]
-    # if (length(minEffectiveSize) == 1) {
-    #   minDesc <- minAnc
-    # } else {
-    #   minDesc <- minEffectiveSize[2]
-    # }
   }
   divNodes <- unique(divergentNode(paths))
   if (extendedSearch) {
@@ -213,14 +203,13 @@ fixationSites.sitePath <- function(
       if (length(beforeTips) < minAnc && length(excludedTips) == 0) {
         next
       }
-      after <- strsplit(align[afterTips], "")
-      before <- strsplit(align[beforeTips], "")
+      after <- align[afterTips]
+      before <- align[beforeTips]
       for (i in 1:length(reference)) {
-        bsum <- table(sapply(before, "[[", reference[i]))
-        asum <- table(sapply(after, "[[", reference[i]))
-        b <- names(bsum[1])
-        a <- names(asum[1])
-        if (sum(bsum[-1]) <= toleranceAnc && sum(asum[-1]) <= toleranceDesc && b != a) {
+        s <- reference[i] - 1
+        b <- summarizeAA(before, s, toleranceAnc)
+        a <- summarizeAA(after, s, toleranceDesc)
+        if (!(is.na(b) || is.na(a)) && a != b) {
           mut <- paste(b, i, a, sep = "")
           from <- tree$tip.label[beforeTips]
           to <- tree$tip.label[afterTips]

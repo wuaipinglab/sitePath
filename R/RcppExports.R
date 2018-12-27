@@ -25,6 +25,10 @@ ancestralPaths <- function(paths, minLen) {
     .Call('_sitePath_ancestralPaths', PACKAGE = 'sitePath', paths, minLen)
 }
 
+summarizeAA <- function(seqs, siteIndex, tolerance) {
+    .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', seqs, siteIndex, tolerance)
+}
+
 tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {
     .Call('_sitePath_tip2colorEdge', PACKAGE = 'sitePath', colorEdge, color, treeEdge, tips, rootNode)
 }
