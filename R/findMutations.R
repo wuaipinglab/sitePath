@@ -275,11 +275,15 @@ print.fixationSites <- function(fixationSites) {
   #   }
   #   cat("\n")
   # }
-  cat(paste(names(fixationSites), collapse = " "))
-  refSeqName <- attr(fixationSites, "refSeqName")
-  if (is.null(refSeqName)) {
-    cat("\nNo reference sequence specified. Using alignment numbering\n")
+  if (length(fixationSites) == 0) {
+    cat("No mutation found\n")
   } else {
-    cat("\nReference sequence: ", refSeqName, "\n", sep = "")
+    cat(paste(names(fixationSites), collapse = " "), "\n")
+    refSeqName <- attr(fixationSites, "refSeqName")
+    if (is.null(refSeqName)) {
+      cat("No reference sequence specified. Using alignment numbering\n")
+    } else {
+      cat("\nReference sequence: ", refSeqName, "\n", sep = "")
+    }
   }
 }

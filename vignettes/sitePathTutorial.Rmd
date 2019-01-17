@@ -101,6 +101,12 @@ fixations <- fixationSites(paths)
 fixations
 ```
 
+The output of `fixtionSites` is an R list. To get the tip names involved in a mutation, you can use index or mutation name to subset the R list
+
+```{r get_tipNames}
+fixations$S139N
+```
+
 ### 3.2 Visualize the result
 
 Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized. Because the `names(fixationSites)` are the mutation names, you can also use one of them as function input

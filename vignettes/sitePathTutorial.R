@@ -37,6 +37,9 @@ paths
 fixations <- fixationSites(paths)
 fixations
 
+## ----get_tipNames--------------------------------------------------------
+fixations$S139N
+
 ## ---- plot_fixations, fig.show="hold", fig.width=4-----------------------
 par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
