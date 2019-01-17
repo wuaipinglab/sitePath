@@ -12,7 +12,7 @@
 
 <meta name="author" content="Chengyang Ji" />
 
-<meta name="date" content="2018-12-27" />
+<meta name="date" content="2019-01-17" />
 
 <title>Tutorial on using sitePath</title>
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tutorial on using sitePath</h1>
 <h4 class="author"><em>Chengyang Ji</em></h4>
-<h4 class="date"><em>2018-12-27</em></h4>
+<h4 class="date"><em>2019-01-17</em></h4>
 
 
 
@@ -158,8 +158,92 @@ paths
 <p>The hierarchical search is done by <code>fixationSites</code> function. The function outputs a list of mutations with the sequence names involved before and after the fixation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fixations &lt;-<span class="st"> </span><span class="kw">fixationSites</span>(paths)
 fixations
-<span class="co">#&gt; N1902H V763M T777M S139N Y2086H M1143V D3398E G894A M2074L R3045C</span>
+<span class="co">#&gt; N1902H V763M T777M S139N Y2086H M1143V D3398E G894A M2074L R3045C </span>
 <span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
+<p>The output of <code>fixtionSites</code> is an R list. To get the tip names involved in a mutation, you can use index or mutation name to subset the R list</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fixations<span class="op">$</span>S139N
+<span class="co">#&gt; $ancestral</span>
+<span class="co">#&gt;   [1] &quot;BBC70847&quot; &quot;AUF35022&quot; &quot;ATL14618&quot; &quot;AUF35021&quot; &quot;ANK57896&quot; &quot;AMD61711&quot;</span>
+<span class="co">#&gt;   [7] &quot;AQS26698&quot; &quot;APG56458&quot; &quot;APH11550&quot; &quot;APH11586&quot; &quot;APH11535&quot; &quot;APH11544&quot;</span>
+<span class="co">#&gt;  [13] &quot;APH11584&quot; &quot;APH11567&quot; &quot;APH11548&quot; &quot;APH11572&quot; &quot;APH11575&quot; &quot;APH11568&quot;</span>
+<span class="co">#&gt;  [19] &quot;APH11561&quot; &quot;APH11533&quot; &quot;APH11523&quot; &quot;AWK27349&quot; &quot;APH11545&quot; &quot;APH11554&quot;</span>
+<span class="co">#&gt;  [25] &quot;APH11558&quot; &quot;APH11564&quot; &quot;APH11553&quot; &quot;APH11555&quot; &quot;APH11577&quot; &quot;APH11525&quot;</span>
+<span class="co">#&gt;  [31] &quot;APH11570&quot; &quot;APH11565&quot; &quot;APH11541&quot; &quot;APH11546&quot; &quot;APH11582&quot; &quot;APH11585&quot;</span>
+<span class="co">#&gt;  [37] &quot;APH11563&quot; &quot;APH11504&quot; &quot;APH11587&quot; &quot;APH11499&quot; &quot;APH11498&quot; &quot;APH11503&quot;</span>
+<span class="co">#&gt;  [43] &quot;APH11578&quot; &quot;APH11506&quot; &quot;APH11507&quot; &quot;APH11497&quot; &quot;APH11500&quot; &quot;APH11502&quot;</span>
+<span class="co">#&gt;  [49] &quot;AVG19202&quot; &quot;APH11539&quot; &quot;APH11534&quot; &quot;APH11592&quot; &quot;APH11594&quot; &quot;APH11518&quot;</span>
+<span class="co">#&gt;  [55] &quot;APH11549&quot; &quot;APH11512&quot; &quot;APH11514&quot; &quot;APH11581&quot; &quot;APH11508&quot; &quot;APH11516&quot;</span>
+<span class="co">#&gt;  [61] &quot;APH11515&quot; &quot;APH11538&quot; &quot;APH11551&quot; &quot;APH11571&quot; &quot;APH11566&quot; &quot;APH11562&quot;</span>
+<span class="co">#&gt;  [67] &quot;APH11595&quot; &quot;APH11528&quot; &quot;APH11560&quot; &quot;APH11543&quot; &quot;APH11529&quot; &quot;APH11573&quot;</span>
+<span class="co">#&gt;  [73] &quot;APH11536&quot; &quot;APH11493&quot; &quot;APH11532&quot; &quot;APH11590&quot; &quot;APH11559&quot; &quot;APH11530&quot;</span>
+<span class="co">#&gt;  [79] &quot;APH11517&quot; &quot;APH11527&quot; &quot;APH11593&quot; &quot;APH11531&quot; &quot;APH11576&quot; &quot;APH11580&quot;</span>
+<span class="co">#&gt;  [85] &quot;APH11569&quot; &quot;APH11542&quot; &quot;APH11579&quot; &quot;APH11540&quot; &quot;APH11557&quot; &quot;APH11495&quot;</span>
+<span class="co">#&gt;  [91] &quot;AOO19565&quot; &quot;APH11511&quot; &quot;APH11547&quot; &quot;APH11524&quot; &quot;APH11505&quot; &quot;APH11501&quot;</span>
+<span class="co">#&gt;  [97] &quot;APH11583&quot; &quot;APH11537&quot; &quot;APH11521&quot; &quot;APH11509&quot; &quot;APH11574&quot; &quot;APH11552&quot;</span>
+<span class="co">#&gt; [103] &quot;AOL02459&quot; &quot;APG56499&quot; &quot;ASW34302&quot; &quot;AVV62004&quot; &quot;BAX00477&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $descendant</span>
+<span class="co">#&gt;   [1] &quot;BAV89190&quot;     &quot;ANO46307&quot;     &quot;AOI20067&quot;     &quot;AVG19275&quot;    </span>
+<span class="co">#&gt;   [5] &quot;ANN44857&quot;     &quot;AMM43325&quot;     &quot;ANO46302&quot;     &quot;ANO46301&quot;    </span>
+<span class="co">#&gt;   [9] &quot;ANO46306&quot;     &quot;ANO46309&quot;     &quot;ANO46305&quot;     &quot;ANO46303&quot;    </span>
+<span class="co">#&gt;  [13] &quot;AMM43326&quot;     &quot;ANO46304&quot;     &quot;ARB08102&quot;     &quot;AHZ13508&quot;    </span>
+<span class="co">#&gt;  [17] &quot;ANO46308&quot;     &quot;ANC90425&quot;     &quot;AUI42329&quot;     &quot;AUI42330&quot;    </span>
+<span class="co">#&gt;  [21] &quot;AMD16557&quot;     &quot;AMR68932&quot;     &quot;AMK49165&quot;     &quot;ANF16414&quot;    </span>
+<span class="co">#&gt;  [25] &quot;AMT75536&quot;     &quot;ARB07976&quot;     &quot;AMV49165&quot;     &quot;AMO03410&quot;    </span>
+<span class="co">#&gt;  [29] &quot;ANA12599&quot;     &quot;AQU12485&quot;     &quot;AMS00611&quot;     &quot;APB03018&quot;    </span>
+<span class="co">#&gt;  [33] &quot;AMM39806&quot;     &quot;AMR39830&quot;     &quot;APY24199&quot;     &quot;ALX35659&quot;    </span>
+<span class="co">#&gt;  [37] &quot;APY24198&quot;     &quot;APO36913&quot;     &quot;AMQ48981&quot;     &quot;ARB07967&quot;    </span>
+<span class="co">#&gt;  [41] &quot;ARU07076&quot;     &quot;ARU07074&quot;     &quot;ANQ92019&quot;     &quot;APH11492&quot;    </span>
+<span class="co">#&gt;  [45] &quot;ANF04752&quot;     &quot;AMC13911&quot;     &quot;APB03019&quot;     &quot;AMH87239&quot;    </span>
+<span class="co">#&gt;  [49] &quot;AMX81919&quot;     &quot;AOX49264&quot;     &quot;AOX49265&quot;     &quot;AOO54270&quot;    </span>
+<span class="co">#&gt;  [53] &quot;AND01116&quot;     &quot;AOE22997&quot;     &quot;ASU55416&quot;     &quot;ANK57897&quot;    </span>
+<span class="co">#&gt;  [57] &quot;AWH65849&quot;     &quot;AML81028&quot;     &quot;AMB37295&quot;     &quot;ASU55403&quot;    </span>
+<span class="co">#&gt;  [61] &quot;ASU55417&quot;     &quot;APY24200&quot;     &quot;AOY08518&quot;     &quot;ARB07962&quot;    </span>
+<span class="co">#&gt;  [65] &quot;AMA12086&quot;     &quot;AMA12085&quot;     &quot;AMU04506&quot;     &quot;ATB53752&quot;    </span>
+<span class="co">#&gt;  [69] &quot;AMB18850&quot;     &quot;YP_009428568&quot; &quot;ART29823&quot;     &quot;ANC90426&quot;    </span>
+<span class="co">#&gt;  [73] &quot;ANW07476&quot;     &quot;AMZ03556&quot;     &quot;AOY08538&quot;     &quot;AOG18295&quot;    </span>
+<span class="co">#&gt;  [77] &quot;AMA12087&quot;     &quot;AMA12084&quot;     &quot;AOR82893&quot;     &quot;ARU07075&quot;    </span>
+<span class="co">#&gt;  [81] &quot;AMQ48982&quot;     &quot;AMK49164&quot;     &quot;APG56457&quot;     &quot;ALU33341&quot;    </span>
+<span class="co">#&gt;  [85] &quot;ASB32509&quot;     &quot;ASU55393&quot;     &quot;AOO19564&quot;     &quot;AOY08517&quot;    </span>
+<span class="co">#&gt;  [89] &quot;AOY08541&quot;     &quot;ANH10698&quot;     &quot;AOR82892&quot;     &quot;ASK51714&quot;    </span>
+<span class="co">#&gt;  [93] &quot;ARB07953&quot;     &quot;ANB66184&quot;     &quot;AMC33116&quot;     &quot;ATG29267&quot;    </span>
+<span class="co">#&gt;  [97] &quot;ART29828&quot;     &quot;AUI42194&quot;     &quot;AOG18296&quot;     &quot;AMM39805&quot;    </span>
+<span class="co">#&gt; [101] &quot;ARX97119&quot;     &quot;AOY08537&quot;     &quot;ASU55400&quot;     &quot;ASU55409&quot;    </span>
+<span class="co">#&gt; [105] &quot;AMQ34003&quot;     &quot;AMQ34004&quot;     &quot;AMK79468&quot;     &quot;AML82110&quot;    </span>
+<span class="co">#&gt; [109] &quot;AMR39831&quot;     &quot;AMX81918&quot;     &quot;AVZ25035&quot;     &quot;AOY08542&quot;    </span>
+<span class="co">#&gt; [113] &quot;ARB07932&quot;     &quot;AMM39804&quot;     &quot;AQX32985&quot;     &quot;AWF93617&quot;    </span>
+<span class="co">#&gt; [117] &quot;APC60215&quot;     &quot;AOS90223&quot;     &quot;AOY08523&quot;     &quot;ASU55411&quot;    </span>
+<span class="co">#&gt; [121] &quot;ASU55395&quot;     &quot;AMZ03557&quot;     &quot;APQ41784&quot;     &quot;ASU55391&quot;    </span>
+<span class="co">#&gt; [125] &quot;AQZ41948&quot;     &quot;ATG29306&quot;     &quot;AOS90220&quot;     &quot;ASW34087&quot;    </span>
+<span class="co">#&gt; [129] &quot;AOS90224&quot;     &quot;BAV82373&quot;     &quot;ASU55396&quot;     &quot;ASU55392&quot;    </span>
+<span class="co">#&gt; [133] &quot;AOY08524&quot;     &quot;ASU55394&quot;     &quot;APQ41782&quot;     &quot;ASU55399&quot;    </span>
+<span class="co">#&gt; [137] &quot;APQ41783&quot;     &quot;ANS60026&quot;     &quot;ASU55408&quot;     &quot;ANC90428&quot;    </span>
+<span class="co">#&gt; [141] &quot;ASU55418&quot;     &quot;ASU55424&quot;     &quot;AQZ41954&quot;     &quot;AOY08533&quot;    </span>
+<span class="co">#&gt; [145] &quot;ASL68978&quot;     &quot;AQZ41953&quot;     &quot;AQZ41947&quot;     &quot;ATG29284&quot;    </span>
+<span class="co">#&gt; [149] &quot;AQM74761&quot;     &quot;ATG29287&quot;     &quot;ATG29303&quot;     &quot;AWF93619&quot;    </span>
+<span class="co">#&gt; [153] &quot;AWF93618&quot;     &quot;APO39232&quot;     &quot;ART29826&quot;     &quot;ART29825&quot;    </span>
+<span class="co">#&gt; [157] &quot;AQX32987&quot;     &quot;APB03017&quot;     &quot;ASU55410&quot;     &quot;ASU55397&quot;    </span>
+<span class="co">#&gt; [161] &quot;ASU55413&quot;     &quot;ASU55420&quot;     &quot;AVZ25033&quot;     &quot;ATG29291&quot;    </span>
+<span class="co">#&gt; [165] &quot;ATG29301&quot;     &quot;ASL68979&quot;     &quot;ATG29299&quot;     &quot;AQZ41949&quot;    </span>
+<span class="co">#&gt; [169] &quot;AQZ41950&quot;     &quot;AQZ41951&quot;     &quot;AOY08525&quot;     &quot;AOY08535&quot;    </span>
+<span class="co">#&gt; [173] &quot;APW84875&quot;     &quot;APW84874&quot;     &quot;APW84873&quot;     &quot;APW84876&quot;    </span>
+<span class="co">#&gt; [177] &quot;ASU55404&quot;     &quot;ASU55423&quot;     &quot;ANB66182&quot;     &quot;ASU55425&quot;    </span>
+<span class="co">#&gt; [181] &quot;ASU55406&quot;     &quot;ASU55398&quot;     &quot;ASU55407&quot;     &quot;ASU55414&quot;    </span>
+<span class="co">#&gt; [185] &quot;ASU55405&quot;     &quot;ATI21641&quot;     &quot;ANO46297&quot;     &quot;ANO46298&quot;    </span>
+<span class="co">#&gt; [189] &quot;APO39233&quot;     &quot;ANH22038&quot;     &quot;APW84877&quot;     &quot;APW84872&quot;    </span>
+<span class="co">#&gt; [193] &quot;AMN14620&quot;     &quot;ASU55401&quot;     &quot;ASU55402&quot;     &quot;ASU55421&quot;    </span>
+<span class="co">#&gt; [197] &quot;ASU55415&quot;     &quot;APO08503&quot;     &quot;AOO85388&quot;     &quot;AOO53981&quot;    </span>
+<span class="co">#&gt; [201] &quot;AOS90222&quot;     &quot;APO39228&quot;     &quot;AOS90221&quot;     &quot;ASU55426&quot;    </span>
+<span class="co">#&gt; [205] &quot;ASU55412&quot;     &quot;AOY08546&quot;     &quot;ASU55419&quot;     &quot;ANG09399&quot;    </span>
+<span class="co">#&gt; [209] &quot;AOY08521&quot;     &quot;APQ41786&quot;     &quot;ASU55390&quot;     &quot;AQX32986&quot;    </span>
+<span class="co">#&gt; [213] &quot;ASU55422&quot;     &quot;ARM59239&quot;     &quot;ANB66183&quot;     &quot;ARU07183&quot;    </span>
+<span class="co">#&gt; [217] &quot;AQZ41956&quot;     &quot;ATG29276&quot;     &quot;AOY08516&quot;     &quot;APB03021&quot;    </span>
+<span class="co">#&gt; [221] &quot;APO39236&quot;     &quot;AOW32303&quot;     &quot;ATG29292&quot;     &quot;ATG29295&quot;    </span>
+<span class="co">#&gt; [225] &quot;AOY08536&quot;     &quot;ASL68974&quot;     &quot;AMQ48986&quot;     &quot;ATG29315&quot;    </span>
+<span class="co">#&gt; [229] &quot;ATG29307&quot;     &quot;ATG29270&quot;     &quot;APO39237&quot;     &quot;APB03020&quot;    </span>
+<span class="co">#&gt; [233] &quot;AOC50654&quot;     &quot;AMC13913&quot;     &quot;AMC13912&quot;     &quot;APO39243&quot;    </span>
+<span class="co">#&gt; [237] &quot;APO39229&quot;     &quot;AQZ41952&quot;     &quot;AQZ41955&quot;     &quot;ARI68105&quot;    </span>
+<span class="co">#&gt; [241] &quot;ASU55505&quot;     &quot;AQM74762&quot;     &quot;AUD54964&quot;</span></code></pre></div>
 </div>
 <div id="visualize-the-result" class="section level3">
 <h3>3.2 Visualize the result</h3>
