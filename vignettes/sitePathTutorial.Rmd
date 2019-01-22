@@ -4,7 +4,7 @@ author: "Chengyang Ji"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Tutorial on using sitePath}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -50,7 +50,7 @@ tree <- root(tree, "ANK57896")
 Occasionally you may get S4 phylo4 class from `ggtree` or other packages, use the `@` symbol to get the S3 phylo object from it
 
 ```{r S4phylo}
-beast_file <- system.file("beast_mcc.tree", package="sitePath")
+beast_file <- system.file("beast_mcc.tree", package = "sitePath")
 treeS4 <- read.beast(beast_file)
 treeS3 <- treeS4@phylo
 ```
@@ -111,7 +111,7 @@ fixations$S139N
 
 Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized. Because the `names(fixationSites)` are the mutation names, you can also use one of them as function input
 
-```{r, plot_fixations, fig.show="hold", fig.width=4}
+```{r plot_fixations, fig.show="hold", fig.width=4}
 par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])

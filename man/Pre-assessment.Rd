@@ -11,23 +11,24 @@ similarityMatrix(tree, align)
 sneakPeek(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
+\item{tree}{a \code{phylo} object. This commonly can be from tree paring function
 in \code{ape} or \code{ggtree}}
 
-\item{align}{an \code{alignment} object. This commonly can be from sequence parsing function
-in \code{ape} or \code{seqinr} and many others}
+\item{align}{an \code{alignment} object. This commonly can be from
+sequence parsing function in \code{ape} or \code{seqinr} and many others}
 
 \item{step}{the similarity window for calculating and ploting}
 
-\item{maxPath}{maximum number of path to show in the plot. The number of path 
-in the raw tree can be far greater than trimmed tree. To better 
+\item{maxPath}{maximum number of path to show in the plot. The number of path
+in the raw tree can be far greater than trimmed tree. To better
 see the impact of chaning threshold on path number. This should be
 specified. The default is one 20th of tree tip number.}
 
 \item{makePlot}{whether make a dot plot when return}
 }
 \value{
-\code{similarityMatrix} returns a diagonal matrix of similarity between sequences
+\code{similarityMatrix} returns a diagonal matrix of
+similarity between sequences
 
 \code{sneakPeek} return the similarity threhold against number of sitePath.
 There will be a simple dot plot between threshold and path number if
@@ -35,12 +36,22 @@ There will be a simple dot plot between threshold and path number if
 }
 \description{
 \code{similarityMatrix} calculates similarity between aligned sequences
-The similarity matrix can be used in \code{\link{groupTips}} or \code{\link{sitePath}}
+The similarity matrix can be used in \code{\link{groupTips}}
+or \code{\link{sitePath}}
 
 \code{sneakPeek} is intended to plot similarity as a threshold
 against number of output sitePath. This plot is intended to give user
-a feel about how many sitePaths they should expect from the similarity threshold.
-The number of sitePath should not be too many or too few. The result excludes
-where the number of sitePath is greater than number of tips divided by 20 or
-self-defined maxPath. The zero sitePath result will also be excluded
+a feel about how many sitePaths they should expect from
+the similarity threshold. The number of sitePath should not
+be too many or too few. The result excludes where the number of sitePath
+is greater than number of tips divided by 20 or self-defined maxPath.
+The zero sitePath result will also be excluded
+}
+\examples{
+data("zikv_tree")
+data("zikv_align")
+similarityMatrix(zikv_tree, zikv_align)
+data("zikv_tree")
+data("zikv_align")
+sneakPeek(zikv_tree, zikv_align)
 }

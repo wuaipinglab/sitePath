@@ -12,7 +12,7 @@
 
 <meta name="author" content="Chengyang Ji" />
 
-<meta name="date" content="2019-01-17" />
+<meta name="date" content="2019-01-21" />
 
 <title>Tutorial on using sitePath</title>
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tutorial on using sitePath</h1>
 <h4 class="author"><em>Chengyang Ji</em></h4>
-<h4 class="date"><em>2019-01-17</em></h4>
+<h4 class="date"><em>2019-01-21</em></h4>
 
 
 
@@ -119,7 +119,7 @@ tree &lt;-<span class="st"> </span><span class="kw">read.tree</span>(zikv_tree)<
 <p>Tree must be rooted before further analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span><span class="kw">root</span>(tree, <span class="st">&quot;ANK57896&quot;</span>)</code></pre></div>
 <p>Occasionally you may get S4 phylo4 class from <code>ggtree</code> or other packages, use the <code>@</code> symbol to get the S3 phylo object from it</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beast_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;beast_mcc.tree&quot;</span>, <span class="dt">package=</span><span class="st">&quot;sitePath&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beast_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;beast_mcc.tree&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;sitePath&quot;</span>)
 treeS4 &lt;-<span class="st"> </span><span class="kw">read.beast</span>(beast_file)
 treeS3 &lt;-<span class="st"> </span>treeS4<span class="op">@</span>phylo</code></pre></div>
 </div>

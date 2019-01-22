@@ -15,7 +15,7 @@ tree <- read.tree(zikv_tree)
 tree <- root(tree, "ANK57896")
 
 ## ----S4phylo-------------------------------------------------------------
-beast_file <- system.file("beast_mcc.tree", package="sitePath")
+beast_file <- system.file("beast_mcc.tree", package = "sitePath")
 treeS4 <- read.beast(beast_file)
 treeS3 <- treeS4@phylo
 
@@ -40,7 +40,7 @@ fixations
 ## ----get_tipNames--------------------------------------------------------
 fixations$S139N
 
-## ---- plot_fixations, fig.show="hold", fig.width=4-----------------------
+## ----plot_fixations, fig.show="hold", fig.width=4------------------------
 par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])

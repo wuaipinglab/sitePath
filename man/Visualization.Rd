@@ -4,22 +4,29 @@
 \alias{plot.fixationSites}
 \title{Color the tree by a single site}
 \usage{
-\method{plot}{fixationSites}(fixation, site)
+\method{plot}{fixationSites}(x, y, ...)
 }
 \arguments{
-\item{site}{One of the mutations in the \code{\link{fixationSites}} object. It should be from 
-the \code{\link{names}} of the object.Or an integer indicating a site could be provide.
-The numbering is consistent with the reference defined at \code{\link{fixationSites}}.}
+\item{x}{a \code{fixationSites} object from \code{\link{fixationSites}}}
 
-\item{fixationSites}{a \code{fixationSites} object from \code{\link{fixationSites}}}
+\item{y}{One of the mutations in the \code{\link{fixationSites}} object.
+It should be from the \code{\link{names}} of the object.
+Or an integer indicating a site could be provide. The numbering
+is consistent with the reference defined at \code{\link{fixationSites}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 plot and color the tree
 }
 \description{
-The result of \code{\link{fixationSites}} can be visualized using the funciton.
-It will plot the tree and color the tips before fixation in red, 
-tips after fixation in blue and excluded tips in grey. 
+The result of \code{\link{fixationSites}} can be visualized using
+the funciton. It will plot the tree and color the ancestral tips
+in red, descendant tips in blue and excluded tips in grey.
 But the plot will color the tree according to the amino acid instead
 if \code{site} argument is provided.
+}
+\examples{
+data("zikv_fixations")
+plot(zikv_fixations, names(zikv_fixations)[[1]])
 }

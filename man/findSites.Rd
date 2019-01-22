@@ -11,17 +11,17 @@ SNPsites(tree, align, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{sitePath}(paths, reference = NULL,
   gapChar = "-", tolerance = c(0, 0), minEffectiveSize = NULL,
-  extendedSearch = TRUE)
+  extendedSearch = TRUE, ...)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree paring function 
+\item{tree}{a \code{phylo} object. This commonly can be from tree paring function
 in \code{ape} or \code{ggtree}}
 
-\item{align}{an \code{alignment} object. This commonly can be from sequence parsing function
-in \code{ape} or \code{seqinr} and many others}
+\item{align}{an \code{alignment} object. This commonly can be from
+sequence parsing function in \code{ape} or \code{seqinr} and many others}
 
-\item{reference}{name of reference for site numbering. 
-The name has to be one of the sequences' name. The default uses the intrinsic alignment numbering}
+\item{reference}{name of reference for site numbering. The name has to be one of the
+sequences' name. The default uses the intrinsic alignment numbering}
 
 \item{gapChar}{the character to indicate gap.
 The numbering will skip the gapChar if reference sequence if specified.}
@@ -30,38 +30,51 @@ The numbering will skip the gapChar if reference sequence if specified.}
 
 \item{paths}{a \code{sitePath} object returned from \code{\link{sitePath}} function}
 
-\item{tolerance}{A vector of two integers to specify maximum amino acid variation before/after mutation. 
-Otherwise the mutation will not be counted into the return.
-If more than one number is given, the ancestral takes the first and
-descendant takes the second as the maximum.
-If only given one number, it' <- s the maximum for both ancestral and descendant.}
+\item{tolerance}{A vector of two integers to specify maximum amino acid variation
+before/after mutation. Otherwise the mutation will not be counted into
+the return. If more than one number is given, the ancestral takes the first
+and descendant takes the second as the maximum. If only given one number,
+it's the maximum for both ancestral and descendant.}
 
-\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved before/after mutation. 
-Otherwise the mutation will not be counted into the return.
-If more than one number is given, the ancestral takes the first and
-descendant takes the second as the minimum.
-If only given one number, it's the minimum for both ancestral and descendant.}
+\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
+before/after mutation. Otherwise the mutation will not be counted into
+the return. If more than one number is given, the ancestral takes the first
+and descendant takes the second as the minimum. If only given one number,
+it's the minimum for both ancestral and descendant.}
 
 \item{extendedSearch}{Whether to extend the search. The terminal of each \code{sitePath} is
-a cluster of tips. To look for the fixation mutation in the cluster, 
+a cluster of tips. To look for the fixation mutation in the cluster,
 the common ancestral node of farthest tips (at least two) will be
 the new terminal search point.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 \code{findSNPsite} returns a list of qualified SNP site
 
-\code{fixationSites} returns a list of mutations with names of the tips involved.
-The name of each list element is the discovered mutation. A mutation has two vectors of
-tip names: 'from' before the fixation and 'to' after the fixation.
+\code{fixationSites} returns a list of mutations
+with names of the tips involved. The name of each list element
+is the discovered mutation. A mutation has two vectors of tip names:
+'from' before the fixation and 'to' after the fixation.
 }
 \description{
-Single nucleotide polymorphism (SNP) in the whole package refers to variation of amino acid.
-\code{findSNPsite} will try to find SNP in the multiple sequence alignment. A reference sequence
-and gap character may be specified to number the site. This us irrelevant to the intended analysis
-but might be helpful to evaluate the performance of \code{fixationSites}
+Single nucleotide polymorphism (SNP) in the whole package refers to
+variation of amino acid. \code{findSNPsite} will try to find SNP in
+the multiple sequence alignment. A reference sequence
+and gap character may be specified to number the site. This is
+irrelevant to the intended analysis but might be helpful to evaluate
+the performance of \code{fixationSites}.
 
-After finding the \code{\link{sitePath}} of a phylogenetic tree, we use the result to find
-those sites that show fixation on some if not all sitePath. Parallel evolution is relatively
-common in RNA virus. There is chance that some site be fixed in one lineage but does not show
+After finding the \code{\link{sitePath}} of a phylogenetic tree, we use
+the result to find those sites that show fixation on some, if not all,
+of the lineages. Parallel evolution is relatively common in RNA virus.
+There is chance that some site be fixed in one lineage but does not show
 fixation because of different sequence context.
+}
+\examples{
+data("zikv_tree")
+data("zikv_align")
+SNPsites(zikv_tree, zikv_align)
+data("zikv_paths")
+fixationSites(zikv_paths)
 }
