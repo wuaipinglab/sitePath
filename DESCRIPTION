@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Lineage-dependent fixation
-Version: 0.0.3
+Version: 0.99.4
 Date: 2018-11-14
 Author: 
     Chengyang Ji
@@ -15,7 +15,7 @@ Description: Find sites with evolutionary siginficance in
     viral protein sequence.
 License: MIT + file LICENSE
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.6.0)
 Imports:
     ape,
     seqinr,
