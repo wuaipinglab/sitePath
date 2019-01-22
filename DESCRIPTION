@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Lineage-dependent fixation
-Version: 0.0.2
+Version: 0.0.3
 Date: 2018-11-14
 Author: 
     Chengyang Ji
@@ -24,7 +24,6 @@ Imports:
     graphics,
     utils
 Suggests:
-    ggtree,
     testthat,
     knitr,
     rmarkdown

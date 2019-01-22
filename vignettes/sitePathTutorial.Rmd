@@ -35,7 +35,6 @@ The S3 phylo class is a common data structure for phylogenetic analysis in R. Th
 
 ```{r import_tree, message=FALSE}
 library(ape)
-library(ggtree)
 
 zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
 tree <- read.tree(zikv_tree)
@@ -44,16 +43,10 @@ tree <- read.tree(zikv_tree)
 Tree must be rooted before further analysis
 
 ```{r root_tree}
-tree <- root(tree, "ANK57896")
+tree <- ape::root(tree, "ANK57896")
 ```
 
 Occasionally you may get S4 phylo4 class from `ggtree` or other packages, use the `@` symbol to get the S3 phylo object from it
-
-```{r S4phylo}
-beast_file <- system.file("beast_mcc.tree", package = "sitePath")
-treeS4 <- read.beast(beast_file)
-treeS3 <- treeS4@phylo
-```
 
 ### 1.2 Parsing sequence alignment
 

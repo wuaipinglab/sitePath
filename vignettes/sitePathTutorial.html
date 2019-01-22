@@ -12,7 +12,7 @@
 
 <meta name="author" content="Chengyang Ji" />
 
-<meta name="date" content="2019-01-21" />
+<meta name="date" content="2019-01-22" />
 
 <title>Tutorial on using sitePath</title>
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tutorial on using sitePath</h1>
 <h4 class="author"><em>Chengyang Ji</em></h4>
-<h4 class="date"><em>2019-01-21</em></h4>
+<h4 class="date"><em>2019-01-22</em></h4>
 
 
 
@@ -112,16 +112,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3>1.1 Parsing tree</h3>
 <p>The S3 phylo class is a common data structure for phylogenetic analysis in R. The CRAN package <a href="https://cran.r-project.org/web/packages/ape/index.html">ape</a> provides basic parsing function for reading tree files. The Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/ggtree.html">ggtree</a> provides more comprehensive parsing utilities.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ape)
-<span class="kw">library</span>(ggtree)
 
 zikv_tree &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ZIKV.newick&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;sitePath&quot;</span>)
 tree &lt;-<span class="st"> </span><span class="kw">read.tree</span>(zikv_tree)</code></pre></div>
 <p>Tree must be rooted before further analysis</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span><span class="kw">root</span>(tree, <span class="st">&quot;ANK57896&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span>ape<span class="op">::</span><span class="kw">root</span>(tree, <span class="st">&quot;ANK57896&quot;</span>)</code></pre></div>
 <p>Occasionally you may get S4 phylo4 class from <code>ggtree</code> or other packages, use the <code>@</code> symbol to get the S3 phylo object from it</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beast_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;beast_mcc.tree&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;sitePath&quot;</span>)
-treeS4 &lt;-<span class="st"> </span><span class="kw">read.beast</span>(beast_file)
-treeS3 &lt;-<span class="st"> </span>treeS4<span class="op">@</span>phylo</code></pre></div>
 </div>
 <div id="parsing-sequence-alignment" class="section level3">
 <h3>1.2 Parsing sequence alignment</h3>

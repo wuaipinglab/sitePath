@@ -6,18 +6,12 @@ knitr::opts_chunk$set(
 
 ## ----import_tree, message=FALSE------------------------------------------
 library(ape)
-library(ggtree)
 
 zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
 tree <- read.tree(zikv_tree)
 
 ## ----root_tree-----------------------------------------------------------
-tree <- root(tree, "ANK57896")
-
-## ----S4phylo-------------------------------------------------------------
-beast_file <- system.file("beast_mcc.tree", package = "sitePath")
-treeS4 <- read.beast(beast_file)
-treeS3 <- treeS4@phylo
+tree <- ape::root(tree, "ANK57896")
 
 ## ----read_alignment, message=FALSE---------------------------------------
 library(seqinr)
