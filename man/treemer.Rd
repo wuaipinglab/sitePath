@@ -6,21 +6,15 @@
 \alias{sitePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, align, similarity, simMatrix = NULL,
-  forbidTrivial = TRUE, tipnames = TRUE)
+groupTips(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE,
+  tipnames = TRUE)
 
-sitePath(tree, align, similarity, simMatrix = NULL,
-  forbidTrivial = TRUE)
+sitePath(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{a \code{phylo} object. This commonly can be from tree paring function
 in \code{ape} or \code{ggtree}
 All the \code{tip.label} should be found in the alignment}
-
-\item{align}{an \code{alignment} object. This commonly can be
-from sequence parsing function in \code{ape} or \code{seqinr}
-and many others. Sequence names in the alignment
-should include all \code{tip.label} in the tree}
 
 \item{similarity}{similarity threshold for tree trimming}
 
@@ -29,6 +23,11 @@ should include all \code{tip.label} in the tree}
 \item{forbidTrivial}{does not allow trivial trimming}
 
 \item{tipnames}{if return as tipnames}
+
+\item{align}{an \code{alignment} object. This commonly can be
+from sequence parsing function in \code{ape} or \code{seqinr}
+and many others. Sequence names in the alignment
+should include all \code{tip.label} in the tree}
 }
 \value{
 grouping of tips
@@ -37,15 +36,15 @@ path represent by node number
 }
 \description{
 \code{groupTips} uses sequence similarity to group tree tips.
-Members in a group are always constrained to share the same 
-ancestral node. Similarity between two tips is derived from 
+Members in a group are always constrained to share the same
+ancestral node. Similarity between two tips is derived from
 their multiple sequence alignment. The site will not be counted
 into total length if both are gap. Similarity is calculated
 as number of matched divided by the corrected total length.
 So far the detection of divergence is based on one simple rule:
 the miminal pairwise similarity. The two branches are decided to
-be divergent if the similarity is lower than the threshold. 
-(Other more statistical approaches such as Kolmogorov-Smirnov 
+be divergent if the similarity is lower than the threshold.
+(Other more statistical approaches such as Kolmogorov-Smirnov
 Tests among pair-wise distance could be introduced in the future)
 
 \code{sitePath} finds the lineages of a phylogenetic tree providing
@@ -55,7 +54,7 @@ the bifurcated terminals of the trimmed tree. The \code{\link{nodepath}}
 between root node and the bifurcated terminals is the lineages.
 In order to extend the search of mutational site. The lineages
 will tag some of its trailing nodes. Here nodes up to
-the ancestor of the tips with the longest \code{\link{nodepath}} 
+the ancestor of the tips with the longest \code{\link{nodepath}}
 are added.
 }
 \examples{

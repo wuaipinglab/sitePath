@@ -7,24 +7,22 @@ knitr::opts_chunk$set(
 ## ----import_tree, message=FALSE------------------------------------------
 library(ape)
 
-zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
-tree <- read.tree(zikv_tree)
+tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
 
 ## ----root_tree-----------------------------------------------------------
-tree <- ape::root(tree, "ANK57896")
+tree <- root(tree, "ANK57896")
 
-## ----read_alignment, message=FALSE---------------------------------------
-library(seqinr)
-
-align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
-
-## ----sneakPeek_plot, fig.width=6, fig.height=4---------------------------
+## ----add_alignment, message=FALSE----------------------------------------
 library(sitePath)
 
-preassessment <- sneakPeek(tree, align)
+alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
+tree <- addMSA(tree, alignment_file, "fasta")
+
+## ----sneakPeek_plot, fig.width=6, fig.height=4---------------------------
+preassessment <- sneakPeek(tree)
 
 ## ----get_sitePath--------------------------------------------------------
-paths <- sitePath(tree, align, 0.996)
+paths <- sitePath(tree, 0.996)
 paths
 
 ## ----find_fixations------------------------------------------------------
@@ -40,7 +38,7 @@ plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])
 
 ## ----group_tips----------------------------------------------------------
-grouping <- groupTips(tree, align, 0.996)
+grouping <- groupTips(tree, 0.996)
 
 ## ----plot_sites, fig.show="hold", fig.width=4----------------------------
 par(mar = c(1,1,1,1))
@@ -48,7 +46,7 @@ plot(fixations, 139)
 plot(fixations, 763)
 
 ## ----find_SNP, fig.show="hold", fig.width=4------------------------------
-snps <- SNPsites(tree, align)
+snps <- SNPsites(tree)
 par(mar = c(1,1,1,1))
 plot(fixations, snps[4])
 plot(fixations, snps[5])
