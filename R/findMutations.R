@@ -5,28 +5,24 @@
 #' \code{similarityMatrix} calculates similarity between aligned sequences
 #' The similarity matrix can be used in \code{\link{groupTips}}
 #' or \code{\link{sitePath}}
-#' @param tree
-#' a \code{phylo} object. This commonly can be from tree paring function
-#' in \code{ape} or \code{ggtree}
-#' @param align
-#' an \code{alignment} object. This commonly can be from
-#' sequence parsing function in \code{ape} or \code{seqinr} and many others
+#' @param tree The return from \code{\link{addMSA}} function
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' similarityMatrix(zikv_tree, zikv_align)
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' simMatrix <- similarityMatrix(tree)
 #' @return
 #' \code{similarityMatrix} returns a diagonal matrix of
 #' similarity between sequences
 #' @importFrom methods is
 #' @export
-similarityMatrix <- function(tree, align) {
+similarityMatrix <- function(tree) {
     if (!inherits(tree, "phylo")) {
         stop("tree is not class phylo")
-    } else if (!is(align, "alignment")) {
-        stop("align is not class alignment")
+    } else if (is.null(attr(tree, "alignment"))) {
+        stop("No alignment found.")
     }
-    sim <- getSimilarityMatrix(checkMatched(tree, align))
+    sim <- getSimilarityMatrix(attr(tree, "alignment"))
     dimnames(sim) <- list(tree$tip.label, tree$tip.label)
     return(sim)
 }
@@ -47,10 +43,8 @@ similarityMatrix <- function(tree, align) {
 #' see the impact of chaning threshold on path number. This should be
 #' specified. The default is one 20th of tree tip number.
 #' @param makePlot whether make a dot plot when return
-#' @examples
-#' data("zikv_tree")
-#' data("zikv_align")
-#' sneakPeek(zikv_tree, zikv_align)
+#' @examples 
+#' sneakPeek(tree)
 #' @return
 #' \code{sneakPeek} return the similarity threhold against number of sitePath.
 #' There will be a simple dot plot between threshold and path number if
@@ -60,11 +54,10 @@ similarityMatrix <- function(tree, align) {
 #' @export
 sneakPeek <-
     function(tree,
-             align,
              step = NULL,
              maxPath = NULL,
              makePlot = TRUE) {
-        simMatrix <- similarityMatrix(tree, align)
+        simMatrix <- similarityMatrix(tree)
         minSim <- min(simMatrix)
         if (is.null(step)) {
             step <- round(minSim - 1, 3) / 50
@@ -79,7 +72,13 @@ sneakPeek <-
         similarity <- numeric(0)
         pathNum <- integer(0)
         for (s in seq(1, minSim, step)) {
-            paths <- sitePath(tree, align, s, simMatrix, FALSE)
+            paths <-
+                sitePath(
+                    tree,
+                    similarity = s,
+                    simMatrix = simMatrix,
+                    forbidTrivial = FALSE
+                )
             if (maxPath < length(paths)) {
                 next
             } else if (length(paths) <= 1) {
@@ -95,7 +94,7 @@ sneakPeek <-
     }
 
 #' @rdname findSites
-#' @name findSites
+#' @name SNPsites
 #' @title Finding sites with variation
 #' @description
 #' Single nucleotide polymorphism (SNP) in the whole package refers to
@@ -104,12 +103,7 @@ sneakPeek <-
 #' and gap character may be specified to number the site. This is
 #' irrelevant to the intended analysis but might be helpful to evaluate
 #' the performance of \code{fixationSites}.
-#' @param tree
-#' a \code{phylo} object. This commonly can be from tree paring function
-#' in \code{ape} or \code{ggtree}
-#' @param align
-#' an \code{alignment} object. This commonly can be from
-#' sequence parsing function in \code{ape} or \code{seqinr} and many others
+#' @param tree The return from \code{\link{addMSA}} function
 #' @param reference
 #' name of reference for site numbering. The name has to be one of the
 #' sequences' name. The default uses the intrinsic alignment numbering
@@ -119,19 +113,19 @@ sneakPeek <-
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' SNPsites(zikv_tree, zikv_align)
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' SNPsites(tree)
 #' @return \code{findSNPsite} returns a list of qualified SNP site
 #' @export
 SNPsites <-
     function(tree,
-             align,
              reference = NULL,
              gapChar = '-',
              minSNP = NULL) {
         if (is.null(minSNP)) {
             minSNP <- length(tree$tip.label) / 10
         }
-        alignedSeq <- toupper(align$seq)
+        alignedSeq <- attr(tree, "alignment")
         if (is.null(reference)) {
             reference <- 1:nchar(alignedSeq[1])
         } else {
@@ -180,9 +174,8 @@ SNPsites <-
 #' the common ancestral node of farthest tips (at least two) will be
 #' the new terminal search point.
 #' @param ... further arguments passed to or from other methods.
-#' @examples
-#' data("zikv_paths")
-#' fixationSites(zikv_paths)
+#' @examples 
+#' fixationSites(sitePath(tree, 0.996))
 #' @return
 #' \code{fixationSites} returns a list of mutations
 #' with names of the tips involved. The name of each list element
@@ -327,6 +320,17 @@ as.data.frame.fixationSites <- function(x, ...) {
 
 #' @export
 print.fixationSites <- function(x, ...) {
+    if (length(x) == 0) {
+        cat("No fixation found\n")
+    } else {
+        cat(paste(names(x), collapse = " "), "\n")
+        refSeqName <- attr(x, "refSeqName")
+        if (is.null(refSeqName)) {
+            cat("No reference sequence specified. Using alignment numbering\n")
+        } else {
+            cat("Reference sequence: ", refSeqName, "\n", sep = "")
+        }
+    }
     # for (m in names(x)) {
     #   cat(m)
     #   cat("\n")
@@ -348,15 +352,4 @@ print.fixationSites <- function(x, ...) {
     #   }
     #   cat("\n")
     # }
-    if (length(x) == 0) {
-        cat("No mutation found\n")
-    } else {
-        cat(paste(names(x), collapse = " "), "\n")
-        refSeqName <- attr(x, "refSeqName")
-        if (is.null(refSeqName)) {
-            cat("No reference sequence specified. Using alignment numbering\n")
-        } else {
-            cat("Reference sequence: ", refSeqName, "\n", sep = "")
-        }
-    }
 }

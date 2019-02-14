@@ -6,16 +6,12 @@
 \alias{sneakPeek}
 \title{Things can be done before the analysis}
 \usage{
-similarityMatrix(tree, align)
+similarityMatrix(tree)
 
-sneakPeek(tree, align, step = NULL, maxPath = NULL, makePlot = TRUE)
+sneakPeek(tree, step = NULL, maxPath = NULL, makePlot = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree paring function
-in \code{ape} or \code{ggtree}}
-
-\item{align}{an \code{alignment} object. This commonly can be from
-sequence parsing function in \code{ape} or \code{seqinr} and many others}
+\item{tree}{The return from \code{\link{addMSA}} function}
 
 \item{step}{the similarity window for calculating and ploting}
 
@@ -50,8 +46,7 @@ The zero sitePath result will also be excluded
 \examples{
 data("zikv_tree")
 data("zikv_align")
-similarityMatrix(zikv_tree, zikv_align)
-data("zikv_tree")
-data("zikv_align")
-sneakPeek(zikv_tree, zikv_align)
+tree <- addMSA(zikv_tree, seqs = zikv_align)
+simMatrix <- similarityMatrix(tree)
+sneakPeek(tree)
 }

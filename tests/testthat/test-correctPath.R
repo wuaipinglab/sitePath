@@ -1,23 +1,21 @@
 context("Treemer")
 
 test_that("Topology-dependent trimming", {
-    tree <-
-        ape::read.tree(system.file("ZIKV.newick", package = "sitePath"))
-    tree <- ape::root(tree, "ANK57896")
-    align <-
-        seqinr::read.alignment(system.file("ZIKV.fasta", package = "sitePath"),
-                               format = "fasta")
-    simMatrix <- similarityMatrix(tree, align)
+    data("zikv_align")
+    data("zikv_tree")
+    tree <- addMSA(zikv_tree, seqs = zikv_align)
+    simMatrix <- similarityMatrix(tree)
     minSim <- min(simMatrix)
     step <- round(minSim - 1, 3) / 50
     for (s in seq(1, minSim, step)) {
         grouping <-
-            groupTips(tree,
-                      align,
-                      s,
-                      simMatrix,
-                      forbidTrivial = FALSE,
-                      tipnames = FALSE)
+            groupTips(
+                tree,
+                similarity = s,
+                simMatrix = simMatrix,
+                forbidTrivial = FALSE,
+                tipnames = FALSE
+            )
         expect_equal(sort(unlist(grouping, use.names = FALSE)),
                      1:length(tree$tip.label))
         for (g in names(grouping)) {
@@ -32,7 +30,12 @@ test_that("Topology-dependent trimming", {
                          sort(sitePath:::ChildrenTips(tree, an)))
         }
         paths <-
-            sitePath(tree, align, s, simMatrix, forbidTrivial = FALSE)
+            sitePath(
+                tree,
+                similarity = s,
+                simMatrix = simMatrix,
+                forbidTrivial = FALSE
+            )
         for (p in paths) {
             expect_equal(ape::nodepath(tree, from = p[1], to = p[length(p)]), p)
         }

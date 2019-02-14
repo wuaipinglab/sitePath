@@ -28,7 +28,7 @@ The `sitePath` package does hierarchical search for fixation events given multip
 
 There're various R packages for parsing phylogenetic tree and multiple sequence alignment files. For now, `sitepath` accepts `phylo` object and `alignment` object. Functions from `ggtree` and `seqinr` are able to handle most file formats.
 
-### 1.1 Parsing tree
+### 1.1 Parse phylogenetic tree
 
 The S3 phylo class is a common data structure for phylogenetic analysis in R. The CRAN package [ape](https://cran.r-project.org/web/packages/ape/index.html) provides basic parsing function for reading tree files. The Bioconductor package [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) provides more comprehensive parsing utilities.
 
@@ -36,26 +36,20 @@ The S3 phylo class is a common data structure for phylogenetic analysis in R. Th
 ```{r import_tree, message=FALSE}
 library(ape)
 
-zikv_tree <- system.file("ZIKV.newick", package = "sitePath")
-tree <- read.tree(zikv_tree)
+tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
 ```
 
-Tree must be rooted before further analysis
+It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.
 
-```{r root_tree}
-tree <- ape::root(tree, "ANK57896")
-```
+### 1.2 Parse and add sequence alignment
 
-Occasionally you may get S4 phylo4 class from `ggtree` or other packages, use the `@` symbol to get the S3 phylo object from it
+Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper functin for parsing and adding the sequence alignment
 
-### 1.2 Parsing sequence alignment
+```{r add_alignment, message=FALSE}
+library(sitePath)
 
-Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html).
-
-```{r read_alignment, message=FALSE}
-library(seqinr)
-
-align <- read.alignment(system.file("ZIKV.fasta", package = "sitePath"), "fasta")
+alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
+tree <- addMSA(tree, alignment_file, "fasta")
 ```
 
 ## 2. Resolve phylogenetic lineages
@@ -67,9 +61,7 @@ The names in tree and aligment must be matched. The fundamental approach in iden
 In the current version, the resolving function only takes sequence similarity as one single threshold. The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can be of great help in choosing the threshold.*
 
 ```{r sneakPeek_plot, fig.width=6, fig.height=4}
-library(sitePath)
-
-preassessment <- sneakPeek(tree, align)
+preassessment <- sneakPeek(tree)
 ```
 
 ### 2.2 You have to choose a threshold by yourself!
@@ -77,7 +69,7 @@ preassessment <- sneakPeek(tree, align)
 There might be one point where the number of resulting paths has an **unusual drop** and that could be the preferable similarity threshold. For example, here 0.996 is a reasonable choice. You can use the function `sitePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis.
 
 ```{r get_sitePath}
-paths <- sitePath(tree, align, 0.996)
+paths <- sitePath(tree, 0.996)
 paths
 ```
 
@@ -120,7 +112,7 @@ may stop here if you wish.
 The function `groupTips` applies the same operation as the function`sitePath` does but it outputs clusters of tree tips instead of paths
 
 ```{r group_tips}
-grouping <- groupTips(tree, align, 0.996)
+grouping <- groupTips(tree, 0.996)
 ```
 
 
@@ -139,7 +131,7 @@ plot(fixations, 763)
 An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP site and the result could be what you'll expect to be fixation mutation.
 
 ```{r find_SNP, fig.show="hold", fig.width=4}
-snps <- SNPsites(tree, align)
+snps <- SNPsites(tree)
 par(mar = c(1,1,1,1))
 plot(fixations, snps[4])
 plot(fixations, snps[5])

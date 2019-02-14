@@ -27,6 +27,9 @@ But the plot will color the tree according to the amino acid instead
 if \code{site} argument is provided.
 }
 \examples{
-data("zikv_fixations")
-plot(zikv_fixations, names(zikv_fixations)[[1]])
+data("zikv_tree")
+data("zikv_align")
+tree <- addMSA(zikv_tree, seqs = zikv_align)
+fixations <- fixationSites(sitePath(tree, 0.996))
+plot(fixations, names(fixations)[[1]])
 }
