@@ -39,11 +39,7 @@ library(ape)
 tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
 ```
 
-Tree should be rooted before further analysis
-
-```{r root_tree}
-tree <- root(tree, "ANK57896")
-```
+It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.
 
 ### 1.2 Parse and add sequence alignment
 

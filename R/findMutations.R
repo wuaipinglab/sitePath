@@ -10,7 +10,7 @@
 #' data("zikv_tree")
 #' data("zikv_align")
 #' tree <- addMSA(zikv_tree, seqs = zikv_align)
-#' similarityMatrix(tree)
+#' simMatrix <- similarityMatrix(tree)
 #' @return
 #' \code{similarityMatrix} returns a diagonal matrix of
 #' similarity between sequences
@@ -43,7 +43,7 @@ similarityMatrix <- function(tree) {
 #' see the impact of chaning threshold on path number. This should be
 #' specified. The default is one 20th of tree tip number.
 #' @param makePlot whether make a dot plot when return
-#' @examples
+#' @examples 
 #' sneakPeek(tree)
 #' @return
 #' \code{sneakPeek} return the similarity threhold against number of sitePath.
@@ -113,7 +113,8 @@ sneakPeek <-
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' SNPsites(zikv_tree, zikv_align)
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' SNPsites(tree)
 #' @return \code{findSNPsite} returns a list of qualified SNP site
 #' @export
 SNPsites <-
@@ -173,9 +174,8 @@ SNPsites <-
 #' the common ancestral node of farthest tips (at least two) will be
 #' the new terminal search point.
 #' @param ... further arguments passed to or from other methods.
-#' @examples
-#' data("zikv_paths")
-#' fixationSites(zikv_paths)
+#' @examples 
+#' fixationSites(sitePath(tree, 0.996))
 #' @return
 #' \code{fixationSites} returns a list of mutations
 #' with names of the tips involved. The name of each list element

@@ -47,6 +47,6 @@ The zero sitePath result will also be excluded
 data("zikv_tree")
 data("zikv_align")
 tree <- addMSA(zikv_tree, seqs = zikv_align)
-similarityMatrix(tree)
+simMatrix <- similarityMatrix(tree)
 sneakPeek(tree)
 }

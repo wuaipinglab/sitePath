@@ -36,6 +36,9 @@ addMSA <-
              msaPath = "",
              msaFormat = "",
              seqs = NULL) {
+        if (is(tree, "treedata")) {
+            tree <- tree@phylo
+        }
         if (!inherits(tree, "phylo")) {
             stop("'tree' is not class phylo")
         }
@@ -43,34 +46,10 @@ addMSA <-
             seqs <- read.alignment(msaPath, msaFormat)
         } else if (is.null(seqs)) {
             stop(paste("There is no file in", msaPath))
-        } else if (!is(seqs, "alignment")) {
-            stop("'seqs' is not class alignment")
         }
         attr(tree, "alignment") <- checkMatched(tree, seqs)
         return(tree)
     }
-
-#' @rdname dataPrep
-#' @description 
-#' \code{rootTree} is a wrap for \code{root.phylo} function in 
-#' \code{ape} package. The detailed description can be found in 
-#' the documentation of \code{ape}.
-#' @param outgroup 
-#' a vector of mode numeric or character specifying the new outgroup.
-#' @param node 
-#' alternatively, a node number where to root the tree.
-#' @return 
-#' \code{rootTree} returns a rooted \code{phylo} object with matched 
-#' multiple sequence alignment
-#' @importFrom ape root
-#' @export
-rootTree <- function(tree, outgroup, node = NULL, ...) {
-    old_tips <- tree$tip.label
-    tree <- root(tree, outgroup, node, ...)
-    m <- match(tree$tip.label, old_tips)
-    attr(tree, "alignment") <- attr(tree, "alignment")[m]
-    return(tree)
-}
 
 #' @useDynLib sitePath
 #' @importFrom Rcpp sourceCpp
@@ -97,29 +76,9 @@ NULL
 #' @docType data
 "zikv_tree"
 
-#' @name zikv_paths
-#' @title Phylogenetic lineages of Zika virus polyprotein
-#' @description
-#' A list of node path to represent phylogenetic lineages of \code{zikv_tree}.
-#' The minimal pairwise sequence similarity was set to 0.996.
-#' @format a \code{sitePath} object
-#' @usage data(zikv_paths)
-#' @docType data
-"zikv_paths"
-
-#' @name zikv_fixations
-#' @title Fixation sites found in Zika virus polyprotein
-#' @description
-#' The fixation mutation predicted on \code{zikv_paths} by
-#' \code{\link{fixationSites}} with default setting.
-#' @format a \code{fixationSites} object
-#' @usage data(zikv_fixations)
-#' @docType data
-"zikv_fixations"
-
 checkMatched <- function(tree, align) {
     if (!is(align, "alignment")) {
-        stop("align is not class alignment")
+        stop("'seqs' is not class alignment")
     }
     m <- match(tree$tip.label, align$nam)
     if (any(is.na(m))) {

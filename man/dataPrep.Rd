@@ -3,12 +3,9 @@
 \name{dataPrep}
 \alias{dataPrep}
 \alias{addMSA}
-\alias{rootTree}
 \title{Prepare data for sitePath analysis}
 \usage{
 addMSA(tree, msaPath = "", msaFormat = "", seqs = NULL)
-
-rootTree(tree, outgroup, node = NULL, ...)
 }
 \arguments{
 \item{tree}{a \code{phylo} object. This commonly can be from tree paring function
@@ -23,16 +20,9 @@ found in the sequence alignment}
 from sequence parsing function in the \code{seqinr} package.
 Sequence names in the alignment should include all \code{tip.label}
 in the tree}
-
-\item{outgroup}{a vector of mode numeric or character specifying the new outgroup.}
-
-\item{node}{alternatively, a node number where to root the tree.}
 }
 \value{
 \code{addMSA} returns a \code{phylo} object with matched 
-multiple sequence alignment
-
-\code{rootTree} returns a rooted \code{phylo} object with matched 
 multiple sequence alignment
 }
 \description{
@@ -42,10 +32,6 @@ provide the file path to an alignment file and its format or an alignment
 object which can be obtained via \code{seqinr} package. If both the file
 path and alignment object are given, the function will use the sequence
 in the alignment file.
-
-\code{rootTree} is a wrap for \code{root.phylo} function in 
-\code{ape} package. The detailed description can be found in 
-the documentation of \code{ape}.
 }
 \examples{
 data(zikv_tree)

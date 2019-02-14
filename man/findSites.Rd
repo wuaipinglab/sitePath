@@ -69,7 +69,7 @@ fixation because of different sequence context.
 \examples{
 data("zikv_tree")
 data("zikv_align")
-SNPsites(zikv_tree, zikv_align)
-data("zikv_paths")
-fixationSites(zikv_paths)
+tree <- addMSA(zikv_tree, seqs = zikv_align)
+SNPsites(tree)
+fixationSites(sitePath(tree, 0.996))
 }

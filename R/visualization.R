@@ -74,8 +74,11 @@ AA_FULL_NAMES = c(
 #' @importFrom ape ladderize
 #' @importFrom ape getMRCA
 #' @examples
-#' data("zikv_fixations")
-#' plot(zikv_fixations, names(zikv_fixations)[[1]])
+#' data("zikv_tree")
+#' data("zikv_align")
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' fixations <- fixationSites(sitePath(tree, 0.996))
+#' plot(fixations, names(fixations)[[1]])
 #' @return plot and color the tree
 #' @importFrom graphics plot
 #' @importFrom graphics legend

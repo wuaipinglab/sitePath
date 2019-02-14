@@ -12,9 +12,7 @@ groupTips(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE,
 sitePath(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree paring function
-in \code{ape} or \code{ggtree}
-All the \code{tip.label} should be found in the alignment}
+\item{tree}{The return from \code{\link{addMSA}} function}
 
 \item{similarity}{similarity threshold for tree trimming}
 
@@ -23,11 +21,6 @@ All the \code{tip.label} should be found in the alignment}
 \item{forbidTrivial}{does not allow trivial trimming}
 
 \item{tipnames}{if return as tipnames}
-
-\item{align}{an \code{alignment} object. This commonly can be
-from sequence parsing function in \code{ape} or \code{seqinr}
-and many others. Sequence names in the alignment
-should include all \code{tip.label} in the tree}
 }
 \value{
 grouping of tips
@@ -60,8 +53,7 @@ are added.
 \examples{
 data("zikv_tree")
 data("zikv_align")
-groupTips(zikv_tree, zikv_align, 0.996)
-data("zikv_tree")
-data("zikv_align")
-sitePath(zikv_tree, zikv_align, 0.996)
+tree <- addMSA(zikv_tree, seqs = zikv_align)
+groupTips(tree, 0.996)
+sitePath(tree, 0.996)
 }

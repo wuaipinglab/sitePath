@@ -13,15 +13,7 @@
 #' be divergent if the similarity is lower than the threshold.
 #' (Other more statistical approaches such as Kolmogorov-Smirnov
 #' Tests among pair-wise distance could be introduced in the future)
-#' @param tree
-#' a \code{phylo} object. This commonly can be from tree paring function
-#' in \code{ape} or \code{ggtree}
-#' All the \code{tip.label} should be found in the alignment
-#' @param align
-#' an \code{alignment} object. This commonly can be
-#' from sequence parsing function in \code{ape} or \code{seqinr}
-#' and many others. Sequence names in the alignment
-#' should include all \code{tip.label} in the tree
+#' @param tree The return from \code{\link{addMSA}} function
 #' @param similarity similarity threshold for tree trimming
 #' @param simMatrix a diagonal matrix of similarity between sequences
 #' @param forbidTrivial does not allow trivial trimming
@@ -30,7 +22,8 @@
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' groupTips(zikv_tree, zikv_align, 0.996)
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' groupTips(tree, 0.996)
 #' @return grouping of tips
 #' @export
 groupTips <- function(tree,
@@ -72,9 +65,7 @@ groupTips <- function(tree,
 #' are added.
 #' @importFrom ape nodepath
 #' @examples
-#' data("zikv_tree")
-#' data("zikv_align")
-#' sitePath(zikv_tree, zikv_align, 0.996)
+#' sitePath(tree, 0.996)
 #' @return path represent by node number
 #' @export
 sitePath <- function(tree,
