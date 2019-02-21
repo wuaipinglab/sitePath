@@ -14,10 +14,12 @@
 #' (Other more statistical approaches such as Kolmogorov-Smirnov
 #' Tests among pair-wise distance could be introduced in the future)
 #' @param tree The return from \code{\link{addMSA}} function
-#' @param similarity similarity threshold for tree trimming
-#' @param simMatrix a diagonal matrix of similarity between sequences
-#' @param forbidTrivial does not allow trivial trimming
-#' @param tipnames if return as tipnames
+#' @param similarity 
+#' Similarity threshold for tree trimming. If not provided, an average
+#' value of similarity among all sequences will be used.
+#' @param simMatrix S diagonal matrix of similarity between sequences
+#' @param forbidTrivial Does not allow trivial trimming
+#' @param tipnames If return as tipnames
 #' @importFrom ape nodepath
 #' @examples
 #' data("zikv_tree")
@@ -27,21 +29,33 @@
 #' @return grouping of tips
 #' @export
 groupTips <- function(tree,
-                      similarity,
+                      similarity = NULL,
                       simMatrix = NULL,
                       forbidTrivial = TRUE,
                       tipnames = TRUE) {
-    simMatrix <- sortSimMatrix(tree, simMatrix)
+    if (is.null(similarity)) {
+        simMatrix <- similarityMatrix(tree)
+        similarity <- mean(simMatrix)
+    } else {
+        simMatrix <- sortSimMatrix(tree, simMatrix)
+    }
+    align <- attr(tree, "alignment")
+    if (is.null(align)) {
+        stop("No alignment found in \"tree\"")
+    }
     grouping <- trimTree(nodepath(tree),
-                         attr(tree, "alignment"),
+                         align,
                          simMatrix,
                          similarity,
                          TRUE)
     if (length(grouping) == 1 && forbidTrivial) {
-        warning(paste0(
-            similarity,
-            " is too low of a cutoff resulting in trivial trimming"
-        ))
+        warning(
+            paste(
+                "\"similarity\"",
+                similarity,
+                "is too low of a cutoff resulting in trivial trimming"
+            )
+        )
     }
     if (tipnames) {
         return(lapply(grouping, function(g) {
@@ -69,11 +83,19 @@ groupTips <- function(tree,
 #' @return path represent by node number
 #' @export
 sitePath <- function(tree,
-                     similarity,
+                     similarity = NULL,
                      simMatrix = NULL,
                      forbidTrivial = TRUE) {
-    simMatrix <- sortSimMatrix(tree, simMatrix)
+    if (is.null(similarity)) {
+        simMatrix <- similarityMatrix(tree)
+        similarity <- mean(simMatrix)
+    } else {
+        simMatrix <- sortSimMatrix(tree, simMatrix)
+    }
     align <- attr(tree, "alignment")
+    if (is.null(align)) {
+        stop("No alignment found in \"tree\"")
+    }
     # nodepath after trimming
     trimmedPaths <-
         unique(trimTree(nodepath(tree), align, simMatrix, similarity, FALSE))
@@ -84,14 +106,17 @@ sitePath <- function(tree,
     paths <-
         unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
     if (length(paths) == 0 && forbidTrivial) {
-        warning(paste0(
-            similarity,
-            " is too low of a cutoff resulting in trivial trimming"
-        ))
+        warning(
+            paste(
+                "\"similarity\"",
+                similarity,
+                "is too low of a cutoff resulting in trivial trimming"
+            )
+        )
     }
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
-    attr(paths, "class") <- "sitePath"
+    class(paths) <- "sitePath"
     return(paths)
 }
 

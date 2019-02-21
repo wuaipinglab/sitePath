@@ -6,21 +6,23 @@
 \alias{sitePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE,
-  tipnames = TRUE)
+groupTips(tree, similarity = NULL, simMatrix = NULL,
+  forbidTrivial = TRUE, tipnames = TRUE)
 
-sitePath(tree, similarity, simMatrix = NULL, forbidTrivial = TRUE)
+sitePath(tree, similarity = NULL, simMatrix = NULL,
+  forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
-\item{similarity}{similarity threshold for tree trimming}
+\item{similarity}{Similarity threshold for tree trimming. If not provided, an average
+value of similarity among all sequences will be used.}
 
-\item{simMatrix}{a diagonal matrix of similarity between sequences}
+\item{simMatrix}{S diagonal matrix of similarity between sequences}
 
-\item{forbidTrivial}{does not allow trivial trimming}
+\item{forbidTrivial}{Does not allow trivial trimming}
 
-\item{tipnames}{if return as tipnames}
+\item{tipnames}{If return as tipnames}
 }
 \value{
 grouping of tips

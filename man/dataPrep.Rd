@@ -22,14 +22,15 @@ Sequence names in the alignment should include all \code{tip.label}
 in the tree}
 }
 \value{
-\code{addMSA} returns a \code{phylo} object with matched 
+\code{addMSA} returns a \code{phylo} object with matched
 multiple sequence alignment
 }
 \description{
 sitePath requires both tree and sequence alignment to do the analysis.
-\code{addMSA} helps match names in tree and sequence alignment. Either
+\code{addMSA} wraps \code{read.alignment} function in \code{seqinr} package
+and helps match names in tree and sequence alignment. Either
 provide the file path to an alignment file and its format or an alignment
-object which can be obtained via \code{seqinr} package. If both the file
+object from the return of \code{read.alignment} function. If both the file
 path and alignment object are given, the function will use the sequence
 in the alignment file.
 }

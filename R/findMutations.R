@@ -1,5 +1,5 @@
-#' @rdname Pre-assessment
-#' @name Pre-assessment
+#' @rdname pre-assessment
+#' @name pre-assessment
 #' @title Things can be done before the analysis
 #' @description
 #' \code{similarityMatrix} calculates similarity between aligned sequences
@@ -18,16 +18,16 @@
 #' @export
 similarityMatrix <- function(tree) {
     if (!inherits(tree, "phylo")) {
-        stop("tree is not class phylo")
+        stop("\"tree\" is not class phylo")
     } else if (is.null(attr(tree, "alignment"))) {
-        stop("No alignment found.")
+        stop("No alignment found in \"tree\"")
     }
     sim <- getSimilarityMatrix(attr(tree, "alignment"))
     dimnames(sim) <- list(tree$tip.label, tree$tip.label)
     return(sim)
 }
 
-#' @rdname Pre-assessment
+#' @rdname pre-assessment
 #' @description
 #' \code{sneakPeek} is intended to plot similarity as a threshold
 #' against number of output sitePath. This plot is intended to give user
@@ -43,7 +43,7 @@ similarityMatrix <- function(tree) {
 #' see the impact of chaning threshold on path number. This should be
 #' specified. The default is one 20th of tree tip number.
 #' @param makePlot whether make a dot plot when return
-#' @examples 
+#' @examples
 #' sneakPeek(tree)
 #' @return
 #' \code{sneakPeek} return the similarity threhold against number of sitePath.
@@ -66,7 +66,7 @@ sneakPeek <-
             maxPath <- length(tree$tip.label) / 20
         } else {
             if (maxPath <= 0) {
-                stop("Invalid maxPath")
+                stop("Invalid \"maxPath\"")
             }
         }
         similarity <- numeric(0)
@@ -94,7 +94,7 @@ sneakPeek <-
     }
 
 #' @rdname findSites
-#' @name SNPsites
+#' @name findSites
 #' @title Finding sites with variation
 #' @description
 #' Single nucleotide polymorphism (SNP) in the whole package refers to
@@ -115,7 +115,7 @@ sneakPeek <-
 #' data("zikv_align")
 #' tree <- addMSA(zikv_tree, seqs = zikv_align)
 #' SNPsites(tree)
-#' @return \code{findSNPsite} returns a list of qualified SNP site
+#' @return \code{SNPsite} returns a list of qualified SNP site
 #' @export
 SNPsites <-
     function(tree,
@@ -126,6 +126,9 @@ SNPsites <-
             minSNP <- length(tree$tip.label) / 10
         }
         alignedSeq <- attr(tree, "alignment")
+        if (is.null(alignedSeq)) {
+            stop("No alignment found in \"tree\"")
+        }
         if (is.null(reference)) {
             reference <- 1:nchar(alignedSeq[1])
         } else {
@@ -147,7 +150,6 @@ SNPsites <-
     }
 
 #' @rdname findSites
-#' @name fixationSites
 #' @description
 #' After finding the \code{\link{sitePath}} of a phylogenetic tree, we use
 #' the result to find those sites that show fixation on some, if not all,
@@ -174,8 +176,12 @@ SNPsites <-
 #' the common ancestral node of farthest tips (at least two) will be
 #' the new terminal search point.
 #' @param ... further arguments passed to or from other methods.
-#' @examples 
-#' fixationSites(sitePath(tree, 0.996))
+#' @examples
+#' fixationSites(
+#'     sitePath(tree, 0.996),
+#'     tolerance = c(1, 1),
+#'     minEffectiveSize = c(10, 10)
+#' )
 #' @return
 #' \code{fixationSites} returns a list of mutations
 #' with names of the tips involved. The name of each list element
@@ -186,7 +192,7 @@ SNPsites <-
 fixationSites.sitePath <- function(paths,
                                    reference = NULL,
                                    gapChar = '-',
-                                   tolerance = c(0, 0),
+                                   tolerance = 0,
                                    minEffectiveSize = NULL,
                                    extendedSearch = TRUE,
                                    ...) {
@@ -198,54 +204,53 @@ fixationSites.sitePath <- function(paths,
     } else {
         if (!is.character(gapChar) ||
             nchar(gapChar) != 1 || length(gapChar) != 1) {
-            stop("gapChar only accepts one single character")
+            stop("\"gapChar\" only accepts one single character")
         }
         reference <-
             getReference(align[which(tree$tip.label == reference)], gapChar)
     }
     if (!is.numeric(tolerance)) {
-        stop("tolerance only accepts numeric")
+        stop("\"tolerance\" only accepts numeric")
     } else {
+        if (any(tolerance < 0)) {
+            stop("\"tolerance\" can only be positive number")
+        }
         toleranceAnc <- tolerance[1]
         toleranceDesc <-
-            if (length(tolerance) == 1)
+            if (length(tolerance) == 1) {
                 toleranceAnc
-        else
-            tolerance[2]
+            } else {
+                tolerance[2]
+            }
+        
     }
     if (is.null(minEffectiveSize)) {
         minAnc <- length(tree$tip.label) / 10
         minDesc <- length(tree$tip.label) / 10
     } else if (!is.numeric(minEffectiveSize)) {
-        stop("minEffectiveSize only accepts numeric")
+        stop("\"minEffectiveSize\" only accepts numeric")
     } else {
+        if (any(minEffectiveSize) <= 0) {
+            stop("\"minEffectiveSize\" can only be positive number")
+        }
         minAnc <- minEffectiveSize
         minDesc <-
-            if (length(minEffectiveSize) == 1)
+            if (length(minEffectiveSize) == 1) {
                 minAnc
-        else
-            minEffectiveSize[2]
+            } else {
+                minEffectiveSize[2]
+            }
     }
     divNodes <- unique(divergentNode(paths))
     if (extendedSearch) {
-        paths <- lapply(paths, function(p) {
-            sn <- p[length(p)]
-            extended <-
-                lapply(ChildrenTips(tree, sn), function(t)
-                    nodepath(tree, sn, t)[-1])
-            el <- lengths(extended)
-            ml <- max(el)
-            longest <- extended[which(el == ml)]
-            extended <-
-                lapply(1:ml, function(i)
-                    unique(sapply(longest, "[[", i)))
-            c(p, unlist(extended[which(lengths(extended) == 1)]))
-        })
+        paths <- extendPaths(paths, tree)
     }
     mutations <- list()
     for (minLen in 2:max(lengths(paths))) {
         # literate all sitePath at the same time
         for (path in unique(ancestralPaths(paths, minLen))) {
+            # first, the number of tips should meet the minimum size
+            # otherwise we'll go for the next node
             afterTips <- ChildrenTips(tree, tail(path, 1))
             if (length(afterTips) < minDesc) {
                 next
@@ -265,10 +270,13 @@ fixationSites.sitePath <- function(paths,
                 length(excludedTips) == 0) {
                 next
             }
+            # get the sequences for ancestral and descendant group
             after <- align[afterTips]
             before <- align[beforeTips]
+            # iterate through each site and compare the two groups
             for (i in 1:length(reference)) {
                 s <- reference[i] - 1
+                # get the dominant AA of the site for the two groups
                 b <- summarizeAA(before, s, toleranceAnc)
                 a <- summarizeAA(after, s, toleranceDesc)
                 if (!(is.na(b) || is.na(a)) && a != b) {
@@ -293,7 +301,13 @@ fixationSites.sitePath <- function(paths,
 }
 
 #' @export
-fixationSites <- function(paths, ...)
+fixationSites <- function(paths,
+                          reference,
+                          gapChar,
+                          tolerance,
+                          minEffectiveSize,
+                          extendedSearch,
+                          ...)
     UseMethod("fixationSites")
 
 #' @export
@@ -331,25 +345,4 @@ print.fixationSites <- function(x, ...) {
             cat("Reference sequence: ", refSeqName, "\n", sep = "")
         }
     }
-    # for (m in names(x)) {
-    #   cat(m)
-    #   cat("\n")
-    #   from <- fixationSites[[m]]$from
-    #   nfrom <- length(from)
-    #   cat(" from ", nfrom, " tips", sep = "")
-    #   if (nfrom >= 6) {
-    #     cat(": ", paste(from[1:5], collapse = ", "), " ...\n", sep = "")
-    #   } else {
-    #     cat(": ", paste(from, collapse = ", "), "\n", sep = "")
-    #   }
-    #   to <- x[[m]]$to
-    #   nto <- length(to)
-    #   cat(" to ", nto, " tips", sep = "")
-    #   if (nto >= 6) {
-    #     cat(":", paste(to[1:5], collapse = ", "), " ...\n", sep = "")
-    #   } else {
-    #     cat(":", paste(to, collapse = ", "), "\n", sep = "")
-    #   }
-    #   cat("\n")
-    # }
 }

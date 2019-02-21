@@ -6,25 +6,25 @@
 using namespace Rcpp;
 
 // getSimilarityMatrix
-NumericMatrix getSimilarityMatrix(const ListOf<CharacterVector>& alignedSeqs);
+Rcpp::NumericMatrix getSimilarityMatrix(const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs);
 RcppExport SEXP _sitePath_getSimilarityMatrix(SEXP alignedSeqsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const ListOf<CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
     rcpp_result_gen = Rcpp::wrap(getSimilarityMatrix(alignedSeqs));
     return rcpp_result_gen;
 END_RCPP
 }
 // trimTree
-SEXP trimTree(const ListOf<IntegerVector>& tipPaths, const ListOf<CharacterVector>& alignedSeqs, NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
+SEXP trimTree(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
 RcppExport SEXP _sitePath_trimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type tipPaths(tipPathsSEXP);
-    Rcpp::traits::input_parameter< const ListOf<CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
     Rcpp::traits::input_parameter< const float >::type similarity(similaritySEXP);
     Rcpp::traits::input_parameter< const bool >::type getTips(getTipsSEXP);
     rcpp_result_gen = Rcpp::wrap(trimTree(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips));
@@ -32,34 +32,34 @@ BEGIN_RCPP
 END_RCPP
 }
 // customTrimTree
-SEXP customTrimTree(const ListOf<IntegerVector>& tipPaths, const ListOf<CharacterVector>& alignedSeqs, NumericMatrix& simMatrixInput, const NumericMatrix& treeEdge, const Function& customQualifyFunc, const bool getTips);
+SEXP customTrimTree(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const Rcpp::NumericMatrix& treeEdge, const Rcpp::Function& customQualifyFunc, const bool getTips);
 RcppExport SEXP _sitePath_customTrimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP treeEdgeSEXP, SEXP customQualifyFuncSEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type tipPaths(tipPathsSEXP);
-    Rcpp::traits::input_parameter< const ListOf<CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type treeEdge(treeEdgeSEXP);
-    Rcpp::traits::input_parameter< const Function& >::type customQualifyFunc(customQualifyFuncSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type treeEdge(treeEdgeSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Function& >::type customQualifyFunc(customQualifyFuncSEXP);
     Rcpp::traits::input_parameter< const bool >::type getTips(getTipsSEXP);
     rcpp_result_gen = Rcpp::wrap(customTrimTree(tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips));
     return rcpp_result_gen;
 END_RCPP
 }
 // divergentNode
-IntegerVector divergentNode(const ListOf<IntegerVector>& paths);
+Rcpp::IntegerVector divergentNode(const Rcpp::ListOf<Rcpp::IntegerVector>& paths);
 RcppExport SEXP _sitePath_divergentNode(SEXP pathsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type paths(pathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type paths(pathsSEXP);
     rcpp_result_gen = Rcpp::wrap(divergentNode(paths));
     return rcpp_result_gen;
 END_RCPP
 }
 // getReference
-IntegerVector getReference(const std::string& refSeq, const char gapChar);
+Rcpp::IntegerVector getReference(const std::string& refSeq, const char gapChar);
 RcppExport SEXP _sitePath_getReference(SEXP refSeqSEXP, SEXP gapCharSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -71,24 +71,24 @@ BEGIN_RCPP
 END_RCPP
 }
 // ancestralPaths
-ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector>& paths, const int minLen);
+Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(const Rcpp::ListOf<Rcpp::IntegerVector>& paths, const int minLen);
 RcppExport SEXP _sitePath_ancestralPaths(SEXP pathsSEXP, SEXP minLenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const ListOf<IntegerVector>& >::type paths(pathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type paths(pathsSEXP);
     Rcpp::traits::input_parameter< const int >::type minLen(minLenSEXP);
     rcpp_result_gen = Rcpp::wrap(ancestralPaths(paths, minLen));
     return rcpp_result_gen;
 END_RCPP
 }
 // summarizeAA
-CharacterVector summarizeAA(const CharacterVector& seqs, const int siteIndex, const float tolerance);
+Rcpp::CharacterVector summarizeAA(const Rcpp::CharacterVector& seqs, const int siteIndex, const float tolerance);
 RcppExport SEXP _sitePath_summarizeAA(SEXP seqsSEXP, SEXP siteIndexSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const CharacterVector& >::type seqs(seqsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type seqs(seqsSEXP);
     Rcpp::traits::input_parameter< const int >::type siteIndex(siteIndexSEXP);
     Rcpp::traits::input_parameter< const float >::type tolerance(toleranceSEXP);
     rcpp_result_gen = Rcpp::wrap(summarizeAA(seqs, siteIndex, tolerance));
@@ -96,15 +96,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // tip2colorEdge
-CharacterVector tip2colorEdge(CharacterVector& colorEdge, const std::string& color, const IntegerMatrix& treeEdge, const IntegerVector& tips, const int rootNode);
+Rcpp::CharacterVector tip2colorEdge(Rcpp::CharacterVector& colorEdge, const std::string& color, const Rcpp::IntegerMatrix& treeEdge, const Rcpp::IntegerVector& tips, const int rootNode);
 RcppExport SEXP _sitePath_tip2colorEdge(SEXP colorEdgeSEXP, SEXP colorSEXP, SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector& >::type colorEdge(colorEdgeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector& >::type colorEdge(colorEdgeSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type color(colorSEXP);
-    Rcpp::traits::input_parameter< const IntegerMatrix& >::type treeEdge(treeEdgeSEXP);
-    Rcpp::traits::input_parameter< const IntegerVector& >::type tips(tipsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix& >::type treeEdge(treeEdgeSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type tips(tipsSEXP);
     Rcpp::traits::input_parameter< const int >::type rootNode(rootNodeSEXP);
     rcpp_result_gen = Rcpp::wrap(tip2colorEdge(colorEdge, color, treeEdge, tips, rootNode));
     return rcpp_result_gen;

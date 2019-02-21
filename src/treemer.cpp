@@ -1,173 +1,97 @@
-#include "pruner.h"
+#include "treemer.h"
 
-// [[Rcpp::export]]
-NumericMatrix getSimilarityMatrix(const ListOf<CharacterVector> &alignedSeqs) {
-  int dim = alignedSeqs.size();
-  NumericMatrix simMatrix(dim, dim);
-  for (int i = 0; i < dim; ++i) {
-    for (int j = i; j < dim; ++j) {
-      if (i == j) {
-        simMatrix(i, j) = 1;
-      } else {
-        simMatrix(j, i) = simMatrix(i, j) = compare(
-          as<std::string>(alignedSeqs[i]),
-          as<std::string>(alignedSeqs[j])
-        );
-      }
+Treemer::Base::Base(
+    const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+    const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
+): 
+    m_root(*(tipPaths[0].begin())),
+    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size()) 
+{
+    for (int i = 0; i < tipPaths.size(); i++) {
+        m_tips.push_back(TipSeqLinker(alignedSeqs[i], tipPaths[i]));
+        m_clusters[m_tips[i].getTip()].push_back(&m_tips[i]);
+        
+        if (m_tips[i].getRoot() != m_root) {
+            throw std::invalid_argument("Root in trees path not equal");
+        } else if (m_tips[i].getSeqLen() != m_seqLen) {
+            throw std::invalid_argument("Sequence length not equal");
+        }
     }
-  }
-  return simMatrix;
 }
 
-// [[Rcpp::export]]
-SEXP trimTree(
-    const ListOf<IntegerVector> &tipPaths, 
-    const ListOf<CharacterVector> &alignedSeqs,
-    NumericMatrix &simMatrixInput,
-    const float similarity, const bool getTips
-) {
-  std::map<std::pair<int, int>, float> simMatrix;
-  int nrow = simMatrixInput.nrow();
-  int ncol = simMatrixInput.ncol();
-  for (int i = 0; i < nrow; ++i) {
-    for (int j = 0; j < ncol; ++j) {
-      if (!R_IsNA(simMatrixInput(i, j))) {
-        simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
-      }
+std::map<int, std::vector<int>> Treemer::Base::getTips() const {
+    std::map<int, std::vector<int>> res;
+    for (const auto &tip: m_tips) { 
+        res[tip.currentClade()].push_back(tip.getTip());
     }
-  }
-  Pruner match(tipPaths, alignedSeqs, similarity, simMatrix);
-  if (getTips) {
-    return wrap(match.getTips());
-  } else {
-    return wrap(match.getPaths());
-  }
+    return res;
 }
 
-// [[Rcpp::export]]
-SEXP customTrimTree(
-    const ListOf<IntegerVector> &tipPaths, 
-    const ListOf<CharacterVector> &alignedSeqs,
-    NumericMatrix &simMatrixInput,
-    const NumericMatrix &treeEdge,
-    const Function &customQualifyFunc,
-    const bool getTips
-) {
-  std::map<std::pair<int, int>, float> simMatrix;
-  int nrow = simMatrixInput.nrow();
-  int ncol = simMatrixInput.ncol();
-  for (int i = 0; i < nrow; ++i) {
-    for (int j = 0; j < ncol; ++j) {
-      if (!R_IsNA(simMatrixInput(i, j))) {
-        simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
-      }
-    }
-  }
-  std::map< int, std::vector<int> > nodeLink;
-  for (int i = 0; i < treeEdge.nrow(); ++i) {
-    nodeLink[treeEdge(i, 0)].push_back(treeEdge(i, 1));
-  }
-  CustomizablePruner match(tipPaths, alignedSeqs, nodeLink, simMatrix, customQualifyFunc);
-  if (getTips) {
-    return wrap(match.getTips());
-  } else {
-    return wrap(match.getPaths());
-  }
+std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
+    std::vector<Rcpp::IntegerVector> res;
+    for (const auto &tip: m_tips) { res.push_back(tip.getPath()); }
+    return res;
 }
 
-// [[Rcpp::export]]
-IntegerVector divergentNode(const ListOf<IntegerVector> &paths) {
-  std::vector<int> res;
-  for (int i = 0; i < paths.size() - 1; i++) {
-    for (int j = i + 1; j < paths.size(); j++) {
-      IntegerVector::const_iterator q  = paths[i].begin(), s = paths[j].begin();
-      do {q++, s++;} while (*q == *s);
-      if (--q != paths[i].begin()) res.push_back(*q);
+void Treemer::Base::pruneTree() {
+    clusters oldClusters;
+    while (true) {
+        for (auto &tip: m_tips) {
+            m_trueClusters[tip.currentClade()].push_back(&tip);
+        }
+        oldClusters = m_clusters;
+        m_clusters.clear();
+        // look down one more node (fake 'proceed') 
+        // for each tip after new positioning
+        for (auto tip: m_tips) {
+            //  group tips by fake 'proceed' node
+            m_clusters[tip.nextClade()].push_back(&tip);
+        }
+        // if no more group 'kissed' each other by a common ancestral node 
+        // after fake 'proceed', then pruning is done
+        if (m_clusters.size() == oldClusters.size()) {
+            m_clusters.clear();
+            break;
+        }
+        // only 'kissed' group can do real 'proceed'
+        // if a grouping doesn't exist in 'oldClusters' 
+        // then all tips in that group can 'proceed'
+        for (auto it = m_clusters.begin(); it != m_clusters.end(); ++it) {
+            // assume a group is kissed with another (give it benefit of the doubt)
+            bool kissed = true;
+            for (auto it2 = oldClusters.begin(); it2 != oldClusters.end(); ++it2) {
+                // a group is 'non-kissed' after fake 'proceed' 
+                // if it can be found in 'oldClusters'
+                if (it->second == it2->second) {
+                    kissed = false;
+                    // a 'non-kissed' group won't appear twice in 'clusters' so deleted
+                    oldClusters.erase(it2);
+                    break;
+                }
+            }
+            // candidate group needs to pass some requirement to be qualified 'kissed'
+            if (kissed and qualified(it)) {
+                for (auto tip: it->second) { tip->proceed(); }
+            }
+        }
+        m_trueClusters.clear();
+        oldClusters.clear();
     }
-  }
-  return wrap(res);
 }
 
-// [[Rcpp::export]]
-IntegerVector getReference(const std::string &refSeq, const char gapChar) {
-  std::vector<int> res;
-  for (unsigned int i = 0; i < refSeq.size(); i++) {
-    if (refSeq[i] != gapChar) {
-      res.push_back(i + 1);
-    }
-  }
-  return wrap(res);
-}
+Treemer::BySite::BySite(
+    const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+    const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+    const int site
+):
+    Base(tipPaths, alignedSeqs), 
+    m_site(site - 1) { pruneTree(); }
 
-// [[Rcpp::export]]
-ListOf<IntegerVector> ancestralPaths(const ListOf<IntegerVector> &paths, const int minLen) {
-  std::vector<IntegerVector> res;
-  for (int i = 0; i < paths.size(); ++i) {
-    if (paths[i].size() >= minLen) {
-      res.push_back(paths[i][Range(0, minLen - 1)]);
+bool Treemer::BySite::qualified(const clusters::iterator &candidate) const {
+    auto it  = candidate->second.begin();
+    char ref_value = (*it)->getSeq()[m_site];
+    for (++it; it != candidate->second.end(); ++it) {
+        if ((*it)->getSeq()[m_site] != ref_value) { return false; }
     }
-  }
-  return wrap(res);
-}
-
-// [[Rcpp::export]]
-CharacterVector summarizeAA(
-    const CharacterVector &seqs, 
-    const int siteIndex, 
-    const float tolerance
-) {
-  int nseq = seqs.size();
-  std::map<char, int> aaSummary;
-  for (int i = 0; i < nseq; ++i) {
-    aaSummary[seqs[i][siteIndex]]++;
-  }
-  int currentMax = 0;
-  char maxArg;
-  for (std::map<char, int>::iterator i = aaSummary.begin(); i != aaSummary.end(); ++i) {
-    if (i->second > currentMax) {
-      currentMax = i->second;
-      maxArg = i->first;
-    }
-  }
-  int tt;
-  if (tolerance < 0) {
-    std::invalid_argument("tolerance can only be positive numeric");
-  } else if (tolerance < 0.5) {
-    tt = tolerance * nseq;
-  } else if (tolerance < 1) {
-    tt = nseq - tolerance * nseq;
-  } else {
-    tt = tolerance;
-  }
-  nseq -= currentMax;
-  if (nseq > tt) {
-    return NA_STRING;
-  } else {
-    return wrap(maxArg);
-  }
-}
-
-// [[Rcpp::export]]
-CharacterVector tip2colorEdge(
-    CharacterVector &colorEdge,
-    const std::string &color,
-    const IntegerMatrix &treeEdge,
-    const IntegerVector &tips,
-    const int rootNode
-) {
-  std::map< int, std::pair<int, int> > nodeLink;
-  for (int i = 0; i < treeEdge.nrow(); ++i) {
-    nodeLink[treeEdge(i, 1)].first = treeEdge(i, 0);
-    nodeLink[treeEdge(i, 1)].second = i;
-  }
-  for (int i = 0; i < tips.size(); ++i) {
-    int cn, an;
-    cn = tips[i];
-    do {
-      an = nodeLink[cn].first;
-      colorEdge[nodeLink[cn].second] = color;
-      cn = an;
-    } while (an != rootNode);
-  }
-  return colorEdge;
+    return true;
 }
