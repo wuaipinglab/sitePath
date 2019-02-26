@@ -7,19 +7,19 @@
 \method{plot}{fixationSites}(x, y, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} object from \code{\link{fixationSites.sitePath}}}
+\item{x}{A \code{fixationSites} object from \code{\link{fixationSites}}}
 
 \item{y}{One of the mutations in the \code{fixationSites} object.
 It should be from the \code{\link{names}} of the object.
 Or an integer indicating a site could be provide. The numbering
 is consistent with the reference defined at 
-\code{\link{fixationSites.sitePath}}.}
+\code{\link{fixationSites}}.}
 
 \item{...}{Arguments in \code{plot.phylo} functions.}
 }
 \value{
-The function makes plot but returns no value
-(It behaviors like the generic \code{plot} function).
+The function only makes plot and returns no value
+(It behaviors like the generic \code{\link{plot}} function).
 }
 \description{
 Visualize \code{fixationSites} object. It will plot the tree

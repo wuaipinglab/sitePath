@@ -16,9 +16,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// trimTree
-SEXP trimTree(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
-RcppExport SEXP _sitePath_trimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
+// runTreemer
+SEXP runTreemer(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
+RcppExport SEXP _sitePath_runTreemer(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -27,23 +27,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
     Rcpp::traits::input_parameter< const float >::type similarity(similaritySEXP);
     Rcpp::traits::input_parameter< const bool >::type getTips(getTipsSEXP);
-    rcpp_result_gen = Rcpp::wrap(trimTree(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips));
-    return rcpp_result_gen;
-END_RCPP
-}
-// customTrimTree
-SEXP customTrimTree(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const Rcpp::NumericMatrix& treeEdge, const Rcpp::Function& customQualifyFunc, const bool getTips);
-RcppExport SEXP _sitePath_customTrimTree(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP treeEdgeSEXP, SEXP customQualifyFuncSEXP, SEXP getTipsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type simMatrixInput(simMatrixInputSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type treeEdge(treeEdgeSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Function& >::type customQualifyFunc(customQualifyFuncSEXP);
-    Rcpp::traits::input_parameter< const bool >::type getTips(getTipsSEXP);
-    rcpp_result_gen = Rcpp::wrap(customTrimTree(tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips));
+    rcpp_result_gen = Rcpp::wrap(runTreemer(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -113,8 +97,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
-    {"_sitePath_trimTree", (DL_FUNC) &_sitePath_trimTree, 5},
-    {"_sitePath_customTrimTree", (DL_FUNC) &_sitePath_customTrimTree, 6},
+    {"_sitePath_runTreemer", (DL_FUNC) &_sitePath_runTreemer, 5},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},

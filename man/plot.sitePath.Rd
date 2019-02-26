@@ -10,13 +10,13 @@
 \item{x}{A \code{\link{sitePath}} object}
 
 \item{y}{Whether plot the nodes from the \code{extendedSearch} in
-\code{\link{fixationSites.sitePath}}}
+\code{\link{fixationSites}}}
 
 \item{...}{Arguments in \code{plot.phylo} functions.}
 }
 \value{
-The function makes plot but returns no value
-(It behaviors like the generic \code{plot} function).
+The function only makes plot and returns no value
+(It behaviors like the generic \code{\link{plot}} function).
 }
 \description{
 Visualize \code{\link{sitePath}} object. A tree diagram will be plotted

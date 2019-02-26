@@ -1,4 +1,4 @@
-#include "pruner.h"
+#include "treemer.h"
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
@@ -20,7 +20,7 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 }
 
 // [[Rcpp::export]]
-SEXP trimTree(
+SEXP runTreemer(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths, 
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         Rcpp::NumericMatrix &simMatrixInput,
@@ -35,7 +35,7 @@ SEXP trimTree(
             }
         }
     }
-    Pruner match(tipPaths, alignedSeqs, similarity, simMatrix);
+    Treemer::BySimilarity match(tipPaths, alignedSeqs, similarity, simMatrix);
     if (getTips) {
         return Rcpp::wrap(match.getTips());
     } else {
@@ -43,38 +43,38 @@ SEXP trimTree(
     }
 }
 
-// [[Rcpp::export]]
-SEXP customTrimTree(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths, 
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        Rcpp::NumericMatrix &simMatrixInput,
-        const Rcpp::NumericMatrix &treeEdge,
-        const Rcpp::Function &customQualifyFunc,
-        const bool getTips
-) {
-    std::map<std::pair<int, int>, float> simMatrix;
-    int nrow = simMatrixInput.nrow(), ncol = simMatrixInput.ncol();
-    for (int i = 0; i < nrow; ++i) {
-        for (int j = 0; j < ncol; ++j) {
-            if (!R_IsNA(simMatrixInput(i, j))) {
-                simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
-            }
-        }
-    }
-    std::map< int, std::vector<int> > nodeLink;
-    for (int i = 0; i < treeEdge.nrow(); ++i) {
-        nodeLink[treeEdge(i, 0)].push_back(treeEdge(i, 1));
-    }
-    CustomizablePruner match(
-            tipPaths, alignedSeqs, nodeLink,
-            simMatrix, customQualifyFunc
-    );
-    if (getTips) {
-        return Rcpp::wrap(match.getTips());
-    } else {
-        return Rcpp::wrap(match.getPaths());
-    }
-}
+// // [[Rcpp::export]]
+// SEXP customTrimTree(
+//         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths, 
+//         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+//         Rcpp::NumericMatrix &simMatrixInput,
+//         const Rcpp::NumericMatrix &treeEdge,
+//         const Rcpp::Function &customQualifyFunc,
+//         const bool getTips
+// ) {
+//     std::map<std::pair<int, int>, float> simMatrix;
+//     int nrow = simMatrixInput.nrow(), ncol = simMatrixInput.ncol();
+//     for (int i = 0; i < nrow; ++i) {
+//         for (int j = 0; j < ncol; ++j) {
+//             if (!R_IsNA(simMatrixInput(i, j))) {
+//                 simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
+//             }
+//         }
+//     }
+//     std::map< int, std::vector<int> > nodeLink;
+//     for (int i = 0; i < treeEdge.nrow(); ++i) {
+//         nodeLink[treeEdge(i, 0)].push_back(treeEdge(i, 1));
+//     }
+//     CustomizablePruner match(
+//             tipPaths, alignedSeqs, nodeLink,
+//             simMatrix, customQualifyFunc
+//     );
+//     if (getTips) {
+//         return Rcpp::wrap(match.getTips());
+//     } else {
+//         return Rcpp::wrap(match.getPaths());
+//     }
+// }
 
 // [[Rcpp::export]]
 Rcpp::IntegerVector divergentNode(
@@ -124,7 +124,7 @@ Rcpp::CharacterVector summarizeAA(
         const int siteIndex, 
         const float tolerance
 ) {
-    const int nseq = seqs.size();
+    int nseq = seqs.size();
     std::map<char, int> aaSummary;
     for (int i = 0; i < nseq; ++i) { aaSummary[seqs[i][siteIndex]]++; }
     auto it = aaSummary.begin();
@@ -145,10 +145,13 @@ Rcpp::CharacterVector summarizeAA(
         tt = nseq - tolerance * nseq;
     }
     // test if the number of non-dominant AAs within tolerance
-    if (nseq - currentMax > tt) {
+    nseq -= currentMax;
+    if (nseq > tt) {
         return NA_STRING;
     } else {
-        return Rcpp::wrap(maxArg);
+        Rcpp::CharacterVector res = Rcpp::wrap(maxArg);
+        res.attr("n") = Rcpp::IntegerVector::create(nseq);
+        return res;
     }
 }
 

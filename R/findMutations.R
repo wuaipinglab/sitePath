@@ -36,12 +36,20 @@ similarityMatrix <- function(tree) {
 #' be too many or too few. The result excludes where the number of sitePath
 #' is greater than number of tips divided by 20 or self-defined maxPath.
 #' The zero sitePath result will also be excluded
-#' @param step the similarity window for calculating and ploting
+#' @param step
+#' the similarity window for calculating and ploting. To better
+#' see the impact of threshold on path number. This is preferably
+#' specified. The default is one 50th of the difference between 1
+#' and minimal pairwise sequence similarity.
 #' @param maxPath
-#' maximum number of path to show in the plot. The number of path
+#' maximum number of path to return show in the plot. The number of path
 #' in the raw tree can be far greater than trimmed tree. To better
-#' see the impact of chaning threshold on path number. This should be
+#' see the impact of threshold on path number. This is preferably
 #' specified. The default is one 20th of tree tip number.
+#' @param minPath
+#' minimum number of path to return show in the plot. To better
+#' see the impact of threshold on path number. This is preferably
+#' specified. The default is 1.
 #' @param makePlot whether make a dot plot when return
 #' @examples
 #' sneakPeek(tree)
@@ -52,49 +60,51 @@ similarityMatrix <- function(tree) {
 #' @importFrom methods is
 #' @importFrom graphics plot
 #' @export
-sneakPeek <-
-    function(tree,
-             step = NULL,
-             maxPath = NULL,
-             makePlot = TRUE) {
-        simMatrix <- similarityMatrix(tree)
-        minSim <- min(simMatrix)
-        if (is.null(step)) {
-            step <- round(minSim - 1, 3) / 50
-        }
-        if (is.null(maxPath)) {
-            maxPath <- length(tree$tip.label) / 20
-        } else {
-            if (maxPath <= 0) {
-                stop("Invalid \"maxPath\"")
-            }
-        }
-        similarity <- numeric(0)
-        pathNum <- integer(0)
-        for (s in seq(1, minSim, step)) {
-            paths <-
-                sitePath(
-                    tree,
-                    similarity = s,
-                    simMatrix = simMatrix,
-                    forbidTrivial = FALSE
-                )
-            if (maxPath < length(paths)) {
-                next
-            } else if (length(paths) <= 1) {
-                break
-            }
-            similarity <- c(similarity, s)
-            pathNum <- c(pathNum, length(paths))
-        }
-        if (makePlot) {
-            plot(similarity, pathNum)
-        }
-        return(data.frame(similarity, pathNum))
+sneakPeek <- function(tree,
+                      step = NULL,
+                      maxPath = NULL,
+                      minPath = 1,
+                      makePlot = TRUE) {
+    simMatrix <- similarityMatrix(tree)
+    minSim <- min(simMatrix)
+    if (is.null(step)) {
+        step <- round(minSim - 1, 3) / 50
     }
+    if (is.null(maxPath)) {
+        maxPath <- length(tree$tip.label) / 20
+    } else if (maxPath <= 0) {
+        stop("Invalid \"maxPath\": less than or equal to zero")
+    }
+    if (minPath >= maxPath) {
+        stop("Invalid \"minPath\": greater than \"maxPath\"")
+    } else if (minPath < 0) {
+        stop("Invalid \"minPath\": less than zero")
+    }
+    similarity <- numeric(0)
+    pathNum <- integer(0)
+    for (s in seq(1, minSim, step)) {
+        paths <- sitePath(
+            tree,
+            similarity = s,
+            simMatrix = simMatrix,
+            forbidTrivial = FALSE
+        )
+        if (maxPath < length(paths)) {
+            next
+        } else if (length(paths) <= minPath) {
+            break
+        }
+        similarity <- c(similarity, s)
+        pathNum <- c(pathNum, length(paths))
+    }
+    if (makePlot) {
+        plot(similarity, pathNum)
+    }
+    return(data.frame(similarity, pathNum))
+}
 
 #' @rdname findSites
-#' @name findSites
+#' @name SNPsites
 #' @title Finding sites with variation
 #' @description
 #' Single nucleotide polymorphism (SNP) in the whole package refers to
@@ -117,39 +127,40 @@ sneakPeek <-
 #' SNPsites(tree)
 #' @return \code{SNPsite} returns a list of qualified SNP site
 #' @export
-SNPsites <-
-    function(tree,
-             reference = NULL,
-             gapChar = '-',
-             minSNP = NULL) {
-        if (is.null(minSNP)) {
-            minSNP <- length(tree$tip.label) / 10
-        }
-        alignedSeq <- attr(tree, "alignment")
-        if (is.null(alignedSeq)) {
-            stop("No alignment found in \"tree\"")
-        }
-        if (is.null(reference)) {
-            reference <- 1:nchar(alignedSeq[1])
-        } else {
-            reference <-
-                getReference(alignedSeq[which(tree$tip.label == reference)], gapChar)
-        }
-        seqLen <- unique(nchar(alignedSeq))
-        if (length(seqLen) != 1)
-            stop("Sequence length not equal")
-        qualified <- integer(0)
-        alignedSeq <- strsplit(alignedSeq, "")
-        for (i in  1:length(reference)) {
-            SNP <- table(sapply(alignedSeq, "[[", reference[i]))
-            if (sum(SNP > minSNP) >= 2) {
-                qualified <- c(qualified, i)
-            }
-        }
-        return(qualified)
+SNPsites <- function(tree,
+                     reference = NULL,
+                     gapChar = '-',
+                     minSNP = NULL) {
+    if (is.null(minSNP)) {
+        minSNP <- length(tree$tip.label) / 10
     }
+    alignedSeq <- attr(tree, "alignment")
+    if (is.null(alignedSeq)) {
+        stop("No alignment found in \"tree\"")
+    }
+    seqLen <- unique(nchar(alignedSeq))
+    if (length(seqLen) != 1)
+        stop("Sequence length not equal")
+    reference <-
+        checkReference(tree, alignedSeq, reference, gapChar)
+    qualified <- integer(0)
+    alignedSeq <- strsplit(alignedSeq, "")
+    for (i in  seq_along(reference)) {
+        SNP <- table(vapply(
+            alignedSeq,
+            FUN = "[[",
+            FUN.VALUE = "",
+            reference[i]
+        ))
+        if (sum(SNP > minSNP) >= 2) {
+            qualified <- c(qualified, i)
+        }
+    }
+    return(qualified)
+}
 
 #' @rdname findSites
+#' @name fixationSites
 #' @description
 #' After finding the \code{\link{sitePath}} of a phylogenetic tree, we use
 #' the result to find those sites that show fixation on some, if not all,
@@ -198,23 +209,11 @@ fixationSites.sitePath <- function(paths,
                                    ...) {
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
-    refSeqName <- reference
-    if (is.null(reference)) {
-        reference <- 1:nchar(align[1])
-    } else {
-        if (!is.character(gapChar) ||
-            nchar(gapChar) != 1 || length(gapChar) != 1) {
-            stop("\"gapChar\" only accepts one single character")
-        }
-        reference <-
-            getReference(align[which(tree$tip.label == reference)], gapChar)
-    }
     if (!is.numeric(tolerance)) {
         stop("\"tolerance\" only accepts numeric")
+    } else if (any(tolerance < 0)) {
+        stop("\"tolerance\" can only be positive number")
     } else {
-        if (any(tolerance < 0)) {
-            stop("\"tolerance\" can only be positive number")
-        }
         toleranceAnc <- tolerance[1]
         toleranceDesc <-
             if (length(tolerance) == 1) {
@@ -222,25 +221,25 @@ fixationSites.sitePath <- function(paths,
             } else {
                 tolerance[2]
             }
-        
     }
     if (is.null(minEffectiveSize)) {
         minAnc <- length(tree$tip.label) / 10
         minDesc <- length(tree$tip.label) / 10
     } else if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
+    } else if (any(minEffectiveSize) <= 0) {
+        stop("\"minEffectiveSize\" can only be positive number")
     } else {
-        if (any(minEffectiveSize) <= 0) {
-            stop("\"minEffectiveSize\" can only be positive number")
-        }
         minAnc <- minEffectiveSize
-        minDesc <-
+        minDesc <- 
             if (length(minEffectiveSize) == 1) {
                 minAnc
             } else {
                 minEffectiveSize[2]
             }
     }
+    refSeqName <- reference
+    reference <- checkReference(tree, align, reference, gapChar)
     divNodes <- unique(divergentNode(paths))
     if (extendedSearch) {
         paths <- extendPaths(paths, tree)
@@ -255,17 +254,19 @@ fixationSites.sitePath <- function(paths,
             if (length(afterTips) < minDesc) {
                 next
             }
-            pathBefore <- path[1:(length(path) - 1)]
-            excludedTips <-
-                sapply(pathBefore[which(pathBefore %in% divNodes)], function(node) {
+            pathBefore <- path[seq_len(length(path) - 1)]
+            excludedTips <- lapply(
+                pathBefore[which(pathBefore %in% divNodes)],
+                FUN = function(node) {
                     children <- tree$edge[which(tree$edge[, 1] == node), 2]
                     children <-
                         children[which(children > length(tree$tip.label) &
                                            !children %in% path)]
                     return(ChildrenTips(tree, children))
-                })
+                }
+            )
             beforeTips <-
-                which(!1:length(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
+                which(!seq_along(tree$tip.label) %in% c(afterTips, unlist(excludedTips)))
             if (length(beforeTips) < minAnc &&
                 length(excludedTips) == 0) {
                 next
@@ -274,7 +275,7 @@ fixationSites.sitePath <- function(paths,
             after <- align[afterTips]
             before <- align[beforeTips]
             # iterate through each site and compare the two groups
-            for (i in 1:length(reference)) {
+            for (i in seq_along(reference)) {
                 s <- reference[i] - 1
                 # get the dominant AA of the site for the two groups
                 b <- summarizeAA(before, s, toleranceAnc)
@@ -283,6 +284,11 @@ fixationSites.sitePath <- function(paths,
                     mut <- paste(b, i, a, sep = "")
                     from <- tree$tip.label[beforeTips]
                     to <- tree$tip.label[afterTips]
+                    # add the mutation or update the tips for a mutation
+                    # if it's in the mutaiton list.
+                    # NOTE: Sometimes, the involved tips could be incompletely
+                    # retrived. The replacement assumes the mutation involves
+                    # a same set of tips but this might not always be true.
                     if (!mut %in% names(mutations) ||
                         length(to) > length(mutations[[mut]]$to)) {
                         mutations[[mut]] <- list(ancestral = from,
@@ -310,6 +316,20 @@ fixationSites <- function(paths,
                           ...)
     UseMethod("fixationSites")
 
+checkReference <- function(tree, align, reference, gapChar) {
+    if (is.null(reference)) {
+        reference <- seq_len(nchar(align[1]))
+    } else {
+        if (!is.character(gapChar) ||
+            nchar(gapChar) != 1 || length(gapChar) != 1) {
+            stop("\"gapChar\" only accepts one single character")
+        }
+        reference <-
+            getReference(align[which(tree$tip.label == reference)], gapChar)
+    }
+    return(reference)
+}
+
 #' @export
 as.data.frame.fixationSites <- function(x, ...) {
     tree <- attr(x, "tree")
@@ -317,7 +337,7 @@ as.data.frame.fixationSites <- function(x, ...) {
     res <- as.data.frame(matrix(
         nrow = length(tree$tip.label),
         ncol = length(reference),
-        dimnames = list(tree$tip.label, 1:length(reference))
+        dimnames = list(tree$tip.label, seq_along(reference))
     ))
     for (m in names(x)) {
         site <- as.integer(substr(m, 2, nchar(m) - 1))

@@ -14,7 +14,7 @@
 #' (Other more statistical approaches such as Kolmogorov-Smirnov
 #' Tests among pair-wise distance could be introduced in the future)
 #' @param tree The return from \code{\link{addMSA}} function
-#' @param similarity 
+#' @param similarity
 #' Similarity threshold for tree trimming. If not provided, an average
 #' value of similarity among all sequences will be used.
 #' @param simMatrix S diagonal matrix of similarity between sequences
@@ -43,11 +43,11 @@ groupTips <- function(tree,
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
-    grouping <- trimTree(nodepath(tree),
-                         align,
-                         simMatrix,
-                         similarity,
-                         TRUE)
+    grouping <- runTreemer(nodepath(tree),
+                           align,
+                           simMatrix,
+                           similarity,
+                           TRUE)
     if (length(grouping) == 1 && forbidTrivial) {
         warning(
             paste(
@@ -98,11 +98,11 @@ sitePath <- function(tree,
     }
     # nodepath after trimming
     trimmedPaths <-
-        unique(trimTree(nodepath(tree), align, simMatrix, similarity, FALSE))
+        unique(runTreemer(nodepath(tree), align, simMatrix, similarity, FALSE))
     # get the bifurcated pre-terminal nodes and their path to the root
     # those paths are the so-called sitePaths (isolated)
     paths <- lapply(trimmedPaths, function(p)
-        p[1:(length(p) - 1)])
+        p[seq_len(length(p) - 1)])
     paths <-
         unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
     if (length(paths) == 0 && forbidTrivial) {

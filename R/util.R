@@ -32,25 +32,24 @@
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
-addMSA <-
-    function(tree,
-             msaPath = "",
-             msaFormat = "",
-             seqs = NULL) {
-        if (is(tree, "treedata")) {
-            tree <- tree@phylo
-        }
-        if (!inherits(tree, "phylo")) {
-            stop("\"tree\" is not class phylo")
-        }
-        if (file.exists(msaPath)) {
-            seqs <- read.alignment(msaPath, msaFormat)
-        } else if (is.null(seqs)) {
-            stop(paste("There is no file in", msaPath))
-        }
-        attr(tree, "alignment") <- checkMatched(tree, seqs)
-        return(tree)
+addMSA <- function(tree,
+                   msaPath = "",
+                   msaFormat = "",
+                   seqs = NULL) {
+    if (is(tree, "treedata")) {
+        tree <- tree@phylo
     }
+    if (!inherits(tree, "phylo")) {
+        stop("\"tree\" is not class phylo")
+    }
+    if (file.exists(msaPath)) {
+        seqs <- read.alignment(msaPath, msaFormat)
+    } else if (is.null(seqs)) {
+        stop(paste("There is no file in", msaPath))
+    }
+    attr(tree, "alignment") <- checkMatched(tree, seqs)
+    return(tree)
+}
 
 #' @useDynLib sitePath
 #' @importFrom Rcpp sourceCpp
@@ -130,14 +129,16 @@ extendPaths <- function(paths, tree) {
     paths <- lapply(paths, function(p) {
         sn <- p[length(p)]
         extended <-
-            lapply(ChildrenTips(tree, sn), function(t)
-                nodepath(tree, sn, t)[-1])
+            lapply(ChildrenTips(tree, sn), function(t) {
+                nodepath(tree, sn, t)[-1]
+            })
         el <- lengths(extended)
         ml <- max(el)
         longest <- extended[which(el == ml)]
         extended <-
-            lapply(1:ml, function(i)
-                unique(sapply(longest, "[[", i)))
+            lapply(seq_len(ml), function(i) {
+                unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
+            })
         c(p, unlist(extended[which(lengths(extended) == 1)]))
     })
     return(paths)

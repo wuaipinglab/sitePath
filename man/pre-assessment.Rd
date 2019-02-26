@@ -8,17 +8,25 @@
 \usage{
 similarityMatrix(tree)
 
-sneakPeek(tree, step = NULL, maxPath = NULL, makePlot = TRUE)
+sneakPeek(tree, step = NULL, maxPath = NULL, minPath = 1,
+  makePlot = TRUE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
-\item{step}{the similarity window for calculating and ploting}
+\item{step}{the similarity window for calculating and ploting. To better
+see the impact of threshold on path number. This is preferably
+specified. The default is one 50th of the difference between 1
+and minimal pairwise sequence similarity.}
 
-\item{maxPath}{maximum number of path to show in the plot. The number of path
+\item{maxPath}{maximum number of path to return show in the plot. The number of path
 in the raw tree can be far greater than trimmed tree. To better
-see the impact of chaning threshold on path number. This should be
+see the impact of threshold on path number. This is preferably
 specified. The default is one 20th of tree tip number.}
+
+\item{minPath}{minimum number of path to return show in the plot. To better
+see the impact of threshold on path number. This is preferably
+specified. The default is 1.}
 
 \item{makePlot}{whether make a dot plot when return}
 }

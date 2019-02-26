@@ -62,17 +62,17 @@ AA_FULL_NAMES = c(
 #' excluded tips in grey.But the plot will color the tree according to
 #' the amino acid instead if \code{site} argument is provided.
 #' @param x
-#' A \code{fixationSites} object from \code{\link{fixationSites.sitePath}}
+#' A \code{fixationSites} object from \code{\link{fixationSites}}
 #' @param y
 #' One of the mutations in the \code{fixationSites} object.
 #' It should be from the \code{\link{names}} of the object.
 #' Or an integer indicating a site could be provide. The numbering
 #' is consistent with the reference defined at 
-#' \code{\link{fixationSites.sitePath}}.
+#' \code{\link{fixationSites}}.
 #' @param ... Arguments in \code{plot.phylo} functions.
 #' @return 
-#' The function makes plot but returns no value
-#' (It behaviors like the generic \code{plot} function).
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
 #' @importFrom ape ladderize
 #' @importFrom ape getMRCA
 #' @examples
@@ -129,7 +129,7 @@ plot.fixationSites <- function(x, y, ...) {
         align <- strsplit(tolower(align), "")
         reference <- attr(x, "reference")
         tryCatch(
-            y <- match.arg(as.character(y), 1:length(reference)),
+            y <- match.arg(as.character(y), seq_along(reference)),
             error = function(e) {
                 stop(paste(
                     "\"y\" is integer but not within the length of reference",
@@ -137,10 +137,10 @@ plot.fixationSites <- function(x, y, ...) {
                 ))
             }
         )
-        siteComp <- sapply(align, "[[", reference[y])
+        siteComp <- vapply(align, FUN = "[[", FUN.VALUE = "", reference[y])
         color <- rep("#FFFF00", length(tree$edge.length))
         group <- list()
-        for (i in 1:length(siteComp)) {
+        for (i in seq_along(siteComp)) {
             group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
         }
         AAnames <- AA_FULL_NAMES[names(group)]
@@ -175,11 +175,11 @@ plot.fixationSites <- function(x, y, ...) {
 #' @param x A \code{\link{sitePath}} object
 #' @param y
 #' Whether plot the nodes from the \code{extendedSearch} in
-#' \code{\link{fixationSites.sitePath}}
+#' \code{\link{fixationSites}}
 #' @param ... Arguments in \code{plot.phylo} functions.
 #' @return 
-#' The function makes plot but returns no value
-#' (It behaviors like the generic \code{plot} function).
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
