@@ -162,11 +162,12 @@ SNPsites <- function(tree,
 #' @rdname findSites
 #' @name fixationSites
 #' @description
-#' After finding the \code{\link{sitePath}} of a phylogenetic tree, we use
-#' the result to find those sites that show fixation on some, if not all,
-#' of the lineages. Parallel evolution is relatively common in RNA virus.
-#' There is chance that some site be fixed in one lineage but does not show
-#' fixation because of different sequence context.
+#' After finding the \code{\link{sitePath}} of a phylogenetic tree, 
+#' \code{fixationSites} uses the result to find those sites that show 
+#' fixation on some, if not all, of the lineages. Parallel evolution is
+#' relatively common in RNA virus. There is chance that some site be fixed
+#' in one lineage but does not show fixation because of different 
+#' sequence context.
 #' @param paths
 #' a \code{sitePath} object returned from \code{\link{sitePath}} function
 #' @param tolerance
@@ -366,3 +367,226 @@ print.fixationSites <- function(x, ...) {
         }
     }
 }
+
+#' @rdname findSites
+#' @name fixationSites
+#' @description
+#' After finding the \code{\link{sitePath}} of a phylogenetic tree, 
+#' \code{multiFixationSites} uses the result to find those sites that show 
+#' multiple fixations on some, if not all, of the lineages.
+#' @return 
+#' \code{multiFixationSites} returns sites with multiple fixations.
+#' @export
+multiFixationSites.sitePath <- function(paths,
+                                        reference = NULL,
+                                        gapChar = '-',
+                                        tolerance = 0,
+                                        minEffectiveSize = NULL,
+                                        extendedSearch = TRUE,
+                                        ...) {
+    tree <- attr(paths, "tree")
+    align <- attr(paths, "align")
+    # refSeqName <- reference
+    reference <-
+        sitePath:::checkReference(tree, align, reference, gapChar)
+    if (!is.numeric(tolerance)) {
+        stop("\"tolerance\" only accepts numeric")
+    } else {
+        tolerance <- if (tolerance < 0) {
+            stop("\"tolerance\" can only be positive number")
+        } else if (tolerance < 0.5) {
+            tolerance * length(tree$tip.label)
+        } else if (tolerance < 1) {
+            (1 - tolerance) * length(tree$tip.label)
+        } else {
+            as.integer(tolerance)
+        }
+    }
+    if (is.null(minEffectiveSize)) {
+        minEffectiveSize <- 10
+    } else if (!is.numeric(minEffectiveSize)) {
+        stop("\"minEffectiveSize\" only accepts numeric")
+    }
+    divNodes <- unique(sitePath:::divergentNode(paths))
+    if (extendedSearch) {
+        paths <- sitePath:::extendPaths(paths, tree)
+    }
+    # get all the nodes that are not at divergent point
+    nodes <- setdiff(unlist(paths), divNodes)
+    # get the sequence of the children tips that are descendant of the nodes.
+    # assign the tip index to the sequences for retrieving the tip name
+    nodeAlign <- lapply(nodes, function(n) {
+        childrenNode <- tree$edge[which(tree$edge[, 1] == n), 2]
+        childrenNode <- setdiff(childrenNode, c(divNodes, nodes))
+        tips <- sitePath:::ChildrenTips(tree, childrenNode)
+        res <- align[tips]
+        names(res) <- tips
+        return(res)
+    })
+    # assign the node index to the 'nodeAlign' list
+    names(nodeAlign) <- nodes
+    # store all the tips by node and the fixed AA
+    # to avoid repeating calculation
+    nodeAAsum <- list()
+    res <- list()
+    for (minLen in 2:max(lengths(paths))) {
+        # literate all sitePath at the same time
+        for (path in unique(sitePath:::ancestralPaths(paths, minLen))) {
+            # for the sequences after the node, examine them as a whole
+            afterTips <-
+                sitePath:::ChildrenTips(tree, tail(path, 1))
+            if (length(afterTips) < minEffectiveSize) {
+                next
+            }
+            after <- align[afterTips]
+            # group the sequences before by nodes
+            pathBefore <- path[seq_len(length(path) - 1)]
+            nodeSeqsBefore <-
+                nodeAlign[as.character(setdiff(pathBefore, divNodes))]
+            # iterate every site
+            for (i in seq_along(reference)) {
+                s <- reference[i] - 1
+                a <- sitePath:::summarizeAA(after, s, tolerance)
+                if (is.na(a)) {
+                    # the AA of the tips after are not fixed
+                    # so the site is disqualifed and go for
+                    # the next site
+                    next
+                }
+                # total number of non-dominant AA for the site
+                # initialized with the number of non-dominant AA
+                # in the 'afterTips'
+                toleranceSum <- attr(a, "n")
+                # 'fixationNodes' groups tips by node. It's a growing
+                # list or NULL if disqualified. If qualified it's
+                # going to be included in the 'res'
+                fixationNodes <- list()
+                # 'fixationNodes' is vector of tips with
+                # an attribute of 'n' to store fixed AA
+                nodeTips <- integer(0)
+                # 'aaSum' collects fixed AA for the site
+                aaSum <- character(0)
+                # iterate all nodes in the 'pathBefore' and check
+                # if their tips have fixed AA for the site
+                for (node in names(nodeSeqsBefore)) {
+                    # if the node has a record in nodeAAsum
+                    nodeTips <- nodeAAsum[[as.character(i)]][[node]]
+                    if (is.null(nodeTips)) {
+                        # summarize the AA for the tips in the node.
+                        # The output is either an AA (with the number
+                        # of non-dominant AA as an attribute) or NA
+                        nodeAA <- sitePath:::summarizeAA(
+                            seqs = nodeAlign[[node]],
+                            siteIndex = s,
+                            tolerance = tolerance
+                        )
+                        if (is.na(nodeAA)) {
+                            # mark the node with non-fixed site as NA
+                            nodeAAsum[[as.character(i)]][[node]] <-
+                                integer(0)
+                            # the rest of the node in the path will be
+                            # ignored once a node appears to be
+                            # 'un-fixed'. And the site is disqualified
+                            fixationNodes <- NULL
+                            break
+                        } else {
+                            toleranceSum <- toleranceSum + attr(nodeAA, "n")
+                            if (toleranceSum > tolerance) {
+                                # mark the node with as NA because the
+                                # the accumlated number of non-dominant
+                                # AA excceeds total tolerance
+                                nodeAAsum[[as.character(i)]][[node]] <-
+                                    integer(0)
+                                # the rest of the node in the path will be
+                                # ignored. And the site
+                                # will be disqualified
+                                fixationNodes <- NULL
+                                break
+                            } else {
+                                # get the descendant tips for the node
+                                nodeTips <-
+                                    as.integer(names(nodeAlign[[node]]))
+                                # AA for the site, for the node
+                                attr(nodeTips, "nonDominant") <-
+                                    attr(nodeAA, "n")
+                                attr(nodeAA, "n") <- NULL
+                                attr(nodeTips, "AA") <- nodeAA
+                                # for summarizing AA for the site
+                                aaSum <- c(aaSum, nodeAA)
+                                nodeTips <- list(nodeTips)
+                                names(nodeTips) <- node
+                                # store the node with fixed AA
+                                nodeAAsum[[as.character(i)]] <-
+                                    c(nodeAAsum[[as.character(i)]], nodeTips)
+                                # collect tips with fixed AA by nodes
+                                # and keep looking for the next node
+                                fixationNodes <-
+                                    c(fixationNodes, nodeTips)
+                            }
+                        }
+                    } else if (length(nodeTips) == 0) {
+                        fixationNodes <- NULL
+                        # the site will be disqualified if the node
+                        # is marked AA for some reason
+                        break
+                    } else {
+                        toleranceSum <-
+                            toleranceSum + attr(nodeTips, "nonDominant")
+                        if (toleranceSum > tolerance) {
+                            nodeAAsum[[as.character(i)]][[node]] <-
+                                integer(0)
+                            fixationNodes <- NULL
+                            break
+                        } else {
+                            nodeTips <- list(nodeTips)
+                            names(nodeTips) <- node
+                            fixationNodes <-
+                                c(fixationNodes, nodeTips)
+                        }
+                    }
+                }
+                # store the nodes with fixed AA for the site
+                if (!is.null(fixationNodes) &&
+                    attr(nodeTips[[node]], "AA") != a &&
+                    length(unique(aaSum)) > 1) {
+                    qualified <- TRUE
+                    previousAA <- attr(fixationNodes[[1]], "AA")
+                    currentAAnum <- length(fixationNodes[[1]])
+                    for (node in fixationNodes[-1]) {
+                        currentAA <- attr(node, "AA")
+                        if (currentAA == previousAA) {
+                            currentAAnum <- currentAAnum + length(node)
+                        } else {
+                            if (currentAAnum < minEffectiveSize) {
+                                qualified <- FALSE
+                                break
+                            }
+                            previousAA <- currentAA
+                            currentAAnum <- length(node)
+                        }
+                    }
+                    if (qualified && currentAAnum >= minEffectiveSize) {
+                        attr(afterTips, "nonDominant") <- attr(a, "n")
+                        attr(a, "n") <- NULL
+                        attr(afterTips, "AA") <- a
+                        terminalTips <- list(afterTips)
+                        names(terminalTips) <- tail(path, 1)
+                        res[[as.character(i)]] <-
+                            c(fixationNodes, terminalTips)
+                    }
+                }
+            }
+        }
+    }
+    return(res)
+}
+
+#' @export
+multiFixationSites <- function(paths,
+                               reference = NULL,
+                               gapChar = '-',
+                               tolerance = 0,
+                               minEffectiveSize = NULL,
+                               extendedSearch = TRUE,
+                               ...)
+    UseMethod("multiFixationSites")
