@@ -9,7 +9,7 @@
 SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{sitePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = c(0, 0), minEffectiveSize = NULL,
+  gapChar = "-", tolerance = 0, minEffectiveSize = NULL,
   extendedSearch = TRUE, ...)
 }
 \arguments{
@@ -45,7 +45,7 @@ the new terminal search point.}
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-\code{findSNPsite} returns a list of qualified SNP site
+\code{SNPsite} returns a list of qualified SNP site
 
 \code{fixationSites} returns a list of mutations
 with names of the tips involved. The name of each list element
@@ -71,5 +71,9 @@ data("zikv_tree")
 data("zikv_align")
 tree <- addMSA(zikv_tree, seqs = zikv_align)
 SNPsites(tree)
-fixationSites(sitePath(tree, 0.996))
+fixationSites(
+    sitePath(tree, 0.996),
+    tolerance = c(1, 1),
+    minEffectiveSize = c(10, 10)
+)
 }

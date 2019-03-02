@@ -66,12 +66,19 @@ preassessment <- sneakPeek(tree)
 
 ### 2.2 You have to choose a threshold by yourself!
 
-There might be one point where the number of resulting paths has an **unusual drop** and that could be the preferable similarity threshold. For example, here 0.996 is a reasonable choice. You can use the function `sitePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis.
+Use the function `sitePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.996 as an example.
 
 ```{r get_sitePath}
 paths <- sitePath(tree, 0.996)
 paths
 ```
+
+You can visualize the result.
+
+```{r plot_paths, fig.show="hold"}
+plot(paths, no.margin = TRUE)
+```
+
 
 ## 3. Hierarchical search for fixation events
 
@@ -96,7 +103,7 @@ fixations$S139N
 
 Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized. Because the `names(fixationSites)` are the mutation names, you can also use one of them as function input
 
-```{r plot_fixations, fig.show="hold", fig.width=4}
+```{r plot_fixations, fig.show="hold", fig.width=3}
 par(mar = c(1,1,1,1))
 plot(fixations, "S139N")
 plot(fixations, names(fixations)[6])
@@ -120,7 +127,7 @@ grouping <- groupTips(tree, 0.996)
 
 If you just input the number of the site, the function will plot distribution of amino acid on the tree
 
-```{r plot_sites, fig.show="hold", fig.width=4}
+```{r plot_sites, fig.show="hold", fig.width=3}
 par(mar = c(1,1,1,1))
 plot(fixations, 139)
 plot(fixations, 763)
@@ -130,7 +137,7 @@ plot(fixations, 763)
 
 An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP site and the result could be what you'll expect to be fixation mutation.
 
-```{r find_SNP, fig.show="hold", fig.width=4}
+```{r find_SNP, fig.show="hold", fig.width=3}
 snps <- SNPsites(tree)
 par(mar = c(1,1,1,1))
 plot(fixations, snps[4])

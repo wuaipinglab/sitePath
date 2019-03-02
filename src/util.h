@@ -5,26 +5,27 @@
 #include <iostream>
 #include <Rcpp.h>
 
-using namespace Rcpp;
-
 const float compare(const std::string &query, const std::string &subject);
 
 class TipSeqLinker {
 public:
-  TipSeqLinker(const CharacterVector &sequence, const IntegerVector &tipPath);
-  void proceed();
-  const int nextClade() const;
-  const int currentClade() const;
-  const int getTip() const;
-  const int getRoot() const;
-  const int getSeqLen() const;
-  IntegerVector getPath() const;
-  std::string getSeq() const;
+    TipSeqLinker(
+        const Rcpp::CharacterVector &sequence,
+        const Rcpp::IntegerVector &tipPath
+    );
+    void proceed();
+    const int nextClade() const;
+    const int currentClade() const;
+    const int getTip() const;
+    const int getRoot() const;
+    const int getSeqLen() const;
+    Rcpp::IntegerVector getPath() const;
+    std::string getSeq() const;
 private:
-  const std::string seq;
-  const IntegerVector path;
-  const int tipIndex;
-  int cIndex;
+    const std::string m_seq;
+    const Rcpp::IntegerVector m_path;
+    const int m_tipIndex;
+    int m_cIndex;
 };
 
 #endif // SITEPATH_UTIL_H

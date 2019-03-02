@@ -3,9 +3,10 @@
 #' @title Prepare data for sitePath analysis
 #' @description
 #' sitePath requires both tree and sequence alignment to do the analysis.
-#' \code{addMSA} helps match names in tree and sequence alignment. Either
+#' \code{addMSA} wraps \code{read.alignment} function in \code{seqinr} package
+#' and helps match names in tree and sequence alignment. Either
 #' provide the file path to an alignment file and its format or an alignment
-#' object which can be obtained via \code{seqinr} package. If both the file
+#' object from the return of \code{read.alignment} function. If both the file
 #' path and alignment object are given, the function will use the sequence
 #' in the alignment file.
 #' @param tree
@@ -21,35 +22,34 @@
 #' from sequence parsing function in the \code{seqinr} package.
 #' Sequence names in the alignment should include all \code{tip.label}
 #' in the tree
-#' @return 
-#' \code{addMSA} returns a \code{phylo} object with matched 
+#' @return
+#' \code{addMSA} returns a \code{phylo} object with matched
 #' multiple sequence alignment
-#' @examples 
+#' @examples
 #' data(zikv_tree)
 #' msaPath <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 #' addMSA(zikv_tree, msaPath = msaPath, msaFormat = "fasta")
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
-addMSA <-
-    function(tree,
-             msaPath = "",
-             msaFormat = "",
-             seqs = NULL) {
-        if (is(tree, "treedata")) {
-            tree <- tree@phylo
-        }
-        if (!inherits(tree, "phylo")) {
-            stop("'tree' is not class phylo")
-        }
-        if (file.exists(msaPath)) {
-            seqs <- read.alignment(msaPath, msaFormat)
-        } else if (is.null(seqs)) {
-            stop(paste("There is no file in", msaPath))
-        }
-        attr(tree, "alignment") <- checkMatched(tree, seqs)
-        return(tree)
+addMSA <- function(tree,
+                   msaPath = "",
+                   msaFormat = "",
+                   seqs = NULL) {
+    if (is(tree, "treedata")) {
+        tree <- tree@phylo
     }
+    if (!inherits(tree, "phylo")) {
+        stop("\"tree\" is not class phylo")
+    }
+    if (file.exists(msaPath)) {
+        seqs <- read.alignment(msaPath, msaFormat)
+    } else if (is.null(seqs)) {
+        stop(paste("There is no file in", msaPath))
+    }
+    attr(tree, "alignment") <- checkMatched(tree, seqs)
+    return(tree)
+}
 
 #' @useDynLib sitePath
 #' @importFrom Rcpp sourceCpp
@@ -78,11 +78,11 @@ NULL
 
 checkMatched <- function(tree, align) {
     if (!is(align, "alignment")) {
-        stop("'seqs' is not class alignment")
+        stop("\"seqs\" is not class alignment")
     }
     m <- match(tree$tip.label, align$nam)
     if (any(is.na(m))) {
-        stop("tree tips and alignment names are not matched")
+        stop("Tree tips and alignment names are not matched")
     } else {
         align <- align$seq[m]
         if (length(unique(nchar(align))) > 1) {
@@ -94,7 +94,7 @@ checkMatched <- function(tree, align) {
 
 sortSimMatrix <- function(tree, simMatrix) {
     if (!inherits(tree, "phylo")) {
-        stop("tree is not class phylo")
+        stop("\"tree\" is not class phylo")
     }
     colMatch <- match(tree$tip.label, colnames(simMatrix))
     rowMatch <- match(tree$tip.label, rownames(simMatrix))
@@ -123,4 +123,23 @@ ChildrenTips <- function(tree, node) {
         }
     }
     return(getChildren(tree$edge, node))
+}
+
+extendPaths <- function(paths, tree) {
+    paths <- lapply(paths, function(p) {
+        sn <- p[length(p)]
+        extended <-
+            lapply(ChildrenTips(tree, sn), function(t) {
+                nodepath(tree, sn, t)[-1]
+            })
+        el <- lengths(extended)
+        ml <- max(el)
+        longest <- extended[which(el == ml)]
+        extended <-
+            lapply(seq_len(ml), function(i) {
+                unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
+            })
+        c(p, unlist(extended[which(lengths(extended) == 1)]))
+    })
+    return(paths)
 }

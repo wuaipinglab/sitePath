@@ -54,23 +54,25 @@ AA_FULL_NAMES = c(
     z = 'Glu_or_Gln'
 )
 
-#' @rdname Visualization
 #' @name plot.fixationSites
 #' @title Color the tree by a single site
 #' @description
-#' The result of \code{\link{fixationSites}} can be visualized using
-#' the funciton. It will plot the tree and color the ancestral tips
-#' in red, descendant tips in blue and excluded tips in grey.
-#' But the plot will color the tree according to the amino acid instead
-#' if \code{site} argument is provided.
+#' Visualize \code{fixationSites} object. It will plot the tree
+#' and color the ancestral tips in red, descendant tips in blue and
+#' excluded tips in grey.But the plot will color the tree according to
+#' the amino acid instead if \code{site} argument is provided.
 #' @param x
-#' a \code{fixationSites} object from \code{\link{fixationSites}}
+#' A \code{fixationSites} object from \code{\link{fixationSites}}
 #' @param y
-#' One of the mutations in the \code{\link{fixationSites}} object.
+#' One of the mutations in the \code{fixationSites} object.
 #' It should be from the \code{\link{names}} of the object.
 #' Or an integer indicating a site could be provide. The numbering
-#' is consistent with the reference defined at \code{\link{fixationSites}}.
-#' @param ... further arguments passed to or from other methods.
+#' is consistent with the reference defined at 
+#' \code{\link{fixationSites}}.
+#' @param ... Arguments in \code{plot.phylo} functions.
+#' @return 
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
 #' @importFrom ape ladderize
 #' @importFrom ape getMRCA
 #' @examples
@@ -79,13 +81,12 @@ AA_FULL_NAMES = c(
 #' tree <- addMSA(zikv_tree, seqs = zikv_align)
 #' fixations <- fixationSites(sitePath(tree, 0.996))
 #' plot(fixations, names(fixations)[[1]])
-#' @return plot and color the tree
 #' @importFrom graphics plot
 #' @importFrom graphics legend
 #' @export
 plot.fixationSites <- function(x, y, ...) {
     if (length(y) != 1) {
-        stop("site is not a single integer or character")
+        stop("\"y\" is not a single integer or character")
     }
     tree <- attr(x, "tree")
     tree <- ladderize(tree, right = FALSE)
@@ -128,18 +129,18 @@ plot.fixationSites <- function(x, y, ...) {
         align <- strsplit(tolower(align), "")
         reference <- attr(x, "reference")
         tryCatch(
-            y <- match.arg(as.character(y), 1:length(reference)),
+            y <- match.arg(as.character(y), seq_along(reference)),
             error = function(e) {
                 stop(paste(
-                    "site is integer but not within the length of reference",
+                    "\"y\" is integer but not within the length of reference",
                     attr(x, "refSeqName")
                 ))
             }
         )
-        siteComp <- sapply(align, "[[", reference[y])
+        siteComp <- vapply(align, FUN = "[[", FUN.VALUE = "", reference[y])
         color <- rep("#FFFF00", length(tree$edge.length))
         group <- list()
-        for (i in 1:length(siteComp)) {
+        for (i in seq_along(siteComp)) {
             group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
         }
         AAnames <- AA_FULL_NAMES[names(group)]
@@ -161,63 +162,50 @@ plot.fixationSites <- function(x, y, ...) {
             box.lty = 0
         )
     } else {
-        stop("site is neither numeric nor integer type")
+        stop("\"y\" is neither numeric nor integer type")
     }
 }
 
-# plot.fixationSites <- function(x, y, ...) {
-#     tree <- attr(x, "tree")
-#     if (length(y) != 1) {
-#         stop("site is not a single integer or character")
-#     }
-#     if (is.character(y)) {
-#         tryCatch(
-#             y <- match.arg(y, choices = names(x)),
-#             error = function(e) {
-#                 stop("\"y\" is character but not a mutation in fixationSites")
-#             }
-#         )
-#         if (!suppressWarnings(require("ggtree")))
-#             group <- c(x[[y]],
-#                        list(excluded = setdiff(tree$tip.label, unlist(x[[y]]))))
-#         groupCols <- c("#d3d3d3", "#ff0000", "#3F51B5")
-#         names(groupCols) <- c("excluded", "ancestral", "descendant")
-#         return(plotColoredTree(tree, group, groupCols, y, "Lineage"))
-#     } else if (is.numeric(y)) {
-#         align <- attr(x, "align")
-#         align <- strsplit(tolower(align), "")
-#         reference <- attr(x, "reference")
-#         tryCatch(
-#             y <- match.arg(as.character(y), 1:length(reference)),
-#             error = function(e) {
-#                 stop(paste(
-#                     "site is integer but not within the length of reference",
-#                     attr(x, "refSeqName")
-#                 ))
-#             }
-#         )
-#         y <- reference[y]
-#         siteComp <- sapply(align, "[[", y)
-#         names(siteComp) <- tree$tip.label
-#         group <- list()
-#         for (s in names(siteComp)) {
-#             group[[siteComp[[s]]]] <- c(group[[siteComp[[s]]]], s)
-#         }
-#         names(group) <- AA_FULL_NAMES[names(group)]
-#         groupCols <- AA_COLORS[names(group)]
-#         return(plotColoredTree(tree, group, groupCols, y, "Amino acid"))
-#     } else {
-#         stop("site is neither numeric nor integer type")
-#     }
-# }
-#
-# plotColoredTree <-
-#     function(tree, group, groupCols, title, legendTitle) {
-#         p <- ggtree(groupOTU(tree, group), aes(color = group)) +
-#             scale_color_manual(values = c('white', groupCols)) +
-#             ggtitle(title) +
-#             theme(legend.position = "left") +
-#             guides(color = guide_legend(override.aes = list(size = 3),
-#                                         title = legendTitle))
-#         return(p)
-#     }
+#' @name plot.sitePath
+#' @title Visualize phylogenetic lineages
+#' @description
+#' Visualize \code{\link{sitePath}} object. A tree diagram will be plotted
+#' and paths are black solid line while the trimmed nodes and tips will use
+#' grey dashed line.
+#' @param x A \code{\link{sitePath}} object
+#' @param y
+#' Whether plot the nodes from the \code{extendedSearch} in
+#' \code{\link{fixationSites}}
+#' @param ... Arguments in \code{plot.phylo} functions.
+#' @return 
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
+#' @examples
+#' data("zikv_tree")
+#' data("zikv_align")
+#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' plot(sitePath(tree, 0.996))
+#' @export
+plot.sitePath <- function(x, y = TRUE, ...) {
+    tree <- attr(x, "tree")
+    tree <- ladderize(tree, right = FALSE)
+    if (y) {
+        x <- extendPaths(x, tree)
+    }
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(1, nEdges)
+    targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
+    color[targetEdges] <- "#000000"
+    lty[targetEdges] <- 1
+    width[targetEdges] <- 2
+    plot(
+        tree,
+        edge.col = color,
+        edge.lty = lty,
+        edge.width = width,
+        show.tip.label = FALSE,
+        ...
+    )
+}

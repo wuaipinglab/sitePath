@@ -5,12 +5,8 @@ getSimilarityMatrix <- function(alignedSeqs) {
     .Call('_sitePath_getSimilarityMatrix', PACKAGE = 'sitePath', alignedSeqs)
 }
 
-trimTree <- function(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips) {
-    .Call('_sitePath_trimTree', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
-}
-
-customTrimTree <- function(tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips) {
-    .Call('_sitePath_customTrimTree', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, treeEdge, customQualifyFunc, getTips)
+runTreemer <- function(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips) {
+    .Call('_sitePath_runTreemer', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
 }
 
 divergentNode <- function(paths) {
