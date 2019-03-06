@@ -1,3 +1,47 @@
+#' @name plot.lineagePath
+#' @title Visualize phylogenetic lineages
+#' @description
+#' Visualize \code{\link{lineagePath}} object. A tree diagram will be plotted
+#' and paths are black solid line while the trimmed nodes and tips will use
+#' grey dashed line.
+#' @param x A \code{\link{lineagePath}} object
+#' @param y
+#' Whether plot the nodes from the \code{extendedSearch} in
+#' \code{\link{fixationSites}}
+#' @param ... Arguments in \code{plot.phylo} functions.
+#' @return
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
+#' @examples
+#' data("zikv_tree")
+#' data("zikv_align")
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' plot(lineagePath(tree, 0.996))
+#' @export
+plot.lineagePath <- function(x, y = TRUE, ...) {
+    tree <- attr(x, "tree")
+    tree <- ladderize(tree, right = FALSE)
+    if (y) {
+        x <- extendPaths(x, tree)
+    }
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(1, nEdges)
+    targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
+    color[targetEdges] <- "#000000"
+    lty[targetEdges] <- 1
+    width[targetEdges] <- 2
+    plot(
+        tree,
+        edge.col = color,
+        edge.lty = lty,
+        edge.width = width,
+        show.tip.label = FALSE,
+        ...
+    )
+}
+
 AA_COLORS <- c(
     His = "#8282D2",
     Arg = "#9370DB",
@@ -20,10 +64,10 @@ AA_COLORS <- c(
     Glu = "#8C1717",
     Asp = "#E60A0A",
     gap = "#000000",
-    unknown = "#000000",
-    Ile_or_Leu = "#000000",
-    Asp_or_Asn = "#000000",
-    Glu_or_Gln = "#000000"
+    unknown = "#d3d3d3",
+    Ile_or_Leu = "#d3d3d3",
+    Asp_or_Asn = "#d3d3d3",
+    Glu_or_Gln = "#d3d3d3"
 )
 
 AA_FULL_NAMES = c(
@@ -54,158 +98,232 @@ AA_FULL_NAMES = c(
     z = 'Glu_or_Gln'
 )
 
-#' @name plot.fixationSites
+#' @rdname plotSingleSite
+#' @name plotSingleSite
 #' @title Color the tree by a single site
 #' @description
-#' Visualize \code{fixationSites} object. It will plot the tree
-#' and color the ancestral tips in red, descendant tips in blue and
-#' excluded tips in grey.But the plot will color the tree according to
-#' the amino acid instead if \code{site} argument is provided.
+#' For \code{lineagePath}, the tree will be colored according to the amino
+#' acid of the site. The color scheme tries to assign distinguishable
+#' color for each amino acid.
 #' @param x
-#' A \code{fixationSites} object from \code{\link{fixationSites}}
-#' @param y
-#' One of the mutations in the \code{fixationSites} object.
-#' It should be from the \code{\link{names}} of the object.
-#' Or an integer indicating a site could be provide. The numbering
-#' is consistent with the reference defined at 
-#' \code{\link{fixationSites}}.
-#' @param ... Arguments in \code{plot.phylo} functions.
-#' @return 
+#' A \code{fixationSites} object from \code{\link{fixationSites}} or
+#' the return from \code{\link{addMSA}} function.
+#' @param site
+#' One of the mutations in the \code{fixationSites} object. It should
+#' be from the \code{\link{names}} of the object. Or an integer to
+#' indicate a site could be provide. The numbering is consistent with
+#' the reference defined at \code{\link{fixationSites}}.
+#' @param showPath
+#' If plot the lineage result from lineagePath.
+#' @param reference
+#' Name of reference for site numbering. The name has to be one of the
+#' sequences' name. The default uses the intrinsic alignment numbering.
+#' @param gapChar
+#' The character to indicate gap. The numbering will skip the gapChar
+#' for the reference sequence.
+#' @param ...
+#' Arguments in \code{plot.phylo} functions and other arguments.
+#' @return
 #' The function only makes plot and returns no value
 #' (It behaviors like the generic \code{\link{plot}} function).
-#' @importFrom ape ladderize
-#' @importFrom ape getMRCA
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' tree <- addMSA(zikv_tree, seqs = zikv_align)
-#' fixations <- fixationSites(sitePath(tree, 0.996))
-#' plot(fixations, names(fixations)[[1]])
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' paths <- lineagePath(tree, 0.996)
+#' plotSingleSite(paths, 139)
+#' @importFrom ape ladderize
+#' @importFrom ape getMRCA
 #' @importFrom graphics plot
 #' @importFrom graphics legend
 #' @export
-plot.fixationSites <- function(x, y, ...) {
-    if (length(y) != 1) {
-        stop("\"y\" is not a single integer or character")
-    }
+plotSingleSite.lineagePath <- function(x,
+                                       site,
+                                       showPath = TRUE,
+                                       reference = NULL,
+                                       gapChar = "-",
+                                       ...) {
+    site <- checkSite(site)
     tree <- attr(x, "tree")
     tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
-    if (is.character(y)) {
-        tryCatch(
-            y <- match.arg(y, choices = names(x)),
-            error = function(e) {
-                stop("\"y\" is character but not a mutation in fixation")
-            }
-        )
-        color <- rep("#d3d3d3", length(tree$edge.length))
-        color <-
-            tip2colorEdge(color,
-                          "#3F51B5",
-                          tree$edge,
-                          match(x[[y]][[2]], tree$tip.label),
-                          rootNode)
-        color <-
-            tip2colorEdge(color,
-                          "#ff0000",
-                          tree$edge,
-                          match(x[[y]][[1]], tree$tip.label),
-                          rootNode)
-        plot(
-            tree,
-            show.tip.label = FALSE,
-            edge.col = color,
-            main = y
-        )
-        legend(
-            "topleft",
-            title = "Lineages",
-            c("ancestral", "descendant", "excluded"),
-            fill = c("#ff0000", "#3F51B5", "#d3d3d3"),
-            box.lty = 0
-        )
-    } else if (is.numeric(y)) {
-        align <- attr(x, "align")
-        align <- strsplit(tolower(align), "")
-        reference <- attr(x, "reference")
-        tryCatch(
-            y <- match.arg(as.character(y), seq_along(reference)),
-            error = function(e) {
-                stop(paste(
-                    "\"y\" is integer but not within the length of reference",
-                    attr(x, "refSeqName")
-                ))
-            }
-        )
-        siteComp <- vapply(align, FUN = "[[", FUN.VALUE = "", reference[y])
-        color <- rep("#FFFF00", length(tree$edge.length))
-        group <- list()
-        for (i in seq_along(siteComp)) {
-            group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
+    align <- attr(x, "align")
+    align <- strsplit(tolower(align), "")
+    refSeqName <- reference
+    reference <- checkReference(tree, align, reference, gapChar)
+    tryCatch(
+        site <- match.arg(as.character(site), seq_along(reference)),
+        error = function(e) {
+            stop(paste(
+                "\"site\":",
+                site,
+                "is not within the length of reference",
+                refSeqName
+            ))
         }
-        AAnames <- AA_FULL_NAMES[names(group)]
-        names(group) <- AA_COLORS[AAnames]
-        for (g in names(group)) {
-            tip2colorEdge(color, g, tree$edge, group[[g]], rootNode)
-        }
-        plot(
-            tree,
-            show.tip.label = FALSE,
-            edge.col = color,
-            main = y
-        )
-        legend(
-            "topleft",
-            title = "Amino acid",
-            unique(AAnames),
-            fill = AA_COLORS[unique(AAnames)],
-            box.lty = 0
-        )
-    } else {
-        stop("\"y\" is neither numeric nor integer type")
-    }
-}
-
-#' @name plot.sitePath
-#' @title Visualize phylogenetic lineages
-#' @description
-#' Visualize \code{\link{sitePath}} object. A tree diagram will be plotted
-#' and paths are black solid line while the trimmed nodes and tips will use
-#' grey dashed line.
-#' @param x A \code{\link{sitePath}} object
-#' @param y
-#' Whether plot the nodes from the \code{extendedSearch} in
-#' \code{\link{fixationSites}}
-#' @param ... Arguments in \code{plot.phylo} functions.
-#' @return 
-#' The function only makes plot and returns no value
-#' (It behaviors like the generic \code{\link{plot}} function).
-#' @examples
-#' data("zikv_tree")
-#' data("zikv_align")
-#' tree <- addMSA(zikv_tree, seqs = zikv_align)
-#' plot(sitePath(tree, 0.996))
-#' @export
-plot.sitePath <- function(x, y = TRUE, ...) {
-    tree <- attr(x, "tree")
-    tree <- ladderize(tree, right = FALSE)
-    if (y) {
-        x <- extendPaths(x, tree)
-    }
+    )
+    siteComp <- vapply(align,
+                       FUN = "[[",
+                       FUN.VALUE = character(1),
+                       reference[site])
     nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
+    color <- rep("#000000", nEdges)
+    rootNode <- getMRCA(tree, tree$tip.label)
+    group <- list()
+    for (i in seq_along(siteComp)) {
+        group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
+    }
+    AAnames <- AA_FULL_NAMES[names(group)]
+    names(group) <- AA_COLORS[AAnames]
+    for (g in names(group)) {
+        tip2colorEdge(color, g, tree$edge, group[[g]], rootNode)
+    }
     width <- rep(1, nEdges)
-    targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
-    color[targetEdges] <- "#000000"
-    lty[targetEdges] <- 1
-    width[targetEdges] <- 2
+    if (showPath) {
+        targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
+        color[targetEdges] <- "#000000"
+        width[targetEdges] <- 2
+    }
     plot(
         tree,
-        edge.col = color,
-        edge.lty = lty,
-        edge.width = width,
         show.tip.label = FALSE,
+        edge.col = color,
+        edge.width = width,
+        main = site,
         ...
     )
+    legend(
+        "topleft",
+        title = "Amino acid",
+        legend = unique(AAnames),
+        fill = AA_COLORS[unique(AAnames)],
+        box.lty = 0
+    )
+}
+
+#' @rdname plotSingleSite
+#' @description
+#' For \code{fixationSites}, it will color the ancestral tips in red,
+#' descendant tips in blue and excluded tips in grey.
+#' @examples
+#' fixations <- fixationSites(paths)
+#' plotSingleSite(fixations, 139)
+#' @export
+plotSingleSite.fixationSites <- function(x, site, ...) {
+    site <- checkSite(site)
+    paths <- attr(x, "paths")
+    tree <- attr(paths, "tree")
+    tree <- ladderize(tree, right = FALSE)
+    rootNode <- getMRCA(tree, tree$tip.label)
+    tryCatch(
+        site <- match.arg(as.character(site), choices = names(x)),
+        error = function(e) {
+            stop(paste("\"site\":", site, "is not a mutation of fixation"))
+        }
+    )
+    sitePaths <- x[[site]]
+    plotName <- character(0)
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    for (sp in sitePaths) {
+        plotName <- c(plotName, paste0(names(sp)[1], site, names(sp)[2]))
+        color <- tip2colorEdge(color,
+                               "#3F51B5",
+                               tree$edge,
+                               match(sp[[2]], tree$tip.label),
+                               rootNode)
+        color <- tip2colorEdge(color,
+                               "#ff0000",
+                               tree$edge,
+                               match(sp[[1]], tree$tip.label),
+                               rootNode)
+    }
+    plot(
+        tree,
+        show.tip.label = FALSE,
+        edge.col = color,
+        main = paste(unique(plotName), collapse = ", "),
+        ...
+    )
+    legend(
+        "topleft",
+        title = "Lineages",
+        legend = c("ancestral", "descendant", "excluded"),
+        fill = c("#ff0000", "#3F51B5", "#d3d3d3"),
+        box.lty = 0
+    )
+}
+
+#' @rdname plotSingleSite
+#' @description
+#' For \code{multiFixationSites}, it will color the tips which have
+#' their site fixed. The color will use the same amino acid color
+#' scheme as \code{plotSingleSite.lineagePath}
+#' @examples
+#' \dontrun{
+#' multiFixations <- multiFixationSites(paths)
+#' plotSingleSite(multiFixations, 1542)
+#' }
+#' @export
+plotSingleSite.multiFixationSites <- function(x, site, ...) {
+    site <- checkSite(site)
+    paths <- attr(x, "paths")
+    tree <- attr(paths, "tree")
+    tree <- ladderize(tree, right = FALSE)
+    rootNode <- getMRCA(tree, tree$tip.label)
+    tryCatch(
+        site <- match.arg(as.character(site), choices = names(x)),
+        error = function(e) {
+            stop(paste("\"site\":", site, "is not a mutation of fixation"))
+        }
+    )
+    sitePaths <- x[[site]]
+    plotName <- character(0)
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    for (sp in sitePaths) {
+        aaName <- character(0)
+        for (tips in sp) {
+            aa <- attr(tips, "AA")
+            aaName <- c(aaName, aa)
+            color <- tip2colorEdge(color,
+                                   AA_COLORS[tolower(aa)],
+                                   tree$edge,
+                                   match(tips, tree$tip.label),
+                                   rootNode)
+        }
+        aaName <- paste0(aaName, collapse = " -> ")
+    }
+    sepChar <- "\n"
+    if (sum(nchar(plotName) <= 18)) {
+        sepChar <- ", "
+    }
+    plot(
+        tree,
+        show.tip.label = FALSE,
+        edge.col = color,
+        main = paste(plotName, collapse = sepChar),
+        ...
+        
+    )
+}
+
+#' @export
+plotSingleSite <- function(x, site, ...)
+    UseMethod("plotSingleSite")
+
+checkSite <- function(site) {
+    if (!is.numeric(site) ||
+        any(site <= 0) || as.integer(site) != site) {
+        stop("Please enter positive integer value for \"site\"")
+    }
+    if (length(site) != 1) {
+        warning(
+            paste(
+                "\"site\" has more than one element, only the first",
+                site[1],
+                " will be used."
+            )
+        )
+    }
+    return(site[1])
 }
