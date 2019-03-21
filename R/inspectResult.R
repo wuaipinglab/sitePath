@@ -19,8 +19,24 @@
 #' @export
 extractTips.fixationSites <- function(x, site, select = 1, ...) {
     site <- checkSite(site)
+    return(actualExtract(x, site, select))
+}
+
+#' @rdname extractTips
+#' @export
+extractTips.multiFixationSites <-
+    function(x, site, select = 1, ...) {
+        site <- checkSite(site)
+        return(actualExtract(x, site, select))
+    }
+
+#' @export
+extractTips <- function(x, site, select, ...)
+    UseMethod("extractTips")
+
+actualExtract <- function(x, site, select) {
     tryCatch(
-        expr = res <- x[[as.character(site)]],
+        expr = sp <- x[[as.character(site)]],
         error = function(e) {
             stop(paste("\"site\":", site, "is not found in \"x\"."))
         }
@@ -29,7 +45,7 @@ extractTips.fixationSites <- function(x, site, select = 1, ...) {
         stop("Please enter a single positive integer for \"select\"")
     }
     tryCatch(
-        expr = res <- res[[select]],
+        expr = sp <- sp[[select]],
         error = function(e) {
             cat(e, "\n")
             if (length(select))
@@ -46,51 +62,18 @@ extractTips.fixationSites <- function(x, site, select = 1, ...) {
                 )
         }
     )
+    res <- list()
+    for (i in sp) {
+        aa <- attr(i, "AA")
+        attributes(aa) <- NULL
+        attributes(i) <- NULL
+        attr(i, "AA") <- aa
+        res <- c(res, list(i))
+    }
     return(res)
 }
 
-#' @rdname extractTips
-#' @export
-extractTips.multiFixationSites <-
-    function(x, site, select = 1, ...) {
-        site <- checkSite(site)
-        tryCatch(
-            expr = res <- x[[as.character(site)]],
-            error = function(e) {
-                stop(paste("\"site\":", site, "is not found in \"x\"."))
-            }
-        )
-        if (select <= 0 || as.integer(select) != select) {
-            stop("Please enter a single positive integer for \"select\"")
-        }
-        tryCatch(
-            expr = res <- res[[select]],
-            error = function(e) {
-                cat(e, "\n")
-                if (length(select))
-                    stop(
-                        paste(
-                            "The site:",
-                            site,
-                            "has",
-                            length(x),
-                            "fixation(s). Please choose a integer from 1 to",
-                            length(x),
-                            "for \"select\"."
-                        )
-                    )
-            }
-        )
-        return(res)
-    }
-
-#' @export
-extractTips <- function(x, site, select, ...)
-    UseMethod("extractTips")
-
-#' @export
 as.data.frame.fixationSites <- function(x, ...) {
-    cat("Under development\n")
     paths <- attr(x, "paths")
     tree <- attr(paths, "tree")
     reference <- attr(paths, "reference")
@@ -113,7 +96,6 @@ as.data.frame.fixationSites <- function(x, ...) {
     return(res)
 }
 
-#' @export
 as.data.frame.multiFixationSites <- function(x, ...) {
     cat("Under development\n")
 }

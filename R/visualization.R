@@ -17,6 +17,8 @@
 #' data("zikv_align")
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' plot(lineagePath(tree, 0.996))
+#' @importFrom ape plot.phylo
+#' @importFrom graphics title
 #' @export
 plot.lineagePath <- function(x, y = TRUE, ...) {
     tree <- attr(x, "tree")
@@ -32,9 +34,9 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
     color[targetEdges] <- "#000000"
     lty[targetEdges] <- 1
     width[targetEdges] <- 2
-    plot(
+    plot.phylo(
         tree,
-        edge.col = color,
+        edge.color = color,
         edge.lty = lty,
         edge.width = width,
         show.tip.label = FALSE,
@@ -183,10 +185,10 @@ plotSingleSite.lineagePath <- function(x,
         color[targetEdges] <- "#000000"
         width[targetEdges] <- 2
     }
-    plot(
+    plot.phylo(
         tree,
         show.tip.label = FALSE,
-        edge.col = color,
+        edge.color = color,
         edge.width = width,
         main = site,
         ...
@@ -237,10 +239,10 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
                                match(sp[[1]], tree$tip.label),
                                rootNode)
     }
-    plot(
+    plot.phylo(
         tree,
         show.tip.label = FALSE,
-        edge.col = color,
+        edge.color = color,
         main = paste(unique(plotName), collapse = ", "),
         ...
     )
@@ -280,30 +282,42 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     plotName <- character(0)
     nEdges <- length(tree$edge.length)
     color <- rep("#d3d3d3", nEdges)
+    AAnames <- character(0)
     for (sp in sitePaths) {
         aaName <- character(0)
         for (tips in sp) {
-            aa <- attr(tips, "AA")
+            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
             aaName <- c(aaName, aa)
             color <- tip2colorEdge(color,
-                                   AA_COLORS[tolower(aa)],
+                                   AA_COLORS[aa],
                                    tree$edge,
-                                   match(tips, tree$tip.label),
+                                   tips,
                                    rootNode)
         }
-        aaName <- paste0(aaName, collapse = " -> ")
+        AAnames <- c(AAnames, aaName)
+        plotName <- c(plotName, paste0(aaName, collapse = " -> "))
     }
-    sepChar <- "\n"
-    if (sum(nchar(plotName) <= 18)) {
-        sepChar <- ", "
-    }
-    plot(
+    plot.phylo(
         tree,
         show.tip.label = FALSE,
-        edge.col = color,
-        main = paste(plotName, collapse = sepChar),
+        edge.color = color,
         ...
         
+    )
+    sepChar <- "\n"
+    if (sum(nchar(plotName) <= 18)) {
+        sepChar <- "\t"
+    }
+    title(
+        main = site,
+        sub = paste(plotName, collapse = sepChar)
+    )
+    legend(
+        "topleft",
+        title = "Amino acid",
+        legend = unique(AAnames),
+        fill = AA_COLORS[unique(AAnames)],
+        box.lty = 0
     )
 }
 

@@ -25,6 +25,14 @@ summarizeAA <- function(seqs, siteIndex, tolerance) {
     .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', seqs, siteIndex, tolerance)
 }
 
+tableAA <- function(seqs, siteIndex) {
+    .Call('_sitePath_tableAA', PACKAGE = 'sitePath', seqs, siteIndex)
+}
+
+minimizeEntropy <- function(nodeSummaries) {
+    .Call('_sitePath_minimizeEntropy', PACKAGE = 'sitePath', nodeSummaries)
+}
+
 tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {
     .Call('_sitePath_tip2colorEdge', PACKAGE = 'sitePath', colorEdge, color, treeEdge, tips, rootNode)
 }

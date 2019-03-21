@@ -62,6 +62,9 @@ print.sitePath <- function(x, ...) {
         "may experience fixation on",
         length(x),
         "path(s):\n\n")
+    # A "sitePath" composes of all the fixation paths for
+    # a single site. So each "m" represent a single fixation
+    # path
     for (m in x) {
         mutName <- character(0)
         for (tips in m) {
@@ -242,12 +245,12 @@ fixationSites.lineagePath <- function(paths,
                         # Add new fixation for the site if it's not existed
                         targetIndex <- 1
                     } else {
-                        # Retrieve existing "sitePath" entry to compare
-                        # with the current "sitePath" enry
+                        # Retrieve existing fixation path with the same
+                        # mutation to compare with the current value
                         existMut <- existPath[[targetIndex]]
-                        # A new "sitePath" will be added to the site
-                        # or an old "sitePath" will be replaced if
-                        # it's actually a subset of the new one.
+                        # A new entry will be added to the "sitePath"
+                        # or an old entry will be replaced if it's actually
+                        # a subset of the new one.
                         if (all(!to %in% existMut[[a]])) {
                             targetIndex <- length(existPath) + 1
                         } else if (length(to) <= length(existMut[[a]])) {
@@ -255,15 +258,14 @@ fixationSites.lineagePath <- function(paths,
                         }
                     }
                 }
-                # Construct a "mutPath" for each fixation
+                # Construct the fixation path
                 attr(from, "AA") <- b
                 attr(to, "AA") <- a
                 mutPath <- list(from, to)
                 names(mutPath) <- c(b, a)
-                # Store the "mutPath" to the appropiate index
+                # Store the entry by the appropiate index of "sitePath"
                 mutations[[site]][[targetIndex]] <- mutPath
-                # (Re)assign the class and site attribute for
-                # the site
+                # (Re)assign the class and site attribute for the site
                 class(mutations[[site]]) <- "sitePath"
                 attr(mutations[[site]], "site") <- as.integer(site)
             }
@@ -302,6 +304,14 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
+getMutPathAA <- function(s) {
+    mutName <- character(0)
+    for (tips in s) {
+        mutName <- paste0(mutName, attr(tips, "AA"))
+    }
+    return(mutName)
+}
+
 #' @rdname findSites
 #' @name multiFixationSites
 #' @description
@@ -314,7 +324,7 @@ print.fixationSites <- function(x, ...) {
 multiFixationSites.lineagePath <- function(paths,
                                            reference = NULL,
                                            gapChar = '-',
-                                           tolerance = 0,
+                                           # tolerance = 0,
                                            minEffectiveSize = NULL,
                                            extendedSearch = TRUE,
                                            ...) {
@@ -323,19 +333,22 @@ multiFixationSites.lineagePath <- function(paths,
     align <- attr(paths, "align")
     refSeqName <- reference
     reference <- checkReference(tree, align, reference, gapChar)
-    if (!is.numeric(tolerance)) {
-        stop("\"tolerance\" only accepts numeric")
-    } else {
-        tolerance <- if (tolerance < 0) {
-            stop("\"tolerance\" can only be positive number")
-        } else if (tolerance < 0.5) {
-            tolerance * nTips
-        } else if (tolerance < 1) {
-            (1 - tolerance) * nTips
-        } else {
-            as.integer(tolerance)
-        }
-    }
+    # TODO: "tolerance" may be accepting numeric vector with
+    # a size of two: first being for within a segment and second
+    # being for the whole path.
+    # if (!is.numeric(tolerance)) {
+    #     stop("\"tolerance\" only accepts numeric")
+    # } else {
+    #     tolerance <- if (tolerance < 0) {
+    #         stop("\"tolerance\" can only be positive number")
+    #     } else if (tolerance < 0.5) {
+    #         tolerance * nTips
+    #     } else if (tolerance < 1) {
+    #         (1 - tolerance) * nTips
+    #     } else {
+    #         as.integer(tolerance)
+    #     }
+    # }
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <- nTips / (length(paths) * 10)
     } else if (!is.numeric(minEffectiveSize)) {
@@ -357,7 +370,7 @@ multiFixationSites.lineagePath <- function(paths,
         names(res) <- tips
         return(res)
     })
-    # Assign the node index to the "nodeAlign" list
+    # Assign the node names to the "nodeAlign" list
     names(nodeAlign) <- nodes
     # Store all the tips by node and their fixed AA to avoid repeating
     # calculation. Each entry in the list stores the info for a single
@@ -373,7 +386,7 @@ multiFixationSites.lineagePath <- function(paths,
     for (path in paths) {
         for (maxLen in seq_along(path)[-1]) {
             # For the sequences after the node, examine them as a whole
-            afterTips <- ChildrenTips(tree, path[maxLen])
+            afterTips <- as.integer(ChildrenTips(tree, path[maxLen]))
             if (length(afterTips) < minEffectiveSize) {
                 next
             }
@@ -384,18 +397,20 @@ multiFixationSites.lineagePath <- function(paths,
             # Iterate every site
             for (i in seq_along(reference)) {
                 s <- reference[i] - 1
-                a <- summarizeAA(after, s, tolerance)
+                # TODO: Add "tolerance"
+                a <- summarizeAA(after, s, 0)
                 if (is.na(a)) {
                     # The AA of the tips after are not fixed
                     # so the site is disqualifed and go for
                     # the next site
                     next
                 }
-                site <- as.character(i)
-                # "toleranceSum" is used to track total number of
+                # TODO: "toleranceSum" is used to track total number of
                 # non-dominant AA for the site initialized with the
                 # number of non-dominant AA in the "afterTips"
-                toleranceSum <- attr(a, "n")
+                # toleranceSum <- attr(a, "n")
+                
+                site <- as.character(i)
                 # "nodeTips" is vector of tips with an attribute
                 # of "AA" to store fixed AA, and an attribute of
                 # "nonDominant" to store non-dominant AA.
@@ -405,6 +420,7 @@ multiFixationSites.lineagePath <- function(paths,
                 # stage, we only focus on the purely fixed AA.
                 previousAA <- NULL
                 currentAA <- NULL
+                previousNode <- NULL
                 # "nodeSummaries" groups tips by node in the summary
                 # stage. In the case that the adjacent ndoes have
                 # the same AA purely fixed, they will be grouped
@@ -412,47 +428,108 @@ multiFixationSites.lineagePath <- function(paths,
                 nodeSummaries <- list()
                 # Iterate all nodes in the "pathBefore". This is
                 # the summary stage
-                for (node in pathBefore) {
+                for (node in as.character(pathBefore)) {
                     # If the node has a record in nodeAAsum
                     nodeTips <- nodeAAsum[[site]][[node]]
+                    # Summarize the node if not existed
                     if (is.null(nodeTips)) {
-                        # Get the related descendant tips
-                        nodeTips <- names(nodeAlign[[node]])
+                        # Get the related descendant tips from "nodeAlign"
+                        nodeTips <-
+                            as.integer(names(nodeAlign[[node]]))
                         # "tableAA" is similar to R function "table"
+                        # Here the AA at site "s" for all tips is summarized
                         aaSummary <- tableAA(nodeAlign[[node]], s)
+                        # Assign the "aaSummary" to the tip names
                         attr(nodeTips, "aaSummary") <- aaSummary
                         # Store the result to avoid repeating calculation
                         nodeAAsum[[site]][[node]] <- nodeTips
                     }
+                    # Extract "aaSummary" if existed
                     aaSummary <- attr(nodeTips, "aaSummary")
+                    # If AA is purely fixed for the node
                     if (length(aaSummary) == 1) {
                         currentAA <- names(aaSummary)
                     } else {
                         currentAA <- NULL
                     }
+                    # Attach the node to the "preivous" node if they're
+                    # both purely fixed and the fixed AA is the same
                     if (!is.null(previousAA) &&
+                        !is.null(currentAA) &&
                         previousAA == currentAA) {
-                        nodeTips <- c(nodeSummaries[[node]], nodeTips)
+                        node <- previousNode
+                        nodeTips <-
+                            c(nodeSummaries[[node]], nodeTips)
                         attr(nodeTips, "aaSummary") <-
                             attr(nodeSummaries[[node]], "aaSummary") +
                             aaSummary
+                        # Oddly, R uses the name of the first element
+                        # in the numeric vector when adding two named
+                        # number. So there is no name (AA) assignment
                     }
+                    # Assign or re-assign the nodeTips with "aaSummary"
+                    # to the "nodeSummaries"
                     nodeSummaries[[node]] <- nodeTips
                     previousAA <- currentAA
+                    previousNode <- node
                 }
-                if (length(nodeSummaries) == 1 || currentAA == a) {
+                # Skip to the next "site" if AA of "pathBefore" is
+                # purely fixed or the terminal AA is the same as
+                # fixed AA of "afterTips". This avoids repetition.
+                if (length(nodeSummaries) == 1 ||
+                    !is.null(currentAA) && currentAA == a) {
                     next
                 }
-                # TODO: integrate the "nodeSummaries"
-                # The function should output tips in groups
-                # where AA is fixed (mostly pure)
-                if (is.null(res[[site]])) {
-                    targetIndex <- 1
-                } else {
-                    targetIndex <- length(res[[site]]) + 1
+                # TODO: The "minimizeEntropy" function hasn't finished
+                # yet as "tolerance" and "minEffectiveSize" might
+                # be introduced as parameters.
+                s <- minimizeEntropy(nodeSummaries)
+                nf <- length(s)
+                if (nf > 1 &&
+                    attr(s[[nf]], "AA") != a &&
+                    all(lengths(s) >= minEffectiveSize)) {
+                    attr(afterTips, "AA") <- a
+                    s[[nf + 1]] <- afterTips
+                    existPath <- res[[site]]
+                    # Some site may have multiple fixation on multiple
+                    # lineages. The following is for deciding which
+                    # index should it be assigned in the "res[[site]]"
+                    if (is.null(res[[site]])) {
+                        targetIndex <- 1
+                    } else {
+                        mut <- getMutPathAA(s)
+                        targetIndex <- which(vapply(
+                            existPath,
+                            FUN = function(i) {
+                                getMutPathAA(i) == mut
+                            },
+                            FUN.VALUE = logical(1)
+                        ))
+                        if (length(targetIndex) == 0) {
+                            # Add new fixation for the site if it's not existed
+                            targetIndex <- 1
+                        } else {
+                            # Retrieve existing fixation path with the same
+                            # mutation to compare with the current value
+                            existMut <- existPath[[targetIndex]]
+                            # A new entry will be added to the "sitePath"
+                            # or an old entry will be replaced if it's
+                            # actually a subset of the new one.
+                            existTips <- unlist(tail(existMut, 1))
+                            if (all(!afterTips %in% existTips)) {
+                                targetIndex <- length(existPath) + 1
+                            } else if (length(afterTips) <= length(existTips)) {
+                                next
+                            }
+                        }
+                    }
+                    # Assign the result to the "res[[site]]"
+                    res[[site]][[targetIndex]] <- s
+                    # Assign or re-assign class and "site" to
+                    # the "res[[site]]"
+                    class(res[[site]]) <- "sitePath"
+                    attr(res[[site]], "site") <- as.integer(site)
                 }
-                class(res[[site]]) <- "sitePath"
-                attr(res[[site]], "site") <- as.integer(site)
             }
         }
     }
@@ -467,9 +544,6 @@ multiFixationSites.lineagePath <- function(paths,
 multiFixationSites <- function(paths,
                                reference = NULL,
                                gapChar = '-',
-                               tolerance = 0,
-                               minEffectiveSize = NULL,
-                               extendedSearch = TRUE,
                                ...)
     UseMethod("multiFixationSites")
 

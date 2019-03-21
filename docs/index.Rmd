@@ -93,11 +93,11 @@ fixations <- fixationSites(paths)
 fixations
 ```
 
-If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
+If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractTips` function. The output is a `sitePath` object which stores the tip names.
 
 ```{r get_tipNames}
-sp <- extractSite(fixations, 139)
-sp[["S->N"]]
+sp <- extractTips(fixations, 139)
+sp
 ```
 
 ### 3.2 Visualize the result

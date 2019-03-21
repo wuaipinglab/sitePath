@@ -16,8 +16,7 @@ SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
   extendedSearch = TRUE, ...)
 
 \method{multiFixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = 0, minEffectiveSize = NULL,
-  extendedSearch = TRUE, ...)
+  gapChar = "-", minEffectiveSize = NULL, extendedSearch = TRUE, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}

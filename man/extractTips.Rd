@@ -8,15 +8,17 @@
 \usage{
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
-\method{extractTips}{multiFixationSites}(x, site, ...)
+\method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} or a \code{multiFixationSites} object}
+\item{x}{A \code{fixationSites} or a \code{multiFixationSites} object.}
 
 \item{site}{A site predicted to experience fixation.}
 
 \item{select}{For a site, there theoretically might be more than one
-fixation on different lineages. To extract}
+fixation on different lineages. You may use this argument
+to extract for a specific fixation of a site. The default
+is the first fixation of the site.}
 
 \item{...}{Other arguments}
 }

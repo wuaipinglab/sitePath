@@ -12,7 +12,7 @@
 
 <meta name="author" content="Chengyang Ji" />
 
-<meta name="date" content="2019-03-06" />
+<meta name="date" content="2019-03-28" />
 
 <title>Tutorial on using sitePath</title>
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tutorial on using sitePath</h1>
 <h4 class="author"><em>Chengyang Ji</em></h4>
-<h4 class="date"><em>2019-03-06</em></h4>
+<h4 class="date"><em>2019-03-28</em></h4>
 
 
 
@@ -157,10 +157,10 @@ fixations
 <span class="co">#&gt; </span>
 <span class="co">#&gt; 1902 763 777 139 2086 894 2074 3045 1143 2842 3398 </span>
 <span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
-<p>If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of <code>fixationSites</code> and the site index to <code>extractSite</code> function. The output is a <code>sitePath</code> object which stores the tip names.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sp &lt;-<span class="st"> </span><span class="kw">extractSite</span>(fixations, <span class="dv">139</span>)
-sp[[<span class="st">&quot;S-&gt;N&quot;</span>]]
-<span class="co">#&gt; $S</span>
+<p>If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of <code>fixationSites</code> and the site index to <code>extractTips</code> function. The output is a <code>sitePath</code> object which stores the tip names.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sp &lt;-<span class="st"> </span><span class="kw">extractTips</span>(fixations, <span class="dv">139</span>)
+sp
+<span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt;   [1] &quot;AMD61711&quot; &quot;AQS26698&quot; &quot;APG56458&quot; &quot;APH11505&quot; &quot;APH11565&quot; &quot;APH11524&quot;</span>
 <span class="co">#&gt;   [7] &quot;APH11593&quot; &quot;AWK27349&quot; &quot;APH11570&quot; &quot;APH11525&quot; &quot;APH11569&quot; &quot;APH11541&quot;</span>
 <span class="co">#&gt;  [13] &quot;APH11579&quot; &quot;APH11557&quot; &quot;APH11594&quot; &quot;APH11559&quot; &quot;APH11563&quot; &quot;APH11592&quot;</span>
@@ -179,8 +179,10 @@ sp[[<span class="st">&quot;S-&gt;N&quot;</span>]]
 <span class="co">#&gt;  [91] &quot;APH11545&quot; &quot;APH11548&quot; &quot;APH11561&quot; &quot;APH11584&quot; &quot;APH11523&quot; &quot;APH11495&quot;</span>
 <span class="co">#&gt;  [97] &quot;APH11549&quot; &quot;AVG19202&quot; &quot;APG56499&quot; &quot;ASW34302&quot; &quot;AVV62004&quot; &quot;BAX00477&quot;</span>
 <span class="co">#&gt; [103] &quot;BBC70847&quot; &quot;AUF35022&quot; &quot;ATL14618&quot; &quot;AUF35021&quot; &quot;ANK57896&quot;</span>
+<span class="co">#&gt; attr(,&quot;AA&quot;)</span>
+<span class="co">#&gt; [1] &quot;S&quot;</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; $N</span>
+<span class="co">#&gt; [[2]]</span>
 <span class="co">#&gt;   [1] &quot;BAV89190&quot;     &quot;AOI20067&quot;     &quot;ANO46307&quot;     &quot;AMM43325&quot;    </span>
 <span class="co">#&gt;   [5] &quot;AVG19275&quot;     &quot;ANN44857&quot;     &quot;AMM43326&quot;     &quot;ANO46306&quot;    </span>
 <span class="co">#&gt;   [9] &quot;ANO46309&quot;     &quot;ANO46305&quot;     &quot;ANO46303&quot;     &quot;ANO46308&quot;    </span>
@@ -242,9 +244,8 @@ sp[[<span class="st">&quot;S-&gt;N&quot;</span>]]
 <span class="co">#&gt; [233] &quot;ANH22038&quot;     &quot;APW84877&quot;     &quot;APO39236&quot;     &quot;AOY08546&quot;    </span>
 <span class="co">#&gt; [237] &quot;AOY08516&quot;     &quot;APO39233&quot;     &quot;AOS90222&quot;     &quot;AOO53981&quot;    </span>
 <span class="co">#&gt; [241] &quot;AOY08521&quot;     &quot;AOO85388&quot;     &quot;APO39228&quot;    </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; attr(,&quot;mutation&quot;)</span>
-<span class="co">#&gt; [1] &quot;S139N&quot;</span></code></pre></div>
+<span class="co">#&gt; attr(,&quot;AA&quot;)</span>
+<span class="co">#&gt; [1] &quot;N&quot;</span></code></pre></div>
 </div>
 <div id="visualize-the-result" class="section level3">
 <h3>3.2 Visualize the result</h3>
