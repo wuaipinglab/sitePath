@@ -76,6 +76,25 @@ NULL
 #' @docType data
 "zikv_tree"
 
+#' @name h3n2_align
+#' @title Multiple sequence alignment of H3N2's HA protein
+#' @description
+#' The raw protein sequences were downloaded from NCBI database.
+#' @format a \code{alignment} object
+#' @usage data(h3n2_align)
+#' @docType data
+"h3n2_align"
+
+
+#' @name h3n2_tree
+#' @title Phylogenetic tree of H3N2's HA protein
+#' @description
+#' Tree was built from \code{h3n2_align} using RAxML with default settings.
+#' @format a \code{phylo} object
+#' @usage data(h3n2_tree)
+#' @docType data
+"h3n2_tree"
+
 checkMatched <- function(tree, align) {
     if (!is(align, "alignment")) {
         stop("\"alignment\" is not class alignment")

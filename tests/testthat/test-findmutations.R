@@ -18,7 +18,7 @@ test_that("Restrication applied in SNPsites", {
 
 context("test-fixationSites")
 
-test_that("Restrication applied in fixationSites", {
+test_that("Constrains in fixationSites work", {
     paths <- lineagePath(tree)
     for (ta in seq(0, 0.49, 0.1)) {
         for (td in seq(0, 0.49, 0.1)) {

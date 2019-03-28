@@ -328,8 +328,8 @@ multiFixationSites.lineagePath <- function(paths,
                                            minEffectiveSize = NULL,
                                            extendedSearch = TRUE,
                                            ...) {
-    nTips <- length(tree$tip.label)
     tree <- attr(paths, "tree")
+    nTips <- length(tree$tip.label)
     align <- attr(paths, "align")
     refSeqName <- reference
     reference <- checkReference(tree, align, reference, gapChar)
