@@ -79,6 +79,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tableAA
+Rcpp::IntegerVector tableAA(const Rcpp::CharacterVector& seqs, const int siteIndex);
+RcppExport SEXP _sitePath_tableAA(SEXP seqsSEXP, SEXP siteIndexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type seqs(seqsSEXP);
+    Rcpp::traits::input_parameter< const int >::type siteIndex(siteIndexSEXP);
+    rcpp_result_gen = Rcpp::wrap(tableAA(seqs, siteIndex));
+    return rcpp_result_gen;
+END_RCPP
+}
+// minimizeEntropy
+Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(const Rcpp::ListOf<Rcpp::IntegerVector>& nodeSummaries);
+RcppExport SEXP _sitePath_minimizeEntropy(SEXP nodeSummariesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type nodeSummaries(nodeSummariesSEXP);
+    rcpp_result_gen = Rcpp::wrap(minimizeEntropy(nodeSummaries));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tip2colorEdge
 Rcpp::CharacterVector tip2colorEdge(Rcpp::CharacterVector& colorEdge, const std::string& color, const Rcpp::IntegerMatrix& treeEdge, const Rcpp::IntegerVector& tips, const int rootNode);
 RcppExport SEXP _sitePath_tip2colorEdge(SEXP colorEdgeSEXP, SEXP colorSEXP, SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
@@ -102,6 +125,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
     {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 3},
+    {"_sitePath_tableAA", (DL_FUNC) &_sitePath_tableAA, 2},
+    {"_sitePath_minimizeEntropy", (DL_FUNC) &_sitePath_minimizeEntropy, 1},
     {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
     {NULL, NULL, 0}
 };

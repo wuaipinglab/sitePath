@@ -1,5 +1,5 @@
-#' @rdname dataPrep
-#' @name dataPrep
+#' @rdname addMSA
+#' @name addMSA
 #' @title Prepare data for sitePath analysis
 #' @description
 #' sitePath requires both tree and sequence alignment to do the analysis.
@@ -17,7 +17,7 @@
 #' The file path to the multiple sequence alignment file
 #' @param msaFormat
 #' The format of the multiple sequence alignment file
-#' @param seqs
+#' @param alignment
 #' an \code{alignment} object. This commonly can be
 #' from sequence parsing function in the \code{seqinr} package.
 #' Sequence names in the alignment should include all \code{tip.label}
@@ -35,7 +35,7 @@
 addMSA <- function(tree,
                    msaPath = "",
                    msaFormat = "",
-                   seqs = NULL) {
+                   alignment = NULL) {
     if (is(tree, "treedata")) {
         tree <- tree@phylo
     }
@@ -43,11 +43,11 @@ addMSA <- function(tree,
         stop("\"tree\" is not class phylo")
     }
     if (file.exists(msaPath)) {
-        seqs <- read.alignment(msaPath, msaFormat)
-    } else if (is.null(seqs)) {
+        alignment <- read.alignment(msaPath, msaFormat)
+    } else if (is.null(alignment)) {
         stop(paste("There is no file in", msaPath))
     }
-    attr(tree, "alignment") <- checkMatched(tree, seqs)
+    attr(tree, "alignment") <- checkMatched(tree, alignment)
     return(tree)
 }
 
@@ -76,9 +76,28 @@ NULL
 #' @docType data
 "zikv_tree"
 
+#' @name h3n2_align
+#' @title Multiple sequence alignment of H3N2's HA protein
+#' @description
+#' The raw protein sequences were downloaded from NCBI database.
+#' @format a \code{alignment} object
+#' @usage data(h3n2_align)
+#' @docType data
+"h3n2_align"
+
+
+#' @name h3n2_tree
+#' @title Phylogenetic tree of H3N2's HA protein
+#' @description
+#' Tree was built from \code{h3n2_align} using RAxML with default settings.
+#' @format a \code{phylo} object
+#' @usage data(h3n2_tree)
+#' @docType data
+"h3n2_tree"
+
 checkMatched <- function(tree, align) {
     if (!is(align, "alignment")) {
-        stop("\"seqs\" is not class alignment")
+        stop("\"alignment\" is not class alignment")
     }
     m <- match(tree$tip.label, align$nam)
     if (any(is.na(m))) {
@@ -92,21 +111,18 @@ checkMatched <- function(tree, align) {
     return(toupper(align))
 }
 
-sortSimMatrix <- function(tree, simMatrix) {
-    if (!inherits(tree, "phylo")) {
-        stop("\"tree\" is not class phylo")
-    }
-    colMatch <- match(tree$tip.label, colnames(simMatrix))
-    rowMatch <- match(tree$tip.label, rownames(simMatrix))
-    if (is.null(simMatrix)) {
-        return(matrix(
-            NA,
-            ncol = length(tree$tip.label),
-            nrow = length(tree$tip.label)
-        ))
+checkReference <- function(tree, align, reference, gapChar) {
+    if (is.null(reference)) {
+        reference <- seq_len(nchar(align[1]))
     } else {
-        return(simMatrix[rowMatch, colMatch])
+        if (!is.character(gapChar) ||
+            nchar(gapChar) != 1 || length(gapChar) != 1) {
+            stop("\"gapChar\" only accepts one single character")
+        }
+        reference <-
+            getReference(align[which(tree$tip.label == reference)], gapChar)
     }
+    return(reference)
 }
 
 ChildrenTips <- function(tree, node) {
@@ -126,6 +142,7 @@ ChildrenTips <- function(tree, node) {
 }
 
 extendPaths <- function(paths, tree) {
+    attrs <- attributes(paths)
     paths <- lapply(paths, function(p) {
         sn <- p[length(p)]
         extended <-
@@ -141,5 +158,6 @@ extendPaths <- function(paths, tree) {
             })
         c(p, unlist(extended[which(lengths(extended) == 1)]))
     })
+    attributes(paths) <- attrs
     return(paths)
 }

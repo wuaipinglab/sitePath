@@ -1,7 +1,6 @@
 #ifndef SITEPATH_TREEMER_H
 #define SITEPATH_TREEMER_H
 
-#include <map>
 #include <utility>
 #include "util.h"
 

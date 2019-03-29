@@ -3,13 +3,13 @@
 \name{treemer}
 \alias{treemer}
 \alias{groupTips}
-\alias{sitePath}
+\alias{lineagePath}
 \title{Topology-dependent tree trimming}
 \usage{
 groupTips(tree, similarity = NULL, simMatrix = NULL,
   forbidTrivial = TRUE, tipnames = TRUE)
 
-sitePath(tree, similarity = NULL, simMatrix = NULL,
+lineagePath(tree, similarity = NULL, simMatrix = NULL,
   forbidTrivial = TRUE)
 }
 \arguments{
@@ -42,7 +42,7 @@ be divergent if the similarity is lower than the threshold.
 (Other more statistical approaches such as Kolmogorov-Smirnov
 Tests among pair-wise distance could be introduced in the future)
 
-\code{sitePath} finds the lineages of a phylogenetic tree providing
+\code{lineagePath} finds the lineages of a phylogenetic tree providing
 the corresponding sequence alignment. This is done by trimming
 the tree to the ancestor node of tips in each group and then find
 the bifurcated terminals of the trimmed tree. The \code{\link{nodepath}}
@@ -55,7 +55,7 @@ are added.
 \examples{
 data("zikv_tree")
 data("zikv_align")
-tree <- addMSA(zikv_tree, seqs = zikv_align)
+tree <- addMSA(zikv_tree, alignment = zikv_align)
 groupTips(tree, 0.996)
-sitePath(tree, 0.996)
+lineagePath(tree, 0.996)
 }

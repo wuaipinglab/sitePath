@@ -1,6 +1,6 @@
 data(zikv_align)
 data(zikv_tree)
-tree <- addMSA(zikv_tree, seqs = zikv_align)
+tree <- addMSA(zikv_tree, alignment = zikv_align)
 
 context("test-SNPsites")
 
@@ -18,28 +18,28 @@ test_that("Restrication applied in SNPsites", {
 
 context("test-fixationSites")
 
-test_that("Restrication applied in fixationSites", {
-    paths <- sitePath(tree)
+test_that("Constrains in fixationSites work", {
+    paths <- lineagePath(tree)
     for (ta in seq(0, 0.49, 0.1)) {
         for (td in seq(0, 0.49, 0.1)) {
             mutations <- fixationSites(paths, tolerance = c(ta, td))
-            for (m in names(mutations)) {
-                nLen <- nchar(m)
-                site <-
-                    substring(m, c(1, 2, nLen), c(1, nLen - 1, nLen))
-                aa <- lapply(mutations[[m]], function(g) {
-                    sum <- zikv_align$seq[which(zikv_align$nam %in% g)]
-                    sum <-
-                        table(sapply(sum, substring, site[2], site[2]))
-                })
-                ancAA <- aa[[1]]
-                ancD <- which.max(ancAA)
-                expect_equal(toupper(names(ancD)), site[1])
-                expect_lte(sum(ancAA[-ancD]), floor(ta * sum(ancAA)))
-                descAA <- aa[[2]]
-                descD <- which.max(descAA)
-                expect_equal(toupper(names(descD)), site[3])
-                expect_lte(sum(descAA[-descD]), floor(td * sum(descAA)))
+            for (sp in mutations) {
+                site <- attr(sp, "site")
+                for (m in sp) {
+                    aa <- lapply(m, function(g) {
+                        sum <- zikv_align$seq[which(zikv_align$nam %in% g)]
+                        sum <-
+                            table(sapply(sum, substring, site, site))
+                    })
+                    ancAA <- aa[[1]]
+                    ancD <- which.max(ancAA)
+                    expect_equal(toupper(names(ancD)), names(m)[1])
+                    expect_lte(sum(ancAA[-ancD]), floor(ta * sum(ancAA)))
+                    descAA <- aa[[2]]
+                    descD <- which.max(descAA)
+                    expect_equal(toupper(names(descD)), names(m)[2])
+                    expect_lte(sum(descAA[-descD]), floor(td * sum(descAA)))
+                }
             }
         }
     }

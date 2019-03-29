@@ -1,3 +1,49 @@
+#' @rdname pre-assessment
+#' @name pre-assessment
+#' @title Things can be done before the analysis
+#' @description
+#' \code{similarityMatrix} calculates similarity between aligned sequences
+#' The similarity matrix can be used in \code{\link{groupTips}}
+#' or \code{\link{lineagePath}}
+#' @param tree The return from \code{\link{addMSA}} function
+#' @examples
+#' data("zikv_tree")
+#' data("zikv_align")
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' simMatrix <- similarityMatrix(tree)
+#' @return
+#' \code{similarityMatrix} returns a diagonal matrix of
+#' similarity between sequences
+#' @importFrom methods is
+#' @export
+similarityMatrix <- function(tree) {
+    if (!inherits(tree, "phylo")) {
+        stop("\"tree\" is not class phylo")
+    } else if (is.null(attr(tree, "alignment"))) {
+        stop("No alignment found in \"tree\"")
+    }
+    sim <- getSimilarityMatrix(attr(tree, "alignment"))
+    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
+    return(sim)
+}
+
+sortSimMatrix <- function(tree, simMatrix) {
+    if (!inherits(tree, "phylo")) {
+        stop("\"tree\" is not class phylo")
+    }
+    colMatch <- match(tree$tip.label, colnames(simMatrix))
+    rowMatch <- match(tree$tip.label, rownames(simMatrix))
+    if (is.null(simMatrix)) {
+        return(matrix(
+            NA,
+            ncol = length(tree$tip.label),
+            nrow = length(tree$tip.label)
+        ))
+    } else {
+        return(simMatrix[rowMatch, colMatch])
+    }
+}
+
 #' @rdname treemer
 #' @name treemer
 #' @title Topology-dependent tree trimming
@@ -24,7 +70,7 @@
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
-#' tree <- addMSA(zikv_tree, seqs = zikv_align)
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' groupTips(tree, 0.996)
 #' @return grouping of tips
 #' @export
@@ -68,7 +114,7 @@ groupTips <- function(tree,
 
 #' @rdname treemer
 #' @description
-#' \code{sitePath} finds the lineages of a phylogenetic tree providing
+#' \code{lineagePath} finds the lineages of a phylogenetic tree providing
 #' the corresponding sequence alignment. This is done by trimming
 #' the tree to the ancestor node of tips in each group and then find
 #' the bifurcated terminals of the trimmed tree. The \code{\link{nodepath}}
@@ -79,10 +125,10 @@ groupTips <- function(tree,
 #' are added.
 #' @importFrom ape nodepath
 #' @examples
-#' sitePath(tree, 0.996)
+#' lineagePath(tree, 0.996)
 #' @return path represent by node number
 #' @export
-sitePath <- function(tree,
+lineagePath <- function(tree,
                      similarity = NULL,
                      simMatrix = NULL,
                      forbidTrivial = TRUE) {
@@ -116,78 +162,87 @@ sitePath <- function(tree,
     }
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
-    class(paths) <- "sitePath"
+    class(paths) <- "lineagePath"
     return(paths)
 }
 
 #' @export
-print.sitePath <- function(x, ...) {
+print.lineagePath <- function(x, ...) {
     cat(length(x), "paths\n")
 }
 
-# customGroupTips <- function(tree,
-#                             align,
-#                             pvalue = 0.05,
-#                             forbidTrivial = TRUE,
-#                             tipnames = TRUE) {
-#     qualifyFunc <- function(x, y) {
-#         return(ks.test(x, y)$p.value > pvalue)
-#     }
-#     grouping <- customTrimTree(
-#         nodepath(tree),
-#         checkMatched(tree, align),
-#         cophenetic.phylo(tree),
-#         tree$edge,
-#         qualifyFunc,
-#         TRUE
-#     )
-#     if (length(grouping) == 1 && forbidTrivial) {
-#         warning(paste0(
-#             pvalue,
-#             " is too low of a cutoff resulting in trivial trimming"
-#         ))
-#     }
-#     if (tipnames) {
-#         return(lapply(grouping, function(g) {
-#             tree$tip.label[g]
-#         }))
-#     } else {
-#         return(grouping)
-#     }
-# }
-#
-# customSitePath <- function(tree,
-#                            align,
-#                            pvalue = 0.05,
-#                            forbidTrivial = TRUE) {
-#     qualifyFunc <- function(x, y) {
-#         return(ks.test(x, y)$p.value > pvalue)
-#     }
-#     # nodepath after trimming
-#     trimmedPaths <- unique(
-#         customTrimTree(
-#             nodepath(tree),
-#             align <- checkMatched(tree, align),
-#             cophenetic.phylo(tree),
-#             tree$edge,
-#             qualifyFunc,
-#             FALSE
-#         )
-#     )
-#     # get the bifurcated pre-terminal nodes and their path to the root
-#     # those paths are the so-called sitePaths (isolated)
-#     paths <- lapply(trimmedPaths, function(p)
-#         p[1:(length(p) - 1)])
-#     paths <-
-#         unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
-#     if (length(paths) == 0 && forbidTrivial) {
-#         warning(paste0(
-#             pvalue,
-#             " is too low of a cutoff resulting in trivial trimming"
-#         ))
-#     }
-#     attr(paths, "tree") <- tree
-#     attr(paths, "align") <- align
-#     attr(paths, "class") <- "sitePath"
-#     return(paths)
-# }
+#' @rdname pre-assessment
+#' @description
+#' \code{sneakPeek} is intended to plot similarity as a threshold
+#' against number of output lineagePath. This plot is intended to give user
+#' a feel about how many sitePaths they should expect from
+#' the similarity threshold. The number of lineagePath should not
+#' be too many or too few. The result excludes where the number of lineagePath
+#' is greater than number of tips divided by 20 or self-defined maxPath.
+#' The zero lineagePath result will also be excluded
+#' @param step
+#' the similarity window for calculating and ploting. To better
+#' see the impact of threshold on path number. This is preferably
+#' specified. The default is one 50th of the difference between 1
+#' and minimal pairwise sequence similarity.
+#' @param maxPath
+#' maximum number of path to return show in the plot. The number of path
+#' in the raw tree can be far greater than trimmed tree. To better
+#' see the impact of threshold on path number. This is preferably
+#' specified. The default is one 20th of tree tip number.
+#' @param minPath
+#' minimum number of path to return show in the plot. To better
+#' see the impact of threshold on path number. This is preferably
+#' specified. The default is 1.
+#' @param makePlot whether make a dot plot when return
+#' @examples
+#' sneakPeek(tree)
+#' @return
+#' \code{sneakPeek} return the similarity threhold against number of lineagePath.
+#' There will be a simple dot plot between threshold and path number if
+#' \code{makePlot} is TRUE.
+#' @importFrom methods is
+#' @importFrom graphics plot
+#' @export
+sneakPeek <- function(tree,
+                      step = NULL,
+                      maxPath = NULL,
+                      minPath = 1,
+                      makePlot = TRUE) {
+    simMatrix <- similarityMatrix(tree)
+    minSim <- min(simMatrix)
+    if (is.null(step)) {
+        step <- round(minSim - 1, 3) / 50
+    }
+    if (is.null(maxPath)) {
+        maxPath <- length(tree$tip.label) / 20
+    } else if (maxPath <= 0) {
+        stop("Invalid \"maxPath\": less than or equal to zero")
+    }
+    if (minPath >= maxPath) {
+        stop("Invalid \"minPath\": greater than \"maxPath\"")
+    } else if (minPath < 0) {
+        stop("Invalid \"minPath\": less than zero")
+    }
+    similarity <- numeric(0)
+    pathNum <- integer(0)
+    for (s in seq(1, minSim, step)) {
+        paths <- lineagePath(
+            tree,
+            similarity = s,
+            simMatrix = simMatrix,
+            forbidTrivial = FALSE
+        )
+        if (maxPath < length(paths)) {
+            next
+        } else if (length(paths) <= minPath) {
+            break
+        }
+        similarity <- c(similarity, s)
+        pathNum <- c(pathNum, length(paths))
+    }
+    if (makePlot) {
+        plot(similarity, pathNum)
+    }
+    return(data.frame(similarity, pathNum))
+}

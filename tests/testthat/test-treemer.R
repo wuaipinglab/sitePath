@@ -3,7 +3,7 @@ context("test-treemer")
 test_that("Topology-dependent trimming", {
     data("zikv_align")
     data("zikv_tree")
-    tree <- addMSA(zikv_tree, seqs = zikv_align)
+    tree <- addMSA(zikv_tree, alignment = zikv_align)
     simMatrix <- similarityMatrix(tree)
     expect_identical(colnames(simMatrix), tree$tip.label)
     expect_identical(row.names(simMatrix), tree$tip.label)
@@ -34,7 +34,7 @@ test_that("Topology-dependent trimming", {
                          sort(sitePath:::ChildrenTips(tree, an)))
         }
         paths <-
-            sitePath(
+            lineagePath(
                 tree,
                 similarity = s,
                 simMatrix = simMatrix,
