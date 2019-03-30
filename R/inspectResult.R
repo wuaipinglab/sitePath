@@ -35,6 +35,8 @@ extractTips <- function(x, site, select, ...)
     UseMethod("extractTips")
 
 actualExtract <- function(x, site, select) {
+    paths <- attr(x, "paths")
+    tree <- attr(paths, "tree")
     tryCatch(
         expr = sp <- x[[as.character(site)]],
         error = function(e) {
@@ -66,7 +68,7 @@ actualExtract <- function(x, site, select) {
     for (i in sp) {
         aa <- attr(i, "AA")
         attributes(aa) <- NULL
-        attributes(i) <- NULL
+        i <- tree$tip.label[i]
         attr(i, "AA") <- aa
         res <- c(res, list(i))
     }

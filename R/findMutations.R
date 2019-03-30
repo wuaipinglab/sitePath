@@ -219,8 +219,8 @@ fixationSites.lineagePath <- function(paths,
                 # Use the site to retrieve possible existing "sitePath"
                 existPath <- mutations[[site]]
                 # Get the tips names for two groups
-                from <- tree$tip.label[beforeTips]
-                to <- tree$tip.label[afterTips]
+                # from <- tree$tip.label[beforeTips]
+                # to <- tree$tip.label[afterTips]
                 # Use "targetIndex" to deciden where to insert
                 # the tip/AA names in the "sitePath" entry.
                 if (is.null(existPath)) {
@@ -251,17 +251,17 @@ fixationSites.lineagePath <- function(paths,
                         # A new entry will be added to the "sitePath"
                         # or an old entry will be replaced if it's actually
                         # a subset of the new one.
-                        if (all(!to %in% existMut[[a]])) {
+                        if (all(!afterTips %in% existMut[[a]])) {
                             targetIndex <- length(existPath) + 1
-                        } else if (length(to) <= length(existMut[[a]])) {
+                        } else if (length(afterTips) <= length(existMut[[a]])) {
                             next
                         }
                     }
                 }
                 # Construct the fixation path
-                attr(from, "AA") <- b
-                attr(to, "AA") <- a
-                mutPath <- list(from, to)
+                attr(beforeTips, "AA") <- b
+                attr(afterTips, "AA") <- a
+                mutPath <- list(beforeTips, afterTips)
                 names(mutPath) <- c(b, a)
                 # Store the entry by the appropiate index of "sitePath"
                 mutations[[site]][[targetIndex]] <- mutPath

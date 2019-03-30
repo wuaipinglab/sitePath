@@ -27,7 +27,8 @@ test_that("Constrains in fixationSites work", {
                 site <- attr(sp, "site")
                 for (m in sp) {
                     aa <- lapply(m, function(g) {
-                        sum <- zikv_align$seq[which(zikv_align$nam %in% g)]
+                        sum <- 
+                            zikv_align$seq[which(zikv_align$nam %in% tree$tip.label[g])]
                         sum <-
                             table(sapply(sum, substring, site, site))
                     })

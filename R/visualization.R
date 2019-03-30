@@ -231,12 +231,12 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
         color <- tip2colorEdge(color,
                                "#3F51B5",
                                tree$edge,
-                               match(sp[[2]], tree$tip.label),
+                               sp[[2]],
                                rootNode)
         color <- tip2colorEdge(color,
                                "#ff0000",
                                tree$edge,
-                               match(sp[[1]], tree$tip.label),
+                               sp[[1]],
                                rootNode)
     }
     plot.phylo(
