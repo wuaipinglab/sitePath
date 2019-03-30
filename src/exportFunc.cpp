@@ -1,7 +1,5 @@
 #include "treemer.h"
 
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
@@ -96,7 +94,7 @@ Rcpp::CharacterVector summarizeAA(
     int nseq = seqs.size();
     std::map<char, int> aaSummary;
     for (int i = 0; i < nseq; ++i) { aaSummary[seqs[i][siteIndex]]++; }
-    auto it = aaSummary.begin();
+    std::map<char, int>::iterator it = aaSummary.begin();
     int currentMax = it->second;
     char maxArg = it->first;
     for (++it; it != aaSummary.end(); ++it) {
@@ -144,7 +142,8 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
 ) {
     const segIndex terminal = nodeSummaries.size();
     segment all;
-    // Transform R list to a vector of AA and mapped frequency.
+    // Transform R list to a vector of AA and mapped frequency as
+    // Segmentor::aaSummaries.
     // Get all the possible segment points
     for (segIndex i = 0; i < terminal; ++i) {
         all.push_back(i);
@@ -152,7 +151,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         Rcpp::CharacterVector aa = summary.names();
         aaSummary node;
         for (unsigned int j = 0; j < aa.size(); ++j) {
-            node.emplace(aa[j], summary[j]);
+            node[Rcpp::as<std::string>(aa[j])] = summary[j];
         }
         Segmentor::aaSummaries.push_back(node);
     }
@@ -182,11 +181,11 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         // Re-calculate the best result from the search list and assign
         // to "tempMin". Temporarily assume the first "Segmentor" in the
         // list is the best result.
-        auto it = segList.begin();
+        std::vector<Segmentor *>::iterator it = segList.begin();
         // This "tempMin" is always one of the "Segmentors" in the search
         // list. And once it's found, it's going to be the new "parent"
         // and removed from the search list.
-        auto rm = it;
+        std::vector<Segmentor *>::iterator rm = it;
         Segmentor *tempMin = *it;
         for (++it; it != segList.end(); ++it) {
             if ((*it)->m_entropy < tempMin->m_entropy) {
@@ -200,8 +199,11 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         if (tempMin->m_entropy > minEntropy) {
             ++depth;
             if (tempMin->m_used.size() == terminal || depth == maxDepth) {
-                for (const auto i: segList) {
-                    delete i;
+                for (
+                        std::vector<Segmentor *>::iterator it = segList.begin();
+                        it != segList.end(); ++it
+                    ) {
+                    delete *it;
                 }
                 break;
             }
@@ -226,10 +228,13 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     std::string prevFixedAA = "";
     aaSummary combNode;
     std::vector<int> combTips;
-    for (const segIndex &end: final) {
+    for (
+            segment::iterator final_itr = final.begin();
+            final_itr != final.end(); ++final_itr
+    ) {
         aaSummary node;
         std::vector<int> tips;
-        for (unsigned int i = start; i < end; ++i) {
+        for (unsigned int i = start; i < *final_itr; ++i) {
             Rcpp::IntegerVector nodeTips = nodeSummaries[i];
             tips.insert(tips.end(), nodeTips.begin(), nodeTips.end());
             Rcpp::IntegerVector summary = nodeTips.attr("aaSummary");
@@ -239,20 +244,20 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
             }
         }
         // The most dominant AA in the current segment
-        auto it = node.begin();
-        std::string fixedAA = it->first;
-        int maxFreq = it->second;
-        for (++it; it != node.end(); ++it) {
-            if (it->second > maxFreq) {
-                fixedAA = it->first;
-                maxFreq = it->second;
+        aaSummary::iterator node_itr = node.begin();
+        std::string fixedAA = node_itr->first;
+        int maxFreq = node_itr->second;
+        for (++node_itr; node_itr != node.end(); ++node_itr) {
+            if (node_itr->second > maxFreq) {
+                fixedAA = node_itr->first;
+                maxFreq = node_itr->second;
             }
         }
         // Combine with the previous segment if the most dominant
         // AA is the same as the previous. 
         if (fixedAA == prevFixedAA) {
-            for (const auto &i: node) {
-                combNode[i.first] += i.second;
+            for (node_itr = node.begin(); node_itr != node.end(); ++node_itr) {
+                combNode[node_itr->first] += node_itr->second;
             }
             combTips.insert(combTips.end(), tips.begin(), tips.end());
         } else {
@@ -263,7 +268,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
             combTips = tips;
             combNode = node;
         }
-        start = end;
+        start = *final_itr;
         prevFixedAA = fixedAA;
     }
     Rcpp::IntegerVector combined = Rcpp::wrap(combTips);

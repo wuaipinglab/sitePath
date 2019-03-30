@@ -129,15 +129,22 @@ const segment Segmentor::getOpen(
 const float Segmentor::totalEntropy() const {
     float res = 0;
     segIndex start = 0;
-    for (const segIndex &end: m_used) {
+    for (
+            segment::const_iterator m_used_itr = m_used.begin();
+            m_used_itr != m_used.end(); ++m_used_itr
+    ) {
         aaSummary values;
-        for (unsigned int i = start; i < end; ++i) {
-            for (const auto &j: aaSummaries.at(i)) {
-                values[j.first] += j.second;
+        for (unsigned int i = start; i < *m_used_itr; ++i) {
+            const aaSummary toBeCombined = aaSummaries.at(i);
+            for (
+                    aaSummary::const_iterator it = toBeCombined.begin();
+                    it != toBeCombined.end(); ++it
+            ) {
+                values[it->first] += it->second;
             }
         }
         res += shannonEntropy(values);
-        start = end;
+        start = *m_used_itr;
     }
     return res;
 }

@@ -7,7 +7,7 @@
 namespace Treemer {
 
 typedef std::vector<TipSeqLinker *> tips;
-typedef std::map<int, std::vector<TipSeqLinker *>> clusters;
+typedef std::map< int, std::vector<TipSeqLinker *> > clusters;
 
 class Base {
 public:
@@ -16,7 +16,7 @@ public:
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
     );
     virtual ~Base();
-    std::map<int, std::vector<int>> getTips() const;
+    std::map< int, std::vector<int> > getTips() const;
     std::vector<Rcpp::IntegerVector> getPaths() const;
 protected:
     void pruneTree();
