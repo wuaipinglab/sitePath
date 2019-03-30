@@ -147,10 +147,10 @@ fixationSites.lineagePath <- function(paths,
         minDesc <- length(tree$tip.label) / 10
     } else if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
-    } else if (any(minEffectiveSize) <= 0) {
+    } else if (any(minEffectiveSize <= 0)) {
         stop("\"minEffectiveSize\" can only be positive number")
     } else {
-        minAnc <- minEffectiveSize
+        minAnc <- minEffectiveSize[1]
         minDesc <-
             if (length(minEffectiveSize) == 1) {
                 minAnc

@@ -1,5 +1,7 @@
 #include "treemer.h"
 
+// [[Rcpp::plugins(cpp11)]]
+
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
