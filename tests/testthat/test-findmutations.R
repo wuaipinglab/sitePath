@@ -20,8 +20,8 @@ context("test-fixationSites")
 
 test_that("Constrains in fixationSites work", {
     paths <- lineagePath(tree)
-    for (ta in seq(0, 0.49, 0.7)) {
-        for (td in seq(0, 0.49, 0.7)) {
+    for (ta in seq(0, 0.49, 0.2)) {
+        for (td in seq(0, 0.49, 0.2)) {
             mutations <- fixationSites(paths, tolerance = c(ta, td))
             for (sp in mutations) {
                 site <- attr(sp, "site")

@@ -21,21 +21,25 @@ Treemer::Base::Base(
 }
 
 Treemer::Base::~Base() {
-    for (auto *tip: m_tips) { delete tip; }
+    for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+        delete *it;
+    }
     m_tips.clear();
 }
 
 std::map<int, std::vector<int>> Treemer::Base::getTips() const {
     std::map<int, std::vector<int>> res;
-    for (const auto &tip: m_tips) {
-        res[tip->currentClade()].push_back(tip->getTip());
+    for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+        res[(*it)->currentClade()].push_back((*it)->getTip());
     }
     return res;
 }
 
 std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
     std::vector<Rcpp::IntegerVector> res;
-    for (const auto &tip: m_tips) { res.push_back(tip->getPath()); }
+    for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+        res.push_back((*it)->getPath());
+    }
     return res;
 }
 
@@ -45,7 +49,9 @@ void Treemer::Base::pruneTree() {
         m_clusters.clear();
         // look down one more node (fake 'proceed') 
         // group each tip after new positioning
-        for (auto &tip: m_tips) { m_clusters[tip->nextClade()].push_back(tip); }
+        for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+            m_clusters[(*it)->nextClade()].push_back(*it);
+        }
         // if no more group 'kissed' each other by a common ancestral node 
         // after fake 'proceed', then pruning is done
         if (m_clusters.size() == oldClusters.size()) {
@@ -55,22 +61,34 @@ void Treemer::Base::pruneTree() {
         // only 'kissed' group can do real 'proceed'
         // if a grouping doesn't exist in 'oldClusters' 
         // then all tips in that group can 'proceed'
-        for (auto it = m_clusters.begin(); it != m_clusters.end(); ++it) {
-            // assume a group is kissed with another (give it benefit of the doubt)
+        for (
+                clusters::iterator it = m_clusters.begin();
+                it != m_clusters.end(); ++it
+        ) {
+            // assume a group is kissed with another 
+            // (give it benefit of the doubt)
             bool kissed = true;
-            for (auto it2 = oldClusters.begin(); it2 != oldClusters.end(); ++it2) {
+            for (
+                    clusters::iterator it2 = oldClusters.begin();
+                    it2 != oldClusters.end(); ++it2
+            ) {
                 // a group is 'non-kissed' after fake 'proceed' 
                 // if it can be found in 'oldClusters'
                 if (it->second == it2->second) {
                     kissed = false;
-                    // a 'non-kissed' group won't appear twice in 'clusters' so deleted
+                    // a 'non-kissed' group won't appear twice in 
+                    // 'clusters' so deleted
                     oldClusters.erase(it2);
                     break;
                 }
             }
-            // clusters_it group needs to pass some requirement to be qualified 'kissed'
+            // clusters_it group needs to pass some requirement to 
+            // be qualified 'kissed'
             if (kissed && qualified(it)) {
-                for (auto tip_ptr: it->second) { tip_ptr->proceed(); }
+                for (
+                        tips::iterator tips_itr = it->second.begin();
+                        tips_itr != it->second.end(); ++tips_itr
+                ) { (*tips_itr)->proceed(); }
             }
         }
     }
@@ -85,7 +103,7 @@ Treemer::BySite::BySite(
     m_site(site - 1) { pruneTree(); }
 
 bool Treemer::BySite::qualified(const clusters::iterator &clusters_it) const {
-    auto it  = clusters_it->second.begin();
+    tips::const_iterator it  = clusters_it->second.begin();
     char ref_value = (*it)->getSeq()[m_site];
     for (++it; it != clusters_it->second.end(); ++it) {
         if ((*it)->getSeq()[m_site] != ref_value) { return false; }
@@ -111,15 +129,24 @@ Treemer::BySimilarity::BySimilarity(
     if (m_simCut != 1) { pruneTree(); }
 }
 
-bool Treemer::BySimilarity::qualified(const clusters::iterator &clusters_it) const {
-    for (auto it = clusters_it->second.begin(); it != clusters_it->second.end() - 1; ++it) {
-        for (auto it2 = it + 1; it2 != clusters_it->second.end(); ++it2) {
+bool Treemer::BySimilarity::qualified(
+        const clusters::iterator &clusters_it
+) const {
+    for (
+            tips::const_iterator it = clusters_it->second.begin();
+            it != clusters_it->second.end() - 1; ++it
+    ) {
+        for (
+                tips::const_iterator it2 = it + 1;
+                it2 != clusters_it->second.end(); ++it2
+        ) {
             std::pair<int, int> pairing = std::make_pair(
                 (*it)->getTip(), 
                 (*it2)->getTip()
             );
             float sim = 0;
-            auto pos = m_compared->find(pairing);
+            std::map<std::pair<int, int>, float>::iterator
+                pos = m_compared->find(pairing);
             if (pos != m_compared->end()) {
                 sim = pos->second;
             } else {
