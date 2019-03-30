@@ -27,8 +27,8 @@ Treemer::Base::~Base() {
     m_tips.clear();
 }
 
-std::map<int, std::vector<int>> Treemer::Base::getTips() const {
-    std::map<int, std::vector<int>> res;
+std::map< int, std::vector<int> > Treemer::Base::getTips() const {
+    std::map< int, std::vector<int> > res;
     for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
         res[(*it)->currentClade()].push_back((*it)->getTip());
     }
@@ -151,7 +151,8 @@ bool Treemer::BySimilarity::qualified(
                 sim = pos->second;
             } else {
                 sim = compare((*it)->getSeq(), (*it2)->getSeq());
-                m_compared->emplace(pairing, sim);
+                (*m_compared)[pairing] = sim;
+                // m_compared->emplace(pairing, sim);
             }
             if (sim < m_simCut) {
                 return false;
