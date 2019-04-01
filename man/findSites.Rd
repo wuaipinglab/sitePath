@@ -85,8 +85,14 @@ data("zikv_align")
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 SNPsites(tree)
 fixationSites(
-    lineagePath(tree, 0.996),
+    lineagePath(tree),
     tolerance = c(1, 1),
-    minEffectiveSize = c(10, 10)
+    minEffectiveSize = c(50, 50)
 )
+\dontrun{
+data(h3n2_tree)
+data(h3n2_align)
+tree <- addMSA(h3n2_tree, alignment = h3n2_align)
+multiFixationSites(lineagePath(tree))
+}
 }

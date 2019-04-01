@@ -5,7 +5,7 @@ data(h3n2_align)
 
 h3n2_tree <- ape::drop.tip(h3n2_tree, 1:1200)
 h3n2_align$seq <- lapply(h3n2_align$seq, FUN = function(s) {
-    substring(s, 20, 550)
+    substring(s, 20, 200)
 })
 
 test_that("Constrains in multiFixationSites work", {

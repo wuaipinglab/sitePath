@@ -109,9 +109,9 @@ print.sitePath <- function(x, ...) {
 #' @param ... further arguments passed to or from other methods.
 #' @examples
 #' fixationSites(
-#'     lineagePath(tree, 0.996),
+#'     lineagePath(tree),
 #'     tolerance = c(1, 1),
-#'     minEffectiveSize = c(10, 10)
+#'     minEffectiveSize = c(50, 50)
 #' )
 #' @return
 #' \code{fixationSites} returns a list of mutations
@@ -318,6 +318,13 @@ getMutPathAA <- function(s) {
 #' After finding the \code{\link{lineagePath}} of a phylogenetic tree,
 #' \code{multiFixationSites} uses the result to find those sites that show
 #' multiple fixations on some, if not all, of the lineages.
+#' @examples
+#' \dontrun{
+#' data(h3n2_tree)
+#' data(h3n2_align)
+#' tree <- addMSA(h3n2_tree, alignment = h3n2_align)
+#' multiFixationSites(lineagePath(tree))
+#' }
 #' @return
 #' \code{multiFixationSites} returns sites with multiple fixations.
 #' @export

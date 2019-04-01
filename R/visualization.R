@@ -207,8 +207,10 @@ plotSingleSite.lineagePath <- function(x,
 #' For \code{fixationSites}, it will color the ancestral tips in red,
 #' descendant tips in blue and excluded tips in grey.
 #' @examples
+#' \dontrun{
 #' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
+#' }
 #' @export
 plotSingleSite.fixationSites <- function(x, site, ...) {
     site <- checkSite(site)
