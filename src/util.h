@@ -41,9 +41,9 @@ class Segmentor {
 public:
     static std::vector<aaSummary> aaSummaries;
 public:
-    const segment m_used;
-    const segment m_open;
-    const float m_entropy;
+    segment m_used;
+    segment m_open;
+    float m_entropy;
 public:
     Segmentor(
         const segment all,

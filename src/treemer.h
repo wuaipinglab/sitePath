@@ -7,7 +7,7 @@
 namespace Treemer {
 
 typedef std::vector<TipSeqLinker *> tips;
-typedef std::map< int, std::vector<TipSeqLinker *> > clusters;
+typedef std::map<int, tips> clusters;
 
 class Base {
 public:

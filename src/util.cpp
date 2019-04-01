@@ -78,12 +78,18 @@ std::string TipSeqLinker::getSeq() const {
 
 float shannonEntropy(const aaSummary &values) {
     int total = 0;
-    for (const auto &i: values) {
-        total += i.second;
+    for (
+            aaSummary::const_iterator it = values.begin();
+            it != values.end(); ++it
+    ) {
+        total += it->second;
     }
     float res = 0;
-    for (const auto &i: values) {
-        float p = i.second / static_cast<float>(total);
+    for (
+            aaSummary::const_iterator it = values.begin();
+            it != values.end(); ++it
+    ) {
+        float p = it->second / static_cast<float>(total);
         res -= p * std::log(p);
     }
     return res;
@@ -95,17 +101,20 @@ Segmentor::Segmentor(
     const segment all,
     const segIndex terminal
 ):
-    m_used({ terminal }),
-    m_open(all),
-    m_entropy(this->totalEntropy()) {}
+    m_open(all)
+{
+    m_used = {terminal};
+    m_entropy = this->totalEntropy();
+}
 
 Segmentor::Segmentor(
     const Segmentor *parent,
     const unsigned int i
-):
-    m_used(this->getUsed(parent, i)),
-    m_open(this->getOpen(parent, i)),
-    m_entropy(this->totalEntropy()) {}
+) {
+    m_used = this->getUsed(parent, i);
+    m_open = this->getOpen(parent, i);
+    m_entropy = this->totalEntropy();
+}
 
 const segment Segmentor::getUsed(
         const Segmentor *parent,
