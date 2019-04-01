@@ -17,12 +17,10 @@
 #' for the reference sequence.
 #' @param minSNP Minimum number of amino acid variation to be a SNP
 #' @examples
-#' \dontrun{
-#' data("zikv_tree")
-#' data("zikv_align")
-#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' data("zikv_tree_reduced")
+#' data("zikv_align_reduced")
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
-#' }
 #' @return \code{SNPsite} returns a list of qualified SNP site
 #' @export
 SNPsites <- function(tree,
@@ -110,13 +108,11 @@ print.sitePath <- function(x, ...) {
 #' the new terminal search point.
 #' @param ... further arguments passed to or from other methods.
 #' @examples
-#' \dontrun{
 #' fixationSites(
 #'     lineagePath(tree),
 #'     tolerance = c(1, 1),
 #'     minEffectiveSize = c(50, 50)
 #' )
-#' }
 #' @return
 #' \code{fixationSites} returns a list of mutations
 #' with names of the tips involved. The name of each list element
@@ -323,12 +319,10 @@ getMutPathAA <- function(s) {
 #' \code{multiFixationSites} uses the result to find those sites that show
 #' multiple fixations on some, if not all, of the lineages.
 #' @examples
-#' \dontrun{
-#' data(h3n2_tree)
-#' data(h3n2_align)
-#' tree <- addMSA(h3n2_tree, alignment = h3n2_align)
+#' data(h3n2_tree_reduced)
+#' data(h3n2_align_reduced)
+#' tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
 #' multiFixationSites(lineagePath(tree))
-#' }
 #' @return
 #' \code{multiFixationSites} returns sites with multiple fixations.
 #' @export

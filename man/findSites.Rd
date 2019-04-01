@@ -80,23 +80,17 @@ After finding the \code{\link{lineagePath}} of a phylogenetic tree,
 multiple fixations on some, if not all, of the lineages.
 }
 \examples{
-\dontrun{
-data("zikv_tree")
-data("zikv_align")
-tree <- addMSA(zikv_tree, alignment = zikv_align)
+data("zikv_tree_reduced")
+data("zikv_align_reduced")
+tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
-}
-\dontrun{
 fixationSites(
     lineagePath(tree),
     tolerance = c(1, 1),
     minEffectiveSize = c(50, 50)
 )
-}
-\dontrun{
-data(h3n2_tree)
-data(h3n2_align)
-tree <- addMSA(h3n2_tree, alignment = h3n2_align)
+data(h3n2_tree_reduced)
+data(h3n2_align_reduced)
+tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
 multiFixationSites(lineagePath(tree))
-}
 }

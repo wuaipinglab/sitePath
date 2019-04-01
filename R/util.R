@@ -69,8 +69,9 @@ NULL
 #' @name zikv_tree
 #' @title Phylogenetic tree of Zika virus polyprotein
 #' @description
-#' Tree was built from \code{zikv_align} using RAxML with default settings.
-#' The tip “ANK57896” was used as outgroup to root the tree.
+#' Tree was built from \code{\link{zikv_align}} using RAxML
+#' with default settings.The tip “ANK57896” was used as
+#' outgroup to root the tree.
 #' @format a \code{phylo} object
 #' @usage data(zikv_tree)
 #' @docType data
@@ -85,15 +86,51 @@ NULL
 #' @docType data
 "h3n2_align"
 
-
 #' @name h3n2_tree
 #' @title Phylogenetic tree of H3N2's HA protein
 #' @description
-#' Tree was built from \code{h3n2_align} using RAxML with default settings.
+#' Tree was built from \code{\link{h3n2_align}} using RAxML
+#' with default settings.
 #' @format a \code{phylo} object
 #' @usage data(h3n2_tree)
 #' @docType data
 "h3n2_tree"
+
+#' @name zikv_align_reduced
+#' @title Truncated data for runnable example
+#' @description
+#' This is a truncated version of \code{\link{zikv_align}}
+#' @format a \code{alignment} object
+#' @usage data(zikv_align_reduced)
+#' @docType data
+"zikv_align_reduced"
+
+#' @name zikv_tree_reduced
+#' @title Truncated data for runnable example
+#' @description
+#' This is a truncated version of \code{\link{zikv_tree}}
+#' @format a \code{phylo} object
+#' @usage data(zikv_tree_reduced)
+#' @docType data
+"zikv_tree_reduced"
+
+#' @name h3n2_align_reduced
+#' @title Truncated data for runnable example
+#' @description
+#' This is a truncated version of \code{\link{h3n2_align}}
+#' @format a \code{alignment} object
+#' @usage data(h3n2_align_reduced)
+#' @docType data
+"h3n2_align_reduced"
+
+#' @name h3n2_tree_reduced
+#' @title Truncated data for runnable example
+#' @description
+#' This is a truncated version of \code{\link{h3n2_tree}}
+#' @format a \code{phylo} object
+#' @usage data(h3n2_tree_reduced)
+#' @docType data
+"h3n2_tree_reduced"
 
 checkMatched <- function(tree, align) {
     if (!is(align, "alignment")) {

@@ -1,6 +1,6 @@
-data(zikv_align)
-data(zikv_tree)
-tree <- addMSA(zikv_tree, alignment = zikv_align)
+data(zikv_align_reduced)
+data(zikv_tree_reduced)
+tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 
 context("test-SNPsites")
 
@@ -10,7 +10,7 @@ test_that("Restrication applied in SNPsites", {
     maxT <- ceiling(nTips / 2)
     for (n in seq(minT, maxT, 20)) {
         for (snp in SNPsites(tree, minSNP = n)) {
-            aa <- table(sapply(zikv_align$seq, substring, snp, snp))
+            aa <- table(sapply(zikv_align_reduced$seq, substring, snp, snp))
             expect_gte(sum(aa > n), 2)
         }
     }
@@ -28,7 +28,9 @@ test_that("Constrains in fixationSites work", {
                 for (m in sp) {
                     aa <- lapply(m, function(g) {
                         sum <- 
-                            zikv_align$seq[which(zikv_align$nam %in% tree$tip.label[g])]
+                            zikv_align_reduced$seq[which(
+                                zikv_align_reduced$nam %in% tree$tip.label[g]
+                            )]
                         sum <-
                             table(sapply(sum, substring, site, site))
                     })

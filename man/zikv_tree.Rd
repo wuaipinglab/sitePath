@@ -9,7 +9,8 @@
 data(zikv_tree)
 }
 \description{
-Tree was built from \code{zikv_align} using RAxML with default settings.
-The tip “ANK57896” was used as outgroup to root the tree.
+Tree was built from \code{\link{zikv_align}} using RAxML
+with default settings.The tip “ANK57896” was used as
+outgroup to root the tree.
 }
 \keyword{datasets}

@@ -1,24 +1,22 @@
 context("test-multiplefixations")
 
-data(h3n2_tree)
-data(h3n2_align)
-
-h3n2_tree <- ape::drop.tip(h3n2_tree, 1:1200)
-h3n2_align$seq <- lapply(h3n2_align$seq, FUN = function(s) {
-    substring(s, 20, 200)
-})
+data(h3n2_tree_reduced)
+data(h3n2_align_reduced)
 
 test_that("Constrains in multiFixationSites work", {
-    tree <- addMSA(h3n2_tree, alignment = h3n2_align)
+    tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
     paths <- lineagePath(tree)
     mutations <- multiFixationSites(paths)
-    minEffectiveSize <- length(tree$tip.label) / (length(paths) * 10)
+    minEffectiveSize <-
+        length(tree$tip.label) / (length(paths) * 10)
     for (sp in mutations) {
         site <- attr(sp, "site")
         for (m in sp) {
             aa <- lapply(m, function(g) {
-                sum <- 
-                    h3n2_align$seq[which(h3n2_align$nam %in% tree$tip.label[g])]
+                sum <-
+                    h3n2_align_reduced$seq[which(
+                        h3n2_align_reduced$nam %in% tree$tip.label[g]
+                    )]
                 sum <-
                     table(sapply(sum, substring, site, site))
             })

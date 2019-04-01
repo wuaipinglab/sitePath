@@ -9,6 +9,7 @@
 data(h3n2_tree)
 }
 \description{
-Tree was built from \code{h3n2_align} using RAxML with default settings.
+Tree was built from \code{\link{h3n2_align}} using RAxML
+with default settings.
 }
 \keyword{datasets}
