@@ -159,8 +159,9 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     all.erase(all.begin());
     // The ultimate "parent" of all "Segmentor". Assume the "entropy"
     // of "parent" is minimum
-    Segmentor *parent = new Segmentor(all, terminal);
-    segment final = parent->m_used;
+    segment final;
+    final.push_back(terminal);
+    Segmentor *parent = new Segmentor(all, final);
     float minEntropy = parent->m_entropy;
     // Initialize the search list and search depth
     std::vector<Segmentor *> segList;

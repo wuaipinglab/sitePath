@@ -3,7 +3,7 @@ context("test-multiplefixations")
 data(h3n2_tree)
 data(h3n2_align)
 
-h3n2_tree <- ape::drop.tip(h3n2_tree, 1:1000)
+h3n2_tree <- ape::drop.tip(h3n2_tree, 1:1200)
 h3n2_align$seq <- lapply(h3n2_align$seq, FUN = function(s) {
     substring(s, 20, 550)
 })

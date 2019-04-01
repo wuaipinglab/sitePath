@@ -99,11 +99,11 @@ std::vector<aaSummary> Segmentor::aaSummaries;
 
 Segmentor::Segmentor(
     const segment all,
-    const segIndex terminal
+    const segment terminal
 ):
+    m_used(terminal),
     m_open(all)
 {
-    m_used = {terminal};
     m_entropy = this->totalEntropy();
 }
 

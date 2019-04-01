@@ -47,7 +47,7 @@ public:
 public:
     Segmentor(
         const segment all,
-        const segIndex terminal
+        const segment terminal
     );
     Segmentor(
         const Segmentor *parent,
