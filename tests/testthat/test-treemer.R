@@ -1,14 +1,14 @@
 context("test-treemer")
 
 test_that("Topology-dependent trimming", {
-    data("zikv_align")
-    data("zikv_tree")
+    data(zikv_align)
+    data(zikv_tree)
     tree <- addMSA(zikv_tree, alignment = zikv_align)
     simMatrix <- similarityMatrix(tree)
     expect_identical(colnames(simMatrix), tree$tip.label)
     expect_identical(row.names(simMatrix), tree$tip.label)
     minSim <- min(simMatrix)
-    step <- round(minSim - 1, 3) / 50
+    step <- round(minSim - 1, 3) / 10
     for (s in seq(1, minSim, step)) {
         grouping <-
             groupTips(

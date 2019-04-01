@@ -8,7 +8,7 @@ test_that("Restrication applied in SNPsites", {
     nTips <- length(tree$tip.label)
     minT <- floor(nTips / 10)
     maxT <- ceiling(nTips / 2)
-    for (n in seq(minT, maxT, 10)) {
+    for (n in seq(minT, maxT, 20)) {
         for (snp in SNPsites(tree, minSNP = n)) {
             aa <- table(sapply(zikv_align$seq, substring, snp, snp))
             expect_gte(sum(aa > n), 2)
@@ -20,8 +20,8 @@ context("test-fixationSites")
 
 test_that("Constrains in fixationSites work", {
     paths <- lineagePath(tree)
-    for (ta in seq(0, 0.49, 0.2)) {
-        for (td in seq(0, 0.49, 0.2)) {
+    for (ta in seq(0, 0.49, 0.3)) {
+        for (td in seq(0, 0.49, 0.3)) {
             mutations <- fixationSites(paths, tolerance = c(ta, td))
             for (sp in mutations) {
                 site <- attr(sp, "site")
