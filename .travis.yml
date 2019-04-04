@@ -1,5 +1,6 @@
 language: r
-r: - bioc-devel
+r:
+  - bioc-devel
 
 cache: packages
 bioc_required: true
