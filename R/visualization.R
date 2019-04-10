@@ -228,18 +228,22 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
     plotName <- character(0)
     nEdges <- length(tree$edge.length)
     color <- rep("#d3d3d3", nEdges)
+    AAnames <- character(0)
     for (sp in sitePaths) {
-        plotName <- c(plotName, paste0(names(sp)[1], site, names(sp)[2]))
+        aa <- toupper(names(sp))
+        plotName <- c(plotName, paste0(aa[1], site, aa[2]))
+        aa <- AA_FULL_NAMES[tolower(aa)]
         color <- tip2colorEdge(color,
-                               "#3F51B5",
+                               AA_COLORS[aa[2]],
                                tree$edge,
                                sp[[2]],
                                rootNode)
         color <- tip2colorEdge(color,
-                               "#ff0000",
+                               AA_COLORS[aa[1]],
                                tree$edge,
                                sp[[1]],
                                rootNode)
+        AAnames <- c(AAnames, aa)
     }
     plot.phylo(
         tree,
@@ -250,9 +254,9 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
     )
     legend(
         "topleft",
-        title = "Lineages",
-        legend = c("ancestral", "descendant", "excluded"),
-        fill = c("#ff0000", "#3F51B5", "#d3d3d3"),
+        title = "Amino acid",
+        legend = c(unique(AAnames), "excluded"),
+        fill = c(AA_COLORS[unique(AAnames)], "#d3d3d3"),
         box.lty = 0
     )
 }
@@ -304,7 +308,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
         show.tip.label = FALSE,
         edge.color = color,
         ...
-        
+
     )
     sepChar <- "\n"
     if (sum(nchar(plotName) <= 18)) {
@@ -317,8 +321,8 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     legend(
         "topleft",
         title = "Amino acid",
-        legend = unique(AAnames),
-        fill = AA_COLORS[unique(AAnames)],
+        legend = c(unique(AAnames), "excluded"),
+        fill = c(AA_COLORS[unique(AAnames)], "#d3d3d3"),
         box.lty = 0
     )
 }

@@ -1,17 +1,13 @@
 Package: sitePath
 Type: Package
-Title: Lineage-dependent fixation
-Version: 0.99.24
-Author: 
-    Chengyang Ji
-    Aipint Wu
-Author@R: c(
-    person("Chengyang", "Ji", email = "chengyang.ji12@alumni.xjtlu.edu.cn", role = c("aut", "cre", "cph")),
-    person("Aiping", "Wu", email = "wap@ism.cams.cn", role = c("aut", "ths"))
-  )
+Title: Detection of sites with fixation of amino acid substitutions
+    in protein evolution
+Version: 0.99.25
+Author: Chengyang Ji, Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
-Description: Find sites with evolutionary siginficance in 
-    viral protein sequence.
+Description: The package does hierarchical search for fixation events given
+    multiple sequence alignment and phylogenetic tree. These fixation events
+    can be specific to a phylogenetic lineages or shared by multiple lineages.
 License: MIT + file LICENSE
 Depends:
     R (>= 3.6.0)
@@ -25,9 +21,12 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    BiocStyle
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr
+URL: https://wuaipinglab.github.io/sitePath/
+BugReports: https://github.com/wuaipinglab/sitePath/issues
 biocViews: Alignment, MultipleSequenceAlignment, Software

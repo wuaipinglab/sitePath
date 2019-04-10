@@ -1,10 +1,14 @@
 ---
-title: "Tutorial on using sitePath"
+title: "A basic workflow for sitePath"
 author: "Chengyang Ji"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+package: sitePath
+output: 
+    BiocStyle::html_document:
+        toc_float: true
+abstract: >
+    Detection of sites with fixation of amino acid substitutions in protein evolution.
 vignette: >
-  %\VignetteIndexEntry{Tutorial on using sitePath}
+  %\VignetteIndexEntry{A basic workflow for sitePath}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +20,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Introduction
+# Introduction
 
 The `sitePath` package does hierarchical search for fixation events given multiple sequence alignment and phylogenetic tree. These fixation events can be specific to a phylogenetic lineages or shared by multiple lineages. This is achieved by three major steps:
 
@@ -24,11 +28,11 @@ The `sitePath` package does hierarchical search for fixation events given multip
 2. Resolve phylogenetic lineages
 3. Hierarchical search for lineage-dependent fixation events
 
-## 1. Import tree and sequence alignment
+# Import tree and sequence alignment
 
 There're various R packages for parsing phylogenetic tree and multiple sequence alignment files. For now, `sitepath` accepts `phylo` object and `alignment` object. Functions from `ggtree` and `seqinr` are able to handle most file formats.
 
-### 1.1 Parse phylogenetic tree
+## Parse phylogenetic tree
 
 The S3 phylo class is a common data structure for phylogenetic analysis in R. The CRAN package [ape](https://cran.r-project.org/web/packages/ape/index.html) provides basic parsing function for reading tree files. The Bioconductor package [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) provides more comprehensive parsing utilities.
 
@@ -41,9 +45,9 @@ tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
 
 It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.
 
-### 1.2 Parse and add sequence alignment
+## Parse and add sequence alignment
 
-Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper functin for parsing and adding the sequence alignment
+Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper function for parsing and adding the sequence alignment.
 
 ```{r add_alignment, message=FALSE}
 library(sitePath)
@@ -52,19 +56,19 @@ alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 tree <- addMSA(tree, alignment_file, "fasta")
 ```
 
-## 2. Resolve phylogenetic lineages
+# Resolve phylogenetic lineages
 
-The names in tree and aligment must be matched. The fundamental approach in identifying phylogenetic lineages is trimming tree leaves/tips to expose the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evalute the impact of threshold on result.
+The names in tree and aligment must be matched. We use a **tip-to-root** algorithm to trim tree leaves/tips to expose the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evalute the impact of threshold on result.
 
-### 2.1 The impact of threshold on resolving lineages
+## The impact of threshold on resolving lineages
 
 In the current version, the resolving function only takes sequence similarity as one single threshold. The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can be of great help in choosing the threshold.*
 
-```{r sneakPeek_plot, fig.width=6, fig.height=4}
+```{r sneakPeek_plot}
 preassessment <- sneakPeek(tree)
 ```
 
-### 2.2 You have to choose a threshold by yourself!
+## Choose a threshold by yourself
 
 Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.996 as an example.
 
@@ -75,16 +79,15 @@ paths
 
 You can visualize the result.
 
-```{r plot_paths, fig.show="hold"}
+```{r plot_paths}
 plot(paths, no.margin = TRUE)
 ```
 
-
-## 3. Hierarchical search for fixation events
+# Hierarchical search for fixation events
 
 Now you're ready to find fixation events.
 
-### 3.1 Fixation mutations
+## Fixation mutations
 
 The hierarchical search is done by `fixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation.
 
@@ -100,46 +103,47 @@ sp <- extractTips(fixations, 139)
 sp
 ```
 
-### 3.2 Visualize the result
+## Visualize the result
 
 Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized. Because the `names(fixationSites)` are the mutation names, you can also use one of them as function input
 
-```{r plot_fixations, fig.show="hold", fig.width=3}
-par(mar = c(1,1,1,1))
+```{r plot_fixations}
 plotSingleSite(fixations, 139)
 ```
 
-## Additional functions
+# Additional functions
 
-The above concluded the tutorial. This part is extra and experimental. You
-may stop here if you wish.
+This part is extra and experimental but might be useful when pre-assessing your data. We'll use an example to demonstrate.
 
-### Just using the trimming function
+## Inspect one site
 
-The function `groupTips` applies the same operation as the function`sitePath` does but it outputs clusters of tree tips instead of paths
+The `plotSingleSite` function will color the tree according to amino acids if you use the output of `lineagePath` function.
 
-```{r group_tips}
-grouping <- groupTips(tree, 0.996)
-```
-
-
-### Inspect one site
-
-If you just input the number of the site, the function will plot distribution of amino acid on the tree
-
-```{r plot_sites, fig.show="hold", fig.width=3}
-par(mar = c(1,1,1,1))
+```{r plot_sites}
 plotSingleSite(paths, 139)
 plotSingleSite(paths, 763)
 ```
 
-### SNP sites
+## SNP sites
 
-An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP site and the result could be what you'll expect to be fixation mutation.
+An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP sites and the result could be what you'll expect to be fixation mutation.
 
-```{r find_SNP, fig.show="hold", fig.width=3}
+```{r find_SNP}
 snps <- SNPsites(tree)
-par(mar = c(1,1,1,1))
 plotSingleSite(paths, snps[4])
 plotSingleSite(paths, snps[5])
+```
+
+## Use just the trimming function
+
+The function `groupTips` does the same on the tree as the function `lineagePath` does but it outputs clusters of tree tips instead of paths. This will give you a feel of the behavior of **tip-to-root** trimming algorithm. The `names` of the output is the internal node number in `phylo` object.
+
+```{r group_tips}
+grouping <- groupTips(tree)
+grouping
+```
+
+# Session info {.unnumbered}
+```{r session_info}
+sessionInfo()
 ```
