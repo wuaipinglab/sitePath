@@ -1,22 +1,26 @@
+CHANGES IN VERSION 0.99.26
+-------------------------
+    o Bug fix: 'nodeAAsum' subscript out of bound in 'multiFixationSite'
+
 CHANGES IN VERSION 0.99.25
 -------------------------
-  o Use amino acid color for 'plotSingleSite.fixationSite'
-  o Add 'excluded' legend to 'plotSingleSite'
-  o Update DESCRIPTION and NEWS
-  o Use BiocStyle for vignettes
+    o Use amino acid color for 'plotSingleSite.fixationSite'
+    o Add 'excluded' legend to 'plotSingleSite'
+    o Update DESCRIPTION and NEWS
+    o Use BiocStyle for vignettes
 
 
 CHANGES IN VERSION 0.99.6
 -------------------------
-  o New functionality 'multiFixationSites'
-  o Rewrite pruner functions
-  o Add 'minPath' argument for 'sneakPeek'
-  o 'sitePath' function's name changed to 'lineagePath'
-  o Minimum entropy
-  o The underlying data structure
+    o New functionality 'multiFixationSites'
+    o Rewrite pruner functions
+    o Add 'minPath' argument for 'sneakPeek'
+    o 'sitePath' function's name changed to 'lineagePath'
+    o Minimum entropy
+    o The underlying data structure
 
 
 CHANGES IN VERSION 0.99.5
 -------------------------
-  o Add new functionality 'addMSA'
-  o Avoid 'root.phylo' function
+    o Add new functionality 'addMSA'
+    o Avoid 'root.phylo' function

@@ -39,19 +39,19 @@ float shannonEntropy(const aaSummary &values);
 // so "minEffectiveSize" can come in to play the role.
 class Segmentor {
 public:
-    static std::vector<aaSummary> aaSummaries;
-public:
     segment m_used;
     segment m_open;
     float m_entropy;
 public:
     Segmentor(
         const segment all,
-        const segment terminal
+        const segment terminal,
+        const std::vector<aaSummary> &aaSummaries
     );
     Segmentor(
         const Segmentor *parent,
-        const unsigned int i
+        const unsigned int i,
+        const std::vector<aaSummary> &aaSummaries
     );
 private:
     const segment getUsed(
@@ -62,7 +62,13 @@ private:
             const Segmentor *parent,
             const unsigned int i
     ) const;
-    const float totalEntropy() const;
+    const float totalEntropy(
+            const std::vector<aaSummary> &aaSummaries
+    ) const;
 };
+
+// class Amalgamator {
+// public:
+// };
 
 #endif // SITEPATH_UTIL_H

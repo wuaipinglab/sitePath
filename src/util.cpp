@@ -41,7 +41,7 @@ const int TipSeqLinker::currentClade() const {
 }
 
 const int TipSeqLinker::nextClade() const {
-    // Look up the immediate ancestral node 
+    // Look up the immediate ancestral node
     // aka fake 'proceed'
     if (m_cIndex > 1) {
         return m_path[m_cIndex - 1];
@@ -95,25 +95,25 @@ float shannonEntropy(const aaSummary &values) {
     return res;
 }
 
-std::vector<aaSummary> Segmentor::aaSummaries;
-
 Segmentor::Segmentor(
     const segment all,
-    const segment terminal
+    const segment terminal,
+    const std::vector<aaSummary> &aaSummaries
 ):
     m_used(terminal),
     m_open(all)
 {
-    m_entropy = this->totalEntropy();
+    m_entropy = this->totalEntropy(aaSummaries);
 }
 
 Segmentor::Segmentor(
     const Segmentor *parent,
-    const unsigned int i
+    const unsigned int i,
+    const std::vector<aaSummary> &aaSummaries
 ) {
     m_used = this->getUsed(parent, i);
     m_open = this->getOpen(parent, i);
-    m_entropy = this->totalEntropy();
+    m_entropy = this->totalEntropy(aaSummaries);
 }
 
 const segment Segmentor::getUsed(
@@ -135,7 +135,9 @@ const segment Segmentor::getOpen(
     return res;
 }
 
-const float Segmentor::totalEntropy() const {
+const float Segmentor::totalEntropy(
+        const std::vector<aaSummary> &aaSummaries
+) const {
     float res = 0;
     segIndex start = 0;
     for (

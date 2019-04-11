@@ -21,7 +21,7 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 
 // [[Rcpp::export]]
 SEXP runTreemer(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths, 
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         Rcpp::NumericMatrix &simMatrixInput,
         const float similarity, const bool getTips
@@ -50,7 +50,7 @@ Rcpp::IntegerVector divergentNode(
     std::vector<int> res;
     for (int i = 0; i < paths.size() - 1; i++) {
         for (int j = i + 1; j < paths.size(); j++) {
-            Rcpp::IntegerVector::const_iterator 
+            Rcpp::IntegerVector::const_iterator
             q  = paths[i].begin(), s = paths[j].begin();
             do { q++, s++; } while (*q == *s);
             if (--q != paths[i].begin()) { res.push_back(*q); }
@@ -61,7 +61,7 @@ Rcpp::IntegerVector divergentNode(
 
 // [[Rcpp::export]]
 Rcpp::IntegerVector getReference(
-        const std::string &refSeq, 
+        const std::string &refSeq,
         const char gapChar
 ) {
     std::vector<int> res;
@@ -78,7 +78,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(
 ) {
     std::vector<Rcpp::IntegerVector> res;
     for (int i = 0; i < paths.size(); ++i) {
-        if (paths[i].size() >= minLen) { 
+        if (paths[i].size() >= minLen) {
             res.push_back(paths[i][Rcpp::Range(0, minLen - 1)]);
         }
     }
@@ -87,8 +87,8 @@ Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(
 
 // [[Rcpp::export]]
 Rcpp::CharacterVector summarizeAA(
-        const Rcpp::CharacterVector &seqs, 
-        const int siteIndex, 
+        const Rcpp::CharacterVector &seqs,
+        const int siteIndex,
         const float tolerance
 ) {
     int nseq = seqs.size();
@@ -141,9 +141,9 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
 ) {
     const segIndex terminal = nodeSummaries.size();
+    std::vector<aaSummary> aaSummaries;
     segment all;
-    // Transform R list to a vector of AA and mapped frequency as
-    // Segmentor::aaSummaries.
+    // Transform R list to a vector of AA and mapped frequency as 'aaSummaries'.
     // Get all the possible segment points
     for (segIndex i = 0; i < terminal; ++i) {
         all.push_back(i);
@@ -153,7 +153,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         for (unsigned int j = 0; j < aa.size(); ++j) {
             node[Rcpp::as<std::string>(aa[j])] = summary[j];
         }
-        Segmentor::aaSummaries.push_back(node);
+        aaSummaries.push_back(node);
     }
     // The segment point of "0" should be removed
     all.erase(all.begin());
@@ -161,7 +161,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     // of "parent" is minimum
     segment final;
     final.push_back(terminal);
-    Segmentor *parent = new Segmentor(all, final);
+    Segmentor *parent = new Segmentor(all, final, aaSummaries);
     float minEntropy = parent->m_entropy;
     // Initialize the search list and search depth
     std::vector<Segmentor *> segList;
@@ -175,7 +175,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     while (true) {
         // Children "Segmentor" of the current "parent"
         for (unsigned int i = 0; i < parent->m_open.size(); ++i) {
-            Segmentor *seg = new Segmentor(parent, i);
+            Segmentor *seg = new Segmentor(parent, i, aaSummaries);
             segList.push_back(seg);
         }
         delete parent;
@@ -198,14 +198,9 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         // The search stops when none of the children "Segmentor" can
         // beat the "minEntropy" for "maxDepth" of consecutive times
         if (tempMin->m_entropy > minEntropy) {
+            // Increment the 'consecutive times'
             ++depth;
-            if (tempMin->m_used.size() == terminal || depth == maxDepth) {
-                for (
-                        std::vector<Segmentor *>::iterator it = segList.begin();
-                        it != segList.end(); ++it
-                    ) {
-                    delete *it;
-                }
+            if (depth >= maxDepth) {
                 break;
             }
             // "final" and "minEntropy" stay unchanged if "tempMin"
@@ -215,14 +210,27 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
             // if the previous "minEntropy" is beaten by it.
             final = tempMin->m_used;
             minEntropy = tempMin->m_entropy;
+            if (minEntropy == 0) {
+                break;
+            }
             // And "depth" is reset to 0
             depth = 0;
+        }
+        if (tempMin->m_used.size() == terminal) {
+            break;
         }
         // "tempMin" is going to be the new "parent" for getting new
         // children "Segmentor" no matter what. So "tempMin" doesn't
         // necessarily have to give the new "final" and "minentropy"
         parent = tempMin;
     }
+    for (
+            std::vector<Segmentor *>::iterator it = segList.begin();
+            it != segList.end(); ++it
+    ) {
+        delete *it;
+    }
+    segList.clear();
     // Group tips by the segment indices in "final"
     std::vector<Rcpp::IntegerVector> res;
     segIndex start = 0;
@@ -255,7 +263,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
             }
         }
         // Combine with the previous segment if the most dominant
-        // AA is the same as the previous. 
+        // AA is the same as the previous.
         if (fixedAA == prevFixedAA) {
             for (node_itr = node.begin(); node_itr != node.end(); ++node_itr) {
                 combNode[node_itr->first] += node_itr->second;

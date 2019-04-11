@@ -414,7 +414,7 @@ multiFixationSites.lineagePath <- function(paths,
                 # non-dominant AA for the site initialized with the
                 # number of non-dominant AA in the "afterTips"
                 # toleranceSum <- attr(a, "n")
-                
+
                 site <- as.character(i)
                 # "nodeTips" is vector of tips with an attribute
                 # of "AA" to store fixed AA, and an attribute of
@@ -447,6 +447,12 @@ multiFixationSites.lineagePath <- function(paths,
                         # Assign the "aaSummary" to the tip names
                         attr(nodeTips, "aaSummary") <- aaSummary
                         # Store the result to avoid repeating calculation
+                        # TODO: Bug fix: 'nodeTips' will be allocated as
+                        # a named vector if its length is of 1. An S4 class
+                        # should be created for 'nodeAAsum' to solve this
+                        # typing problem. Here a vector of c(1,2) is used
+                        # to first guarantee a type of list.
+                        nodeAAsum[[site]][[node]] <- c(1, 2)
                         nodeAAsum[[site]][[node]] <- nodeTips
                     }
                     # Extract "aaSummary" if existed
