@@ -402,7 +402,7 @@ multiFixationSites.lineagePath <- function(paths,
             # Iterate every site
             for (i in seq_along(reference)) {
                 s <- reference[i] - 1
-                # TODO: Add "tolerance"
+                # TODO: Add "tolerance". Here using 0 temprarily
                 a <- summarizeAA(after, s, 0)
                 if (is.na(a)) {
                     # The AA of the tips after are not fixed
@@ -491,16 +491,13 @@ multiFixationSites.lineagePath <- function(paths,
                     !is.null(currentAA) && currentAA == a) {
                     next
                 }
-                # TODO: The "minimizeEntropy" function hasn't finished
-                # yet as "tolerance" and "minEffectiveSize" might
-                # be introduced as parameters.
-                s <- minimizeEntropy(nodeSummaries)
+                s <- minimizeEntropy(nodeSummaries, minEffectiveSize)
                 nf <- length(s)
-                if (nf > 1 &&
-                    attr(s[[nf]], "AA") != a &&
-                    all(lengths(s) >= minEffectiveSize)) {
+                if (nf > 1 && attr(s[[nf]], "AA") != a) {
                     attr(afterTips, "AA") <- a
+                    # Append the "afterTips" to the result
                     s[[nf + 1]] <- afterTips
+                    # Retrieve the existing mutation path of the site
                     existPath <- res[[site]]
                     # Some site may have multiple fixation on multiple
                     # lineages. The following is for deciding which

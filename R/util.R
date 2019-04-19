@@ -179,22 +179,32 @@ ChildrenTips <- function(tree, node) {
 }
 
 extendPaths <- function(paths, tree) {
+    # Store the attributes of "paths"
     attrs <- attributes(paths)
+    # Extend each path
     paths <- lapply(paths, function(p) {
+        # Starting node
         sn <- p[length(p)]
-        extended <-
-            lapply(ChildrenTips(tree, sn), function(t) {
-                nodepath(tree, sn, t)[-1]
-            })
+        # nodePath from starting node to each children tip
+        extended <- lapply(ChildrenTips(tree, sn), function(t) {
+            # The staring node is excluded from the nodePath
+            nodepath(tree, sn, t)[-1]
+        })
         el <- lengths(extended)
+        # The length of longest nodePath
         ml <- max(el)
+        # The longest nodePath
         longest <- extended[which(el == ml)]
+        # Zip up the longest nodePath until hitting diverging node
         extended <-
             lapply(seq_len(ml), function(i) {
                 unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
             })
+        # The length of the element in "extended" would be 1
+        # if the node is shared by the longest nodePath
         c(p, unlist(extended[which(lengths(extended) == 1)]))
     })
+    # Give back the attributes of "paths"
     attributes(paths) <- attrs
     return(paths)
 }

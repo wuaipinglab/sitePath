@@ -6,6 +6,11 @@
 #include <vector>
 #include <Rcpp.h>
 
+typedef unsigned int segIndex;
+typedef std::vector<segIndex> segment;
+typedef std::map<std::string, int> aaSummary;
+
+float shannonEntropy(const aaSummary &values);
 const float compare(const std::string &query, const std::string &subject);
 
 class TipSeqLinker {
@@ -28,47 +33,5 @@ private:
     const int m_tipIndex;
     int m_cIndex;
 };
-
-typedef unsigned int segIndex;
-typedef std::vector<segIndex> segment;
-typedef std::map<std::string, int> aaSummary;
-
-float shannonEntropy(const aaSummary &values);
-
-// TODO: Need a way to actually get the segmented list
-// so "minEffectiveSize" can come in to play the role.
-class Segmentor {
-public:
-    segment m_used;
-    segment m_open;
-    float m_entropy;
-public:
-    Segmentor(
-        const segment all,
-        const segment terminal,
-        const std::vector<aaSummary> &aaSummaries
-    );
-    Segmentor(
-        const Segmentor *parent,
-        const unsigned int i,
-        const std::vector<aaSummary> &aaSummaries
-    );
-private:
-    const segment getUsed(
-            const Segmentor *parent,
-            const unsigned int i
-    ) const;
-    const segment getOpen(
-            const Segmentor *parent,
-            const unsigned int i
-    ) const;
-    const float totalEntropy(
-            const std::vector<aaSummary> &aaSummaries
-    ) const;
-};
-
-// class Amalgamator {
-// public:
-// };
 
 #endif // SITEPATH_UTIL_H

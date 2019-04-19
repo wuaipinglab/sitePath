@@ -34,6 +34,7 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
     color[targetEdges] <- "#000000"
     lty[targetEdges] <- 1
     width[targetEdges] <- 2
+    # TODO: Emphaszie the nodes along the lineagePath
     plot.phylo(
         tree,
         edge.color = color,
