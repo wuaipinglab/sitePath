@@ -1,3 +1,4 @@
+#include <cmath>
 #include "minEntropy.h"
 
 MinEntropy::TreeSearchNode::TreeSearchNode() {}
@@ -85,6 +86,8 @@ segment MinEntropy::Segmentor::newUsed(
 ) const {
     segment res = parent->m_used;
     res.push_back(parent->m_open.at(i));
+    // Sort the "res" to make sure the segment points
+    // are in order
     std::sort(res.begin(), res.end());
     return res;
 }
@@ -134,6 +137,9 @@ segment MinEntropy::Amalgamator::newUsed(
 ) const {
     segment res = parent->getUsed();
     res.erase(res.begin() + i);
+    // There is no need to sort as the order won't change
+    // And no need to create the list for available segment
+    // points as "m_used" here already contains them.
     return res;
 }
 
@@ -159,12 +165,25 @@ MinEntropy::SearchTree<T>::SearchTree(
     }
     // The segment point of "0" should be removed
     m_all.erase(m_all.begin());
+    // The "m_final" must have "m_enclosed" as the last element
+    m_final.push_back(m_enclosed);
+    // Generate the first parent node for the search
     initSearch();
+}
+
+template <class T>
+MinEntropy::SearchTree<T>::~SearchTree() {
+    typedef typename std::vector<T *>::iterator iter;
+    for (iter it = m_segList.begin(); it != m_segList.end(); ++it) {
+        delete *it;
+    }
+    m_segList.clear();
 }
 
 template<>
 void MinEntropy::SearchTree<MinEntropy::Segmentor>::initSearch() {
-    m_final.push_back(m_enclosed);
+    // The search by adding segment points starts with only "m_enclosed"
+    // as used and "m_all" open for children node
     m_parent = new MinEntropy::Segmentor(
         m_all,
         m_final,
@@ -177,8 +196,8 @@ void MinEntropy::SearchTree<MinEntropy::Segmentor>::initSearch() {
 
 template<>
 void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
-    m_all.push_back(m_enclosed);
-    m_final.push_back(m_enclosed);
+    // Use the "m_enclosed" segment point and its entropy as the
+    // initial values as the initial "Amalgamator" can be unqualified
     MinEntropy::Segmentor noSeg(
             m_all,
             m_final,
@@ -187,6 +206,7 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
     );
     m_final = noSeg.getUsed();
     m_minEntropy = noSeg.getEntropy();
+    m_all.push_back(m_enclosed);
     m_parent = new MinEntropy::Amalgamator(
         m_all,
         m_aaSummaries,
@@ -194,104 +214,127 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
     );
 }
 
-template <class T>
-MinEntropy::SearchTree<T>::~SearchTree() {
-    typedef typename std::vector<T *>::iterator iter;
-    for (iter it = m_segList.begin(); it != m_segList.end(); ++it) {
-        delete *it;
+template <>
+void MinEntropy::SearchTree<MinEntropy::Segmentor>::growTree(
+        MinEntropy::Segmentor *seg
+) {
+    if (seg->isQualified()) {
+        m_segList.push_back(seg);
+    } else {
+        delete seg;
     }
-    m_segList.clear();
 }
 
 template <>
-void MinEntropy::SearchTree<MinEntropy::Segmentor>::growTree() {
-    // Children "SearchNode" of the current "parent"
-    for (unsigned int i = 0; i < m_parent->getOpenSize(); ++i) {
-        MinEntropy::Segmentor *seg = new MinEntropy::Segmentor(
-            m_parent, i,
-            m_aaSummaries,
-            m_minTipNum
-        );
-        if (seg->isQualified()) {
-            m_segList.push_back(seg);
-        } else {
-            delete seg;
-        }
-    }
-    delete m_parent;
-}
-
-template <>
-void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree() {
-    // Children "SearchNode" of the current "parent"
-    for (unsigned int i = 0; i < m_parent->getOpenSize(); ++i) {
-        MinEntropy::Amalgamator *seg = new MinEntropy::Amalgamator(
-            m_parent, i,
-            m_aaSummaries,
-            m_minTipNum
-        );
+void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
+        MinEntropy::Amalgamator *seg
+) {
+    segment x = seg->getUsed();
+    if (std::find(
+            m_segListHistory.begin(),
+            m_segListHistory.end(),
+            x
+    ) == m_segListHistory.end()) {
+        m_segListHistory.push_back(x);
         m_segList.push_back(seg);
     }
-    delete m_parent;
+}
+
+template <class T>
+segment MinEntropy::SearchTree<T>::getFinal() const { return m_final; }
+
+template <class T>
+float MinEntropy::SearchTree<T>::getMinEntropy() const { return m_minEntropy; }
+
+template <class T>
+T *MinEntropy::SearchTree<T>::updateParent() {
+    typedef typename std::vector<T *>::iterator iter;
+    // Assume the first "SearchNode" is the best hit.
+    iter it = m_segList.begin(), rm = it;
+    // This "tempMin" is always one of the "SearchNode" in the search
+    // list. And once it's found, it's going to be the new "parent"
+    // and its pointer is removed from the search list.
+    T *tempMin = *it;
+    for (++it; it != m_segList.end(); ++it) {
+        if ((*it)->getEntropy() < tempMin->getEntropy()) {
+            tempMin = *it;
+            rm = it;
+        }
+    }
+    m_segList.erase(rm);
+    // Return the pointer to the current best hit in the "SearchNode" list
+    return tempMin;
+}
+
+template <class T>
+void MinEntropy::SearchTree<T>::resumeSearch() {
+    if (!m_segList.empty()) {
+        m_parent = updateParent();
+        search();
+    }
 }
 
 template <class T>
 void MinEntropy::SearchTree<T>::search() {
-    typedef typename std::vector<T *>::iterator iter;
     unsigned int depth = 0;
+    unsigned int maxDepth = m_enclosed;
     // Find the "minEntropy" among "SearchNode" in "segList" and make
     // the "SearchNode" the "parent" for next round. The new "minEntropy"
     // should be decreasing but increasing is allowed. So "final" is
-    // returned when its "minEntropy" stays until the terminal of the tree.
+    // returned when its "minEntropy" stays for "m_enclosed" consecutive
+    // of times.
     while (true) {
-        growTree();
+        // for (int i = 0; i < m_parent->getUsed().size(); ++i) {
+        //     std::cout << m_parent->getUsed()[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // Stop when the search reaches the end and delete "m_parent"
+        if (m_parent->isEndNode()) {
+            delete m_parent;
+            break;
+        }
+        // Children "SearchNode" of the current "parent"
+        for (unsigned int i = 0; i < m_parent->getOpenSize(); ++i) {
+            T *seg = new T(m_parent, i, m_aaSummaries, m_minTipNum);
+            // This is to decide whether the child is included
+            // in the search list
+            growTree(seg);
+        }
+        // delete "parent" as its pointer already removed from "m_segList"
+        delete m_parent;
         // Stop when there is no search node in the list
         if (m_segList.empty()) { break; }
-        // Re-calculate the best result from the search list and assign
-        // to "tempMin". Temporarily assume the first "SearchNode" in the
-        // list is the best result.
-        iter it = m_segList.begin(), rm = it;
-        // This "tempMin" is always one of the "SearchNode" in the search
-        // list. And once it's found, it's going to be the new "parent"
-        // and removed from the search list.
-        T *tempMin = *it;
-        for (++it; it != m_segList.end(); ++it) {
-            if ((*it)->getEntropy() < tempMin->getEntropy()) {
-                tempMin = *it;
-                rm = it;
-            }
-        }
-        m_segList.erase(rm);
+        // Re-calculate the best hit from the search list and assign
+        // to "tempMin".
+        T *tempMin = updateParent();
+        // Increment the number ("depth") of consecutive times last
+        // "minEntropy" being best hit or update "minEntropy" and
+        // re-count "depth"
         if (tempMin->getEntropy() > m_minEntropy) {
             // Increment the 'consecutive times'
             ++depth;
-            // The search stops when none of the children "SearchNode" can
-            // beat the "minEntropy"
-            if (depth >= m_enclosed) { break; }
+            // The search stops when none of the children "SearchNode"
+            // can beat the "minEntropy"
+            if (depth >= maxDepth) { break; }
             // "final" and "minEntropy" stay unchanged if "tempMin"
             // cannot beat the previous "minEntropy".
         } else {
             // "tempMin" will be the new "final" and "minEntropy"
             // if the previous "minEntropy" is beaten by it.
-            m_final = tempMin->getUsed();
-            m_minEntropy = tempMin->getEntropy();
+            if (tempMin->isQualified()) {
+                m_final = tempMin->getUsed();
+                m_minEntropy = tempMin->getEntropy();
+            }
             // Stop when entropy is 0, which couldn't be better
             if (m_minEntropy == 0) { break; }
-            // And "depth" is reset to 0
+            // "depth" is reset to 0
             depth = 0;
         }
-        // Stop when the search reaches the end
-        if (tempMin->isEndNode()) { break; }
         // "tempMin" is going to be the new "parent" for getting new
         // children "SearchNode" no matter what. So "tempMin" doesn't
-        // necessarily have to give the new "final" and "minentropy"
+        // necessarily have to give the new "final" and "minEntropy"
         m_parent = tempMin;
     }
-}
-
-template <class T>
-segment MinEntropy::SearchTree<T>::getFinal() const {
-    return m_final;
 }
 
 Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(

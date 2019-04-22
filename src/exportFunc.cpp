@@ -130,6 +130,7 @@ Rcpp::IntegerVector tableAA(
         const Rcpp::CharacterVector &seqs,
         const int siteIndex
 ) {
+    // Summarize the AAs for tree tips of a node
     std::map<std::string, int> aaSummary;
     for (int i = 0; i < seqs.size(); ++i) {
         aaSummary[std::string(1, seqs[i][siteIndex])]++;
@@ -145,9 +146,21 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     using namespace MinEntropy;
     SearchTree<Segmentor> iSearch(minEffectiveSize, nodeSummaries);
     iSearch.search();
-    return updatedSegmentation(nodeSummaries, iSearch.getFinal());
-    // SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
-    // dSearch.search();
+    // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+    SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
+    dSearch.search();
+    float iMin = iSearch.getMinEntropy(), dMin = dSearch.getMinEntropy();
+    segment final = (iMin < dMin) ? iSearch.getFinal() : dSearch.getFinal();
+    return updatedSegmentation(nodeSummaries, final);
+    // while (iSearch.getFinal() != dSearch.getFinal()) {
+    //     if (iMin > dMin) {
+    //         iSearch.resumeSearch();
+    //         iMin = iSearch.getMinEntropy();
+    //     } else {
+    //         dSearch.resumeSearch();
+    //         dMin = dSearch.getMinEntropy();
+    //     }
+    // }
     // return updatedSegmentation(nodeSummaries, dSearch.getFinal());
 }
 

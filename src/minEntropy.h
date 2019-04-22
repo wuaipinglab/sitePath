@@ -130,10 +130,13 @@ public:
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
     );
     virtual ~SearchTree();
-    // Pure virtual method for minimum entropy search
-    void search();
-    // Getter for final list of segment points
+    // Getter for "m_final"
     segment getFinal() const;
+    // Getter for "m_minEntropy"
+    float getMinEntropy() const;
+    // Minimum entropy search
+    void search();
+    void resumeSearch();
 private:
     // The minimum number of tips within a segmented group
     const unsigned int m_minTipNum;
@@ -150,18 +153,24 @@ private:
     float m_minEntropy;
     // The search list for resuming the search
     std::vector<T *> m_segList;
+    // The existing or dropped segment
+    std::vector<segment> m_segListHistory;
 private:
     void initSearch();
-    void growTree();
+    void growTree(T *seg);
+    void updateFinal(T *tempMin);
+    T *updateParent();
 };
 
 template<> void SearchTree<Segmentor>::initSearch();
-
 template<> void SearchTree<Amalgamator>::initSearch();
 
-template<> void SearchTree<Segmentor>::growTree();
+template<> void SearchTree<Segmentor>::growTree(Segmentor *seg);
+template<> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
 
-template<> void SearchTree<Amalgamator>::growTree();
+// Not yet implemented
+template<> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
+template<> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
 
 Rcpp::ListOf<Rcpp::IntegerVector> updatedSegmentation(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,

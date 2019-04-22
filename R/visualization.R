@@ -313,7 +313,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     )
     sepChar <- "\n"
     if (sum(nchar(plotName) <= 18)) {
-        sepChar <- "\t"
+        sepChar <- ",\t"
     }
     title(
         main = site,

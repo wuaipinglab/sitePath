@@ -243,7 +243,7 @@ fixationSites.lineagePath <- function(paths,
                     ))
                     if (length(targetIndex) == 0) {
                         # Add new fixation for the site if it's not existed
-                        targetIndex <- 1
+                        targetIndex <- length(existPath) + 1
                     } else {
                         # Retrieve existing fixation path with the same
                         # mutation to compare with the current value
@@ -251,7 +251,7 @@ fixationSites.lineagePath <- function(paths,
                         # A new entry will be added to the "sitePath"
                         # or an old entry will be replaced if it's actually
                         # a subset of the new one.
-                        if (all(!afterTips %in% existMut[[a]])) {
+                        if (!all(afterTips %in% existMut[[a]])) {
                             targetIndex <- length(existPath) + 1
                         } else if (length(afterTips) <= length(existMut[[a]])) {
                             next
@@ -389,32 +389,38 @@ multiFixationSites.lineagePath <- function(paths,
     res <- list()
     # Iterate each path in the "lineagePath" object
     for (path in paths) {
+        # Try every node as the terminal node
         for (maxLen in seq_along(path)[-1]) {
-            # For the sequences after the node, examine them as a whole
-            afterTips <- as.integer(ChildrenTips(tree, path[maxLen]))
-            if (length(afterTips) < minEffectiveSize) {
-                next
-            }
-            after <- align[afterTips]
+            # For the sequences after the terminal node,
+            # examine them as a whole
+            afterTips <-
+                as.integer(ChildrenTips(tree, path[maxLen]))
             # Group the sequences by nodes in the path before
             pathBefore <-
                 setdiff(path[seq_len(maxLen - 1)], divNodes)
             # Iterate every site
             for (i in seq_along(reference)) {
+                # for (i in 281) { # for debugging purpose
                 s <- reference[i] - 1
-                # TODO: Add "tolerance". Here using 0 temprarily
-                a <- summarizeAA(after, s, 0)
-                if (is.na(a)) {
-                    # The AA of the tips after are not fixed
-                    # so the site is disqualifed and go for
-                    # the next site
-                    next
-                }
+                # "tableAA" is similar to R function "table"
+                # Here the AA at site "s" for all tips is summarized
+                afterSummary <- tableAA(align[afterTips], s)
                 # TODO: "toleranceSum" is used to track total number of
                 # non-dominant AA for the site initialized with the
-                # number of non-dominant AA in the "afterTips"
-                # toleranceSum <- attr(a, "n")
-
+                # number of non-dominant AA in the "afterTips".
+                # May jump to next site if exceeding tolerance
+                toleranceSum <-
+                    sum(afterSummary) - max(afterSummary)
+                if (toleranceSum > length(afterTips) * 0.1) {
+                    next
+                }
+                attr(afterTips, "aaSummary") <- afterSummary
+                # If AA is purely fixed for the node
+                if (length(afterSummary) == 1) {
+                    afterAA <- names(afterSummary)
+                } else {
+                    afterAA <- NULL
+                }
                 site <- as.character(i)
                 # "nodeTips" is vector of tips with an attribute
                 # of "AA" to store fixed AA, and an attribute of
@@ -431,7 +437,7 @@ multiFixationSites.lineagePath <- function(paths,
                 # the same AA purely fixed, they will be grouped
                 # into one.
                 nodeSummaries <- list()
-                # Iterate all nodes in the "pathBefore". This is
+                # Iterate each single node in the "pathBefore". This is
                 # the summary stage
                 for (node in as.character(pathBefore)) {
                     # If the node has a record in nodeAAsum
@@ -441,8 +447,6 @@ multiFixationSites.lineagePath <- function(paths,
                         # Get the related descendant tips from "nodeAlign"
                         nodeTips <-
                             as.integer(names(nodeAlign[[node]]))
-                        # "tableAA" is similar to R function "table"
-                        # Here the AA at site "s" for all tips is summarized
                         aaSummary <- tableAA(nodeAlign[[node]], s)
                         # Assign the "aaSummary" to the tip names
                         attr(nodeTips, "aaSummary") <- aaSummary
@@ -484,52 +488,80 @@ multiFixationSites.lineagePath <- function(paths,
                     previousAA <- currentAA
                     previousNode <- node
                 }
+                # Attach the "afterTips" to "nodeSummaries"
+                if (!is.null(previousAA) &&
+                    !is.null(afterAA) &&
+                    previousAA == afterAA) {
+                    nodeTips <- c(nodeSummaries[[previousNode]], afterTips)
+                    attr(nodeTips, "aaSummary") <-
+                        attr(nodeSummaries[[previousNode]], "aaSummary") +
+                        afterSummary
+                    nodeSummaries[[previousNode]] <- nodeTips
+                } else {
+                    nodeSummaries[[as.character(path[maxLen])]] <- afterTips
+                }
                 # Skip to the next "site" if AA of "pathBefore" is
                 # purely fixed or the terminal AA is the same as
                 # fixed AA of "afterTips". This avoids repetition.
-                if (length(nodeSummaries) == 1 ||
-                    !is.null(currentAA) && currentAA == a) {
+                if (length(nodeSummaries) <= 2) {
                     next
                 }
-                s <- minimizeEntropy(nodeSummaries, minEffectiveSize)
-                nf <- length(s)
-                if (nf > 1 && attr(s[[nf]], "AA") != a) {
-                    attr(afterTips, "AA") <- a
-                    # Append the "afterTips" to the result
-                    s[[nf + 1]] <- afterTips
+                s <- minimizeEntropy(nodeSummaries,
+                                     minEffectiveSize)
+                if (length(s) > 2) {
                     # Retrieve the existing mutation path of the site
                     existPath <- res[[site]]
                     # Some site may have multiple fixation on multiple
-                    # lineages. The following is for deciding which
+                    # lineages. The following is for deciding at which
                     # index should it be assigned in the "res[[site]]"
+                    targetIndex <- NULL
                     if (is.null(res[[site]])) {
                         targetIndex <- 1
                     } else {
                         mut <- getMutPathAA(s)
-                        targetIndex <- which(vapply(
+                        existIndex <- which(vapply(
                             existPath,
                             FUN = function(i) {
                                 getMutPathAA(i) == mut
                             },
                             FUN.VALUE = logical(1)
                         ))
-                        if (length(targetIndex) == 0) {
+                        if (length(existIndex) == 0) {
                             # Add new fixation for the site if it's not existed
-                            targetIndex <- 1
+                            targetIndex <- length(existPath) + 1
                         } else {
-                            # Retrieve existing fixation path with the same
-                            # mutation to compare with the current value
-                            existMut <- existPath[[targetIndex]]
-                            # A new entry will be added to the "sitePath"
-                            # or an old entry will be replaced if it's
-                            # actually a subset of the new one.
-                            existTips <- unlist(tail(existMut, 1))
-                            if (all(!afterTips %in% existTips)) {
-                                targetIndex <- length(existPath) + 1
-                            } else if (length(afterTips) <= length(existTips)) {
-                                next
+                            qualified <- vapply(
+                                existIndex,
+                                FUN = function(ei) {
+                                    existMut <- existPath[[ei]]
+                                    existTips <-
+                                        unlist(tail(existMut, 1))
+                                    if (all(existTips %in% afterTips)) {
+                                        return(2L)
+                                    }
+                                    if (!all(afterTips %in% existTips)) {
+                                        return(1L)
+                                    }
+                                    return(0L)
+                                },
+                                FUN.VALUE = integer(1)
+                            )
+                            if (all(qualified == 1L)) {
+                                targetIndex <-
+                                    length(existPath) + length(existIndex)
+                            }
+                            replaceIndex <- which(qualified > 1)
+                            if (length(replaceIndex) > 1) {
+                                targetIndex <-
+                                    length(existPath) + length(existIndex)
+                                res[[site]] <- res[[site]][-replaceIndex]
+                            } else if (length(replaceIndex) == 1) {
+                                targetIndex <- replaceIndex
                             }
                         }
+                    }
+                    if (is.null(targetIndex)) {
+                        next
                     }
                     # Assign the result to the "res[[site]]"
                     res[[site]][[targetIndex]] <- s
