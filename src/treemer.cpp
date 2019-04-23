@@ -3,15 +3,15 @@
 Treemer::Base::Base(
     const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
     const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
-): 
+):
     m_root(*(tipPaths[0].begin())),
-    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size()) 
+    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size())
 {
     for (int i = 0; i < tipPaths.size(); i++) {
         TipSeqLinker *tip = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
         m_tips.push_back(tip);
         m_clusters[tip->getTip()].push_back(tip);
-        
+
         if (m_tips[i]->getRoot() != m_root) {
             throw std::invalid_argument("Root in tree paths not equal");
         } else if (m_tips[i]->getSeqLen() != m_seqLen) {
@@ -47,42 +47,42 @@ void Treemer::Base::pruneTree() {
     while (true) {
         clusters oldClusters = m_clusters;
         m_clusters.clear();
-        // look down one more node (fake 'proceed') 
+        // look down one more node (fake 'proceed')
         // group each tip after new positioning
         for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
             m_clusters[(*it)->nextClade()].push_back(*it);
         }
-        // if no more group 'kissed' each other by a common ancestral node 
+        // if no more group 'kissed' each other by a common ancestral node
         // after fake 'proceed', then pruning is done
         if (m_clusters.size() == oldClusters.size()) {
             m_clusters.clear();
             break;
         }
         // only 'kissed' group can do real 'proceed'
-        // if a grouping doesn't exist in 'oldClusters' 
+        // if a grouping doesn't exist in 'oldClusters'
         // then all tips in that group can 'proceed'
         for (
                 clusters::iterator it = m_clusters.begin();
                 it != m_clusters.end(); ++it
         ) {
-            // assume a group is kissed with another 
+            // assume a group is kissed with another
             // (give it benefit of the doubt)
             bool kissed = true;
             for (
                     clusters::iterator it2 = oldClusters.begin();
                     it2 != oldClusters.end(); ++it2
             ) {
-                // a group is 'non-kissed' after fake 'proceed' 
+                // a group is 'non-kissed' after fake 'proceed'
                 // if it can be found in 'oldClusters'
                 if (it->second == it2->second) {
                     kissed = false;
-                    // a 'non-kissed' group won't appear twice in 
+                    // a 'non-kissed' group won't appear twice in
                     // 'clusters' so deleted
                     oldClusters.erase(it2);
                     break;
                 }
             }
-            // clusters_it group needs to pass some requirement to 
+            // clusters_it group needs to pass some requirement to
             // be qualified 'kissed'
             if (kissed && qualified(it)) {
                 for (
@@ -99,7 +99,7 @@ Treemer::BySite::BySite(
     const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
     const int site
 ):
-    Base(tipPaths, alignedSeqs), 
+    Base(tipPaths, alignedSeqs),
     m_site(site - 1) { pruneTree(); }
 
 bool Treemer::BySite::qualified(const clusters::iterator &clusters_it) const {
@@ -141,7 +141,7 @@ bool Treemer::BySimilarity::qualified(
                 it2 != clusters_it->second.end(); ++it2
         ) {
             std::pair<int, int> pairing = std::make_pair(
-                (*it)->getTip(), 
+                (*it)->getTip(),
                 (*it2)->getTip()
             );
             float sim = 0;
@@ -152,7 +152,6 @@ bool Treemer::BySimilarity::qualified(
             } else {
                 sim = compare((*it)->getSeq(), (*it2)->getSeq());
                 (*m_compared)[pairing] = sim;
-                // m_compared->emplace(pairing, sim);
             }
             if (sim < m_simCut) {
                 return false;

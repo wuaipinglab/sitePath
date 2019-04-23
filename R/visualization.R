@@ -34,6 +34,7 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
     color[targetEdges] <- "#000000"
     lty[targetEdges] <- 1
     width[targetEdges] <- 2
+    # TODO: Emphaszie the nodes along the lineagePath
     plot.phylo(
         tree,
         edge.color = color,
@@ -228,35 +229,35 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
     plotName <- character(0)
     nEdges <- length(tree$edge.length)
     color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(1, nEdges)
     AAnames <- character(0)
     for (sp in sitePaths) {
         aa <- toupper(names(sp))
         plotName <- c(plotName, paste0(aa[1], site, aa[2]))
         aa <- AA_FULL_NAMES[tolower(aa)]
-        color <- tip2colorEdge(color,
-                               AA_COLORS[aa[2]],
-                               tree$edge,
-                               sp[[2]],
-                               rootNode)
-        color <- tip2colorEdge(color,
-                               AA_COLORS[aa[1]],
-                               tree$edge,
-                               sp[[1]],
-                               rootNode)
+        for (n in c(1, 2)) {
+            targetEdges <- tip2Edge(tree$edge, sp[[n]], rootNode)
+            color[targetEdges] <- AA_COLORS[aa[n]]
+            lty[targetEdges] <- 1
+            width[targetEdges] <- 2
+        }
         AAnames <- c(AAnames, aa)
     }
     plot.phylo(
         tree,
         show.tip.label = FALSE,
         edge.color = color,
+        edge.lty = lty,
+        edge.width = width,
         main = paste(unique(plotName), collapse = ", "),
         ...
     )
     legend(
         "topleft",
         title = "Amino acid",
-        legend = c(unique(AAnames), "excluded"),
-        fill = c(AA_COLORS[unique(AAnames)], "#d3d3d3"),
+        legend = unique(AAnames),
+        fill = AA_COLORS[unique(AAnames)],
         box.lty = 0
     )
 }
@@ -288,17 +289,18 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     plotName <- character(0)
     nEdges <- length(tree$edge.length)
     color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(0.5, nEdges)
     AAnames <- character(0)
     for (sp in sitePaths) {
         aaName <- character(0)
         for (tips in sp) {
             aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
             aaName <- c(aaName, aa)
-            color <- tip2colorEdge(color,
-                                   AA_COLORS[aa],
-                                   tree$edge,
-                                   tips,
-                                   rootNode)
+            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
+            color[targetEdges] <- AA_COLORS[aa]
+            lty[targetEdges] <- 1
+            width[targetEdges] <- 1
         }
         AAnames <- c(AAnames, aaName)
         plotName <- c(plotName, paste0(aaName, collapse = " -> "))
@@ -307,22 +309,22 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
         tree,
         show.tip.label = FALSE,
         edge.color = color,
+        edge.lty = lty,
+        edge.width = width,
         ...
 
     )
     sepChar <- "\n"
     if (sum(nchar(plotName) <= 18)) {
-        sepChar <- "\t"
+        sepChar <- ",\t"
     }
-    title(
-        main = site,
-        sub = paste(plotName, collapse = sepChar)
-    )
+    title(main = site,
+          sub = paste(plotName, collapse = sepChar))
     legend(
         "topleft",
         title = "Amino acid",
-        legend = c(unique(AAnames), "excluded"),
-        fill = c(AA_COLORS[unique(AAnames)], "#d3d3d3"),
+        legend = unique(AAnames),
+        fill = AA_COLORS[unique(AAnames)],
         box.lty = 0
     )
 }

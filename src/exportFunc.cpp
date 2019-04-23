@@ -1,4 +1,5 @@
 #include "treemer.h"
+#include "minEntropy.h"
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
@@ -36,11 +37,13 @@ SEXP runTreemer(
         }
     }
     Treemer::BySimilarity match(tipPaths, alignedSeqs, similarity, simMatrix);
-    if (getTips) {
-        return Rcpp::wrap(match.getTips());
-    } else {
-        return Rcpp::wrap(match.getPaths());
-    }
+    // TODO: Separate the two functionalities
+    return getTips ? Rcpp::wrap(match.getTips()) : Rcpp::wrap(match.getPaths());
+    // if (getTips) {
+    //     return Rcpp::wrap(match.getTips());
+    // } else {
+    //     return Rcpp::wrap(match.getPaths());
+    // }
 }
 
 // [[Rcpp::export]]
@@ -129,6 +132,7 @@ Rcpp::IntegerVector tableAA(
         const Rcpp::CharacterVector &seqs,
         const int siteIndex
 ) {
+    // Summarize the AAs for tree tips of a node
     std::map<std::string, int> aaSummary;
     for (int i = 0; i < seqs.size(); ++i) {
         aaSummary[std::string(1, seqs[i][siteIndex])]++;
@@ -138,154 +142,28 @@ Rcpp::IntegerVector tableAA(
 
 // [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
+        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
+        const unsigned int minEffectiveSize
 ) {
-    const segIndex terminal = nodeSummaries.size();
-    std::vector<aaSummary> aaSummaries;
-    segment all;
-    // Transform R list to a vector of AA and mapped frequency as 'aaSummaries'.
-    // Get all the possible segment points
-    for (segIndex i = 0; i < terminal; ++i) {
-        all.push_back(i);
-        Rcpp::IntegerVector summary = nodeSummaries[i].attr("aaSummary");
-        Rcpp::CharacterVector aa = summary.names();
-        aaSummary node;
-        for (unsigned int j = 0; j < aa.size(); ++j) {
-            node[Rcpp::as<std::string>(aa[j])] = summary[j];
-        }
-        aaSummaries.push_back(node);
-    }
-    // The segment point of "0" should be removed
-    all.erase(all.begin());
-    // The ultimate "parent" of all "Segmentor". Assume the "entropy"
-    // of "parent" is minimum
-    segment final;
-    final.push_back(terminal);
-    Segmentor *parent = new Segmentor(all, final, aaSummaries);
-    float minEntropy = parent->m_entropy;
-    // Initialize the search list and search depth
-    std::vector<Segmentor *> segList;
-    const unsigned int maxDepth = terminal / 3;
-    unsigned int depth = 0;
-    // Find the "minEntropy" among "Segmentor" in "segList" and make
-    // the "Segmentor" the "parent" for next round. The new "minEntropy"
-    // should be decreasing but increasing is allowed. So "final" is
-    // returned when its "minEntropy" is not beaten for "maxDepth" of
-    // consecutive times.
-    while (true) {
-        // Children "Segmentor" of the current "parent"
-        for (unsigned int i = 0; i < parent->m_open.size(); ++i) {
-            Segmentor *seg = new Segmentor(parent, i, aaSummaries);
-            segList.push_back(seg);
-        }
-        delete parent;
-        // Re-calculate the best result from the search list and assign
-        // to "tempMin". Temporarily assume the first "Segmentor" in the
-        // list is the best result.
-        std::vector<Segmentor *>::iterator it = segList.begin();
-        // This "tempMin" is always one of the "Segmentors" in the search
-        // list. And once it's found, it's going to be the new "parent"
-        // and removed from the search list.
-        std::vector<Segmentor *>::iterator rm = it;
-        Segmentor *tempMin = *it;
-        for (++it; it != segList.end(); ++it) {
-            if ((*it)->m_entropy < tempMin->m_entropy) {
-                tempMin = *it;
-                rm = it;
-            }
-        }
-        segList.erase(rm);
-        // The search stops when none of the children "Segmentor" can
-        // beat the "minEntropy" for "maxDepth" of consecutive times
-        if (tempMin->m_entropy > minEntropy) {
-            // Increment the 'consecutive times'
-            ++depth;
-            if (depth >= maxDepth) {
-                break;
-            }
-            // "final" and "minEntropy" stay unchanged if "tempMin"
-            // cannot beat the previous "minEntropy".
-        } else {
-            // "tempMin" will be the new "final" and "minEntropy"
-            // if the previous "minEntropy" is beaten by it.
-            final = tempMin->m_used;
-            minEntropy = tempMin->m_entropy;
-            if (minEntropy == 0) {
-                break;
-            }
-            // And "depth" is reset to 0
-            depth = 0;
-        }
-        if (tempMin->m_used.size() == terminal) {
-            break;
-        }
-        // "tempMin" is going to be the new "parent" for getting new
-        // children "Segmentor" no matter what. So "tempMin" doesn't
-        // necessarily have to give the new "final" and "minentropy"
-        parent = tempMin;
-    }
-    for (
-            std::vector<Segmentor *>::iterator it = segList.begin();
-            it != segList.end(); ++it
-    ) {
-        delete *it;
-    }
-    segList.clear();
-    // Group tips by the segment indices in "final"
-    std::vector<Rcpp::IntegerVector> res;
-    segIndex start = 0;
-    std::string prevFixedAA = "";
-    aaSummary combNode;
-    std::vector<int> combTips;
-    for (
-            segment::iterator final_itr = final.begin();
-            final_itr != final.end(); ++final_itr
-    ) {
-        aaSummary node;
-        std::vector<int> tips;
-        for (unsigned int i = start; i < *final_itr; ++i) {
-            Rcpp::IntegerVector nodeTips = nodeSummaries[i];
-            tips.insert(tips.end(), nodeTips.begin(), nodeTips.end());
-            Rcpp::IntegerVector summary = nodeTips.attr("aaSummary");
-            Rcpp::CharacterVector aa = summary.names();
-            for (unsigned int j = 0; j < aa.size(); ++j) {
-                node[Rcpp::as<std::string>(aa.at(j))] += summary.at(j);
-            }
-        }
-        // The most dominant AA in the current segment
-        aaSummary::iterator node_itr = node.begin();
-        std::string fixedAA = node_itr->first;
-        int maxFreq = node_itr->second;
-        for (++node_itr; node_itr != node.end(); ++node_itr) {
-            if (node_itr->second > maxFreq) {
-                fixedAA = node_itr->first;
-                maxFreq = node_itr->second;
-            }
-        }
-        // Combine with the previous segment if the most dominant
-        // AA is the same as the previous.
-        if (fixedAA == prevFixedAA) {
-            for (node_itr = node.begin(); node_itr != node.end(); ++node_itr) {
-                combNode[node_itr->first] += node_itr->second;
-            }
-            combTips.insert(combTips.end(), tips.begin(), tips.end());
-        } else {
-            Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
-            combined.attr("aaSummary") = Rcpp::wrap(combNode);
-            combined.attr("AA") = prevFixedAA;
-            res.push_back(combined);
-            combTips = tips;
-            combNode = node;
-        }
-        start = *final_itr;
-        prevFixedAA = fixedAA;
-    }
-    Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
-    combined.attr("aaSummary") = Rcpp::wrap(combNode);
-    combined.attr("AA") = prevFixedAA;
-    res.push_back(combined);
-    res.erase(res.begin());
-    return Rcpp::wrap(res);
+    using namespace MinEntropy;
+    SearchTree<Segmentor> iSearch(minEffectiveSize, nodeSummaries);
+    iSearch.search();
+    // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+    SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
+    dSearch.search();
+    float iMin = iSearch.getMinEntropy(), dMin = dSearch.getMinEntropy();
+    segment final = (iMin < dMin) ? iSearch.getFinal() : dSearch.getFinal();
+    return updatedSegmentation(nodeSummaries, final);
+    // while (iSearch.getFinal() != dSearch.getFinal()) {
+    //     if (iMin > dMin) {
+    //         iSearch.resumeSearch();
+    //         iMin = iSearch.getMinEntropy();
+    //     } else {
+    //         dSearch.resumeSearch();
+    //         dMin = dSearch.getMinEntropy();
+    //     }
+    // }
+    // return updatedSegmentation(nodeSummaries, dSearch.getFinal());
 }
 
 // [[Rcpp::export]]
@@ -310,4 +188,34 @@ Rcpp::CharacterVector tip2colorEdge(
         } while (an != rootNode);
     }
     return colorEdge;
+}
+
+// [[Rcpp::export]]
+Rcpp::IntegerVector tip2Edge(
+        const Rcpp::IntegerMatrix &treeEdge,
+        const Rcpp::IntegerVector &tips,
+        const int rootNode
+) {
+    std::vector<int> res;
+    // Transform "treeEdge" matrix as a map of ancestral node
+    // and its children nodes
+    std::map< int, std::pair<int, int> > nodeLink;
+    for (int i = 0; i < treeEdge.nrow(); ++i) {
+        nodeLink[treeEdge(i, 1)].first = treeEdge(i, 0);
+        nodeLink[treeEdge(i, 1)].second = i;
+    }
+    for (int i = 0; i < tips.size(); ++i) {
+        // Initiate children node "cn" as the tip node
+        int cn = tips[i], an;
+        do {
+            // Find the ancestral node "an" of children node "cn"
+            // by the map "nodeLink"
+            an = nodeLink[cn].first;
+            res.push_back(nodeLink[cn].second + 1);
+            // colorEdge[nodeLink[cn].second] = color;
+            // The ancestral node becomes the new children node
+            cn = an;
+        } while (an != rootNode);
+    }
+    return Rcpp::wrap(res);
 }

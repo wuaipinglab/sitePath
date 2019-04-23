@@ -18,6 +18,28 @@ const float compare(const std::string &query, const std::string &subject) {
     return match / length;
 }
 
+float shannonEntropy(const aaSummary &values) {
+    // The total number of tree tips within a group being
+    // segmentated out by segment points
+    int total = 0;
+    for (
+            aaSummary::const_iterator it = values.begin();
+            it != values.end(); ++it
+    ) {
+        total += it->second;
+    }
+    float res = 0;
+    for (
+            aaSummary::const_iterator it = values.begin();
+            it != values.end(); ++it
+    ) {
+        // Probability of drawing distinct AA
+        float p = it->second / static_cast<float>(total);
+        res -= p * std::log(p);
+    }
+    return res;
+}
+
 TipSeqLinker::TipSeqLinker(
     const Rcpp::CharacterVector &sequence,
     const Rcpp::IntegerVector &tipPath
@@ -74,88 +96,4 @@ Rcpp::IntegerVector TipSeqLinker::getPath() const {
 std::string TipSeqLinker::getSeq() const {
     // The aligned sequence
     return m_seq;
-}
-
-float shannonEntropy(const aaSummary &values) {
-    int total = 0;
-    for (
-            aaSummary::const_iterator it = values.begin();
-            it != values.end(); ++it
-    ) {
-        total += it->second;
-    }
-    float res = 0;
-    for (
-            aaSummary::const_iterator it = values.begin();
-            it != values.end(); ++it
-    ) {
-        float p = it->second / static_cast<float>(total);
-        res -= p * std::log(p);
-    }
-    return res;
-}
-
-Segmentor::Segmentor(
-    const segment all,
-    const segment terminal,
-    const std::vector<aaSummary> &aaSummaries
-):
-    m_used(terminal),
-    m_open(all)
-{
-    m_entropy = this->totalEntropy(aaSummaries);
-}
-
-Segmentor::Segmentor(
-    const Segmentor *parent,
-    const unsigned int i,
-    const std::vector<aaSummary> &aaSummaries
-) {
-    m_used = this->getUsed(parent, i);
-    m_open = this->getOpen(parent, i);
-    m_entropy = this->totalEntropy(aaSummaries);
-}
-
-const segment Segmentor::getUsed(
-        const Segmentor *parent,
-        const unsigned int i
-) const {
-    segment res = parent->m_used;
-    res.push_back(parent->m_open.at(i));
-    std::sort(res.begin(), res.end());
-    return res;
-}
-
-const segment Segmentor::getOpen(
-        const Segmentor *parent,
-        const unsigned int i
-) const {
-    segment res = parent->m_open;
-    res.erase(res.begin() + i);
-    return res;
-}
-
-const float Segmentor::totalEntropy(
-        const std::vector<aaSummary> &aaSummaries
-) const {
-    float res = 0;
-    segIndex start = 0;
-    for (
-            segment::const_iterator m_used_itr = m_used.begin();
-            m_used_itr != m_used.end(); ++m_used_itr
-    ) {
-        aaSummary values;
-        for (unsigned int i = start; i < *m_used_itr; ++i) {
-            const aaSummary toBeCombined = aaSummaries.at(i);
-            for (
-                    aaSummary::const_iterator it = toBeCombined.begin();
-                    it != toBeCombined.end(); ++it
-            ) {
-                values[it->first] += it->second;
-            }
-        }
-        res += shannonEntropy(values);
-        start = *m_used_itr;
-    }
-    return res;
 }
