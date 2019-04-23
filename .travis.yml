@@ -4,3 +4,7 @@ r:
 
 cache: packages
 bioc_required: true
+
+os:
+  - linux
+  - osx

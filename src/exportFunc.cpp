@@ -37,11 +37,13 @@ SEXP runTreemer(
         }
     }
     Treemer::BySimilarity match(tipPaths, alignedSeqs, similarity, simMatrix);
-    if (getTips) {
-        return Rcpp::wrap(match.getTips());
-    } else {
-        return Rcpp::wrap(match.getPaths());
-    }
+    // TODO: Separate the two functionalities
+    return getTips ? Rcpp::wrap(match.getTips()) : Rcpp::wrap(match.getPaths());
+    // if (getTips) {
+    //     return Rcpp::wrap(match.getTips());
+    // } else {
+    //     return Rcpp::wrap(match.getPaths());
+    // }
 }
 
 // [[Rcpp::export]]
@@ -186,4 +188,34 @@ Rcpp::CharacterVector tip2colorEdge(
         } while (an != rootNode);
     }
     return colorEdge;
+}
+
+// [[Rcpp::export]]
+Rcpp::IntegerVector tip2Edge(
+        const Rcpp::IntegerMatrix &treeEdge,
+        const Rcpp::IntegerVector &tips,
+        const int rootNode
+) {
+    std::vector<int> res;
+    // Transform "treeEdge" matrix as a map of ancestral node
+    // and its children nodes
+    std::map< int, std::pair<int, int> > nodeLink;
+    for (int i = 0; i < treeEdge.nrow(); ++i) {
+        nodeLink[treeEdge(i, 1)].first = treeEdge(i, 0);
+        nodeLink[treeEdge(i, 1)].second = i;
+    }
+    for (int i = 0; i < tips.size(); ++i) {
+        // Initiate children node "cn" as the tip node
+        int cn = tips[i], an;
+        do {
+            // Find the ancestral node "an" of children node "cn"
+            // by the map "nodeLink"
+            an = nodeLink[cn].first;
+            res.push_back(nodeLink[cn].second + 1);
+            // colorEdge[nodeLink[cn].second] = color;
+            // The ancestral node becomes the new children node
+            cn = an;
+        } while (an != rootNode);
+    }
+    return Rcpp::wrap(res);
 }

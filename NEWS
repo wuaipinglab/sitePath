@@ -1,3 +1,9 @@
+CHANGES IN VERSION 0.99.27
+-------------------------
+    o Improve 'multiFixationSite' with a two-way greedy algorithm
+    o Use dash line for excluded 'lineagePath' in 'plotSingleSite'
+
+
 CHANGES IN VERSION 0.99.26
 -------------------------
     o Bug fix: 'nodeAAsum' subscript out of bound in 'multiFixationSite'

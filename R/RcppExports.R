@@ -37,3 +37,7 @@ tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {
     .Call('_sitePath_tip2colorEdge', PACKAGE = 'sitePath', colorEdge, color, treeEdge, tips, rootNode)
 }
 
+tip2Edge <- function(treeEdge, tips, rootNode) {
+    .Call('_sitePath_tip2Edge', PACKAGE = 'sitePath', treeEdge, tips, rootNode)
+}
+
