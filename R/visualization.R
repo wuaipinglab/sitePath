@@ -294,7 +294,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     AAnames <- character(0)
     for (sp in sitePaths) {
         aaName <- character(0)
-        for (tips in sp) {
+        for (tips in rev(sp)) {
             aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
             aaName <- c(aaName, aa)
             targetEdges <- tip2Edge(tree$edge, tips, rootNode)

@@ -66,6 +66,7 @@ In the current version, the resolving function only takes sequence similarity as
 
 ```{r sneakPeek_plot}
 preassessment <- sneakPeek(tree)
+plot(preassessment$similarity, preassessment$pathNum)
 ```
 
 ## Choose a threshold by yourself
