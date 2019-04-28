@@ -1,3 +1,11 @@
+CHANGES IN VERSION 0.99.28
+-------------------------
+    o Bug fix: Internal indexing error in 'multiFixationSites'
+    o The default for 'makePlot' in 'sneakPeak' changed to False
+    o The default 'tolerance' in 'fixationSite' changed to 0.01
+    o Improve visualization of 'fixationSites' return
+
+
 CHANGES IN VERSION 0.99.27
 -------------------------
     o Improve 'multiFixationSite' with a two-way greedy algorithm

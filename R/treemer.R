@@ -208,7 +208,7 @@ sneakPeek <- function(tree,
                       step = NULL,
                       maxPath = NULL,
                       minPath = 1,
-                      makePlot = TRUE) {
+                      makePlot = FALSE) {
     simMatrix <- similarityMatrix(tree)
     minSim <- min(simMatrix)
     if (is.null(step)) {
@@ -236,6 +236,8 @@ sneakPeek <- function(tree,
         if (maxPath < length(paths)) {
             next
         } else if (length(paths) <= minPath) {
+            similarity <- c(similarity, s)
+            pathNum <- c(pathNum, length(paths))
             break
         }
         similarity <- c(similarity, s)

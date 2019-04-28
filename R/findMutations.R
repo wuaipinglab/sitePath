@@ -94,7 +94,7 @@ print.sitePath <- function(x, ...) {
 #' before/after mutation. Otherwise the mutation will not be counted into
 #' the return. If more than one number is given, the ancestral takes the first
 #' and descendant takes the second as the maximum. If only given one number,
-#' it's the maximum for both ancestral and descendant.
+#' it's the maximum for both ancestral and descendant. The default is 0.01
 #' @param minEffectiveSize
 #' A vector of two integers to specifiy minimum tree tips involved
 #' before/after mutation. Otherwise the mutation will not be counted into
@@ -123,7 +123,7 @@ print.sitePath <- function(x, ...) {
 fixationSites.lineagePath <- function(paths,
                                       reference = NULL,
                                       gapChar = '-',
-                                      tolerance = 0,
+                                      tolerance = 0.01,
                                       minEffectiveSize = NULL,
                                       extendedSearch = TRUE,
                                       ...) {
@@ -516,9 +516,12 @@ multiFixationSites.lineagePath <- function(paths,
                     # index should it be assigned in the "res[[site]]"
                     targetIndex <- NULL
                     if (is.null(res[[site]])) {
+                        # Create the "sitePath" entry for the "site"
+                        # if it doesn't exist yet
                         targetIndex <- 1
                     } else {
                         mut <- getMutPathAA(s)
+                        # Which mutaiton path has the same mutations as "s"
                         existIndex <- which(vapply(
                             existPath,
                             FUN = function(i) {
@@ -527,9 +530,23 @@ multiFixationSites.lineagePath <- function(paths,
                             FUN.VALUE = logical(1)
                         ))
                         if (length(existIndex) == 0) {
-                            # Add new fixation for the site if it's not existed
+                            # Add new fixation for the site if none of
+                            # the existing mutation path has the same
+                            # mutations as "s"
                             targetIndex <- length(existPath) + 1
                         } else {
+                            # "Adding state" for each existing mutation
+                            # path that has the same mutations as "s" does.
+                            #
+                            # 0L: "s" is a subset of existing path and won't
+                            # be added to the "res"
+                            #
+                            # 1L: The path is different from "s". They just
+                            # happen to share the same mutations. A new
+                            # mutation path will be created
+                            #
+                            # 2L: The existing path is a subset of "s" and
+                            # needs to be replaced by "s"
                             qualified <- vapply(
                                 existIndex,
                                 FUN = function(ei) {
@@ -546,17 +563,18 @@ multiFixationSites.lineagePath <- function(paths,
                                 },
                                 FUN.VALUE = integer(1)
                             )
+                            # Extend the "sitePath" when all existing paths
+                            # have an "adding state" of 1L, being different
+                            # from the "s"
                             if (all(qualified == 1L)) {
+                                targetIndex <- length(existPath) + 1
+                            } else if (any(r <- qualified == 2L)) {
+                                # Remove existing paths with an "adding state"
+                                # of 2L and add the "s"
+                                res[[site]] <-
+                                    res[[site]][-which(r)]
                                 targetIndex <-
-                                    length(existPath) + length(existIndex)
-                            }
-                            replaceIndex <- which(qualified > 1)
-                            if (length(replaceIndex) > 1) {
-                                targetIndex <-
-                                    length(existPath) + length(existIndex)
-                                res[[site]] <- res[[site]][-replaceIndex]
-                            } else if (length(replaceIndex) == 1) {
-                                targetIndex <- replaceIndex
+                                    length(res[[site]]) + 1
                             }
                         }
                     }

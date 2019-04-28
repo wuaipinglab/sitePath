@@ -12,7 +12,7 @@
 SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = 0, minEffectiveSize = NULL,
+  gapChar = "-", tolerance = 0.01, minEffectiveSize = NULL,
   extendedSearch = TRUE, ...)
 
 \method{multiFixationSites}{lineagePath}(paths, reference = NULL,
@@ -35,7 +35,7 @@ for the reference sequence.}
 before/after mutation. Otherwise the mutation will not be counted into
 the return. If more than one number is given, the ancestral takes the first
 and descendant takes the second as the maximum. If only given one number,
-it's the maximum for both ancestral and descendant.}
+it's the maximum for both ancestral and descendant. The default is 0.01}
 
 \item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
 before/after mutation. Otherwise the mutation will not be counted into

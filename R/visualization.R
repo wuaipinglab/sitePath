@@ -236,7 +236,7 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
         aa <- toupper(names(sp))
         plotName <- c(plotName, paste0(aa[1], site, aa[2]))
         aa <- AA_FULL_NAMES[tolower(aa)]
-        for (n in c(1, 2)) {
+        for (n in c(2, 1)) {
             targetEdges <- tip2Edge(tree$edge, sp[[n]], rootNode)
             color[targetEdges] <- AA_COLORS[aa[n]]
             lty[targetEdges] <- 1
