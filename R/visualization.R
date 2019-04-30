@@ -296,7 +296,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
         aaName <- character(0)
         for (tips in rev(sp)) {
             aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
-            aaName <- c(aaName, aa)
+            aaName <- c(aa, aaName)
             targetEdges <- tip2Edge(tree$edge, tips, rootNode)
             color[targetEdges] <- AA_COLORS[aa]
             lty[targetEdges] <- 1
