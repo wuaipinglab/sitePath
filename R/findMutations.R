@@ -234,27 +234,45 @@ fixationSites.lineagePath <- function(paths,
                     # Using "mut" as the name will cause the conflict
                     # and override some fixation events.
                     mut <- paste(c(b, a), collapse = "")
-                    targetIndex <- which(vapply(
+                    existIndex <- which(vapply(
                         existPath,
                         FUN = function(i) {
                             paste(names(i), collapse = "") == mut
                         },
                         FUN.VALUE = logical(1)
                     ))
-                    if (length(targetIndex) == 0) {
+                    if (length(existIndex) == 0) {
                         # Add new fixation for the site if it's not existed
                         targetIndex <- length(existPath) + 1
                     } else {
-                        # Retrieve existing fixation path with the same
-                        # mutation to compare with the current value
-                        existMut <- existPath[[targetIndex]]
-                        # A new entry will be added to the "sitePath"
-                        # or an old entry will be replaced if it's actually
-                        # a subset of the new one.
-                        if (!all(afterTips %in% existMut[[a]])) {
+                        qualified <- vapply(
+                            existIndex,
+                            FUN = function(ei) {
+                                existMut <- existPath[[ei]]
+                                existTips <-
+                                    unlist(tail(existMut, 1))
+                                if (all(existTips %in% afterTips)) {
+                                    return(2L)
+                                }
+                                if (!all(afterTips %in% existTips)) {
+                                    return(1L)
+                                }
+                                return(0L)
+                            },
+                            FUN.VALUE = integer(1)
+                        )
+                        # Extend the "sitePath" when all existing paths
+                        # have an "adding state" of 1L, being different
+                        # from the "s"
+                        if (all(qualified == 1L)) {
                             targetIndex <- length(existPath) + 1
-                        } else if (length(afterTips) <= length(existMut[[a]])) {
-                            next
+                        } else if (any(r <- qualified == 2L)) {
+                            # Remove existing paths with an "adding state"
+                            # of 2L and add the "s"
+                            res[[site]] <-
+                                res[[site]][-which(r)]
+                            targetIndex <-
+                                length(res[[site]]) + 1
                         }
                     }
                 }

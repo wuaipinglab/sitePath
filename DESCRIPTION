@@ -2,7 +2,7 @@ Package: sitePath
 Type: Package
 Title: Detection of sites with fixation of amino acid substitutions
     in protein evolution
-Version: 1.1.0
+Version: 1.1.1
 Author: Chengyang Ji, Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
 Description: The package does hierarchical search for fixation events given
