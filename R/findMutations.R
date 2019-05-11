@@ -269,10 +269,10 @@ fixationSites.lineagePath <- function(paths,
                         } else if (any(r <- qualified == 2L)) {
                             # Remove existing paths with an "adding state"
                             # of 2L and add the "s"
-                            res[[site]] <-
-                                res[[site]][-which(r)]
+                            mutations[[site]] <-
+                                mutations[[site]][-which(r)]
                             targetIndex <-
-                                length(res[[site]]) + 1
+                                length(mutations[[site]]) + 1
                         }
                     }
                 }
@@ -328,6 +328,20 @@ getMutPathAA <- function(s) {
         mutName <- paste0(mutName, attr(tips, "AA"))
     }
     return(mutName)
+}
+
+compareMutPathAA <- function(e, s) {
+    len <- length(e)
+    if (len != length(s)) {
+        return(FALSE)
+    } else {
+        for (i in seq_len(len)) {
+            if (attr(e[[i]], "AA") != attr(s[[i]], "AA")) {
+                return(FALSE)
+            }
+        }
+    }
+    return(TRUE)
 }
 
 #' @rdname findSites
@@ -524,88 +538,78 @@ multiFixationSites.lineagePath <- function(paths,
                 if (length(nodeSummaries) <= 2) {
                     next
                 }
-                s <- minimizeEntropy(nodeSummaries,
-                                     minEffectiveSize)
-                if (length(s) > 2) {
-                    # Retrieve the existing mutation path of the site
-                    existPath <- res[[site]]
+                seg <-
+                    minimizeEntropy(nodeSummaries, minEffectiveSize)
+                targetIndex <- NULL
+                if (length(seg) < 2) {
+                    next
+                } else if (!site %in% names(res)) {
+                    targetIndex <- 1
+                } else {
                     # Some site may have multiple fixation on multiple
                     # lineages. The following is for deciding at which
                     # index should it be assigned in the "res[[site]]"
-                    targetIndex <- NULL
-                    if (is.null(res[[site]])) {
-                        # Create the "sitePath" entry for the "site"
-                        # if it doesn't exist yet
-                        targetIndex <- 1
-                    } else {
-                        mut <- getMutPathAA(s)
-                        # Which mutaiton path has the same mutations as "s"
-                        existIndex <- which(vapply(
-                            existPath,
-                            FUN = function(i) {
-                                getMutPathAA(i) == mut
+                    # Retrieve the existing mutation path of the site
+                    existPath <- res[[site]]
+                    # Add new fixation for the site. Assume none of
+                    # the existing mutation path has the same
+                    # mutations as "seg"
+                    targetIndex <- length(existPath) + 1
+                    # Which mutaiton path has the same mutations as "seg"
+                    # mut <- getMutPathAA(s)
+                    existIndex <- which(vapply(
+                        existPath,
+                        FUN = compareMutPathAA,
+                        FUN.VALUE = logical(1),
+                        seg
+                    ))
+                    if (length(existIndex) > 0) {
+                        # afterTips <- unlist(tail(seg, 1))
+                        # "Adding state" for each existing mutation
+                        # path that has the same mutations as "seg" does.
+                        #
+                        # 0L: "seg" is a subset of existing path and won't
+                        # be added to the "res"
+                        #
+                        # 1L: The path is different from "seg". They just
+                        # happen to share the same mutations. A new
+                        # mutation path will be created
+                        #
+                        # 2L: The existing path is a subset of "seg" and
+                        # needs to be replaced by "seg"
+                        qualified <- vapply(
+                            existPath[existIndex],
+                            FUN = function(ep) {
+                                existTips <- unlist(tail(ep, 1))
+                                if (all(existTips %in% afterTips)) {
+                                    return(2L)
+                                }
+                                if (!all(afterTips %in% existTips)) {
+                                    return(1L)
+                                }
+                                return(0L)
                             },
-                            FUN.VALUE = logical(1)
-                        ))
-                        if (length(existIndex) == 0) {
-                            # Add new fixation for the site if none of
-                            # the existing mutation path has the same
-                            # mutations as "s"
-                            targetIndex <- length(existPath) + 1
-                        } else {
-                            # "Adding state" for each existing mutation
-                            # path that has the same mutations as "s" does.
-                            #
-                            # 0L: "s" is a subset of existing path and won't
-                            # be added to the "res"
-                            #
-                            # 1L: The path is different from "s". They just
-                            # happen to share the same mutations. A new
-                            # mutation path will be created
-                            #
-                            # 2L: The existing path is a subset of "s" and
-                            # needs to be replaced by "s"
-                            qualified <- vapply(
-                                existIndex,
-                                FUN = function(ei) {
-                                    existMut <- existPath[[ei]]
-                                    existTips <-
-                                        unlist(tail(existMut, 1))
-                                    if (all(existTips %in% afterTips)) {
-                                        return(2L)
-                                    }
-                                    if (!all(afterTips %in% existTips)) {
-                                        return(1L)
-                                    }
-                                    return(0L)
-                                },
-                                FUN.VALUE = integer(1)
-                            )
-                            # Extend the "sitePath" when all existing paths
-                            # have an "adding state" of 1L, being different
-                            # from the "s"
-                            if (all(qualified == 1L)) {
-                                targetIndex <- length(existPath) + 1
-                            } else if (any(r <- qualified == 2L)) {
-                                # Remove existing paths with an "adding state"
-                                # of 2L and add the "s"
-                                res[[site]] <-
-                                    res[[site]][-which(r)]
-                                targetIndex <-
-                                    length(res[[site]]) + 1
-                            }
+                            FUN.VALUE = integer(1)
+                        )
+                        if (any(r <- qualified == 2L)) {
+                            # Remove existing paths with an "adding state"
+                            # of 2L and add the "seg"
+                            res[[site]] <- res[[site]][-which(r)]
+                            targetIndex <- length(res[[site]]) + 1
+                        } else if (all(qualified == 0)) {
+                            targetIndex <- NULL
                         }
                     }
-                    if (is.null(targetIndex)) {
-                        next
-                    }
-                    # Assign the result to the "res[[site]]"
-                    res[[site]][[targetIndex]] <- s
-                    # Assign or re-assign class and "site" to
-                    # the "res[[site]]"
-                    class(res[[site]]) <- "sitePath"
-                    attr(res[[site]], "site") <- as.integer(site)
                 }
+                if (is.null(targetIndex)) {
+                    next
+                }
+                # Assign the result to the "res[[site]]"
+                res[[site]][[targetIndex]] <- seg
+                # Assign or re-assign class and "site" to
+                # the "res[[site]]"
+                class(res[[site]]) <- "sitePath"
+                attr(res[[site]], "site") <- i
             }
         }
     }
