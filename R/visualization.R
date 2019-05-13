@@ -300,7 +300,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
             targetEdges <- tip2Edge(tree$edge, tips, rootNode)
             color[targetEdges] <- AA_COLORS[aa]
             lty[targetEdges] <- 1
-            width[targetEdges] <- 1
+            width[targetEdges] <- 2
         }
         AAnames <- c(AAnames, aaName)
         plotName <- c(plotName, paste0(aaName, collapse = " -> "))
