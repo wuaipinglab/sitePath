@@ -66,13 +66,22 @@ print.sitePath <- function(x, ...) {
     # a single site. So each "m" represent a single fixation
     # path
     for (m in x) {
-        mutName <- character(0)
-        for (tips in m) {
-            aa <- attr(tips, "AA")
-            mutName <-
-                c(mutName, paste0(aa, "(", length(tips), ")"))
+        if (length(m) == 2) {
+            mutName <- paste0(attr(m[[1]], "AA"),
+                              attr(x, "site"),
+                              attr(m[[2]], "AA"))
+            cat(mutName,
+                paste0("(", length(m[[1]]), "->", length(m[[2]]), ")"),
+                "\n")
+        } else {
+            mutName <- character(0)
+            for (tips in m) {
+                aa <- attr(tips, "AA")
+                mutName <-
+                    c(mutName, paste0(aa, "(", length(tips), ")"))
+            }
+            cat(paste0(mutName, collapse = " -> "), "\n")
         }
-        cat(paste0(mutName, collapse = " -> "), "\n")
     }
     cat("\nIn the bracket are the number of tips",
         "involved before and after the fixation\n")
@@ -322,14 +331,6 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
-getMutPathAA <- function(s) {
-    mutName <- character(0)
-    for (tips in s) {
-        mutName <- paste0(mutName, attr(tips, "AA"))
-    }
-    return(mutName)
-}
-
 compareMutPathAA <- function(e, s) {
     len <- length(e)
     if (len != length(s)) {
@@ -370,27 +371,13 @@ multiFixationSites.lineagePath <- function(paths,
     align <- attr(paths, "align")
     refSeqName <- reference
     reference <- checkReference(tree, align, reference, gapChar)
-    # TODO: "tolerance" may be accepting numeric vector with
-    # a size of two: first being for within a segment and second
-    # being for the whole path.
-    # if (!is.numeric(tolerance)) {
-    #     stop("\"tolerance\" only accepts numeric")
-    # } else {
-    #     tolerance <- if (tolerance < 0) {
-    #         stop("\"tolerance\" can only be positive number")
-    #     } else if (tolerance < 0.5) {
-    #         tolerance * nTips
-    #     } else if (tolerance < 1) {
-    #         (1 - tolerance) * nTips
-    #     } else {
-    #         as.integer(tolerance)
-    #     }
-    # }
+    # Get the "minEffectiveSize" for each fixation
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <- nTips / (length(paths) * 10)
     } else if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
     }
+    minEffectiveSize <- ceiling(minEffectiveSize)
     divNodes <- unique(divergentNode(paths))
     if (extendedSearch) {
         paths <- extendPaths(paths, tree)
@@ -535,8 +522,20 @@ multiFixationSites.lineagePath <- function(paths,
                 # Skip to the next "site" if AA of "pathBefore" is
                 # purely fixed or the terminal AA is the same as
                 # fixed AA of "afterTips". This avoids repetition.
-                if (length(nodeSummaries) <= 2) {
+                if (length(nodeSummaries) <= 1) {
                     next
+                } else if (site %in% names(res)) {
+                    aTips <- nodeSummaries[[length(nodeSummaries)]]
+                    exist <- vapply(
+                        res[[site]],
+                        FUN = function(ep) {
+                            all(aTips %in% ep[[length(ep)]])
+                        },
+                        FUN.VALUE = logical(1)
+                    )
+                    if (any(exist)) {
+                        next
+                    }
                 }
                 seg <-
                     minimizeEntropy(nodeSummaries, minEffectiveSize)
@@ -556,13 +555,14 @@ multiFixationSites.lineagePath <- function(paths,
                     # mutations as "seg"
                     targetIndex <- length(existPath) + 1
                     # Which mutaiton path has the same mutations as "seg"
-                    # mut <- getMutPathAA(s)
-                    existIndex <- which(vapply(
-                        existPath,
-                        FUN = compareMutPathAA,
-                        FUN.VALUE = logical(1),
-                        seg
-                    ))
+                    existIndex <- which(
+                        vapply(
+                            existPath,
+                            FUN = compareMutPathAA,
+                            FUN.VALUE = logical(1),
+                            seg
+                        )
+                    )
                     if (length(existIndex) > 0) {
                         # afterTips <- unlist(tail(seg, 1))
                         # "Adding state" for each existing mutation

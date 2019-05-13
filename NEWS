@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.1.2
+-------------------------
+    o Use 'multiFixationSites' for both single and multiple fixation sites
+
+
+CHANGES IN VERSION 1.1.1
+-------------------------
+    o Bug fix: Error when adding new result in 'fixationSites'
+
+
 CHANGES IN VERSION 0.99.28
 -------------------------
     o Bug fix: Internal indexing error in 'multiFixationSites'
