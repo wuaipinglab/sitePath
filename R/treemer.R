@@ -67,6 +67,7 @@ sortSimMatrix <- function(tree, simMatrix) {
 #' @param forbidTrivial Does not allow trivial trimming
 #' @param tipnames If return as tipnames
 #' @importFrom ape nodepath
+#' @importFrom stats sd
 #' @examples
 #' data("zikv_tree")
 #' data("zikv_align")
@@ -81,7 +82,8 @@ groupTips <- function(tree,
                       tipnames = TRUE) {
     if (is.null(similarity)) {
         simMatrix <- similarityMatrix(tree)
-        similarity <- mean(simMatrix)
+        simDist <- simMatrix[upper.tri(simMatrix)]
+        similarity <- mean(simDist) - sd(simDist)
     } else {
         simMatrix <- sortSimMatrix(tree, simMatrix)
     }
@@ -134,7 +136,8 @@ lineagePath <- function(tree,
                      forbidTrivial = TRUE) {
     if (is.null(similarity)) {
         simMatrix <- similarityMatrix(tree)
-        similarity <- mean(simMatrix)
+        simDist <- simMatrix[upper.tri(simMatrix)]
+        similarity <- mean(simDist) - sd(simDist)
     } else {
         simMatrix <- sortSimMatrix(tree, simMatrix)
     }

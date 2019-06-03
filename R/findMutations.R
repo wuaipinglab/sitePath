@@ -430,7 +430,7 @@ multiFixationSites.lineagePath <- function(paths,
                 # May jump to next site if exceeding tolerance
                 toleranceSum <-
                     sum(afterSummary) - max(afterSummary)
-                if (toleranceSum > length(afterTips) * 0.1) {
+                if (toleranceSum > length(afterTips) * 0.01) {
                     next
                 }
                 attr(afterTips, "aaSummary") <- afterSummary
