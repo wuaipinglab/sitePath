@@ -148,7 +148,20 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     using namespace MinEntropy;
     SearchTree<Segmentor> iSearch(minEffectiveSize, nodeSummaries);
     iSearch.search();
-    return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+    // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+    SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
+    dSearch.search();
+    float iMin = iSearch.getMinEntropy(), dMin = dSearch.getMinEntropy();
+    segment iFinal = iSearch.getFinal(), dFinal = dSearch.getFinal();
+    segment final;
+    if (iFinal.size() > dFinal.size()) {
+        final = iFinal;
+    } else if (iFinal.size() == dFinal.size()) {
+        final = iSearch.getFinal();
+    } else {
+        final = dFinal;
+    }
+    return updatedSegmentation(nodeSummaries, final);
     // SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
     // dSearch.search();
     // while (iSearch.getFinal() != dSearch.getFinal()) {
