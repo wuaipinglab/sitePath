@@ -151,7 +151,6 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
     SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
     dSearch.search();
-    float iMin = iSearch.getMinEntropy(), dMin = dSearch.getMinEntropy();
     segment iFinal = iSearch.getFinal(), dFinal = dSearch.getFinal();
     segment final;
     if (iFinal.size() > dFinal.size()) {

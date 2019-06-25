@@ -7,7 +7,7 @@
 \alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
-\method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE,
+\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE,
   reference = NULL, gapChar = "-", ...)
 
 \method{plotSingleSite}{fixationSites}(x, site, ...)

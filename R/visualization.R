@@ -101,6 +101,34 @@ AA_FULL_NAMES = c(
     z = 'Glu_or_Gln'
 )
 
+AA_SHORT_NAMES = c(
+    "His" = "H",
+    "Arg" = "R",
+    "Lys" = "K",
+    "Ile" = "I",
+    "Phe" = "F",
+    "Leu" = "L",
+    "Trp" = "W",
+    "Ala" = "A",
+    "Met" = "M",
+    "Pro" = "P",
+    "Val" = "V",
+    "Asn" = "N",
+    "Cys" = "C",
+    "Gly" = "G",
+    "Ser" = "S",
+    "Tyr" = "Y",
+    "Gln" = "Q",
+    "Thr" = "T",
+    "Glu" = "E",
+    "Asp" = "D",
+    "gap" = "-",
+    "unknown" = "X",
+    "Ile_or_Leu" = "J",
+    "Asp_or_Asn" = "B",
+    "Glu_or_Gln" = "Z"
+)
+
 #' @rdname plotSingleSite
 #' @name plotSingleSite
 #' @title Color the tree by a single site
@@ -142,7 +170,7 @@ AA_FULL_NAMES = c(
 #' @export
 plotSingleSite.lineagePath <- function(x,
                                        site,
-                                       showPath = TRUE,
+                                       showPath = FALSE,
                                        reference = NULL,
                                        gapChar = "-",
                                        ...) {
@@ -256,7 +284,7 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
     legend(
         "topleft",
         title = "Amino acid",
-        legend = unique(AAnames),
+        legend = AA_SHORT_NAMES[unique(AAnames)],
         fill = AA_COLORS[unique(AAnames)],
         box.lty = 0
     )
@@ -303,7 +331,8 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
             width[targetEdges] <- 2
         }
         AAnames <- c(AAnames, aaName)
-        plotName <- c(plotName, paste0(aaName, collapse = " -> "))
+        plotName <-
+            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
     plot.phylo(
         tree,
@@ -323,7 +352,7 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
     legend(
         "topleft",
         title = "Amino acid",
-        legend = unique(AAnames),
+        legend = AA_SHORT_NAMES[unique(AAnames)],
         fill = AA_COLORS[unique(AAnames)],
         box.lty = 0
     )

@@ -5,13 +5,16 @@ Treemer::Base::Base(
     const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
 ):
     m_root(*(tipPaths[0].begin())),
-    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size())
-{
+    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size()) {
+    // Iterate tipPaths and alignedSeqs to construct a list of TipSeqLinkers
     for (int i = 0; i < tipPaths.size(); i++) {
         TipSeqLinker *tip = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
         m_tips.push_back(tip);
+        // The initial clustering is each tip as a cluster
         m_clusters[tip->getTip()].push_back(tip);
 
+        // The root of each tipPath should be the same
+        // The sequences should be of the same length
         if (m_tips[i]->getRoot() != m_root) {
             throw std::invalid_argument("Root in tree paths not equal");
         } else if (m_tips[i]->getSeqLen() != m_seqLen) {
@@ -21,6 +24,7 @@ Treemer::Base::Base(
 }
 
 Treemer::Base::~Base() {
+    // Release the memory used by TipSeqLinkers
     for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
         delete *it;
     }
@@ -29,6 +33,7 @@ Treemer::Base::~Base() {
 
 std::map< int, std::vector<int> > Treemer::Base::getTips() const {
     std::map< int, std::vector<int> > res;
+    // Get tip from each TipSeqLinker in the list
     for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
         res[(*it)->currentClade()].push_back((*it)->getTip());
     }
@@ -37,6 +42,7 @@ std::map< int, std::vector<int> > Treemer::Base::getTips() const {
 
 std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
     std::vector<Rcpp::IntegerVector> res;
+    // Get path from root to trimming-node from each TipSeqLinker in the list
     for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
         res.push_back((*it)->getPath());
     }
@@ -119,19 +125,19 @@ Treemer::BySimilarity::BySimilarity(
 ):
     Base(tipPaths, alignedSeqs),
     m_simCut(simThreshold),
-    m_compared(&simMatrix)
-{
+    m_compared(&simMatrix) {
+    // The similarity threshold should be between 0 and 1
     if (m_simCut <= 0) {
         throw std::invalid_argument("Similarity cannot be lower or equal to 0");
     } else if (m_simCut > 1) {
         throw std::invalid_argument("Similarity cannot be greater than 1");
     }
+    // Trim the tree when the object is instantiated
     if (m_simCut != 1) { pruneTree(); }
 }
 
-bool Treemer::BySimilarity::qualified(
-        const clusters::iterator &clusters_it
-) const {
+bool Treemer::BySimilarity::qualified(const clusters::iterator &clusters_it) const {
+    // Iterate all pairs of tips in the cluster
     for (
             tips::const_iterator it = clusters_it->second.begin();
             it != clusters_it->second.end() - 1; ++it
@@ -144,6 +150,8 @@ bool Treemer::BySimilarity::qualified(
                 (*it)->getTip(),
                 (*it2)->getTip()
             );
+            // Retrieve similarity from existing values
+            // Calculate the value otherwise
             float sim = 0;
             std::map<std::pair<int, int>, float>::iterator
                 pos = m_compared->find(pairing);
@@ -153,6 +161,7 @@ bool Treemer::BySimilarity::qualified(
                 sim = compare((*it)->getSeq(), (*it2)->getSeq());
                 (*m_compared)[pairing] = sim;
             }
+            // Break the loop and disqualified the cluster if applied
             if (sim < m_simCut) {
                 return false;
             }

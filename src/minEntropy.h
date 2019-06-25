@@ -20,12 +20,17 @@
 
 namespace MinEntropy {
 
-// The base class for node in tree search for minimum entropy
 class TreeSearchNode {
+    /*
+     * The base class for implementing node in tree search for minimum entropy
+     * The node stores the segment points and calculates the total entropy of
+     * the current segmentation
+     */
 public:
     // Pure virtual methods
     virtual unsigned int getOpenSize() const = 0;
     virtual bool isEndNode() const = 0;
+    virtual ~TreeSearchNode();
     // Getters for private/protected member variables
     segment getUsed() const;
     float getEntropy() const;
@@ -45,35 +50,39 @@ protected:
             const unsigned int minEffectiveSize
     );
 protected:
-    // The segment points being used and this list must
-    // include the enclosed point
+    // A list of the segment points which must include the enclosed point
     segment m_used;
     // The Shannon Entropy of the search node
     float m_entropy;
-    // Assume the search node is qualified
-    bool m_qualified = true;
+    // Whether the search node is qualified
+    bool m_qualified;
 };
 
 class Segmentor: public TreeSearchNode {
+    /*
+     * The class to implement the node in the adding search
+     *
+     * Store segment indices of a nodePath and the remaining unused indices
+     * The growing of the tree search is by adding one segment point from
+     * the open list to the used list for each children node
+     */
 public:
-    // Initially all segment points are open and
-    // only terminal point is used.
+    // Initially only the terminal enclosed point is used.
     Segmentor(
         const segment &all,
         const segment &terminal,
         const std::vector<aaSummary> &aaSummaries,
         const unsigned int minEffectiveSize
     );
-    // Genetrat a child node from the parent node
-    // The new used segment point is based on
-    // open points in parent node.
+    // Genetrat a children node from the parent node
+    // Simply pick the "i"th segment point from the parent's open list
     Segmentor(
         const Segmentor *parent,
         const unsigned int i,
         const std::vector<aaSummary> &aaSummaries,
         const unsigned int minEffectiveSize
     );
-    // Provide size of open points for generating children node
+    // Provide size of open list for generating children node
     unsigned int getOpenSize() const;
     // If the node has reach the end of the search
     bool isEndNode() const;
@@ -94,6 +103,13 @@ private:
 };
 
 class Amalgamator: public TreeSearchNode {
+    /*
+     * The class to implemenet the node in the removing search
+     *
+     * Only the used list is needed tracking as it's also the open list.
+     * The growing of the search tree is by removing one segment point
+     * from the used list
+     */
 public:
     // All segment points are being used initially
     Amalgamator(
@@ -102,15 +118,13 @@ public:
         const unsigned int minEffectiveSize
     );
     // Genetrat a child node from the parent node
-    // The new used segment point is based on
-    // used points in parent node.
     Amalgamator(
         const Amalgamator *parent,
         const unsigned int i,
         const std::vector<aaSummary> &aaSummaries,
         const unsigned int minEffectiveSize
     );
-    // Provide size of open points for generating children node
+    // Provide size of used list for generating children node
     unsigned int getOpenSize() const;
     // If the node has reach the end of the search
     bool isEndNode() const;
@@ -124,15 +138,20 @@ private:
 
 template <class T>
 class SearchTree {
+    /*
+     * The template class for implementing the tree search
+     *
+     * Store the original nodePath segmentation and search constrain.
+     * It's gonna carry the heuristic search for minimum entropy
+     */
 public:
     SearchTree(
         const unsigned int minEffectiveSize,
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
     );
     virtual ~SearchTree();
-    // Getter for "m_final"
+    // Getters for the private/protected member variables
     segment getFinal() const;
-    // Getter for "m_minEntropy"
     float getMinEntropy() const;
     // Minimum entropy search
     void search();
@@ -140,7 +159,7 @@ public:
 private:
     // The minimum number of tips within a segmented group
     const unsigned int m_minTipNum;
-    // The terminal segment point necessary for enclosing the segmenting
+    // The terminal segment point essential for enclosing the segmenting
     const segIndex m_enclosed;
     // Store all possible segment points (except the enclosed point).
     // Track final list of segment points which gives minimum entropy
@@ -151,26 +170,29 @@ private:
     T *m_parent;
     // To keep track of current minimum entropy of the segmenting
     float m_minEntropy;
-    // The search list for resuming the search
+    // The search list containin all the active search nodes
     std::vector<T *> m_segList;
     // The existing or dropped segment
     std::vector<segment> m_segListHistory;
 private:
+    // Initialize the tree search
     void initSearch();
+    // Grow the tree from the current parent node
     void growTree(T *seg);
     void updateFinal(T *tempMin);
+    // Decide the new parent node
     T *updateParent();
 };
 
-template<> void SearchTree<Segmentor>::initSearch();
-template<> void SearchTree<Amalgamator>::initSearch();
+template <> void SearchTree<Segmentor>::initSearch();
+template <> void SearchTree<Amalgamator>::initSearch();
 
-template<> void SearchTree<Segmentor>::growTree(Segmentor *seg);
-template<> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
+template <> void SearchTree<Segmentor>::growTree(Segmentor *seg);
+template <> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
 
 // Not yet implemented
-template<> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
-template<> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
+template <> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
+template <> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
 
 Rcpp::ListOf<Rcpp::IntegerVector> updatedSegmentation(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,

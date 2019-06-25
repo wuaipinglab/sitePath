@@ -1,14 +1,19 @@
 #include <cmath>
 #include "minEntropy.h"
 
-MinEntropy::TreeSearchNode::TreeSearchNode() {}
+// Empty constructor
+MinEntropy::TreeSearchNode::TreeSearchNode(): m_qualified(true) {}
+
+MinEntropy::TreeSearchNode::~TreeSearchNode() {}
 
 MinEntropy::TreeSearchNode::TreeSearchNode(
     const segment &used,
     const std::vector<aaSummary> &aaSummaries,
     const unsigned int minEffectiveSize
 ):
-    m_used(used) {
+    m_used(used),
+    m_qualified(true) {
+    // Calculate the total entropy upon instantiating
     m_entropy = this->totalEntropy(aaSummaries, minEffectiveSize);
 }
 
@@ -34,6 +39,7 @@ float MinEntropy::TreeSearchNode::totalEntropy(
         // Iterate throught the tree nodes between the segment points
         for (unsigned int i = start; i < *m_used_itr; ++i) {
             // Get the tree node and its summary on amino acid of tips
+            // And combine them into a segment
             const aaSummary toBeCombined = aaSummaries.at(i);
             for (
                     aaSummary::const_iterator it = toBeCombined.begin();
@@ -43,9 +49,12 @@ float MinEntropy::TreeSearchNode::totalEntropy(
                 tipNum += it->second;
             }
         }
+        // The search node will be disqualified if the number of tips
+        // in the segment is lower than the constrain
         if (tipNum < minEffectiveSize) { m_qualified = false; }
         // TODO: tipNum can be used as total in calculating entropy
         res += shannonEntropy(values);
+        // Update the starting segment point
         start = *m_used_itr;
     }
     return res;
@@ -67,16 +76,19 @@ MinEntropy::Segmentor::Segmentor(
     const unsigned int minEffectiveSize
 ):
     MinEntropy::TreeSearchNode() {
+        // List-initialization is only supported since c++11
         m_used = this->newUsed(parent, i);
         m_open = this->newOpen(parent, i);
         m_entropy = this->totalEntropy(aaSummaries, minEffectiveSize);
     }
 
 unsigned int MinEntropy::Segmentor::getOpenSize() const {
+    // This is just for iterating the open list
     return m_open.size();
 }
 
 bool MinEntropy::Segmentor::isEndNode() const {
+    // The search should be forced to end when the open list is empty
     return (m_open.empty()) ? true : false;
 }
 
@@ -85,9 +97,10 @@ segment MinEntropy::Segmentor::newUsed(
         const unsigned int i
 ) const {
     segment res = parent->m_used;
+    // Add the "i"th segment point in the parent's open list to the parent's
+    // used list
     res.push_back(parent->m_open.at(i));
-    // Sort the "res" to make sure the segment points
-    // are in order
+    // Sort to make sure the segment points are in order
     std::sort(res.begin(), res.end());
     return res;
 }
@@ -97,6 +110,7 @@ segment MinEntropy::Segmentor::newOpen(
         const unsigned int i
 ) const {
     segment res = parent->m_open;
+    // Erase the "i"th segment point in the parent's open list
     res.erase(res.begin() + i);
     return res;
 }
@@ -119,15 +133,18 @@ MinEntropy::Amalgamator::Amalgamator(
     const unsigned int minEffectiveSize
 ):
     MinEntropy::TreeSearchNode() {
+        // List-initialization is only supported since c++11
         m_used = this->newUsed(parent, i);
         m_entropy = this->totalEntropy(aaSummaries, minEffectiveSize);
     }
 
 unsigned int MinEntropy::Amalgamator::getOpenSize() const {
+    // This is just for iterating the open list
     return m_used.size() - 1;
 }
 
 bool MinEntropy::Amalgamator::isEndNode() const {
+    // The search should be forced to end when the open list is empty
     return (m_used.size() == 1) ? true : false;
 }
 
@@ -138,8 +155,6 @@ segment MinEntropy::Amalgamator::newUsed(
     segment res = parent->getUsed();
     res.erase(res.begin() + i);
     // There is no need to sort as the order won't change
-    // And no need to create the list for available segment
-    // points as "m_used" here already contains them.
     return res;
 }
 
@@ -149,8 +164,7 @@ MinEntropy::SearchTree<T>::SearchTree(
     const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
 ):
     m_minTipNum(minEffectiveSize),
-    m_enclosed(nodeSummaries.size())
-{
+    m_enclosed(nodeSummaries.size()) {
     // Transform R list to a vector of AA and mapped frequency as
     // 'm_aaSummaries'. Get all the possible segment points
     for (segIndex i = 0; i < m_enclosed; ++i) {
@@ -163,16 +177,18 @@ MinEntropy::SearchTree<T>::SearchTree(
         }
         m_aaSummaries.push_back(node);
     }
-    // The segment point of "0" should be removed
+    // The segment point of "0" is removed
     m_all.erase(m_all.begin());
-    // The "m_final" must have "m_enclosed" as the last element
+    // The final used list contains the last segment point to enclose
+    // the last segment
     m_final.push_back(m_enclosed);
-    // Generate the first parent node for the search
+    // Generate the first parent node to initialize the search
     initSearch();
 }
 
 template <class T>
 MinEntropy::SearchTree<T>::~SearchTree() {
+    // Release the memory used by search nodes
     typedef typename std::vector<T *>::iterator iter;
     for (iter it = m_segList.begin(); it != m_segList.end(); ++it) {
         delete *it;
@@ -180,24 +196,24 @@ MinEntropy::SearchTree<T>::~SearchTree() {
     m_segList.clear();
 }
 
-template<>
+template <>
 void MinEntropy::SearchTree<MinEntropy::Segmentor>::initSearch() {
-    // The search by adding segment points starts with only "m_enclosed"
-    // as used and "m_all" open for children node
+    // The adding search starts with only the last segment point
+    // and all the rest are open for children nodes
     m_parent = new MinEntropy::Segmentor(
         m_all,
         m_final,
         m_aaSummaries,
         m_minTipNum
     );
-    // Initialize minimum entropy as initial parent's entropy
+    // Initialize minimum entropy as the initial parent's entropy
     m_minEntropy = m_parent->getEntropy();
 }
 
-template<>
+template <>
 void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
-    // Use the "m_enclosed" segment point and its entropy as the
-    // initial values as the initial "Amalgamator" can be unqualified
+    // Use the initial entropy is the starting parent node of the adding search
+    // because the starting parent node of the removing search can be invalid
     MinEntropy::Segmentor noSeg(
             m_all,
             m_final,
@@ -206,6 +222,7 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
     );
     m_final = noSeg.getUsed();
     m_minEntropy = noSeg.getEntropy();
+    // Add the last segment point to the used list for the staring parent node
     m_all.push_back(m_enclosed);
     m_parent = new MinEntropy::Amalgamator(
         m_all,
@@ -218,6 +235,8 @@ template <>
 void MinEntropy::SearchTree<MinEntropy::Segmentor>::growTree(
         MinEntropy::Segmentor *seg
 ) {
+    // Only the qualified search node in the adding search is added to
+    // the active list. Deleted otherwise
     if (seg->isQualified()) {
         m_segList.push_back(seg);
     } else {
@@ -229,6 +248,11 @@ template <>
 void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
         MinEntropy::Amalgamator *seg
 ) {
+    // The node will not be included in the active list and deleted if
+    // a node with the same used list has already been evaluated.
+    //
+    // The node doesn't have to be qualified because we don't want to rule
+    // out the possibly qualifed children node
     segment x = seg->getUsed();
     if (std::find(
             m_segListHistory.begin(),
@@ -237,6 +261,8 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
     ) == m_segListHistory.end()) {
         m_segListHistory.push_back(x);
         m_segList.push_back(seg);
+    } else {
+        delete seg;
     }
 }
 
@@ -249,11 +275,9 @@ float MinEntropy::SearchTree<T>::getMinEntropy() const { return m_minEntropy; }
 template <class T>
 T *MinEntropy::SearchTree<T>::updateParent() {
     typedef typename std::vector<T *>::iterator iter;
-    // Assume the first "SearchNode" is the best hit.
+    // Assume the first search node in the active list is the new parent node.
     iter it = m_segList.begin(), rm = it;
-    // This "tempMin" is always one of the "SearchNode" in the search
-    // list. And once it's found, it's going to be the new "parent"
-    // and its pointer is removed from the search list.
+    // The new parent node has the minimum entropy among the active list
     T *tempMin = *it;
     for (++it; it != m_segList.end(); ++it) {
         if ((*it)->getEntropy() < tempMin->getEntropy()) {
@@ -261,8 +285,9 @@ T *MinEntropy::SearchTree<T>::updateParent() {
             rm = it;
         }
     }
+    // Remove the pointer of the new parent from the search list.
     m_segList.erase(rm);
-    // Return the pointer to the current best hit in the "SearchNode" list
+    // Return the pointer to the new parent node
     return tempMin;
 }
 
@@ -277,62 +302,54 @@ void MinEntropy::SearchTree<T>::resumeSearch() {
 template <class T>
 void MinEntropy::SearchTree<T>::search() {
     unsigned int depth = 0;
-    unsigned int maxDepth = m_enclosed;
-    // Find the "minEntropy" among "SearchNode" in "segList" and make
-    // the "SearchNode" the "parent" for next round. The new "minEntropy"
-    // should be decreasing but increasing is allowed. So "final" is
-    // returned when its "minEntropy" stays for "m_enclosed" consecutive
-    // of times.
+    unsigned int maxDepth = m_enclosed * m_enclosed;
+    // Find the search node with minimum entropy in the active list and
+    // make it the growing parent node for the next round. The current minimum
+    // entropy should be decreasing but increasing is allowed. The used list
+    // of a node is returned when its entropy stays minimum for a long time.
     while (true) {
-        // for (int i = 0; i < m_parent->getUsed().size(); ++i) {
-        //     std::cout << m_parent->getUsed()[i] << " ";
-        // }
-        // std::cout << std::endl;
-        // Stop when the search reaches the end and delete "m_parent"
+        // Stop when the search reaches the end and delete the new parent node
         if (m_parent->isEndNode()) {
             delete m_parent;
             break;
         }
-        // Children "SearchNode" of the current "parent"
+        // Generate children node from the parent node
         for (unsigned int i = 0; i < m_parent->getOpenSize(); ++i) {
             T *seg = new T(m_parent, i, m_aaSummaries, m_minTipNum);
-            // This is to decide whether the child is included
+            // This is to decide whether the child is valid and can be included
             // in the search list
             growTree(seg);
         }
-        // delete "parent" as its pointer already removed from "m_segList"
+        // Delete the parent node as its pointer already removed
         delete m_parent;
         // Stop when there is no search node in the list
         if (m_segList.empty()) { break; }
-        // Re-calculate the best hit from the search list and assign
-        // to "tempMin".
+        // Get a new parent node from the search list.
         T *tempMin = updateParent();
-        // Increment the number ("depth") of consecutive times last
-        // "minEntropy" being best hit or update "minEntropy" and
-        // re-count "depth"
+        // Increment the number (depth) of consecutive times the candidate
+        // node being minimum entropy or update to a new candidate node and
+        // re-count the depth
         if (tempMin->getEntropy() > m_minEntropy) {
-            // Increment the 'consecutive times'
+            // Increment the depth when the candidate is not beaten
             ++depth;
-            // The search stops when none of the children "SearchNode"
-            // can beat the "minEntropy"
+            // The search stops when the depth reaches the threshold
             if (depth >= maxDepth) { break; }
-            // "final" and "minEntropy" stay unchanged if "tempMin"
-            // cannot beat the previous "minEntropy".
+            // The candidate node stays unchanged if the new parent node
+            // cannot beat the it.
         } else {
-            // "tempMin" will be the new "final" and "minEntropy"
-            // if the previous "minEntropy" is beaten by it.
+            // The new parent node will be the new candidate node
+            // if the previous candidate is beaten by it.
             if (tempMin->isQualified()) {
                 m_final = tempMin->getUsed();
                 m_minEntropy = tempMin->getEntropy();
             }
-            // Stop when entropy is 0, which couldn't be better
+            // Stop when the entropy of the new parent node is 0
             if (m_minEntropy == 0) { break; }
-            // "depth" is reset to 0
+            // Re-count the depth for the new candidate
             depth = 0;
         }
-        // "tempMin" is going to be the new "parent" for getting new
-        // children "SearchNode" no matter what. So "tempMin" doesn't
-        // necessarily have to give the new "final" and "minEntropy"
+        // Update the new parent node no matter whether it becomes the new
+        // candidate or not.
         m_parent = tempMin;
     }
 }
@@ -341,12 +358,15 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
         const segment &final
 ) {
-    // Group tips by the segment indices in "final"
     std::vector<Rcpp::IntegerVector> res;
-    segIndex start = 0;
+    // Keep track of previous AA to see if the segment can be combined
     std::string prevFixedAA = "";
+    // Summarize the AA if combined
     aaSummary combNode;
+    // Group the tips if combined
     std::vector<int> combTips;
+    // Iterate segment points and grouping tips
+    segIndex start = 0;
     for (
             segment::const_iterator final_itr = final.begin();
             final_itr != final.end(); ++final_itr
@@ -355,14 +375,16 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
         std::vector<int> tips;
         for (unsigned int i = start; i < *final_itr; ++i) {
             Rcpp::IntegerVector nodeTips = nodeSummaries[i];
+            // Group the tips with a segment
             tips.insert(tips.end(), nodeTips.begin(), nodeTips.end());
+            // Summarize the AA within a segment
             Rcpp::IntegerVector summary = nodeTips.attr("aaSummary");
             Rcpp::CharacterVector aa = summary.names();
             for (unsigned int j = 0; j < aa.size(); ++j) {
                 node[Rcpp::as<std::string>(aa.at(j))] += summary.at(j);
             }
         }
-        // The most dominant AA in the current segment
+        // Find the most dominant AA in the current segment
         aaSummary::iterator node_itr = node.begin();
         std::string fixedAA = node_itr->first;
         int maxFreq = node_itr->second;
@@ -372,28 +394,34 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
                 maxFreq = node_itr->second;
             }
         }
-        // Combine with the previous segment if the most dominant
-        // AA is the same as the previous.
+        // If the most dominant AA is the same as the previous segment.
         if (fixedAA == prevFixedAA) {
+            // Combine with the previous segment
             for (node_itr = node.begin(); node_itr != node.end(); ++node_itr) {
                 combNode[node_itr->first] += node_itr->second;
             }
             combTips.insert(combTips.end(), tips.begin(), tips.end());
         } else {
+            // Add the previous combination as a new segment
             Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
             combined.attr("aaSummary") = Rcpp::wrap(combNode);
             combined.attr("AA") = prevFixedAA;
             res.push_back(combined);
+            // Initiate a new segment to be combined
             combTips = tips;
             combNode = node;
         }
+        // Update the starting segment point for the next segment
         start = *final_itr;
+        // Update the previous fixed AA
         prevFixedAA = fixedAA;
     }
+    // Add the last segment to the return list
     Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
     combined.attr("aaSummary") = Rcpp::wrap(combNode);
     combined.attr("AA") = prevFixedAA;
     res.push_back(combined);
+    // The first combination of segments is actually empty
     res.erase(res.begin());
     return Rcpp::wrap(res);
 }
