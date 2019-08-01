@@ -12,11 +12,10 @@
 SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
 
 \method{fixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = 0.01, minEffectiveSize = NULL,
-  extendedSearch = TRUE, ...)
+  gapChar = "-", tolerance = 0.01, minEffectiveSize = NULL, ...)
 
 \method{multiFixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", minEffectiveSize = NULL, extendedSearch = TRUE, ...)
+  gapChar = "-", minEffectiveSize = NULL, searchDepth = 1, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
@@ -43,12 +42,11 @@ the return. If more than one number is given, the ancestral takes the first
 and descendant takes the second as the minimum. If only given one number,
 it's the minimum for both ancestral and descendant.}
 
-\item{extendedSearch}{Whether to extend the search. The terminal of each \code{lineagePath} is
-a cluster of tips. To look for the fixation mutation in the cluster,
-the common ancestral node of farthest tips (at least two) will be
-the new terminal search point.}
-
 \item{...}{further arguments passed to or from other methods.}
+
+\item{searchDepth}{The function uses heuristic search but the termination of the search
+cannot be intrinsically decided. \code{searchDepth} is needed to tell
+the search when to stop.}
 }
 \value{
 \code{SNPsite} returns a list of qualified SNP site

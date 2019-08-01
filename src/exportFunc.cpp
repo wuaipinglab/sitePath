@@ -39,11 +39,6 @@ SEXP runTreemer(
     Treemer::BySimilarity match(tipPaths, alignedSeqs, similarity, simMatrix);
     // TODO: Separate the two functionalities
     return getTips ? Rcpp::wrap(match.getTips()) : Rcpp::wrap(match.getPaths());
-    // if (getTips) {
-    //     return Rcpp::wrap(match.getTips());
-    // } else {
-    //     return Rcpp::wrap(match.getPaths());
-    // }
 }
 
 // [[Rcpp::export]]
@@ -143,13 +138,22 @@ Rcpp::IntegerVector tableAA(
 // [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
-        const unsigned int minEffectiveSize
+        const unsigned int minEffectiveSize,
+        const unsigned int searchDepth
 ) {
     using namespace MinEntropy;
-    SearchTree<Segmentor> iSearch(minEffectiveSize, nodeSummaries);
+    SearchTree<Segmentor> iSearch(
+            minEffectiveSize,
+            searchDepth,
+            nodeSummaries
+    );
     iSearch.search();
     // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
-    SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
+    SearchTree<Amalgamator> dSearch(
+            minEffectiveSize,
+            searchDepth,
+            nodeSummaries
+    );
     dSearch.search();
     segment iFinal = iSearch.getFinal(), dFinal = dSearch.getFinal();
     segment final;
@@ -161,8 +165,6 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
         final = dFinal;
     }
     return updatedSegmentation(nodeSummaries, final);
-    // SearchTree<Amalgamator> dSearch(minEffectiveSize, nodeSummaries);
-    // dSearch.search();
     // while (iSearch.getFinal() != dSearch.getFinal()) {
     //     if (iMin > dMin) {
     //         iSearch.resumeSearch();

@@ -147,6 +147,7 @@ class SearchTree {
 public:
     SearchTree(
         const unsigned int minEffectiveSize,
+        const unsigned int searchDepth,
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
     );
     virtual ~SearchTree();
@@ -158,7 +159,7 @@ public:
     void resumeSearch();
 private:
     // The minimum number of tips within a segmented group
-    const unsigned int m_minTipNum;
+    const unsigned int m_minTipNum, m_searchDepth;
     // The terminal segment point essential for enclosing the segmenting
     const segIndex m_enclosed;
     // Store all possible segment points (except the enclosed point).

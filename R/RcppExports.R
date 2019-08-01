@@ -29,8 +29,8 @@ tableAA <- function(seqs, siteIndex) {
     .Call('_sitePath_tableAA', PACKAGE = 'sitePath', seqs, siteIndex)
 }
 
-minimizeEntropy <- function(nodeSummaries, minEffectiveSize) {
-    .Call('_sitePath_minimizeEntropy', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize)
+minimizeEntropy <- function(nodeSummaries, minEffectiveSize, searchDepth) {
+    .Call('_sitePath_minimizeEntropy', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
 }
 
 tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {

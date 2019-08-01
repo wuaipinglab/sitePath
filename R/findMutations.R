@@ -110,11 +110,6 @@ print.sitePath <- function(x, ...) {
 #' the return. If more than one number is given, the ancestral takes the first
 #' and descendant takes the second as the minimum. If only given one number,
 #' it's the minimum for both ancestral and descendant.
-#' @param extendedSearch
-#' Whether to extend the search. The terminal of each \code{lineagePath} is
-#' a cluster of tips. To look for the fixation mutation in the cluster,
-#' the common ancestral node of farthest tips (at least two) will be
-#' the new terminal search point.
 #' @param ... further arguments passed to or from other methods.
 #' @examples
 #' fixationSites(
@@ -134,7 +129,6 @@ fixationSites.lineagePath <- function(paths,
                                       gapChar = '-',
                                       tolerance = 0.01,
                                       minEffectiveSize = NULL,
-                                      extendedSearch = TRUE,
                                       ...) {
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
@@ -170,9 +164,7 @@ fixationSites.lineagePath <- function(paths,
     refSeqName <- reference
     reference <- checkReference(tree, align, reference, gapChar)
     divNodes <- unique(divergentNode(paths))
-    if (extendedSearch) {
-        paths <- extendPaths(paths, tree)
-    }
+    paths <- extendPaths(paths, tree)
     # "mutations" is the final return of this function.
     # Each item ("sitePath") is named by the site predicted to
     # experience fixation and an attribute names "site" also
@@ -306,13 +298,7 @@ fixationSites.lineagePath <- function(paths,
 }
 
 #' @export
-fixationSites <- function(paths,
-                          reference,
-                          gapChar,
-                          tolerance,
-                          minEffectiveSize,
-                          extendedSearch,
-                          ...)
+fixationSites <- function(paths, reference, gapChar, ...)
     UseMethod("fixationSites")
 
 #' @export
@@ -351,6 +337,10 @@ compareMutPathAA <- function(e, s) {
 #' After finding the \code{\link{lineagePath}} of a phylogenetic tree,
 #' \code{multiFixationSites} uses the result to find those sites that show
 #' multiple fixations on some, if not all, of the lineages.
+#' @param searchDepth
+#' The function uses heuristic search but the termination of the search
+#' cannot be intrinsically decided. \code{searchDepth} is needed to tell
+#' the search when to stop.
 #' @examples
 #' data(h3n2_tree_reduced)
 #' data(h3n2_align_reduced)
@@ -362,9 +352,8 @@ compareMutPathAA <- function(e, s) {
 multiFixationSites.lineagePath <- function(paths,
                                            reference = NULL,
                                            gapChar = '-',
-                                           # tolerance = 0,
                                            minEffectiveSize = NULL,
-                                           extendedSearch = TRUE,
+                                           searchDepth = 1,
                                            ...) {
     tree <- attr(paths, "tree")
     nTips <- length(tree$tip.label)
@@ -378,10 +367,14 @@ multiFixationSites.lineagePath <- function(paths,
         stop("\"minEffectiveSize\" only accepts numeric")
     }
     minEffectiveSize <- ceiling(minEffectiveSize)
-    divNodes <- unique(divergentNode(paths))
-    if (extendedSearch) {
-        paths <- extendPaths(paths, tree)
+    # Get the "searchDepth" for heuristic search
+    if (searchDepth < 1) {
+        stop("\"searchDepth\" should be at least 1")
+    } else {
+        searchDepth <- ceiling(searchDepth)
     }
+    divNodes <- unique(divergentNode(paths))
+    paths <- extendPaths(paths, tree)
     # Get all the nodes that are not at divergent point
     nodes <- setdiff(unlist(paths), divNodes)
     # Get the sequence of the children tips that are descendant of the nodes.
@@ -419,7 +412,6 @@ multiFixationSites.lineagePath <- function(paths,
                 setdiff(path[seq_len(maxLen - 1)], divNodes)
             # Iterate every site
             for (i in seq_along(reference)) {
-                # for (i in 281) { # for debugging purpose
                 s <- reference[i] - 1
                 # "tableAA" is similar to R function "table"
                 # Here the AA at site "s" for all tips is summarized
@@ -537,8 +529,9 @@ multiFixationSites.lineagePath <- function(paths,
                         next
                     }
                 }
-                seg <-
-                    minimizeEntropy(nodeSummaries, minEffectiveSize)
+                seg <- minimizeEntropy(nodeSummaries,
+                                       minEffectiveSize,
+                                       searchDepth)
                 targetIndex <- NULL
                 if (length(seg) < 2) {
                     next
@@ -621,10 +614,7 @@ multiFixationSites.lineagePath <- function(paths,
 }
 
 #' @export
-multiFixationSites <- function(paths,
-                               reference = NULL,
-                               gapChar = '-',
-                               ...)
+multiFixationSites <- function(paths, reference, gapChar, ...)
     UseMethod("multiFixationSites")
 
 #' @export

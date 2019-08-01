@@ -161,9 +161,11 @@ segment MinEntropy::Amalgamator::newUsed(
 template <class T>
 MinEntropy::SearchTree<T>::SearchTree(
     const unsigned int minEffectiveSize,
+    const unsigned int searchDepth,
     const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries
 ):
     m_minTipNum(minEffectiveSize),
+    m_searchDepth(searchDepth),
     m_enclosed(nodeSummaries.size()) {
     // Transform R list to a vector of AA and mapped frequency as
     // 'm_aaSummaries'. Get all the possible segment points
@@ -302,7 +304,7 @@ void MinEntropy::SearchTree<T>::resumeSearch() {
 template <class T>
 void MinEntropy::SearchTree<T>::search() {
     unsigned int depth = 0;
-    unsigned int maxDepth = m_enclosed * m_enclosed;
+    const unsigned int maxDepth = m_enclosed * m_searchDepth;
     // Find the search node with minimum entropy in the active list and
     // make it the growing parent node for the next round. The current minimum
     // entropy should be decreasing but increasing is allowed. The used list
