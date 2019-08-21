@@ -71,10 +71,10 @@ plot(preassessment$similarity, preassessment$pathNum)
 
 ## Choose a threshold by yourself
 
-Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.996 as an example.
+Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.995 as an example.
 
 ```{r get_sitePath}
-paths <- lineagePath(tree, 0.996)
+paths <- lineagePath(tree, 0.995)
 paths
 ```
 
@@ -93,7 +93,7 @@ Now you're ready to find fixation events.
 The hierarchical search is done by `fixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation.
 
 ```{r find_fixations}
-fixations <- fixationSites(paths)
+fixations <- multiFixationSites(paths)
 fixations
 ```
 

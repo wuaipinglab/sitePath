@@ -156,8 +156,8 @@ checkReference <- function(tree, align, reference, gapChar) {
             nchar(gapChar) != 1 || length(gapChar) != 1) {
             stop("\"gapChar\" only accepts one single character")
         }
-        reference <-
-            getReference(align[which(tree$tip.label == reference)], gapChar)
+        reference <- getReference(align[which(tree$tip.label == reference)],
+                                  gapChar)
     }
     return(reference)
 }
@@ -196,10 +196,12 @@ extendPaths <- function(paths, tree) {
         # The longest nodePath
         longest <- extended[which(el == ml)]
         # Zip up the longest nodePath until hitting diverging node
-        extended <-
-            lapply(seq_len(ml), function(i) {
+        extended <- lapply(
+            X = seq_len(ml),
+            FUN = function(i) {
                 unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
-            })
+            }
+        )
         # The length of the element in "extended" would be 1
         # if the node is shared by the longest nodePath
         c(p, unlist(extended[which(lengths(extended) == 1)]))

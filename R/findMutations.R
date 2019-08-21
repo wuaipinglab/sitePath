@@ -358,11 +358,20 @@ multiFixationSites.lineagePath <- function(paths,
     tree <- attr(paths, "tree")
     nTips <- length(tree$tip.label)
     align <- attr(paths, "align")
+    # Generate the site mapping from reference
     refSeqName <- reference
     reference <- checkReference(tree, align, reference, gapChar)
+    # Exclude the invariant sites
+    loci <- which(vapply(
+        X = seq_along(reference),
+        FUN = function(s) {
+            length(unique(substr(align, s, s))) > 1
+        },
+        FUN.VALUE = logical(1)
+    ))
     # Get the "minEffectiveSize" for each fixation
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- nTips / (length(paths) * 10)
+        minEffectiveSize <- nTips / length(unique(unlist(paths)))
     } else if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
     }
@@ -411,18 +420,17 @@ multiFixationSites.lineagePath <- function(paths,
             pathBefore <-
                 setdiff(path[seq_len(maxLen - 1)], divNodes)
             # Iterate every site
-            for (i in seq_along(reference)) {
+            for (i in loci) {
                 s <- reference[i] - 1
                 # "tableAA" is similar to R function "table"
                 # Here the AA at site "s" for all tips is summarized
                 afterSummary <- tableAA(align[afterTips], s)
-                # TODO: "toleranceSum" is used to track total number of
+                # TODO: "tolerance" is used to track total number of
                 # non-dominant AA for the site initialized with the
                 # number of non-dominant AA in the "afterTips".
                 # May jump to next site if exceeding tolerance
-                toleranceSum <-
-                    sum(afterSummary) - max(afterSummary)
-                if (toleranceSum > length(afterTips) * 0.01) {
+                tolerance <- sum(afterSummary) - max(afterSummary)
+                if (tolerance > length(afterTips) * 0.01) {
                     next
                 }
                 attr(afterTips, "aaSummary") <- afterSummary
@@ -584,7 +592,8 @@ multiFixationSites.lineagePath <- function(paths,
                             },
                             FUN.VALUE = integer(1)
                         )
-                        if (any(r <- qualified == 2L)) {
+                        r <- qualified == 2L
+                        if (any(r)) {
                             # Remove existing paths with an "adding state"
                             # of 2L and add the "seg"
                             res[[site]] <- res[[site]][-which(r)]
