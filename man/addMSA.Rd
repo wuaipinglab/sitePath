@@ -7,9 +7,9 @@
 addMSA(tree, msaPath = "", msaFormat = "", alignment = NULL)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree paring function
+\item{tree}{a \code{phylo} object. This commonly can be from tree parsing function
 in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
-found in the sequence alignment}
+found in the sequence alignment.}
 
 \item{msaPath}{The file path to the multiple sequence alignment file}
 
@@ -35,6 +35,6 @@ in the alignment file.
 }
 \examples{
 data(zikv_tree)
-msaPath <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
-addMSA(zikv_tree, msaPath = msaPath, msaFormat = "fasta")
+msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
+addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 }

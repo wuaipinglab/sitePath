@@ -78,8 +78,8 @@ After finding the \code{\link{lineagePath}} of a phylogenetic tree,
 multiple fixations on some, if not all, of the lineages.
 }
 \examples{
-data("zikv_tree_reduced")
-data("zikv_align_reduced")
+data('zikv_tree_reduced')
+data('zikv_align_reduced')
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
 fixationSites(

@@ -52,8 +52,8 @@ is greater than number of tips divided by 20 or self-defined maxPath.
 The zero lineagePath result will also be excluded
 }
 \examples{
-data("zikv_tree")
-data("zikv_align")
+data('zikv_tree')
+data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 simMatrix <- similarityMatrix(tree)
 sneakPeek(tree)

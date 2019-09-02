@@ -7,16 +7,13 @@ test_that("Constrains in multiFixationSites work", {
     tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
     paths <- lineagePath(tree)
     mutations <- multiFixationSites(paths)
-    minEffectiveSize <-
-        length(tree$tip.label) / length(unique(unlist(paths)))
+    minEffectiveSize <- length(tree$tip.label)/length(unique(unlist(paths)))
     for (sp in mutations) {
         site <- attr(sp, "site")
         for (m in sp) {
             aa <- lapply(m, function(g) {
-                sum <-
-                    h3n2_align_reduced$seq[which(h3n2_align_reduced$nam %in% tree$tip.label[g])]
-                sum <-
-                    table(sapply(sum, substring, site, site))
+                sum <- h3n2_align_reduced$seq[which(h3n2_align_reduced$nam %in% tree$tip.label[g])]
+                sum <- table(sapply(sum, substring, site, site))
             })
             for (i in seq_along(m)) {
                 nodeTips <- m[[i]]

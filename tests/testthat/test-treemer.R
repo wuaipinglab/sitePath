@@ -8,18 +8,10 @@ test_that("Topology-dependent trimming", {
     expect_identical(colnames(simMatrix), tree$tip.label)
     expect_identical(row.names(simMatrix), tree$tip.label)
     minSim <- min(simMatrix)
-    step <- round(minSim - 1, 3) / 10
+    step <- round(minSim - 1, 3)/10
     for (s in seq(1, minSim, step)) {
-        grouping <-
-            groupTips(
-                tree,
-                similarity = s,
-                simMatrix = simMatrix,
-                forbidTrivial = FALSE,
-                tipnames = FALSE
-            )
-        expect_equal(sort(unlist(grouping, use.names = FALSE)),
-                     1:length(tree$tip.label))
+        grouping <- groupTips(tree, similarity = s, forbidTrivial = FALSE, tipnames = FALSE)
+        expect_equal(sort(unlist(grouping, use.names = FALSE)), 1:length(tree$tip.label))
         for (g in names(grouping)) {
             an <- as.integer(g)
             index <- which(row.names(simMatrix) %in% grouping[[g]])
@@ -30,16 +22,9 @@ test_that("Topology-dependent trimming", {
             } else {
                 expect_equal(an, ape::getMRCA(tree, descendant))
             }
-            expect_equal(sort(descendant),
-                         sort(sitePath:::ChildrenTips(tree, an)))
+            expect_equal(sort(descendant), sort(sitePath:::.childrenTips(tree, an)))
         }
-        paths <-
-            lineagePath(
-                tree,
-                similarity = s,
-                simMatrix = simMatrix,
-                forbidTrivial = FALSE
-            )
+        paths <- lineagePath(tree, similarity = s, forbidTrivial = FALSE)
         for (p in paths) {
             expect_equal(ape::nodepath(tree, from = p[1], to = p[length(p)]), p)
         }

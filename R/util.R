@@ -10,9 +10,9 @@
 #' path and alignment object are given, the function will use the sequence
 #' in the alignment file.
 #' @param tree
-#' a \code{phylo} object. This commonly can be from tree paring function
+#' a \code{phylo} object. This commonly can be from tree parsing function
 #' in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
-#' found in the sequence alignment
+#' found in the sequence alignment.
 #' @param msaPath
 #' The file path to the multiple sequence alignment file
 #' @param msaFormat
@@ -27,33 +27,48 @@
 #' multiple sequence alignment
 #' @examples
 #' data(zikv_tree)
-#' msaPath <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
-#' addMSA(zikv_tree, msaPath = msaPath, msaFormat = "fasta")
+#' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
+#' addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
-addMSA <- function(tree,
-                   msaPath = "",
-                   msaFormat = "",
-                   alignment = NULL) {
+addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
+    # Get/test the tree object
     if (is(tree, "treedata")) {
         tree <- tree@phylo
     }
     if (!inherits(tree, "phylo")) {
         stop("\"tree\" is not class phylo")
     }
+    # Read alignment from the file if applicable
     if (file.exists(msaPath)) {
         alignment <- read.alignment(msaPath, msaFormat)
     } else if (is.null(alignment)) {
-        stop(paste("There is no file in", msaPath))
+        stop(paste("File", msaPath, "does not exist"))
     }
-    attr(tree, "alignment") <- checkMatched(tree, alignment)
+    # Test the alignment object
+    if (!is(alignment, "alignment")) {
+        stop("\"alignment\" is not class alignment")
+    }
+    # Map the names between tree and alignment
+    m <- match(tree$tip.label, alignment$nam)
+    if (any(is.na(m))) {
+        stop("Tree tips and alignment names are not matched")
+    } else {
+        align <- toupper(alignment$seq[m])
+        if (length(unique(nchar(align))) > 1) {
+            stop("Sequence lengths are not the same in alignment")
+        }
+    }
+    attr(tree, "alignment") <- align
+    # Similarity matrix
+    sim <- getSimilarityMatrix(align)
+    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
+    attr(tree, "simMatrix") <- sim
     return(tree)
 }
 
-#' @useDynLib sitePath
-#' @importFrom Rcpp sourceCpp
-NULL
+setReference <- function(x, reference = NULL, gapChar = "-", ...) UseMethod("setReference")
 
 #' @name zikv_align
 #' @title Multiple sequence alignment of Zika virus polyprotein
@@ -70,7 +85,7 @@ NULL
 #' @title Phylogenetic tree of Zika virus polyprotein
 #' @description
 #' Tree was built from \code{\link{zikv_align}} using RAxML
-#' with default settings.The tip “ANK57896” was used as
+#' with default settings.The tip ANK57896 was used as
 #' outgroup to root the tree.
 #' @format a \code{phylo} object
 #' @usage data(zikv_tree)
@@ -132,37 +147,23 @@ NULL
 #' @docType data
 "h3n2_tree_reduced"
 
-checkMatched <- function(tree, align) {
-    if (!is(align, "alignment")) {
-        stop("\"alignment\" is not class alignment")
-    }
-    m <- match(tree$tip.label, align$nam)
-    if (any(is.na(m))) {
-        stop("Tree tips and alignment names are not matched")
-    } else {
-        align <- align$seq[m]
-        if (length(unique(nchar(align))) > 1) {
-            stop("Sequence lengths are not the same in alignment")
-        }
-    }
-    return(toupper(align))
-}
+#' @useDynLib sitePath
+#' @importFrom Rcpp sourceCpp
+NULL
 
-checkReference <- function(tree, align, reference, gapChar) {
+.checkReference <- function(tree, align, reference, gapChar) {
     if (is.null(reference)) {
         reference <- seq_len(nchar(align[1]))
     } else {
-        if (!is.character(gapChar) ||
-            nchar(gapChar) != 1 || length(gapChar) != 1) {
+        if (!is.character(gapChar) || nchar(gapChar) != 1 || length(gapChar) != 1) {
             stop("\"gapChar\" only accepts one single character")
         }
-        reference <- getReference(align[which(tree$tip.label == reference)],
-                                  gapChar)
+        reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
     }
     return(reference)
 }
 
-ChildrenTips <- function(tree, node) {
+.childrenTips <- function(tree, node) {
     maxTip <- length(tree$tip.label)
     children <- integer(0)
     getChildren <- function(edges, parent) {
@@ -178,15 +179,15 @@ ChildrenTips <- function(tree, node) {
     return(getChildren(tree$edge, node))
 }
 
-extendPaths <- function(paths, tree) {
-    # Store the attributes of "paths"
+.extendPaths <- function(paths, tree) {
+    # Store the attributes of 'paths'
     attrs <- attributes(paths)
     # Extend each path
     paths <- lapply(paths, function(p) {
         # Starting node
         sn <- p[length(p)]
         # nodePath from starting node to each children tip
-        extended <- lapply(ChildrenTips(tree, sn), function(t) {
+        extended <- lapply(.childrenTips(tree, sn), function(t) {
             # The staring node is excluded from the nodePath
             nodepath(tree, sn, t)[-1]
         })
@@ -196,17 +197,14 @@ extendPaths <- function(paths, tree) {
         # The longest nodePath
         longest <- extended[which(el == ml)]
         # Zip up the longest nodePath until hitting diverging node
-        extended <- lapply(
-            X = seq_len(ml),
-            FUN = function(i) {
-                unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
-            }
-        )
-        # The length of the element in "extended" would be 1
-        # if the node is shared by the longest nodePath
+        extended <- lapply(X = seq_len(ml), FUN = function(i) {
+            unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
+        })
+        # The length of the element in 'extended' would be 1 if the node is shared by the
+        # longest nodePath
         c(p, unlist(extended[which(lengths(extended) == 1)]))
     })
-    # Give back the attributes of "paths"
+    # Give back the attributes of 'paths'
     attributes(paths) <- attrs
     return(paths)
 }

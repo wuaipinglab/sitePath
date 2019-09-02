@@ -50,8 +50,8 @@ their site fixed. The color will use the same amino acid color
 scheme as \code{plotSingleSite.lineagePath}
 }
 \examples{
-data("zikv_tree")
-data("zikv_align")
+data('zikv_tree')
+data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 paths <- lineagePath(tree, 0.996)
 plotSingleSite(paths, 139)

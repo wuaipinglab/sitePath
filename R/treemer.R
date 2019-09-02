@@ -7,8 +7,8 @@
 #' or \code{\link{lineagePath}}
 #' @param tree The return from \code{\link{addMSA}} function
 #' @examples
-#' data("zikv_tree")
-#' data("zikv_align")
+#' data('zikv_tree')
+#' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' simMatrix <- similarityMatrix(tree)
 #' @return
@@ -17,31 +17,7 @@
 #' @importFrom methods is
 #' @export
 similarityMatrix <- function(tree) {
-    if (!inherits(tree, "phylo")) {
-        stop("\"tree\" is not class phylo")
-    } else if (is.null(attr(tree, "alignment"))) {
-        stop("No alignment found in \"tree\"")
-    }
-    sim <- getSimilarityMatrix(attr(tree, "alignment"))
-    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
-    return(sim)
-}
-
-sortSimMatrix <- function(tree, simMatrix) {
-    if (!inherits(tree, "phylo")) {
-        stop("\"tree\" is not class phylo")
-    }
-    colMatch <- match(tree$tip.label, colnames(simMatrix))
-    rowMatch <- match(tree$tip.label, rownames(simMatrix))
-    if (is.null(simMatrix)) {
-        return(matrix(
-            NA,
-            ncol = length(tree$tip.label),
-            nrow = length(tree$tip.label)
-        ))
-    } else {
-        return(simMatrix[rowMatch, colMatch])
-    }
+    return(attr(tree, "simMatrix"))
 }
 
 #' @rdname treemer
@@ -63,47 +39,30 @@ sortSimMatrix <- function(tree, simMatrix) {
 #' @param similarity
 #' Similarity threshold for tree trimming. If not provided, an average
 #' value of similarity among all sequences will be used.
-#' @param simMatrix S diagonal matrix of similarity between sequences
 #' @param forbidTrivial Does not allow trivial trimming
 #' @param tipnames If return as tipnames
 #' @importFrom ape nodepath
 #' @importFrom stats sd
 #' @examples
-#' data("zikv_tree")
-#' data("zikv_align")
+#' data('zikv_tree')
+#' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' groupTips(tree, 0.996)
 #' @return grouping of tips
 #' @export
-groupTips <- function(tree,
-                      similarity = NULL,
-                      simMatrix = NULL,
-                      forbidTrivial = TRUE,
-                      tipnames = TRUE) {
+groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = TRUE) {
+    simMatrix <- similarityMatrix(tree)
     if (is.null(similarity)) {
-        simMatrix <- similarityMatrix(tree)
         simDist <- simMatrix[upper.tri(simMatrix)]
         similarity <- mean(simDist) - sd(simDist)
-    } else {
-        simMatrix <- sortSimMatrix(tree, simMatrix)
     }
     align <- attr(tree, "alignment")
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
-    grouping <- runTreemer(nodepath(tree),
-                           align,
-                           simMatrix,
-                           similarity,
-                           TRUE)
+    grouping <- runTreemer(nodepath(tree), align, simMatrix, similarity, TRUE)
     if (length(grouping) == 1 && forbidTrivial) {
-        warning(
-            paste(
-                "\"similarity\"",
-                similarity,
-                "is too low of a cutoff resulting in trivial trimming"
-            )
-        )
+        warning(paste("\"similarity\"", similarity, "is too low of a cutoff resulting in trivial trimming"))
     }
     if (tipnames) {
         return(lapply(grouping, function(g) {
@@ -130,38 +89,25 @@ groupTips <- function(tree,
 #' lineagePath(tree, 0.996)
 #' @return path represent by node number
 #' @export
-lineagePath <- function(tree,
-                     similarity = NULL,
-                     simMatrix = NULL,
-                     forbidTrivial = TRUE) {
+lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
+    simMatrix <- similarityMatrix(tree)
     if (is.null(similarity)) {
-        simMatrix <- similarityMatrix(tree)
         simDist <- simMatrix[upper.tri(simMatrix)]
         similarity <- mean(simDist) - sd(simDist)
-    } else {
-        simMatrix <- sortSimMatrix(tree, simMatrix)
     }
     align <- attr(tree, "alignment")
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
     # nodepath after trimming
-    trimmedPaths <-
-        unique(runTreemer(nodepath(tree), align, simMatrix, similarity, FALSE))
-    # get the bifurcated pre-terminal nodes and their path to the root
-    # those paths are the so-called sitePaths (isolated)
-    paths <- lapply(trimmedPaths, function(p)
-        p[seq_len(length(p) - 1)])
-    paths <-
-        unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
+    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity, 
+        FALSE))
+    # get the bifurcated pre-terminal nodes and their path to the root those paths
+    # are the so-called sitePaths (isolated)
+    paths <- lapply(trimmedPaths, function(p) p[seq_len(length(p) - 1)])
+    paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
     if (length(paths) == 0 && forbidTrivial) {
-        warning(
-            paste(
-                "\"similarity\"",
-                similarity,
-                "is too low of a cutoff resulting in trivial trimming"
-            )
-        )
+        warning(paste("\"similarity\"", similarity, "is too low of a cutoff resulting in trivial trimming"))
     }
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
@@ -207,18 +153,13 @@ print.lineagePath <- function(x, ...) {
 #' @importFrom methods is
 #' @importFrom graphics plot
 #' @export
-sneakPeek <- function(tree,
-                      step = NULL,
-                      maxPath = NULL,
-                      minPath = 1,
-                      makePlot = FALSE) {
-    simMatrix <- similarityMatrix(tree)
-    minSim <- min(simMatrix)
+sneakPeek <- function(tree, step = NULL, maxPath = NULL, minPath = 1, makePlot = FALSE) {
+    minSim <- min(similarityMatrix(tree))
     if (is.null(step)) {
-        step <- round(minSim - 1, 3) / 50
+        step <- round(minSim - 1, 3)/50
     }
     if (is.null(maxPath)) {
-        maxPath <- length(tree$tip.label) / 20
+        maxPath <- length(tree$tip.label)/20
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
@@ -230,12 +171,7 @@ sneakPeek <- function(tree,
     similarity <- numeric(0)
     pathNum <- integer(0)
     for (s in seq(1, minSim, step)) {
-        paths <- lineagePath(
-            tree,
-            similarity = s,
-            simMatrix = simMatrix,
-            forbidTrivial = FALSE
-        )
+        paths <- lineagePath(tree, similarity = s, forbidTrivial = FALSE)
         if (maxPath < length(paths)) {
             next
         } else if (length(paths) <= minPath) {
