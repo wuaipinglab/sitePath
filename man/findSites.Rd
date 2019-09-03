@@ -9,22 +9,16 @@
 \alias{multiFixationSites.lineagePath}
 \title{Finding sites with variation}
 \usage{
-SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
+SNPsites(tree, minSNP = NULL)
 
-\method{fixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = 0.01, minEffectiveSize = NULL, ...)
+\method{fixationSites}{lineagePath}(paths, tolerance = 0.01,
+  minEffectiveSize = NULL, ...)
 
-\method{multiFixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", minEffectiveSize = NULL, searchDepth = 1, ...)
+\method{multiFixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
+  searchDepth = 1, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
-
-\item{reference}{Name of reference for site numbering. The name has to be one of the
-sequences' name. The default uses the intrinsic alignment numbering}
-
-\item{gapChar}{The character to indicate gap. The numbering will skip the gapChar
-for the reference sequence.}
 
 \item{minSNP}{Minimum number of amino acid variation to be a SNP}
 

@@ -7,8 +7,7 @@
 \alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
-\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE,
-  reference = NULL, gapChar = "-", ...)
+\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE, ...)
 
 \method{plotSingleSite}{fixationSites}(x, site, ...)
 
@@ -24,12 +23,6 @@ indicate a site could be provide. The numbering is consistent with
 the reference defined at \code{\link{fixationSites}}.}
 
 \item{showPath}{If plot the lineage result from lineagePath.}
-
-\item{reference}{Name of reference for site numbering. The name has to be one of the
-sequences' name. The default uses the intrinsic alignment numbering.}
-
-\item{gapChar}{The character to indicate gap. The numbering will skip the gapChar
-for the reference sequence.}
 
 \item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
 }

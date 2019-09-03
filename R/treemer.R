@@ -56,7 +56,7 @@ groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = 
         simDist <- simMatrix[upper.tri(simMatrix)]
         similarity <- mean(simDist) - sd(simDist)
     }
-    align <- attr(tree, "alignment")
+    align <- attr(tree, "align")
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
@@ -90,17 +90,19 @@ groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = 
 #' @return path represent by node number
 #' @export
 lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
-    simMatrix <- similarityMatrix(tree)
+    simMatrix <- attr(tree, "simMatrix")
+    attr(tree, "simMatrix") <- NULL
     if (is.null(similarity)) {
         simDist <- simMatrix[upper.tri(simMatrix)]
         similarity <- mean(simDist) - sd(simDist)
     }
-    align <- attr(tree, "alignment")
+    align <- attr(tree, "align")
+    attr(tree, "align") <- NULL
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
     # nodepath after trimming
-    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity, 
+    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity,
         FALSE))
     # get the bifurcated pre-terminal nodes and their path to the root those paths
     # are the so-called sitePaths (isolated)
@@ -109,6 +111,8 @@ lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
     if (length(paths) == 0 && forbidTrivial) {
         warning(paste("\"similarity\"", similarity, "is too low of a cutoff resulting in trivial trimming"))
     }
+    attr(paths, "reference") <- attr(tree, "reference")
+    attr(tree, "reference") <- NULL
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
     class(paths) <- "lineagePath"

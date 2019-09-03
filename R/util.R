@@ -60,7 +60,9 @@ addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
             stop("Sequence lengths are not the same in alignment")
         }
     }
-    attr(tree, "alignment") <- align
+    attr(tree, "align") <- align
+    # Use the numbering of MSA as the default site numbering
+    attr(tree, "reference") <- .checkReference(tree, align, NULL, "-")
     # Similarity matrix
     sim <- getSimilarityMatrix(align)
     dimnames(sim) <- list(tree$tip.label, tree$tip.label)
@@ -68,7 +70,55 @@ addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
     return(tree)
 }
 
-setReference <- function(x, reference = NULL, gapChar = "-", ...) UseMethod("setReference")
+#' @rdname setSiteNumbering
+#' @name setSiteNumbering
+#' @title Set site numbering to the reference sequence
+#' @description
+#' A reference sequence can be used to define a global site numbering
+#' scheme for multiple sequence alignment. The gap in the reference
+#' will be skipped so the site ignored in numbering.
+#' @param x
+#' The object to set site numbering. It could be a \code{phylo} object
+#' after \code{\link{addMSA}} or a \code{lineagePath} object. The function
+#' for \code{fixaitonSites} and \code{multiFixationSites} will be
+#' added in later version.
+#' @param reference
+#' Name of reference for site numbering. The name has to be one of the
+#' sequences' name. The default uses the intrinsic alignment numbering
+#' @param gapChar
+#' The character to indicate gap. The numbering will skip the gapChar
+#' for the reference sequence.
+#' @param ... further arguments passed to or from other methods.
+#' @return
+#' A \code{phylo} object with site numbering mapped to reference sequence
+#' @examples
+#' data(zikv_tree)
+#' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
+#' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
+#' setSiteNumbering(tree)
+#' @export
+setSiteNumbering.phylo <- function(x, reference = NULL, gapChar = "-", ...) {
+    align <- attr(x, "align")
+    siteMapping <- .checkReference(x, align, reference, gapChar)
+    attr(siteMapping, "refSeqName") <- reference
+    attr(x, "reference") <- siteMapping
+    return(x)
+}
+
+#' @rdname setSiteNumbering
+#' @name setSiteNumbering
+#' @export
+setSiteNumbering.lineagePath <- function(x, reference = NULL, gapChar = "-", ...) {
+    align <- attr(x, "align")
+    tree <- attr(x, "tree")
+    siteMapping <- .checkReference(tree, align, reference, gapChar)
+    attr(siteMapping, "refSeqName") <- reference
+    attr(x, "reference") <- siteMapping
+    return(x)
+}
+
+#' @export
+setSiteNumbering <- function(x, reference, gapChar, ...) UseMethod("setSiteNumbering")
 
 #' @name zikv_align
 #' @title Multiple sequence alignment of Zika virus polyprotein

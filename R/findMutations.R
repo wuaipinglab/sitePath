@@ -9,12 +9,6 @@
 #' irrelevant to the intended analysis but might be helpful to evaluate
 #' the performance of \code{fixationSites}.
 #' @param tree The return from \code{\link{addMSA}} function
-#' @param reference
-#' Name of reference for site numbering. The name has to be one of the
-#' sequences' name. The default uses the intrinsic alignment numbering
-#' @param gapChar
-#' The character to indicate gap. The numbering will skip the gapChar
-#' for the reference sequence.
 #' @param minSNP Minimum number of amino acid variation to be a SNP
 #' @examples
 #' data('zikv_tree_reduced')
@@ -23,18 +17,18 @@
 #' SNPsites(tree)
 #' @return \code{SNPsite} returns a list of qualified SNP site
 #' @export
-SNPsites <- function(tree, reference = NULL, gapChar = "-", minSNP = NULL) {
+SNPsites <- function(tree, minSNP = NULL) {
     if (is.null(minSNP)) {
         minSNP <- length(tree$tip.label)/10
     }
-    alignedSeq <- attr(tree, "alignment")
+    alignedSeq <- attr(tree, "align")
     if (is.null(alignedSeq)) {
         stop("No alignment found in \"tree\"")
     }
     seqLen <- unique(nchar(alignedSeq))
     if (length(seqLen) != 1)
         stop("Sequence length not equal")
-    reference <- .checkReference(tree, alignedSeq, reference, gapChar)
+    reference <- attr(tree, "reference")
     qualified <- integer(0)
     alignedSeq <- strsplit(alignedSeq, "")
     for (i in seq_along(reference)) {
@@ -105,8 +99,8 @@ print.sitePath <- function(x, ...) {
 #' 'from' before the fixation and 'to' after the fixation.
 #' @importFrom utils tail
 #' @export
-fixationSites.lineagePath <- function(paths, reference = NULL, gapChar = "-", tolerance = 0.01,
-    minEffectiveSize = NULL, ...) {
+fixationSites.lineagePath <- function(paths, tolerance = 0.01, minEffectiveSize = NULL,
+    ...) {
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
     if (!is.numeric(tolerance)) {
@@ -136,8 +130,7 @@ fixationSites.lineagePath <- function(paths, reference = NULL, gapChar = "-", to
             minEffectiveSize[2]
         }
     }
-    refSeqName <- reference
-    reference <- .checkReference(tree, align, reference, gapChar)
+    reference <- attr(paths, "reference")
     divNodes <- unique(divergentNode(paths))
     paths <- .extendPaths(paths, tree)
     # 'mutations' is the final return of this function.  Each item ('sitePath') is
@@ -241,13 +234,12 @@ fixationSites.lineagePath <- function(paths, reference = NULL, gapChar = "-", to
     }
     attr(mutations, "paths") <- paths
     attr(mutations, "reference") <- reference
-    attr(mutations, "refSeqName") <- refSeqName
     class(mutations) <- "fixationSites"
     return(mutations)
 }
 
 #' @export
-fixationSites <- function(paths, reference, gapChar, ...) UseMethod("fixationSites")
+fixationSites <- function(paths, ...) UseMethod("fixationSites")
 
 #' @export
 print.fixationSites <- function(x, ...) {
@@ -297,14 +289,13 @@ print.fixationSites <- function(x, ...) {
 #' @return
 #' \code{multiFixationSites} returns sites with multiple fixations.
 #' @export
-multiFixationSites.lineagePath <- function(paths, reference = NULL, gapChar = "-",
-    minEffectiveSize = NULL, searchDepth = 1, ...) {
+multiFixationSites.lineagePath <- function(paths, minEffectiveSize = NULL, searchDepth = 1,
+    ...) {
     tree <- attr(paths, "tree")
     nTips <- length(tree$tip.label)
     align <- attr(paths, "align")
     # Generate the site mapping from reference
-    refSeqName <- reference
-    reference <- .checkReference(tree, align, reference, gapChar)
+    reference <- attr(paths, "reference")
     # Exclude the invariant sites
     loci <- which(vapply(X = seq_along(reference), FUN = function(s) {
         length(unique(substr(align, s, s))) > 1
@@ -508,13 +499,12 @@ multiFixationSites.lineagePath <- function(paths, reference = NULL, gapChar = "-
     }
     attr(res, "paths") <- paths
     attr(res, "reference") <- reference
-    attr(res, "refSeqName") <- refSeqName
     class(res) <- "multiFixationSites"
     return(res)
 }
 
 #' @export
-multiFixationSites <- function(paths, reference, gapChar, ...) UseMethod("multiFixationSites")
+multiFixationSites <- function(paths, ...) UseMethod("multiFixationSites")
 
 #' @export
 print.multiFixationSites <- function(x, ...) {
