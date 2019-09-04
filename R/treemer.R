@@ -102,7 +102,7 @@ lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
         stop("No alignment found in \"tree\"")
     }
     # nodepath after trimming
-    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity,
+    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity, 
         FALSE))
     # get the bifurcated pre-terminal nodes and their path to the root those paths
     # are the so-called sitePaths (isolated)

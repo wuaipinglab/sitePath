@@ -48,10 +48,8 @@ data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 paths <- lineagePath(tree, 0.996)
 plotSingleSite(paths, 139)
-\dontrun{
 fixations <- fixationSites(paths)
 plotSingleSite(fixations, 139)
-}
 \dontrun{
 multiFixations <- multiFixationSites(paths)
 plotSingleSite(multiFixations, 1542)

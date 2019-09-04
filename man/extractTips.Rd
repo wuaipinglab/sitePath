@@ -4,14 +4,25 @@
 \alias{extractTips}
 \alias{extractTips.fixationSites}
 \alias{extractTips.multiFixationSites}
-\title{Extract sitePath for a single site}
+\alias{extractTips.sitePath}
+\alias{extractSite}
+\alias{extractSite.fixationSites}
+\alias{extractSite.multiFixationSites}
+\title{Extract info for fixation of a single site}
 \usage{
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
 \method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
+
+\method{extractTips}{sitePath}(x, select = 1, ...)
+
+\method{extractSite}{fixationSites}(x, site, ...)
+
+\method{extractSite}{multiFixationSites}(x, site, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} or a \code{multiFixationSites} object.}
+\item{x}{A \code{fixationSites} or a \code{multiFixationSites} or
+a \code{sitePath} object.}
 
 \item{site}{A site predicted to experience fixation.}
 
@@ -23,8 +34,24 @@ is the first fixation of the site.}
 \item{...}{Other arguments}
 }
 \value{
-The name of the tips involved in the fixation
+The function \code{extractTips} returns the name of the
+tips involved in the fixation.
+
+The function \code{extractSite} returns a \code{sitePath} object
 }
 \description{
-Retrieve the name of the tips involved in the fixation
+The result of \code{\link{fixationSites}} contains all the possible sites
+with fixation mutation. The function \code{extractTips} retrieves
+the name of the tips involved in the fixation.
+
+The function \code{extractSite} can be used to extract the fixation info
+of a single site.
+}
+\examples{
+data('zikv_tree_reduced')
+data('zikv_align_reduced')
+tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+mutations <- fixationSites(lineagePath(tree))
+extractTips(mutations, 139)
+extractSite(mutations, 139)
 }

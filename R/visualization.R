@@ -35,25 +35,25 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
     lty[targetEdges] <- 1
     width[targetEdges] <- 2
     # TODO: Emphaszie the nodes along the lineagePath
-    plot.phylo(tree, edge.color = color, edge.lty = lty, edge.width = width, show.tip.label = FALSE,
+    plot.phylo(tree, edge.color = color, edge.lty = lty, edge.width = width, show.tip.label = FALSE, 
         ...)
 }
 
-AA_COLORS <- c(His = "#8282D2", Arg = "#9370DB", Lys = "#145AFF", Ile = "#55AE3A",
-    Phe = "#3232AA", Leu = "#0F820F", Trp = "#B45AB4", Ala = "#C8C8C8", Met = "#FFD700",
-    Pro = "#DC9682", Val = "#2F4F2F", Asn = "#00DCDC", Cys = "#E6E600", Gly = "#666666",
-    Ser = "#FF6347", Tyr = "#ADD8E6", Gln = "#0099CC", Thr = "#FA9600", Glu = "#8C1717",
-    Asp = "#E60A0A", gap = "#000000", unknown = "#d3d3d3", Ile_or_Leu = "#d3d3d3",
+AA_COLORS <- c(His = "#8282D2", Arg = "#9370DB", Lys = "#145AFF", Ile = "#55AE3A", 
+    Phe = "#3232AA", Leu = "#0F820F", Trp = "#B45AB4", Ala = "#C8C8C8", Met = "#FFD700", 
+    Pro = "#DC9682", Val = "#2F4F2F", Asn = "#00DCDC", Cys = "#E6E600", Gly = "#666666", 
+    Ser = "#FF6347", Tyr = "#ADD8E6", Gln = "#0099CC", Thr = "#FA9600", Glu = "#8C1717", 
+    Asp = "#E60A0A", gap = "#000000", unknown = "#d3d3d3", Ile_or_Leu = "#d3d3d3", 
     Asp_or_Asn = "#d3d3d3", Glu_or_Gln = "#d3d3d3")
 
-AA_FULL_NAMES = c(h = "His", r = "Arg", k = "Lys", i = "Ile", f = "Phe", l = "Leu",
-    w = "Trp", a = "Ala", m = "Met", p = "Pro", v = "Val", n = "Asn", c = "Cys",
-    g = "Gly", s = "Ser", y = "Tyr", q = "Gln", t = "Thr", e = "Glu", d = "Asp",
+AA_FULL_NAMES = c(h = "His", r = "Arg", k = "Lys", i = "Ile", f = "Phe", l = "Leu", 
+    w = "Trp", a = "Ala", m = "Met", p = "Pro", v = "Val", n = "Asn", c = "Cys", 
+    g = "Gly", s = "Ser", y = "Tyr", q = "Gln", t = "Thr", e = "Glu", d = "Asp", 
     `-` = "gap", x = "unknown", j = "Ile_or_Leu", b = "Asp_or_Asn", z = "Glu_or_Gln")
 
-AA_SHORT_NAMES = c(His = "H", Arg = "R", Lys = "K", Ile = "I", Phe = "F", Leu = "L",
-    Trp = "W", Ala = "A", Met = "M", Pro = "P", Val = "V", Asn = "N", Cys = "C",
-    Gly = "G", Ser = "S", Tyr = "Y", Gln = "Q", Thr = "T", Glu = "E", Asp = "D",
+AA_SHORT_NAMES = c(His = "H", Arg = "R", Lys = "K", Ile = "I", Phe = "F", Leu = "L", 
+    Trp = "W", Ala = "A", Met = "M", Pro = "P", Val = "V", Asn = "N", Cys = "C", 
+    Gly = "G", Ser = "S", Tyr = "Y", Gln = "Q", Thr = "T", Glu = "E", Asp = "D", 
     gap = "-", unknown = "X", Ile_or_Leu = "J", Asp_or_Asn = "B", Glu_or_Gln = "Z")
 
 #' @rdname plotSingleSite
@@ -96,9 +96,10 @@ plotSingleSite.lineagePath <- function(x, site, showPath = FALSE, ...) {
     align <- attr(x, "align")
     align <- strsplit(tolower(align), "")
     reference <- attr(x, "reference")
-    tryCatch(site <- match.arg(as.character(site), seq_along(reference)), error = function(e) {
-        stop(paste("\"site\":", site, "is not within the length of reference"))
-    })
+    tryCatch(expr = site <- match.arg(as.character(site), seq_along(reference)), 
+        error = function(e) {
+            stop(paste("\"site\":", site, "is not within the length of reference"))
+        })
     siteComp <- vapply(align, FUN = "[[", FUN.VALUE = character(1), reference[site])
     nEdges <- length(tree$edge.length)
     color <- rep("#000000", nEdges)
@@ -118,9 +119,9 @@ plotSingleSite.lineagePath <- function(x, site, showPath = FALSE, ...) {
         color[targetEdges] <- "#000000"
         width[targetEdges] <- 2
     }
-    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.width = width,
+    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.width = width, 
         main = site, ...)
-    legend("topleft", title = "Amino acid", legend = unique(AAnames), fill = AA_COLORS[unique(AAnames)],
+    legend("topleft", title = "Amino acid", legend = unique(AAnames), fill = AA_COLORS[unique(AAnames)], 
         box.lty = 0)
 }
 
@@ -129,10 +130,8 @@ plotSingleSite.lineagePath <- function(x, site, showPath = FALSE, ...) {
 #' For \code{fixationSites}, it will color the ancestral tips in red,
 #' descendant tips in blue and excluded tips in grey.
 #' @examples
-#' \dontrun{
 #' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
-#' }
 #' @export
 plotSingleSite.fixationSites <- function(x, site, ...) {
     site <- .checkSite(site)
@@ -140,52 +139,7 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
     tree <- attr(paths, "tree")
     tree <- ladderize(tree, right = FALSE)
     rootNode <- getMRCA(tree, tree$tip.label)
-    tryCatch(site <- match.arg(as.character(site), choices = names(x)), error = function(e) {
-        stop(paste("\"site\":", site, "is not a mutation of fixation"))
-    })
-    sitePaths <- x[[site]]
-    plotName <- character(0)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(1, nEdges)
-    AAnames <- character(0)
-    for (sp in sitePaths) {
-        aa <- toupper(names(sp))
-        plotName <- c(plotName, paste0(aa[1], site, aa[2]))
-        aa <- AA_FULL_NAMES[tolower(aa)]
-        for (n in c(2, 1)) {
-            targetEdges <- tip2Edge(tree$edge, sp[[n]], rootNode)
-            color[targetEdges] <- AA_COLORS[aa[n]]
-            lty[targetEdges] <- 1
-            width[targetEdges] <- 2
-        }
-        AAnames <- c(AAnames, aa)
-    }
-    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.lty = lty,
-        edge.width = width, main = paste(unique(plotName), collapse = ", "), ...)
-    legend("topleft", title = "Amino acid", legend = AA_SHORT_NAMES[unique(AAnames)],
-        fill = AA_COLORS[unique(AAnames)], box.lty = 0)
-}
-
-#' @rdname plotSingleSite
-#' @description
-#' For \code{multiFixationSites}, it will color the tips which have
-#' their site fixed. The color will use the same amino acid color
-#' scheme as \code{plotSingleSite.lineagePath}
-#' @examples
-#' \dontrun{
-#' multiFixations <- multiFixationSites(paths)
-#' plotSingleSite(multiFixations, 1542)
-#' }
-#' @export
-plotSingleSite.multiFixationSites <- function(x, site, ...) {
-    site <- .checkSite(site)
-    paths <- attr(x, "paths")
-    tree <- attr(paths, "tree")
-    tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
-    tryCatch(site <- match.arg(as.character(site), choices = names(x)), error = function(e) {
+    tryCatch(expr = site <- match.arg(as.character(site), choices = names(x)), error = function(e) {
         stop(paste("\"site\":", site, "is not a mutation of fixation"))
     })
     sitePaths <- x[[site]]
@@ -208,26 +162,77 @@ plotSingleSite.multiFixationSites <- function(x, site, ...) {
         AAnames <- c(AAnames, aaName)
         plotName <- c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
-    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.lty = lty,
+    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.lty = lty, 
         edge.width = width, ...)
     sepChar <- "\n"
     if (sum(nchar(plotName) <= 18)) {
         sepChar <- ",\t"
     }
     title(main = site, sub = paste(plotName, collapse = sepChar))
-    legend("topleft", title = "Amino acid", legend = AA_SHORT_NAMES[unique(AAnames)],
+    legend("topleft", title = "Amino acid", legend = AA_SHORT_NAMES[unique(AAnames)], 
+        fill = AA_COLORS[unique(AAnames)], box.lty = 0)
+}
+
+#' @rdname plotSingleSite
+#' @description
+#' For \code{multiFixationSites}, it will color the tips which have
+#' their site fixed. The color will use the same amino acid color
+#' scheme as \code{plotSingleSite.lineagePath}
+#' @examples
+#' \dontrun{
+#' multiFixations <- multiFixationSites(paths)
+#' plotSingleSite(multiFixations, 1542)
+#' }
+#' @export
+plotSingleSite.multiFixationSites <- function(x, site, ...) {
+    site <- .checkSite(site)
+    paths <- attr(x, "paths")
+    tree <- attr(paths, "tree")
+    tree <- ladderize(tree, right = FALSE)
+    rootNode <- getMRCA(tree, tree$tip.label)
+    tryCatch(expr = site <- match.arg(as.character(site), choices = names(x)), error = function(e) {
+        stop(paste("\"site\":", site, "is not a mutation of fixation"))
+    })
+    sitePaths <- x[[site]]
+    plotName <- character(0)
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(0.5, nEdges)
+    AAnames <- character(0)
+    for (sp in sitePaths) {
+        aaName <- character(0)
+        for (tips in rev(sp)) {
+            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
+            aaName <- c(aa, aaName)
+            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
+            color[targetEdges] <- AA_COLORS[aa]
+            lty[targetEdges] <- 1
+            width[targetEdges] <- 2
+        }
+        AAnames <- c(AAnames, aaName)
+        plotName <- c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+    }
+    plot.phylo(tree, show.tip.label = FALSE, edge.color = color, edge.lty = lty, 
+        edge.width = width, ...)
+    sepChar <- "\n"
+    if (sum(nchar(plotName) <= 18)) {
+        sepChar <- ",\t"
+    }
+    title(main = site, sub = paste(plotName, collapse = sepChar))
+    legend("topleft", title = "Amino acid", legend = AA_SHORT_NAMES[unique(AAnames)], 
         fill = AA_COLORS[unique(AAnames)], box.lty = 0)
 }
 
 #' @export
-plotSingleSite <- function(x, site, ...) UseMethod("plotSingleSite")
+plotSingleSite <- function(x, ...) UseMethod("plotSingleSite")
 
 .checkSite <- function(site) {
     if (!is.numeric(site) || any(site <= 0) || as.integer(site) != site) {
         stop("Please enter positive integer value for \"site\"")
     }
     if (length(site) != 1) {
-        warning(paste("\"site\" has more than one element, only the first", site[1],
+        warning(paste("\"site\" has more than one element, only the first", site[1], 
             " will be used."))
     }
     return(site[1])

@@ -16,30 +16,30 @@ test_that("Restrication applied in SNPsites", {
     }
 })
 
+data(h3n2_tree_reduced)
+data(h3n2_align_reduced)
+
 context("test-fixationSites")
 
 test_that("Constrains in fixationSites work", {
+    tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
     paths <- lineagePath(tree)
-    for (ta in seq(0, 0.49, 0.3)) {
-        for (td in seq(0, 0.49, 0.3)) {
-            mutations <- fixationSites(paths, tolerance = c(ta, td))
-            for (sp in mutations) {
-                site <- attr(sp, "site")
-                for (m in sp) {
-                  aa <- lapply(m, function(g) {
-                    sum <- zikv_align_reduced$seq[which(zikv_align_reduced$nam %in% 
-                      tree$tip.label[g])]
-                    sum <- table(sapply(sum, substring, site, site))
-                  })
-                  ancAA <- aa[[1]]
-                  ancD <- which.max(ancAA)
-                  expect_equal(toupper(names(ancD)), names(m)[1])
-                  expect_lte(sum(ancAA[-ancD]), floor(ta * sum(ancAA)))
-                  descAA <- aa[[2]]
-                  descD <- which.max(descAA)
-                  expect_equal(toupper(names(descD)), names(m)[2])
-                  expect_lte(sum(descAA[-descD]), floor(td * sum(descAA)))
-                }
+    mutations <- fixationSites(paths)
+    minEffectiveSize <- length(tree$tip.label)/length(unique(unlist(paths)))
+    for (sp in mutations) {
+        site <- attr(sp, "site")
+        for (m in sp) {
+            aa <- lapply(m, function(g) {
+                sum <- h3n2_align_reduced$seq[which(h3n2_align_reduced$nam %in% tree$tip.label[g])]
+                sum <- table(sapply(sum, substring, site, site))
+            })
+            for (i in seq_along(m)) {
+                nodeTips <- m[[i]]
+                expect_gte(length(nodeTips), minEffectiveSize)
+                aaD <- toupper(names(which.max(aa[[i]])))
+                fixedAA <- attr(nodeTips, "AA")
+                attributes(fixedAA) <- NULL
+                expect_equal(fixedAA, aaD)
             }
         }
     }

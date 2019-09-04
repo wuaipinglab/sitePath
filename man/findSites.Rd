@@ -11,8 +11,8 @@
 \usage{
 SNPsites(tree, minSNP = NULL)
 
-\method{fixationSites}{lineagePath}(paths, tolerance = 0.01,
-  minEffectiveSize = NULL, ...)
+\method{fixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
+  searchDepth = 1, ...)
 
 \method{multiFixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
   searchDepth = 1, ...)
@@ -24,23 +24,17 @@ SNPsites(tree, minSNP = NULL)
 
 \item{paths}{a \code{lineagePath} object returned from \code{\link{lineagePath}} function}
 
-\item{tolerance}{A vector of two integers to specify maximum amino acid variation
-before/after mutation. Otherwise the mutation will not be counted into
-the return. If more than one number is given, the ancestral takes the first
-and descendant takes the second as the maximum. If only given one number,
-it's the maximum for both ancestral and descendant. The default is 0.01}
-
 \item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
 before/after mutation. Otherwise the mutation will not be counted into
 the return. If more than one number is given, the ancestral takes the first
 and descendant takes the second as the minimum. If only given one number,
 it's the minimum for both ancestral and descendant.}
 
-\item{...}{further arguments passed to or from other methods.}
-
 \item{searchDepth}{The function uses heuristic search but the termination of the search
 cannot be intrinsically decided. \code{searchDepth} is needed to tell
 the search when to stop.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 \code{SNPsite} returns a list of qualified SNP site
@@ -76,11 +70,7 @@ data('zikv_tree_reduced')
 data('zikv_align_reduced')
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
-fixationSites(
-    lineagePath(tree),
-    tolerance = c(1, 1),
-    minEffectiveSize = c(50, 50)
-)
+fixationSites(lineagePath(tree))
 data(h3n2_tree_reduced)
 data(h3n2_align_reduced)
 tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
