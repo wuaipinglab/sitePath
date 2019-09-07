@@ -21,8 +21,8 @@
 #' The function \code{extractTips} returns the name of the
 #' tips involved in the fixation.
 #' @examples
-#' data('zikv_tree_reduced')
-#' data('zikv_align_reduced')
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
@@ -34,10 +34,11 @@ extractTips.fixationSites <- function(x, site, select = 1, ...) {
 
 #' @rdname extractTips
 #' @export
-extractTips.multiFixationSites <- function(x, site, select = 1, ...) {
-    sp <- extractSite(x, site)
-    return(.actualExtractTips(sp, select))
-}
+extractTips.multiFixationSites <-
+    function(x, site, select = 1, ...) {
+        sp <- extractSite(x, site)
+        return(.actualExtractTips(sp, select))
+    }
 
 #' @rdname extractTips
 #' @export
@@ -46,7 +47,8 @@ extractTips.sitePath <- function(x, select = 1, ...) {
 }
 
 #' @export
-extractTips <- function(x, ...) UseMethod("extractTips")
+extractTips <- function(x, ...)
+    UseMethod("extractTips")
 
 #' @rdname extractTips
 #' @name extractSite
@@ -70,15 +72,19 @@ extractSite.multiFixationSites <- function(x, site, ...) {
 }
 
 #' @export
-extractSite <- function(x, site, ...) UseMethod("extractSite")
+extractSite <- function(x, site, ...)
+    UseMethod("extractSite")
 
 .actualExtractSite <- function(x, site) {
     site <- .checkSite(site)
     paths <- attr(x, "paths")
     tree <- attr(paths, "tree")
-    tryCatch(expr = sp <- x[[as.character(site)]], error = function(e) {
-        stop(paste("\"site\":", site, "is not found in \"x\"."))
-    })
+    tryCatch(
+        expr = sp <- x[[as.character(site)]],
+        error = function(e) {
+            stop("\"site\": ", site, " is not found in \"x\".")
+        }
+    )
     attr(sp, "tree") <- tree
     return(sp)
 }
@@ -88,12 +94,22 @@ extractSite <- function(x, site, ...) UseMethod("extractSite")
     if (select <= 0 || as.integer(select) != select) {
         stop("Please enter a single positive integer for \"select\"")
     }
-    tryCatch(expr = sp <- sp[[select]], error = function(e) {
-        cat(e, "\n")
-        if (length(select)) 
-            stop(paste("The site:", attr(sp, "site"), "has", length(sp), "fixation(s). Please choose a number from 1 to", 
-                length(sp), "for \"select\"."))
-    })
+    tryCatch(
+        expr = sp <- sp[[select]],
+        error = function(e) {
+            cat(e, "\n")
+            if (length(select))
+                stop(
+                    "The site: ",
+                    attr(sp, "site"),
+                    " has ",
+                    length(sp),
+                    " fixation(s). Please choose a number from 1 to ",
+                    length(sp),
+                    " for \"select\"."
+                )
+        }
+    )
     res <- list()
     for (i in sp) {
         aa <- attr(i, "AA")

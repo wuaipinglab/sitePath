@@ -50,7 +50,10 @@ similarityMatrix <- function(tree) {
 #' groupTips(tree, 0.996)
 #' @return grouping of tips
 #' @export
-groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = TRUE) {
+groupTips <- function(tree,
+                      similarity = NULL,
+                      forbidTrivial = TRUE,
+                      tipnames = TRUE) {
     simMatrix <- similarityMatrix(tree)
     if (is.null(similarity)) {
         simDist <- simMatrix[upper.tri(simMatrix)]
@@ -60,9 +63,14 @@ groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = 
     if (is.null(align)) {
         stop("No alignment found in \"tree\"")
     }
-    grouping <- runTreemer(nodepath(tree), align, simMatrix, similarity, TRUE)
+    grouping <-
+        runTreemer(nodepath(tree), align, simMatrix, similarity, TRUE)
     if (length(grouping) == 1 && forbidTrivial) {
-        warning(paste("\"similarity\"", similarity, "is too low of a cutoff resulting in trivial trimming"))
+        warning(
+            "\"similarity\" ",
+            similarity,
+            " is too low of a cutoff resulting in trivial trimming"
+        )
     }
     if (tipnames) {
         return(lapply(grouping, function(g) {
@@ -89,7 +97,9 @@ groupTips <- function(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = 
 #' lineagePath(tree, 0.996)
 #' @return path represent by node number
 #' @export
-lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
+lineagePath <- function(tree,
+                        similarity = NULL,
+                        forbidTrivial = TRUE) {
     simMatrix <- attr(tree, "simMatrix")
     attr(tree, "simMatrix") <- NULL
     if (is.null(similarity)) {
@@ -102,19 +112,27 @@ lineagePath <- function(tree, similarity = NULL, forbidTrivial = TRUE) {
         stop("No alignment found in \"tree\"")
     }
     # nodepath after trimming
-    trimmedPaths <- unique(runTreemer(nodepath(tree), align, simMatrix, similarity, 
-        FALSE))
-    # get the bifurcated pre-terminal nodes and their path to the root those paths
-    # are the so-called sitePaths (isolated)
-    paths <- lapply(trimmedPaths, function(p) p[seq_len(length(p) - 1)])
-    paths <- unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
+    trimmedPaths <-
+        unique(runTreemer(nodepath(tree), align, simMatrix, similarity,
+                          FALSE))
+    # get the bifurcated pre-terminal nodes and their path to the root
+    # those paths are the so-called sitePaths (isolated)
+    paths <- lapply(trimmedPaths, function(p)
+        p[seq_len(length(p) - 1)])
+    paths <-
+        unique(paths[which(duplicated(paths) & lengths(paths) > 1)])
     if (length(paths) == 0 && forbidTrivial) {
-        warning(paste("\"similarity\"", similarity, "is too low of a cutoff resulting in trivial trimming"))
+        warning(
+            "\"similarity\" ",
+            similarity,
+            " is too low of a cutoff resulting in trivial trimming"
+        )
     }
     attr(paths, "reference") <- attr(tree, "reference")
     attr(tree, "reference") <- NULL
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
+    attr(paths, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
     class(paths) <- "lineagePath"
     return(paths)
 }
@@ -157,13 +175,17 @@ print.lineagePath <- function(x, ...) {
 #' @importFrom methods is
 #' @importFrom graphics plot
 #' @export
-sneakPeek <- function(tree, step = NULL, maxPath = NULL, minPath = 1, makePlot = FALSE) {
+sneakPeek <- function(tree,
+                      step = NULL,
+                      maxPath = NULL,
+                      minPath = 1,
+                      makePlot = FALSE) {
     minSim <- min(similarityMatrix(tree))
     if (is.null(step)) {
-        step <- round(minSim - 1, 3)/50
+        step <- round(minSim - 1, 3) / 50
     }
     if (is.null(maxPath)) {
-        maxPath <- length(tree$tip.label)/20
+        maxPath <- length(tree$tip.label) / 20
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
@@ -175,7 +197,9 @@ sneakPeek <- function(tree, step = NULL, maxPath = NULL, minPath = 1, makePlot =
     similarity <- numeric(0)
     pathNum <- integer(0)
     for (s in seq(1, minSim, step)) {
-        paths <- lineagePath(tree, similarity = s, forbidTrivial = FALSE)
+        paths <- lineagePath(tree,
+                             similarity = s,
+                             forbidTrivial = FALSE)
         if (maxPath < length(paths)) {
             next
         } else if (length(paths) <= minPath) {

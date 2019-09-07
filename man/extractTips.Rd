@@ -48,8 +48,8 @@ The function \code{extractSite} can be used to extract the fixation info
 of a single site.
 }
 \examples{
-data('zikv_tree_reduced')
-data('zikv_align_reduced')
+data(zikv_tree_reduced)
+data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 mutations <- fixationSites(lineagePath(tree))
 extractTips(mutations, 139)

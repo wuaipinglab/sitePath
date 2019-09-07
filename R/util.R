@@ -32,7 +32,10 @@
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
-addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
+addMSA <- function(tree,
+                   msaPath = "",
+                   msaFormat = "",
+                   alignment = NULL) {
     # Get/test the tree object
     if (is(tree, "treedata")) {
         tree <- tree@phylo
@@ -44,7 +47,7 @@ addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
     if (file.exists(msaPath)) {
         alignment <- read.alignment(msaPath, msaFormat)
     } else if (is.null(alignment)) {
-        stop(paste("File", msaPath, "does not exist"))
+        stop("Alignment file \"", msaPath, "\" does not exist")
     }
     # Test the alignment object
     if (!is(alignment, "alignment")) {
@@ -62,7 +65,8 @@ addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
     }
     attr(tree, "align") <- align
     # Use the numbering of MSA as the default site numbering
-    attr(tree, "reference") <- .checkReference(tree, align, NULL, "-")
+    attr(tree, "reference") <-
+        .checkReference(tree, align, NULL, "-")
     # Similarity matrix
     sim <- getSimilarityMatrix(align)
     dimnames(sim) <- list(tree$tip.label, tree$tip.label)
@@ -97,7 +101,10 @@ addMSA <- function(tree, msaPath = "", msaFormat = "", alignment = NULL) {
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
 #' @export
-setSiteNumbering.phylo <- function(x, reference = NULL, gapChar = "-", ...) {
+setSiteNumbering.phylo <- function(x,
+                                   reference = NULL,
+                                   gapChar = "-",
+                                   ...) {
     align <- attr(x, "align")
     siteMapping <- .checkReference(x, align, reference, gapChar)
     attr(siteMapping, "refSeqName") <- reference
@@ -108,17 +115,24 @@ setSiteNumbering.phylo <- function(x, reference = NULL, gapChar = "-", ...) {
 #' @rdname setSiteNumbering
 #' @name setSiteNumbering
 #' @export
-setSiteNumbering.lineagePath <- function(x, reference = NULL, gapChar = "-", ...) {
+setSiteNumbering.lineagePath <- function(x,
+                                         reference = NULL,
+                                         gapChar = "-",
+                                         ...) {
     align <- attr(x, "align")
     tree <- attr(x, "tree")
-    siteMapping <- .checkReference(tree, align, reference, gapChar)
+    siteMapping <-
+        .checkReference(tree, align, reference, gapChar)
     attr(siteMapping, "refSeqName") <- reference
     attr(x, "reference") <- siteMapping
     return(x)
 }
 
 #' @export
-setSiteNumbering <- function(x, reference, gapChar, ...) UseMethod("setSiteNumbering")
+setSiteNumbering <- function(x, reference, gapChar, ...)
+    UseMethod("setSiteNumbering")
+
+# TODO: Need a class called "reference" for site numbering
 
 #' @name zikv_align
 #' @title Multiple sequence alignment of Zika virus polyprotein
@@ -205,10 +219,12 @@ NULL
     if (is.null(reference)) {
         reference <- seq_len(nchar(align[1]))
     } else {
-        if (!is.character(gapChar) || nchar(gapChar) != 1 || length(gapChar) != 1) {
+        if (!is.character(gapChar) ||
+            nchar(gapChar) != 1 || length(gapChar) != 1) {
             stop("\"gapChar\" only accepts one single character")
         }
-        reference <- getReference(align[which(tree$tip.label == reference)], gapChar)
+        reference <-
+            getReference(align[which(tree$tip.label == reference)], gapChar)
     }
     return(reference)
 }
@@ -247,11 +263,19 @@ NULL
         # The longest nodePath
         longest <- extended[which(el == ml)]
         # Zip up the longest nodePath until hitting diverging node
-        extended <- lapply(X = seq_len(ml), FUN = function(i) {
-            unique(vapply(longest, FUN = "[[", FUN.VALUE = 0, i))
-        })
-        # The length of the element in 'extended' would be 1 if the node is shared by the
-        # longest nodePath
+        extended <- lapply(
+            X = seq_len(ml),
+            FUN = function(i) {
+                unique(vapply(
+                    longest,
+                    FUN = "[[",
+                    FUN.VALUE = integer(1),
+                    i
+                ))
+            }
+        )
+        # The length of the element in 'extended' would be 1 if the
+        # node is shared by the longest nodePath
         c(p, unlist(extended[which(lengths(extended) == 1)]))
     })
     # Give back the attributes of 'paths'

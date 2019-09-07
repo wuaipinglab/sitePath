@@ -14,8 +14,8 @@ SNPsites(tree, minSNP = NULL)
 \method{fixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
   searchDepth = 1, ...)
 
-\method{multiFixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
-  searchDepth = 1, ...)
+\method{multiFixationSites}{lineagePath}(paths, samplingSize = NULL,
+  samplingTimes = 100, minEffectiveSize = 0, searchDepth = 1, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
@@ -35,14 +35,17 @@ cannot be intrinsically decided. \code{searchDepth} is needed to tell
 the search when to stop.}
 
 \item{...}{further arguments passed to or from other methods.}
+
+\item{samplingSize}{The number of tips sampled for each round of resampling. It shoud be
+at least 10th and at most nine 10ths of the tree tips.}
+
+\item{samplingTimes}{The total times of random sampling to do. It should be greater than 100.}
 }
 \value{
 \code{SNPsite} returns a list of qualified SNP site
 
-\code{fixationSites} returns a list of mutations
-with names of the tips involved. The name of each list element
-is the discovered mutation. A mutation has two vectors of tip names:
-'from' before the fixation and 'to' after the fixation.
+\code{fixationSites} returns a list of fixation mutations
+with names of the tips involved.
 
 \code{multiFixationSites} returns sites with multiple fixations.
 }
@@ -62,12 +65,13 @@ in one lineage but does not show fixation because of different
 sequence context.
 
 After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-\code{multiFixationSites} uses the result to find those sites that show
-multiple fixations on some, if not all, of the lineages.
+\code{multiFixationSites} uses random sampling on the original tree
+and applies the method used in \code{fixationSites} to each sampled
+tree and summarize the results from all the samples.
 }
 \examples{
-data('zikv_tree_reduced')
-data('zikv_align_reduced')
+data(zikv_tree_reduced)
+data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
 fixationSites(lineagePath(tree))

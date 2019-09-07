@@ -369,12 +369,16 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
     std::vector<int> combTips;
     // Iterate segment points and grouping tips
     segIndex start = 0;
+    // To get the ancestral nodes of the raw groups
+    Rcpp::CharacterVector ancestralNodes = nodeSummaries.names();
+    // Index of the ancestral node of the group
+    segIndex aNodeIndex = 0;
     for (
             segment::const_iterator final_itr = final.begin();
             final_itr != final.end(); ++final_itr
     ) {
-        aaSummary node;
-        std::vector<int> tips;
+        std::vector<int> tips; // To store and grow the group
+        aaSummary node; // To summarize the amino acids of the group
         for (unsigned int i = start; i < *final_itr; ++i) {
             Rcpp::IntegerVector nodeTips = nodeSummaries[i];
             // Group the tips with a segment
@@ -408,10 +412,12 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
             Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
             combined.attr("aaSummary") = Rcpp::wrap(combNode);
             combined.attr("AA") = prevFixedAA;
+            combined.attr("node") = Rcpp::as<std::string>(ancestralNodes.at(aNodeIndex));
             res.push_back(combined);
             // Initiate a new segment to be combined
             combTips = tips;
             combNode = node;
+            aNodeIndex = *final_itr - 1;
         }
         // Update the starting segment point for the next segment
         start = *final_itr;
@@ -422,6 +428,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
     Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
     combined.attr("aaSummary") = Rcpp::wrap(combNode);
     combined.attr("AA") = prevFixedAA;
+    combined.attr("node") = Rcpp::as<std::string>(ancestralNodes.at(aNodeIndex));
     res.push_back(combined);
     // The first combination of segments is actually empty
     res.erase(res.begin());
