@@ -129,6 +129,90 @@ AA_SHORT_NAMES = c(
     Glu_or_Gln = "Z"
 )
 
+#' @name plot.sitePath
+#' @title Plot the fixation mutation
+#' @description
+#' Visualize the \code{sitePath} object which is the basic unit of the
+#' result of \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
+#' @param x A \code{sitePath} object
+#' @param y
+#' A \code{sitePath} object can have more than one fixation path.
+#' This is to select which path to plot. The default is NULL which
+#' will plot all the paths.
+#' @param ...
+#' Arguments in \code{plot.phylo} functions and other arguments.
+#' @return
+#' The function only makes plot and returns no value
+#' (It behaviors like the generic \code{\link{plot}} function).
+#' @examples
+#' data(zikv_align_reduced)
+#' data(zikv_tree_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' paths <- lineagePath(tree)
+#' fixations <- fixationSites(paths)
+#' plot(fixations[[1]])
+#' @export
+plot.sitePath <- function(x, y = NULL, ...) {
+    tree <- attr(x, "tree")
+    # Prepare tree for plotting
+    tree <- ladderize(tree, right = FALSE)
+    rootNode <- getMRCA(tree, tree$tip.label)
+    plotName <- character(0)
+    nEdges <- length(tree$edge.length)
+    color <- rep("#d3d3d3", nEdges)
+    lty <- rep(2, nEdges)
+    width <- rep(0.5, nEdges)
+    AAnames <- character(0)
+    if (is.null(y)) {
+        sitePaths <- x[]
+    } else {
+        tryCatch(
+            expr = sitePaths <- x[y],
+            error = function(e) {
+                stop("There are ",
+                     length(x),
+                     " in \"x\". ",
+                     "The selection \"y\" is out of bounds.")
+            }
+        )
+    }
+    for (sp in sitePaths) {
+        aaName <- character(0)
+        for (tips in rev(sp)) {
+            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
+            aaName <- c(aa, aaName)
+            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
+            color[targetEdges] <- AA_COLORS[aa]
+            lty[targetEdges] <- 1
+            width[targetEdges] <- 2
+        }
+        AAnames <- c(AAnames, aaName)
+        plotName <-
+            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+    }
+    plot.phylo(
+        tree,
+        show.tip.label = FALSE,
+        edge.color = color,
+        edge.lty = lty,
+        edge.width = width,
+        ...
+    )
+    sepChar <- "\n"
+    if (sum(nchar(plotName) <= 18)) {
+        sepChar <- ",\t"
+    }
+    title(main = attr(x, "site"),
+          sub = paste(plotName, collapse = sepChar))
+    legend(
+        "topleft",
+        title = "Amino acid",
+        legend = AA_SHORT_NAMES[unique(AAnames)],
+        fill = AA_COLORS[unique(AAnames)],
+        box.lty = 0
+    )
+}
+
 #' @rdname plotSingleSite
 #' @name plotSingleSite
 #' @title Color the tree by a single site
@@ -221,64 +305,25 @@ plotSingleSite.lineagePath <- function(x,
 #' @description
 #' For \code{fixationSites}, it will color the ancestral tips in red,
 #' descendant tips in blue and excluded tips in grey.
+#' @param select
+#' Select which fixation path in to plot. The default is NULL which
+#' will plot all the fixations.
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
 #' @export
-plotSingleSite.fixationSites <- function(x, site, ...) {
+plotSingleSite.fixationSites <- function(x,
+                                         site,
+                                         select = NULL,
+                                         ...) {
     site <- .checkSite(site)
-    paths <- attr(x, "paths")
-    tree <- attr(paths, "tree")
-    tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
     tryCatch(
         expr = site <- match.arg(as.character(site), choices = names(x)),
         error = function(e) {
             stop("\"site\": ", site, " is not a mutation of fixation")
         }
     )
-    sitePaths <- x[[site]]
-    plotName <- character(0)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(0.5, nEdges)
-    AAnames <- character(0)
-    for (sp in sitePaths) {
-        aaName <- character(0)
-        for (tips in rev(sp)) {
-            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
-            aaName <- c(aa, aaName)
-            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
-            color[targetEdges] <- AA_COLORS[aa]
-            lty[targetEdges] <- 1
-            width[targetEdges] <- 2
-        }
-        AAnames <- c(AAnames, aaName)
-        plotName <-
-            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
-    }
-    plot.phylo(
-        tree,
-        show.tip.label = FALSE,
-        edge.color = color,
-        edge.lty = lty,
-        edge.width = width,
-        ...
-    )
-    sepChar <- "\n"
-    if (sum(nchar(plotName) <= 18)) {
-        sepChar <- ",\t"
-    }
-    title(main = site,
-          sub = paste(plotName, collapse = sepChar))
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = AA_SHORT_NAMES[unique(AAnames)],
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    plot.sitePath(x = x[[site]], y = select, ...)
 }
 
 #' @rdname plotSingleSite
@@ -292,60 +337,18 @@ plotSingleSite.fixationSites <- function(x, site, ...) {
 #' plotSingleSite(multiFixations, 1542)
 #' }
 #' @export
-plotSingleSite.multiFixationSites <- function(x, site, ...) {
+plotSingleSite.multiFixationSites <- function(x,
+                                              site,
+                                              select = NULL,
+                                              ...) {
     site <- .checkSite(site)
-    paths <- attr(x, "paths")
-    tree <- attr(paths, "tree")
-    tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
     tryCatch(
         expr = site <- match.arg(as.character(site), choices = names(x)),
         error = function(e) {
             stop("\"site\": ", site, " is not a mutation of fixation")
         }
     )
-    sitePaths <- x[[site]]
-    plotName <- character(0)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(0.5, nEdges)
-    AAnames <- character(0)
-    for (sp in sitePaths) {
-        aaName <- character(0)
-        for (tips in rev(sp)) {
-            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
-            aaName <- c(aa, aaName)
-            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
-            color[targetEdges] <- AA_COLORS[aa]
-            lty[targetEdges] <- 1
-            width[targetEdges] <- 2
-        }
-        AAnames <- c(AAnames, aaName)
-        plotName <-
-            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
-    }
-    plot.phylo(
-        tree,
-        show.tip.label = FALSE,
-        edge.color = color,
-        edge.lty = lty,
-        edge.width = width,
-        ...
-    )
-    sepChar <- "\n"
-    if (sum(nchar(plotName) <= 18)) {
-        sepChar <- ",\t"
-    }
-    title(main = site,
-          sub = paste(plotName, collapse = sepChar))
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = AA_SHORT_NAMES[unique(AAnames)],
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    plot.sitePath(x = x[[site]], y = select, ...)
 }
 
 #' @export

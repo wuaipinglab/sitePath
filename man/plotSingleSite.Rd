@@ -9,9 +9,9 @@
 \usage{
 \method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE, ...)
 
-\method{plotSingleSite}{fixationSites}(x, site, ...)
+\method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
 
-\method{plotSingleSite}{multiFixationSites}(x, site, ...)
+\method{plotSingleSite}{multiFixationSites}(x, site, select = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} object from \code{\link{fixationSites}} or
@@ -25,6 +25,9 @@ the reference defined at \code{\link{fixationSites}}.}
 \item{showPath}{If plot the lineage result from lineagePath.}
 
 \item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
+
+\item{select}{Select which fixation path in to plot. The default is NULL which
+will plot all the fixations.}
 }
 \value{
 The function only makes plot and returns no value

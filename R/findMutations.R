@@ -212,7 +212,8 @@ print.sitePath <- function(x, ...) {
         i <- attr(segs, "site")
         site <- as.character(i)
         res[[site]][[1]] <- segs[[1]]
-        attr(res[[site]], "site") <- site
+        attr(res[[site]], "site") <- i
+        attr(res[[site]], "tree") <- tree
         class(res[[site]]) <- "sitePath"
         for (seg in segs[-1]) {
             # Assume a new fixation path is to add.
@@ -257,6 +258,7 @@ print.sitePath <- function(x, ...) {
             }
             res[[site]][[targetIndex]] <- seg
             attr(res[[site]], "site") <- i
+            attr(res[[site]], "tree") <- tree
             class(res[[site]]) <- "sitePath"
         }
     }
@@ -633,6 +635,7 @@ print.fixationSites <- function(x, ...) {
                 }
                 res[[site]][[targetIndex]] <- seg
                 attr(res[[site]], "site") <- as.integer(site)
+                attr(res[[site]], "tree") <- tree
                 class(res[[site]]) <- "sitePath"
             }
         }
@@ -684,7 +687,7 @@ multiFixationSites.lineagePath <- function(paths,
         samplingSize <- as.integer(samplingSize)
     }
     if (samplingTimes < 100) {
-        warning("\"samplingTimes\" should be at least 100")
+        warning("\"samplingTimes\" is preferably over 100.")
     } else {
         samplingTimes <- seq_len(samplingTimes)
     }
