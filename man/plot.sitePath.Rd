@@ -31,3 +31,6 @@ paths <- lineagePath(tree)
 fixations <- fixationSites(paths)
 plot(fixations[[1]])
 }
+\seealso{
+\code{\link{plotSingleSite}}
+}

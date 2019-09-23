@@ -58,3 +58,6 @@ multiFixations <- multiFixationSites(paths)
 plotSingleSite(multiFixations, 1542)
 }
 }
+\seealso{
+\code{\link{plot.sitePath}}
+}

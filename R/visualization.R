@@ -151,6 +151,7 @@ AA_SHORT_NAMES = c(
 #' paths <- lineagePath(tree)
 #' fixations <- fixationSites(paths)
 #' plot(fixations[[1]])
+#' @seealso \code{\link{plotSingleSite}}
 #' @export
 plot.sitePath <- function(x, y = NULL, ...) {
     tree <- attr(x, "tree")
@@ -241,6 +242,7 @@ plot.sitePath <- function(x, y = NULL, ...) {
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree, 0.996)
 #' plotSingleSite(paths, 139)
+#' @seealso \code{\link{plot.sitePath}}
 #' @importFrom ape ladderize
 #' @importFrom ape getMRCA
 #' @importFrom graphics plot
