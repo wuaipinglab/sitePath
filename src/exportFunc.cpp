@@ -1,3 +1,4 @@
+#include <set>
 #include "treemer.h"
 #include "minEntropy.h"
 
@@ -21,7 +22,7 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 }
 
 // [[Rcpp::export]]
-SEXP runTreemer(
+Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         Rcpp::NumericMatrix &simMatrixInput,
@@ -45,13 +46,13 @@ SEXP runTreemer(
 Rcpp::IntegerVector divergentNode(
         const Rcpp::ListOf<Rcpp::IntegerVector> &paths
 ) {
-    std::vector<int> res;
+    std::set<int> res;
     for (int i = 0; i < paths.size() - 1; i++) {
         for (int j = i + 1; j < paths.size(); j++) {
             Rcpp::IntegerVector::const_iterator
             q  = paths[i].begin(), s = paths[j].begin();
             do { q++, s++; } while (*q == *s);
-            if (--q != paths[i].begin()) { res.push_back(*q); }
+            if (--q != paths[i].begin()) { res.insert(*q); }
         }
     }
     return Rcpp::wrap(res);

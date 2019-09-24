@@ -9,32 +9,20 @@
 \alias{multiFixationSites.lineagePath}
 \title{Finding sites with variation}
 \usage{
-SNPsites(tree, reference = NULL, gapChar = "-", minSNP = NULL)
+SNPsites(tree, minSNP = NULL)
 
-\method{fixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", tolerance = 0.01, minEffectiveSize = NULL, ...)
+\method{fixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
+  searchDepth = 1, ...)
 
-\method{multiFixationSites}{lineagePath}(paths, reference = NULL,
-  gapChar = "-", minEffectiveSize = NULL, searchDepth = 1, ...)
+\method{multiFixationSites}{lineagePath}(paths, samplingSize = NULL,
+  samplingTimes = 100, minEffectiveSize = 0, searchDepth = 1, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
-\item{reference}{Name of reference for site numbering. The name has to be one of the
-sequences' name. The default uses the intrinsic alignment numbering}
-
-\item{gapChar}{The character to indicate gap. The numbering will skip the gapChar
-for the reference sequence.}
-
 \item{minSNP}{Minimum number of amino acid variation to be a SNP}
 
 \item{paths}{a \code{lineagePath} object returned from \code{\link{lineagePath}} function}
-
-\item{tolerance}{A vector of two integers to specify maximum amino acid variation
-before/after mutation. Otherwise the mutation will not be counted into
-the return. If more than one number is given, the ancestral takes the first
-and descendant takes the second as the maximum. If only given one number,
-it's the maximum for both ancestral and descendant. The default is 0.01}
 
 \item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
 before/after mutation. Otherwise the mutation will not be counted into
@@ -42,19 +30,22 @@ the return. If more than one number is given, the ancestral takes the first
 and descendant takes the second as the minimum. If only given one number,
 it's the minimum for both ancestral and descendant.}
 
-\item{...}{further arguments passed to or from other methods.}
-
 \item{searchDepth}{The function uses heuristic search but the termination of the search
 cannot be intrinsically decided. \code{searchDepth} is needed to tell
 the search when to stop.}
+
+\item{...}{further arguments passed to or from other methods.}
+
+\item{samplingSize}{The number of tips sampled for each round of resampling. It shoud be
+at least 10th and at most nine 10ths of the tree tips.}
+
+\item{samplingTimes}{The total times of random sampling to do. It should be greater than 100.}
 }
 \value{
 \code{SNPsite} returns a list of qualified SNP site
 
-\code{fixationSites} returns a list of mutations
-with names of the tips involved. The name of each list element
-is the discovered mutation. A mutation has two vectors of tip names:
-'from' before the fixation and 'to' after the fixation.
+\code{fixationSites} returns a list of fixation mutations
+with names of the tips involved.
 
 \code{multiFixationSites} returns sites with multiple fixations.
 }
@@ -74,21 +65,14 @@ in one lineage but does not show fixation because of different
 sequence context.
 
 After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-\code{multiFixationSites} uses the result to find those sites that show
-multiple fixations on some, if not all, of the lineages.
+\code{multiFixationSites} uses random sampling on the original tree
+and applies the method used in \code{fixationSites} to each sampled
+tree and summarize the results from all the samples.
 }
 \examples{
-data("zikv_tree_reduced")
-data("zikv_align_reduced")
+data(zikv_tree_reduced)
+data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
-fixationSites(
-    lineagePath(tree),
-    tolerance = c(1, 1),
-    minEffectiveSize = c(50, 50)
-)
-data(h3n2_tree_reduced)
-data(h3n2_align_reduced)
-tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
-multiFixationSites(lineagePath(tree))
+fixationSites(lineagePath(tree))
 }

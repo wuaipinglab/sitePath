@@ -73,7 +73,7 @@ plot(preassessment$similarity, preassessment$pathNum)
 
 Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.995 as an example.
 
-```{r get_sitePath}
+```{r get_lineagePath}
 paths <- lineagePath(tree, 0.995)
 paths
 ```
@@ -93,15 +93,20 @@ Now you're ready to find fixation events.
 The hierarchical search is done by `fixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation.
 
 ```{r find_fixations}
-fixations <- multiFixationSites(paths)
+fixations <- fixationSites(paths)
 fixations
 ```
 
-If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractTips` function. The output is a `sitePath` object which stores the tip names.
+If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
+
+```{r get_sitePath}
+extractSite(fixations, 139)
+```
+
+It is also possible to retrieve the tips involved in the fixation of the site.
 
 ```{r get_tipNames}
-sp <- extractTips(fixations, 139)
-sp
+extractTips(fixations, 139)
 ```
 
 ## Visualize the result

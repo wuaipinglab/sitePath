@@ -1,10 +1,13 @@
 #' @rdname extractTips
 #' @name extractTips
-#' @title Extract sitePath for a single site
+#' @title Extract info for fixation of a single site
 #' @description
-#' Retrieve the name of the tips involved in the fixation
+#' The result of \code{\link{fixationSites}} contains all the possible sites
+#' with fixation mutation. The function \code{extractTips} retrieves
+#' the name of the tips involved in the fixation.
 #' @param x
-#' A \code{fixationSites} or a \code{multiFixationSites} object.
+#' A \code{fixationSites} or a \code{multiFixationSites} or
+#' a \code{sitePath} object.
 #' @param site
 #' A site predicted to experience fixation.
 #' @param select
@@ -15,34 +18,84 @@
 #' @param ...
 #' Other arguments
 #' @return
-#' The name of the tips involved in the fixation
+#' The function \code{extractTips} returns the name of the
+#' tips involved in the fixation.
+#' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' mutations <- fixationSites(lineagePath(tree))
+#' extractTips(mutations, 139)
 #' @export
-extractTips.fixationSites <- function(x, site, select = 1, ...) {
-    site <- checkSite(site)
-    return(actualExtract(x, site, select))
+extractTips.fixationSites <- function(x,
+                                      site,
+                                      select = 1,
+                                      ...) {
+    sp <- extractSite(x, site)
+    return(.actualExtractTips(sp, select))
 }
 
 #' @rdname extractTips
 #' @export
-extractTips.multiFixationSites <-
-    function(x, site, select = 1, ...) {
-        site <- checkSite(site)
-        return(actualExtract(x, site, select))
-    }
+extractTips.multiFixationSites <- function(x,
+                                           site,
+                                           select = 1,
+                                           ...) {
+    sp <- extractSite(x, site)
+    return(.actualExtractTips(sp, select))
+}
+
+#' @rdname extractTips
+#' @export
+extractTips.sitePath <- function(x, select = 1, ...) {
+    return(.actualExtractTips(x, select))
+}
 
 #' @export
-extractTips <- function(x, site, select, ...)
+extractTips <- function(x, ...)
     UseMethod("extractTips")
 
-actualExtract <- function(x, site, select) {
+#' @rdname extractTips
+#' @name extractSite
+#' @description
+#' The function \code{extractSite} can be used to extract the fixation info
+#' of a single site.
+#' @return
+#' The function \code{extractSite} returns a \code{sitePath} object
+#' @examples
+#' extractSite(mutations, 139)
+#' @export
+extractSite.fixationSites <- function(x, site, ...) {
+    return(.actualExtractSite(x, site))
+}
+
+#' @rdname extractTips
+#' @name extractSite
+#' @export
+extractSite.multiFixationSites <- function(x, site, ...) {
+    return(.actualExtractSite(x, site))
+}
+
+#' @export
+extractSite <- function(x, site, ...)
+    UseMethod("extractSite")
+
+.actualExtractSite <- function(x, site) {
+    site <- .checkSite(site)
     paths <- attr(x, "paths")
     tree <- attr(paths, "tree")
     tryCatch(
         expr = sp <- x[[as.character(site)]],
         error = function(e) {
-            stop(paste("\"site\":", site, "is not found in \"x\"."))
+            stop("\"site\": ", site, " is not found in \"x\".")
         }
     )
+    attr(sp, "tree") <- tree
+    return(sp)
+}
+
+.actualExtractTips <- function(sp, select) {
+    tree <- attr(sp, "tree")
     if (select <= 0 || as.integer(select) != select) {
         stop("Please enter a single positive integer for \"select\"")
     }
@@ -52,15 +105,13 @@ actualExtract <- function(x, site, select) {
             cat(e, "\n")
             if (length(select))
                 stop(
-                    paste(
-                        "The site:",
-                        site,
-                        "has",
-                        length(x),
-                        "fixation(s). Please choose a number from 1 to",
-                        length(x),
-                        "for \"select\"."
-                    )
+                    "The site: ",
+                    attr(sp, "site"),
+                    " has ",
+                    length(sp),
+                    " fixation(s). Please choose a number from 1 to ",
+                    length(sp),
+                    " for \"select\"."
                 )
         }
     )
@@ -76,26 +127,7 @@ actualExtract <- function(x, site, select) {
 }
 
 as.data.frame.fixationSites <- function(x, ...) {
-    paths <- attr(x, "paths")
-    tree <- attr(paths, "tree")
-    reference <- attr(paths, "reference")
-    res <- as.data.frame(matrix(
-        nrow = length(tree$tip.label),
-        ncol = length(reference),
-        dimnames = list(tree$tip.label, seq_along(reference))
-    ))
-    for (site in names(x)) {
-        for (tips in x[[site]]) {
-            fixedAA <- AA_FULL_NAMES[tolower(names(tips))]
-            for (tip in tips[[2]]) {
-                res[tip, site] <- fixedAA
-            }
-        }
-    }
-    whichNA <- is.na(res)
-    res <-
-        res[rowSums(whichNA) < ncol(res), colSums(whichNA) < nrow(res)]
-    return(res)
+    cat("Under development\n")
 }
 
 as.data.frame.multiFixationSites <- function(x, ...) {

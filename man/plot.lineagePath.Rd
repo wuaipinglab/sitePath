@@ -24,8 +24,8 @@ and paths are black solid line while the trimmed nodes and tips will use
 grey dashed line.
 }
 \examples{
-data("zikv_tree")
-data("zikv_align")
+data(zikv_tree)
+data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 plot(lineagePath(tree, 0.996))
 }

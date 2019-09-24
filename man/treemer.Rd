@@ -6,19 +6,16 @@
 \alias{lineagePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, similarity = NULL, simMatrix = NULL,
-  forbidTrivial = TRUE, tipnames = TRUE)
+groupTips(tree, similarity = NULL, forbidTrivial = TRUE,
+  tipnames = TRUE)
 
-lineagePath(tree, similarity = NULL, simMatrix = NULL,
-  forbidTrivial = TRUE)
+lineagePath(tree, similarity = NULL, forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
 \item{similarity}{Similarity threshold for tree trimming. If not provided, an average
 value of similarity among all sequences will be used.}
-
-\item{simMatrix}{S diagonal matrix of similarity between sequences}
 
 \item{forbidTrivial}{Does not allow trivial trimming}
 
@@ -53,8 +50,8 @@ the ancestor of the tips with the longest \code{\link{nodepath}}
 are added.
 }
 \examples{
-data("zikv_tree")
-data("zikv_align")
+data('zikv_tree')
+data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 groupTips(tree, 0.996)
 lineagePath(tree, 0.996)

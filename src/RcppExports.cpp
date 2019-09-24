@@ -17,7 +17,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // runTreemer
-SEXP runTreemer(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
+Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
 RcppExport SEXP _sitePath_runTreemer(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

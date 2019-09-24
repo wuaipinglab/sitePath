@@ -14,12 +14,10 @@ test_that("Topology-dependent trimming", {
             groupTips(
                 tree,
                 similarity = s,
-                simMatrix = simMatrix,
                 forbidTrivial = FALSE,
                 tipnames = FALSE
             )
-        expect_equal(sort(unlist(grouping, use.names = FALSE)),
-                     1:length(tree$tip.label))
+        expect_equal(sort(unlist(grouping, use.names = FALSE)), 1:length(tree$tip.label))
         for (g in names(grouping)) {
             an <- as.integer(g)
             index <- which(row.names(simMatrix) %in% grouping[[g]])
@@ -31,15 +29,12 @@ test_that("Topology-dependent trimming", {
                 expect_equal(an, ape::getMRCA(tree, descendant))
             }
             expect_equal(sort(descendant),
-                         sort(sitePath:::ChildrenTips(tree, an)))
+                         sort(sitePath:::.childrenTips(tree, an)))
         }
         paths <-
-            lineagePath(
-                tree,
-                similarity = s,
-                simMatrix = simMatrix,
-                forbidTrivial = FALSE
-            )
+            lineagePath(tree,
+                        similarity = s,
+                        forbidTrivial = FALSE)
         for (p in paths) {
             expect_equal(ape::nodepath(tree, from = p[1], to = p[length(p)]), p)
         }
