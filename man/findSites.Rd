@@ -75,8 +75,4 @@ data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 SNPsites(tree)
 fixationSites(lineagePath(tree))
-data(h3n2_tree_reduced)
-data(h3n2_align_reduced)
-tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
-multiFixationSites(lineagePath(tree))
 }

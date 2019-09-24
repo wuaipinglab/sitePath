@@ -27,18 +27,23 @@
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
 #' @export
-extractTips.fixationSites <- function(x, site, select = 1, ...) {
+extractTips.fixationSites <- function(x,
+                                      site,
+                                      select = 1,
+                                      ...) {
     sp <- extractSite(x, site)
     return(.actualExtractTips(sp, select))
 }
 
 #' @rdname extractTips
 #' @export
-extractTips.multiFixationSites <-
-    function(x, site, select = 1, ...) {
-        sp <- extractSite(x, site)
-        return(.actualExtractTips(sp, select))
-    }
+extractTips.multiFixationSites <- function(x,
+                                           site,
+                                           select = 1,
+                                           ...) {
+    sp <- extractSite(x, site)
+    return(.actualExtractTips(sp, select))
+}
 
 #' @rdname extractTips
 #' @export

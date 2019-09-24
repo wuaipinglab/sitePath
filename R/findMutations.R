@@ -202,7 +202,7 @@ print.sitePath <- function(x, ...) {
     return(res)
 }
 
-.combineFixations <- function(fixations, tree) {
+.combineFixations <- function(fixations, tree, align) {
     # 'res' is going to be the return of this function. Each entry in
     # the list is the 'sitePath' for a site. Each site ('sitePath')
     # consists of 'mutPath' that is named by the starting node name.
@@ -211,7 +211,12 @@ print.sitePath <- function(x, ...) {
     for (segs in fixations) {
         i <- attr(segs, "site")
         site <- as.character(i)
-        res[[site]][[1]] <- segs[[1]]
+        res[[site]][[1]] <- lapply(segs[[1]], function(tips) {
+            attr(tips, "tipsAA") <- substr(x = align[tips],
+                                           start = i,
+                                           stop = i)
+            return(tips)
+        })
         attr(res[[site]], "site") <- i
         attr(res[[site]], "tree") <- tree
         class(res[[site]]) <- "sitePath"
@@ -256,6 +261,12 @@ print.sitePath <- function(x, ...) {
                     targetIndex <- length(existPath) + 1
                 }
             }
+            seg <- lapply(seg, function(tips) {
+                attr(tips, "tipsAA") <- substr(x = align[tips],
+                                               start = i,
+                                               stop = i)
+                return(tips)
+            })
             res[[site]][[targetIndex]] <- seg
             attr(res[[site]], "site") <- i
             attr(res[[site]], "tree") <- tree
@@ -334,7 +345,7 @@ fixationSites.lineagePath <- function(paths,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
     )
-    res <- .combineFixations(fixations, tree)
+    res <- .combineFixations(fixations, tree, align)
     attr(res, "paths") <- paths
     attr(res, "reference") <- reference
     class(res) <- "fixationSites"
@@ -443,11 +454,15 @@ print.fixationSites <- function(x, ...) {
         sampledTree <- attr(sampledPaths, "tree")
         sampledTree[["tip.label"]]
     })
+    cat("Summarizing...\n")
+    flush.console()
+    pb <- txtProgressBar(min = 0, max = length(allMutations), style = 3)
     # The tip names grouped by ancestral node of the original tree
     originalNodeTips <- lapply(nodeAlign, function(nd) {
         tree[["tip.label"]][as.integer(names(nd))]
     })
     # Keep track of the essential info of each sample's result
+    iter <- 0
     siteCol <- integer()
     nodeCol <- integer()
     fixedAACol <- character()
@@ -504,7 +519,10 @@ print.fixationSites <- function(x, ...) {
                 }
             }
         }
+        iter <- iter + 1
+        setTxtProgressBar(pb, iter)
     }
+    close(pb)
     # Record of site-node pair in all samples
     res <- data.frame(
         "site" = siteCol,
@@ -533,7 +551,8 @@ print.fixationSites <- function(x, ...) {
 .summarizeSamplingAA <- function(nodeTips) {
     tipsAA <- attr(nodeTips, "aaSummary")
     samplingAA <- attr(nodeTips, "samplingSummary")
-    if (length(tipsAA) == 1 && names(tipsAA) %in% names(samplingAA)) {
+    if (length(tipsAA) == 1 &&
+        names(tipsAA) %in% names(samplingAA)) {
         return(names(tipsAA))
     }
     overlappedAA <- intersect(names(tipsAA), names(samplingAA))
@@ -545,7 +564,7 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
-.assemblyFixation <- function(x, tree, paths, divNodes) {
+.assemblyFixation <- function(x, tree, align, paths, divNodes) {
     # Divergent nodes are not included anywhere in the result
     noDivNodesPaths <- lapply(paths, function(p) {
         as.character(setdiff(p, divNodes))
@@ -633,8 +652,15 @@ print.fixationSites <- function(x, ...) {
                 if (is.null(targetIndex)) {
                     next
                 }
+                i <- as.integer(site)
+                seg <- lapply(seg, function(tips) {
+                    attr(tips, "tipsAA") <- substr(x = align[tips],
+                                                   start = i,
+                                                   stop = i)
+                    return(tips)
+                })
                 res[[site]][[targetIndex]] <- seg
-                attr(res[[site]], "site") <- as.integer(site)
+                attr(res[[site]], "site") <- i
                 attr(res[[site]], "tree") <- tree
                 class(res[[site]]) <- "sitePath"
             }
@@ -655,14 +681,12 @@ print.fixationSites <- function(x, ...) {
 #' at least 10th and at most nine 10ths of the tree tips.
 #' @param samplingTimes
 #' The total times of random sampling to do. It should be greater than 100.
-#' @examples
-#' data(h3n2_tree_reduced)
-#' data(h3n2_align_reduced)
-#' tree <- addMSA(h3n2_tree_reduced, alignment = h3n2_align_reduced)
-#' multiFixationSites(lineagePath(tree))
 #' @return
 #' \code{multiFixationSites} returns sites with multiple fixations.
 #' @importFrom ape drop.tip
+#' @importFrom utils flush.console
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
 #' @export
 multiFixationSites.lineagePath <- function(paths,
                                            samplingSize = NULL,
@@ -688,8 +712,6 @@ multiFixationSites.lineagePath <- function(paths,
     }
     if (samplingTimes < 100) {
         warning("\"samplingTimes\" is preferably over 100.")
-    } else {
-        samplingTimes <- seq_len(samplingTimes)
     }
     if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
@@ -715,8 +737,11 @@ multiFixationSites.lineagePath <- function(paths,
         tree = tree,
         align = align
     )
+    cat("\nResampling...\n")
+    flush.console()
     # The resampling process
-    allMutations <- lapply(samplingTimes, function(iter) {
+    pb <- txtProgressBar(min = 0, max = samplingTimes, style = 3)
+    allMutations <- lapply(seq_len(samplingTimes), function(iter) {
         # Sampled tree
         sampledTree <-
             drop.tip(tree, sample(seq_len(nTips), nTips - samplingSize))
@@ -747,14 +772,17 @@ multiFixationSites.lineagePath <- function(paths,
         )
         attr(sampledPaths, "tree") <- sampledTree
         attr(res, "paths") <- sampledPaths
+        setTxtProgressBar(pb, iter)
         return(res)
     })
+    close(pb)
     # Summarize the fixed amino acid for tips from resampling
     sampleSummary <- .sampleSummarize(allMutations, nodeAlign, tree)
     # Rebuild the fixation path
     res <- .assemblyFixation(
         x = sampleSummary,
         tree = tree,
+        align = align,
         paths = paths,
         divNodes = divNodes
     )
