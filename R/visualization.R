@@ -4,10 +4,13 @@
 #' Visualize \code{\link{lineagePath}} object. A tree diagram will be plotted
 #' and paths are black solid line while the trimmed nodes and tips will use
 #' grey dashed line.
-#' @param x A \code{\link{lineagePath}} object
+#' @param x
+#' A \code{\link{lineagePath}} object
 #' @param y
 #' Whether plot the nodes from the \code{extendedSearch} in
 #' \code{\link{fixationSites}}
+#' @param showTips
+#' Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Arguments in \code{plot.phylo} functions.
 #' @return
 #' The function only makes plot and returns no value
@@ -20,7 +23,10 @@
 #' @importFrom ape plot.phylo
 #' @importFrom graphics title
 #' @export
-plot.lineagePath <- function(x, y = TRUE, ...) {
+plot.lineagePath <- function(x,
+                             y = TRUE,
+                             showTips = FALSE,
+                             ...) {
     tree <- attr(x, "tree")
     tree <- ladderize(tree, right = FALSE)
     if (y) {
@@ -40,7 +46,7 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
         edge.color = color,
         edge.lty = lty,
         edge.width = width,
-        show.tip.label = FALSE,
+        show.tip.label = showTips,
         ...
     )
 }
@@ -73,7 +79,7 @@ AA_COLORS <- c(
     Glu_or_Gln = "#d3d3d3"
 )
 
-AA_FULL_NAMES = c(
+AA_FULL_NAMES <- c(
     h = "His",
     r = "Arg",
     k = "Lys",
@@ -101,7 +107,7 @@ AA_FULL_NAMES = c(
     z = "Glu_or_Gln"
 )
 
-AA_SHORT_NAMES = c(
+AA_SHORT_NAMES <- c(
     His = "H",
     Arg = "R",
     Lys = "K",
@@ -134,11 +140,14 @@ AA_SHORT_NAMES = c(
 #' @description
 #' Visualize the \code{sitePath} object which is the basic unit of the
 #' result of \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
-#' @param x A \code{sitePath} object
+#' @param x
+#' A \code{sitePath} object
 #' @param y
 #' A \code{sitePath} object can have more than one fixation path.
 #' This is to select which path to plot. The default is NULL which
 #' will plot all the paths.
+#' @param showTips
+#' Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ...
 #' Arguments in \code{plot.phylo} functions and other arguments.
 #' @return
@@ -153,7 +162,10 @@ AA_SHORT_NAMES = c(
 #' plot(fixations[[1]])
 #' @seealso \code{\link{plotSingleSite}}
 #' @export
-plot.sitePath <- function(x, y = NULL, ...) {
+plot.sitePath <- function(x,
+                          y = NULL,
+                          showTips = FALSE,
+                          ...) {
     tree <- attr(x, "tree")
     # Prepare tree for plotting
     tree <- ladderize(tree, right = FALSE)
@@ -193,7 +205,7 @@ plot.sitePath <- function(x, y = NULL, ...) {
     }
     plot.phylo(
         tree,
-        show.tip.label = FALSE,
+        show.tip.label = showTips,
         edge.color = color,
         edge.lty = lty,
         edge.width = width,
@@ -231,6 +243,8 @@ plot.sitePath <- function(x, y = NULL, ...) {
 #' the reference defined at \code{\link{fixationSites}}.
 #' @param showPath
 #' If plot the lineage result from lineagePath.
+#' @param showTips
+#' Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ...
 #' Arguments in \code{plot.phylo} functions and other arguments.
 #' @return
@@ -251,6 +265,7 @@ plot.sitePath <- function(x, y = NULL, ...) {
 plotSingleSite.lineagePath <- function(x,
                                        site,
                                        showPath = FALSE,
+                                       showTips = FALSE,
                                        ...) {
     site <- .checkSite(site)
     tree <- attr(x, "tree")
@@ -288,7 +303,7 @@ plotSingleSite.lineagePath <- function(x,
     }
     plot.phylo(
         tree,
-        show.tip.label = FALSE,
+        show.tip.label = showTips,
         edge.color = color,
         edge.width = width,
         main = site,

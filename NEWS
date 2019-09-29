@@ -1,3 +1,32 @@
+CHANGES IN VERSION 1.1.10
+-------------------------
+    o Allow user to choose whether to show tip labels in the plot functions
+
+CHANGES IN VERSION 1.1.9
+-------------------------
+    o Add progress bar for the resampling and summarizing step of the function
+      'multiFixationSites'
+
+CHANGES IN VERSION 1.1.8
+-------------------------
+    o Add 'plot' function for directly plotting the return of 'extractSite'
+    o Apply resampling method for 'multiFixationSites'
+    o The function 'fixationSites' applys the old 'multiFixationSites'
+
+CHANGES IN VERSION 1.1.7
+-------------------------
+    o Add functionality 'extractSite' to allow accessing a single site from
+      the result of 'fixationSites' and 'multiFixationSites'
+
+CHANGES IN VERSION 1.1.6
+-------------------------
+    o Add functionality 'setSiteNumbering' to allow manipulating the
+      reference of site numbering
+
+CHANGES IN VERSION 1.1.5
+-------------------------
+    o Move similarity calculation to 'addMSA'. This will slow the function
+
 CHANGES IN VERSION 1.1.4
 -------------------------
     o Use total number of tips divided by number of nodes as 'minEffectiveSize'

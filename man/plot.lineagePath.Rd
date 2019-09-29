@@ -4,13 +4,15 @@
 \alias{plot.lineagePath}
 \title{Visualize phylogenetic lineages}
 \usage{
-\method{plot}{lineagePath}(x, y = TRUE, ...)
+\method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{\link{lineagePath}} object}
 
 \item{y}{Whether plot the nodes from the \code{extendedSearch} in
 \code{\link{fixationSites}}}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{...}{Arguments in \code{plot.phylo} functions.}
 }

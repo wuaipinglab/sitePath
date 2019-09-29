@@ -7,7 +7,8 @@
 \alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
-\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE, ...)
+\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE,
+  showTips = FALSE, ...)
 
 \method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
 
@@ -23,6 +24,8 @@ indicate a site could be provide. The numbering is consistent with
 the reference defined at \code{\link{fixationSites}}.}
 
 \item{showPath}{If plot the lineage result from lineagePath.}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
 

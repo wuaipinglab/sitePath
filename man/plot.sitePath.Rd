@@ -4,7 +4,7 @@
 \alias{plot.sitePath}
 \title{Plot the fixation mutation}
 \usage{
-\method{plot}{sitePath}(x, y = NULL, ...)
+\method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{sitePath} object}
@@ -12,6 +12,8 @@
 \item{y}{A \code{sitePath} object can have more than one fixation path.
 This is to select which path to plot. The default is NULL which
 will plot all the paths.}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
 }
