@@ -234,7 +234,8 @@ print.sitePath <- function(x, ...) {
             toCombine <- vapply(
                 X = existPath,
                 FUN = function(ep) {
-                    identical(seg[-endIndex], ep[-endIndex]) &&
+                    identical(lapply(seg, c)[-endIndex],
+                              lapply(ep, c)[-endIndex]) &&
                         finalAA == attr(ep[[endIndex]], "AA")
                 },
                 FUN.VALUE = logical(1)
@@ -456,7 +457,9 @@ print.fixationSites <- function(x, ...) {
     })
     cat("Summarizing...\n")
     flush.console()
-    pb <- txtProgressBar(min = 0, max = length(allMutations), style = 3)
+    pb <- txtProgressBar(min = 0,
+                         max = length(allMutations),
+                         style = 3)
     # The tip names grouped by ancestral node of the original tree
     originalNodeTips <- lapply(nodeAlign, function(nd) {
         tree[["tip.label"]][as.integer(names(nd))]
@@ -621,7 +624,8 @@ print.fixationSites <- function(x, ...) {
                     toCombine <- vapply(
                         X = existPath,
                         FUN = function(ep) {
-                            identical(seg[-endIndex], ep[-endIndex]) &&
+                            identical(lapply(seg, c)[-endIndex],
+                                      lapply(ep, c)[-endIndex]) &&
                                 currentAA == attr(ep[[endIndex]], "AA")
                         },
                         FUN.VALUE = logical(1)
@@ -740,7 +744,9 @@ multiFixationSites.lineagePath <- function(paths,
     cat("\nResampling...\n")
     flush.console()
     # The resampling process
-    pb <- txtProgressBar(min = 0, max = samplingTimes, style = 3)
+    pb <- txtProgressBar(min = 0,
+                         max = samplingTimes,
+                         style = 3)
     allMutations <- lapply(seq_len(samplingTimes), function(iter) {
         # Sampled tree
         sampledTree <-
