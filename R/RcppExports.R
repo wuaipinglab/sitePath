@@ -21,16 +21,16 @@ ancestralPaths <- function(paths, minLen) {
     .Call('_sitePath_ancestralPaths', PACKAGE = 'sitePath', paths, minLen)
 }
 
-summarizeAA <- function(seqs, siteIndex, tolerance) {
-    .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', seqs, siteIndex, tolerance)
-}
-
 tableAA <- function(seqs, siteIndex) {
     .Call('_sitePath_tableAA', PACKAGE = 'sitePath', seqs, siteIndex)
 }
 
 minimizeEntropy <- function(nodeSummaries, minEffectiveSize, searchDepth) {
     .Call('_sitePath_minimizeEntropy', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
+}
+
+summarizeAA <- function(allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb) {
+    .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb)
 }
 
 tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {

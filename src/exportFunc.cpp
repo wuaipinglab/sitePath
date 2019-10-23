@@ -85,45 +85,6 @@ Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(
 }
 
 // [[Rcpp::export]]
-Rcpp::CharacterVector summarizeAA(
-        const Rcpp::CharacterVector &seqs,
-        const int siteIndex,
-        const float tolerance
-) {
-    int nseq = seqs.size();
-    std::map<char, int> aaSummary;
-    for (int i = 0; i < nseq; ++i) { aaSummary[seqs[i][siteIndex]]++; }
-    std::map<char, int>::iterator it = aaSummary.begin();
-    int currentMax = it->second;
-    char maxArg = it->first;
-    for (++it; it != aaSummary.end(); ++it) {
-        if (it->second > currentMax) {
-            currentMax = it->second;
-            maxArg = it->first;
-        }
-    }
-    // The default tolerance would be a number
-    int tt = static_cast<int>(tolerance);
-    // Get the tolerance number if receiving float
-    if (tolerance < 0.5) {
-        tt = tolerance * nseq;
-    } else if (tolerance < 1) {
-        tt = nseq - tolerance * nseq;
-    }
-    // Test if the number of non-dominant AAs within tolerance
-    nseq -= currentMax;
-    if (nseq > tt) {
-        return NA_STRING;
-    } else {
-        // The functin will return the fixed AA if the number
-        // of non-dominant AA doesn't exceed the tolerance "tt"
-        Rcpp::CharacterVector res = Rcpp::wrap(maxArg);
-        res.attr("n") = Rcpp::IntegerVector::create(nseq);
-        return res;
-    }
-}
-
-// [[Rcpp::export]]
 Rcpp::IntegerVector tableAA(
         const Rcpp::CharacterVector &seqs,
         const int siteIndex
@@ -176,6 +137,80 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
     //     }
     // }
     // return updatedSegmentation(nodeSummaries, dSearch.getFinal());
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > summarizeAA(
+    const Rcpp::List &allMutations,
+    const Rcpp::ListOf<Rcpp::CharacterVector> &allSampledTips,
+    const Rcpp::ListOf<Rcpp::CharacterVector> &originalNodeTips,
+    const Rcpp::Function &setTxtProgressBar,
+    const Rcpp::List &pb
+) {
+    unsigned int nSampling = allMutations.size();
+    const Rcpp::CharacterVector ancestralNodes = originalNodeTips.names();
+    std::map< std::string, std::map< std::string, std::map<std::string, int> > > res;
+    // Assign amino acid for each ancestral nodes from the sampling result
+    for (unsigned int i = 0; i < nSampling;) {
+        const Rcpp::CharacterVector sampledTips = allSampledTips[i];
+        const Rcpp::List mutations = allMutations[i];
+        const Rcpp::CharacterVector sites = mutations.names();
+        for (int j = 0; j < mutations.size(); ++j) {
+            const Rcpp::List sitePath = mutations[j];
+            const std::string site = Rcpp::as<std::string>(sites[j]);
+            for (int n = 0; n < sitePath.size(); ++n) {
+                const Rcpp::List mutPath = sitePath[n];
+                for (int m = 0; m < mutPath.size(); ++m) {
+                    // Grab the tips during a fixation and relevant info
+                    const Rcpp::IntegerVector tips = mutPath[m];
+                    const std::string fixedAA = Rcpp::as<std::string>(tips.attr("AA"));
+                    Rcpp::CharacterVector stn = sampledTips[tips - 1];
+                    bool qualified = true;
+                    // The tips during a fixation should not disappear due to the
+                    // sampling in case
+                    for (unsigned int it = 0; it < nSampling; ++it) {
+                        const Rcpp::CharacterVector overlap = Rcpp::intersect(
+                            stn,
+                            allSampledTips[it]
+                        );
+                        if (overlap.size() == 0) {
+                            qualified = false;
+                            break;
+                        }
+                    }
+                    if (qualified) {
+                        // Get the ancestral node on the original tree for each tip
+                        // and assign the amino acid.
+                        // Duplicated nodes only count once.
+                        for (int it = 0; it < ancestralNodes.size(); ++it) {
+                            const std::string node = Rcpp::as<std::string>(ancestralNodes[it]);
+                            bool nodeIncluded = false;
+                            Rcpp::CharacterVector otn = originalNodeTips[node];
+                            Rcpp::CharacterVector::iterator stn_itr, otn_itr;
+                            // There will be shared tips if node is to be included
+                            for (stn_itr = stn.begin(); stn_itr != stn.end();) {
+                                otn_itr = std::find(otn.begin(), otn.end(), *stn_itr);
+                                if (otn_itr == otn.end()) {
+                                    ++stn_itr;
+                                } else {
+                                    nodeIncluded = true;
+                                    // Remove the shared tip for both
+                                    otn.erase(otn_itr);
+                                    stn_itr = stn.erase(stn_itr);
+                                }
+                            }
+                            // Increase the count for the site-node pair
+                            if (nodeIncluded) {
+                                ++res[site][node][fixedAA];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setTxtProgressBar(pb, ++i);
+    }
+    return Rcpp::wrap(res);
 }
 
 // [[Rcpp::export]]

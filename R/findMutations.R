@@ -378,6 +378,7 @@ print.fixationSites <- function(x, ...) {
                                   original2sampled,
                                   sampledTree) {
     rootNode <- getMRCA(sampledTree, sampledTree[["tip.label"]])
+    sampledEdge <- sampledTree[["edge"]]
     # To translate the path of original tree, first we need to find the
     # ancestral node on the sampled tree of the remaining tips in each
     # node of the original path.
@@ -397,12 +398,12 @@ print.fixationSites <- function(x, ...) {
         if (length(tips) == 1) {
             # A lineage path can disappear due to the sampling
             sampledNode <-
-                sampledTree[["edge"]][which(sampledTree[["edge"]][, 2] == tips), 1]
+                sampledEdge[which(sampledEdge[, 2] == tips), 1]
         } else {
             sampledNode <- getMRCA(sampledTree, tips)
             if (!isTerminal && sampledNode != rootNode) {
                 sampledNode <-
-                    sampledTree[["edge"]][which(sampledTree[["edge"]][, 2] == sampledNode), 1]
+                    sampledEdge[which(sampledEdge[, 2] == sampledNode), 1]
             }
         }
         sampledNode <- as.character(sampledNode)
@@ -464,90 +465,30 @@ print.fixationSites <- function(x, ...) {
     originalNodeTips <- lapply(nodeAlign, function(nd) {
         tree[["tip.label"]][as.integer(names(nd))]
     })
-    # Keep track of the essential info of each sample's result
-    iter <- 0
-    siteCol <- integer()
-    nodeCol <- integer()
-    fixedAACol <- character()
-    # The nodes of original tree
-    originalNodes <- as.integer(names(originalNodeTips))
     # Assign amino acid for each ancestral node from the sampling result
-    for (mutations in allMutations) {
-        sampledPaths <- attr(mutations, "paths")
-        sampledTree <- attr(sampledPaths, "tree")
-        for (sitePath in mutations) {
-            site <- attr(sitePath, "site")
-            for (mutPath in sitePath) {
-                for (tips in mutPath) {
-                    fixedAA <- attr(tips, "AA")
-                    tips <- sampledTree[["tip.label"]][tips]
-                    # The tips during a fixation should not disappear
-                    # due to the sampling in any case
-                    qualified <- all(vapply(
-                        X = allSampledTips,
-                        FUN = function(s) {
-                            any(tips %in% s)
-                        },
-                        FUN.VALUE = logical(1)
-                    ))
-                    if (!qualified) {
-                        next
-                    }
-                    # Get the ancestral nodes on the original tree
-                    # for each tip and assign the amino acid.
-                    # Duplicated nodes count only once.
-                    nodes <- unique(vapply(
-                        X = tips,
-                        FUN = function(t) {
-                            # Grab the ancestral node if the tip is among
-                            # its descendent tips on the original tree
-                            originalNodes[which(
-                                vapply(
-                                    X = originalNodeTips,
-                                    FUN = function(nodeTips) {
-                                        t %in% nodeTips
-                                    },
-                                    FUN.VALUE = logical(1)
-                                )
-                            )]
-                        },
-                        FUN.VALUE = integer(1)
-                    ))
-                    # The amino acid for each site-node pair
-                    for (n in nodes) {
-                        siteCol <- c(siteCol, site)
-                        nodeCol <- c(nodeCol, n)
-                        fixedAACol <- c(fixedAACol, fixedAA)
-                    }
-                }
-            }
-        }
-        iter <- iter + 1
-        setTxtProgressBar(pb, iter)
-    }
-    close(pb)
-    # Record of site-node pair in all samples
-    res <- data.frame(
-        "site" = siteCol,
-        "node" = nodeCol,
-        "fixedAA" = fixedAACol,
-        stringsAsFactors = FALSE
+    assembled <- summarizeAA(
+        allMutations = allMutations,
+        allSampledTips = allSampledTips,
+        originalNodeTips = originalNodeTips,
+        setTxtProgressBar = setTxtProgressBar,
+        pb = pb
     )
-    # Split the record by site
-    res <- split(res, res[[1]])
+    close(pb)
     # Split the result by node and summarize fixed amino acid of all samples
-    res <- lapply(res, function(s) {
-        lapply(split(s, s[[2]]), function(n) {
-            site <- unique(n[[1]])
-            node <- as.character(unique(n[[2]]))
-            res <- as.integer(names(nodeAlign[[node]]))
-            attr(res, "samplingSummary") <-
-                tableAA(n[["fixedAA"]], 0)
-            attr(res, "aaSummary") <-
+    res <- lapply(names(assembled), function(site) {
+        nodeAAdist <- assembled[[site]]
+        site <- as.integer(site)
+        siteSummary <- lapply(names(nodeAAdist), function(node) {
+            nodeTips <- as.integer(names(nodeAlign[[node]]))
+            attr(nodeTips, "samplingSummary") <- nodeAAdist[[node]]
+            attr(nodeTips, "aaSummary") <-
                 tableAA(nodeAlign[[node]], site - 1)
-            return(res)
+            return(nodeTips)
         })
+        names(siteSummary) <- names(nodeAAdist)
+        return(siteSummary)
     })
+    names(res) <- names(assembled)
     return(res)
 }
 
@@ -567,7 +508,7 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
-.assemblyFixation <- function(x, tree, align, paths, divNodes) {
+.assembleFixation <- function(x, tree, align, paths, divNodes) {
     # Divergent nodes are not included anywhere in the result
     noDivNodesPaths <- lapply(paths, function(p) {
         as.character(setdiff(p, divNodes))
@@ -785,7 +726,7 @@ multiFixationSites.lineagePath <- function(paths,
     # Summarize the fixed amino acid for tips from resampling
     sampleSummary <- .sampleSummarize(allMutations, nodeAlign, tree)
     # Rebuild the fixation path
-    res <- .assemblyFixation(
+    res <- .assembleFixation(
         x = sampleSummary,
         tree = tree,
         align = align,

@@ -66,19 +66,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// summarizeAA
-Rcpp::CharacterVector summarizeAA(const Rcpp::CharacterVector& seqs, const int siteIndex, const float tolerance);
-RcppExport SEXP _sitePath_summarizeAA(SEXP seqsSEXP, SEXP siteIndexSEXP, SEXP toleranceSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type seqs(seqsSEXP);
-    Rcpp::traits::input_parameter< const int >::type siteIndex(siteIndexSEXP);
-    Rcpp::traits::input_parameter< const float >::type tolerance(toleranceSEXP);
-    rcpp_result_gen = Rcpp::wrap(summarizeAA(seqs, siteIndex, tolerance));
-    return rcpp_result_gen;
-END_RCPP
-}
 // tableAA
 Rcpp::IntegerVector tableAA(const Rcpp::CharacterVector& seqs, const int siteIndex);
 RcppExport SEXP _sitePath_tableAA(SEXP seqsSEXP, SEXP siteIndexSEXP) {
@@ -101,6 +88,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const unsigned int >::type minEffectiveSize(minEffectiveSizeSEXP);
     Rcpp::traits::input_parameter< const unsigned int >::type searchDepth(searchDepthSEXP);
     rcpp_result_gen = Rcpp::wrap(minimizeEntropy(nodeSummaries, minEffectiveSize, searchDepth));
+    return rcpp_result_gen;
+END_RCPP
+}
+// summarizeAA
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > summarizeAA(const Rcpp::List& allMutations, const Rcpp::ListOf<Rcpp::CharacterVector>& allSampledTips, const Rcpp::ListOf<Rcpp::CharacterVector>& originalNodeTips, const Rcpp::Function& setTxtProgressBar, const Rcpp::List& pb);
+RcppExport SEXP _sitePath_summarizeAA(SEXP allMutationsSEXP, SEXP allSampledTipsSEXP, SEXP originalNodeTipsSEXP, SEXP setTxtProgressBarSEXP, SEXP pbSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type allMutations(allMutationsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type allSampledTips(allSampledTipsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type originalNodeTips(originalNodeTipsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Function& >::type setTxtProgressBar(setTxtProgressBarSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type pb(pbSEXP);
+    rcpp_result_gen = Rcpp::wrap(summarizeAA(allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -139,9 +141,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
-    {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 3},
     {"_sitePath_tableAA", (DL_FUNC) &_sitePath_tableAA, 2},
     {"_sitePath_minimizeEntropy", (DL_FUNC) &_sitePath_minimizeEntropy, 3},
+    {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 5},
     {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
     {"_sitePath_tip2Edge", (DL_FUNC) &_sitePath_tip2Edge, 3},
     {NULL, NULL, 0}
