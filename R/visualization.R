@@ -213,7 +213,7 @@ plot.sitePath <- function(x,
     )
     sepChar <- "\n"
     if (sum(nchar(plotName) <= 18)) {
-        sepChar <- ",\t"
+        sepChar <- ", "
     }
     title(main = attr(x, "site"),
           sub = paste(plotName, collapse = sepChar))
