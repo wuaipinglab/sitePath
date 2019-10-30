@@ -244,11 +244,11 @@ print.sitePath <- function(x, ...) {
                 existIndex <- which(toCombine)
                 # These are the candidates to combine. The additional
                 # condition be all the descendant tips are included.
-                toCombine <- unlist(lapply(
+                toCombine <- unique(unlist(lapply(
                     X = c(res[[site]][existIndex], list(seg)),
                     FUN = "[[",
                     ... = endIndex
-                ))
+                )))
                 allTips <-
                     .childrenTips(tree, getMRCA(tree, toCombine))
                 if (all(allTips %in% toCombine)) {
