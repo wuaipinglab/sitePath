@@ -12,10 +12,11 @@
 SNPsites(tree, minSNP = NULL)
 
 \method{fixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
-  searchDepth = 1, ...)
+  searchDepth = 1, method = c("compare", "insert", "delete"), ...)
 
 \method{multiFixationSites}{lineagePath}(paths, samplingSize = NULL,
-  samplingTimes = 100, minEffectiveSize = 0, searchDepth = 1, ...)
+  samplingTimes = 100, minEffectiveSize = 0, searchDepth = 1,
+  method = c("compare", "insert", "delete"), ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
@@ -33,6 +34,10 @@ it's the minimum for both ancestral and descendant.}
 \item{searchDepth}{The function uses heuristic search but the termination of the search
 cannot be intrinsically decided. \code{searchDepth} is needed to tell
 the search when to stop.}
+
+\item{method}{The strategy for predicting the fixation. The basic approach is entropy
+minimization and can be achieved by adding or removing fixation point,
+or by comparing the two.}
 
 \item{...}{further arguments passed to or from other methods.}
 

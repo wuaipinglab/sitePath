@@ -78,16 +78,42 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// minimizeEntropy
-Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(const Rcpp::ListOf<Rcpp::IntegerVector>& nodeSummaries, const unsigned int minEffectiveSize, const unsigned int searchDepth);
-RcppExport SEXP _sitePath_minimizeEntropy(SEXP nodeSummariesSEXP, SEXP minEffectiveSizeSEXP, SEXP searchDepthSEXP) {
+// minEntropyByInserting
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByInserting(const Rcpp::ListOf<Rcpp::IntegerVector>& nodeSummaries, const unsigned int minEffectiveSize, const unsigned int searchDepth);
+RcppExport SEXP _sitePath_minEntropyByInserting(SEXP nodeSummariesSEXP, SEXP minEffectiveSizeSEXP, SEXP searchDepthSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type nodeSummaries(nodeSummariesSEXP);
     Rcpp::traits::input_parameter< const unsigned int >::type minEffectiveSize(minEffectiveSizeSEXP);
     Rcpp::traits::input_parameter< const unsigned int >::type searchDepth(searchDepthSEXP);
-    rcpp_result_gen = Rcpp::wrap(minimizeEntropy(nodeSummaries, minEffectiveSize, searchDepth));
+    rcpp_result_gen = Rcpp::wrap(minEntropyByInserting(nodeSummaries, minEffectiveSize, searchDepth));
+    return rcpp_result_gen;
+END_RCPP
+}
+// minEntropyByDeleting
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByDeleting(const Rcpp::ListOf<Rcpp::IntegerVector>& nodeSummaries, const unsigned int minEffectiveSize, const unsigned int searchDepth);
+RcppExport SEXP _sitePath_minEntropyByDeleting(SEXP nodeSummariesSEXP, SEXP minEffectiveSizeSEXP, SEXP searchDepthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type nodeSummaries(nodeSummariesSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type minEffectiveSize(minEffectiveSizeSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type searchDepth(searchDepthSEXP);
+    rcpp_result_gen = Rcpp::wrap(minEntropyByDeleting(nodeSummaries, minEffectiveSize, searchDepth));
+    return rcpp_result_gen;
+END_RCPP
+}
+// minEntropyByComparing
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByComparing(const Rcpp::ListOf<Rcpp::IntegerVector>& nodeSummaries, const unsigned int minEffectiveSize, const unsigned int searchDepth);
+RcppExport SEXP _sitePath_minEntropyByComparing(SEXP nodeSummariesSEXP, SEXP minEffectiveSizeSEXP, SEXP searchDepthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type nodeSummaries(nodeSummariesSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type minEffectiveSize(minEffectiveSizeSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type searchDepth(searchDepthSEXP);
+    rcpp_result_gen = Rcpp::wrap(minEntropyByComparing(nodeSummaries, minEffectiveSize, searchDepth));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -142,7 +168,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
     {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
     {"_sitePath_tableAA", (DL_FUNC) &_sitePath_tableAA, 2},
-    {"_sitePath_minimizeEntropy", (DL_FUNC) &_sitePath_minimizeEntropy, 3},
+    {"_sitePath_minEntropyByInserting", (DL_FUNC) &_sitePath_minEntropyByInserting, 3},
+    {"_sitePath_minEntropyByDeleting", (DL_FUNC) &_sitePath_minEntropyByDeleting, 3},
+    {"_sitePath_minEntropyByComparing", (DL_FUNC) &_sitePath_minEntropyByComparing, 3},
     {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 5},
     {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
     {"_sitePath_tip2Edge", (DL_FUNC) &_sitePath_tip2Edge, 3},

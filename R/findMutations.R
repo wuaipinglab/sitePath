@@ -116,6 +116,7 @@ print.sitePath <- function(x, ...) {
                               nodeAlign,
                               divNodes,
                               reference,
+                              minimizeEntropy,
                               minEffectiveSize,
                               searchDepth) {
     # Exclude the invariant sites
@@ -298,6 +299,10 @@ print.sitePath <- function(x, ...) {
 #' The function uses heuristic search but the termination of the search
 #' cannot be intrinsically decided. \code{searchDepth} is needed to tell
 #' the search when to stop.
+#' @param method
+#' The strategy for predicting the fixation. The basic approach is entropy
+#' minimization and can be achieved by adding or removing fixation point,
+#' or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
 #' @examples
 #' fixationSites(lineagePath(tree))
@@ -309,12 +314,20 @@ print.sitePath <- function(x, ...) {
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
                                       searchDepth = 1,
+                                      method = c("compare", "insert", "delete"),
                                       ...) {
     tree <- attr(paths, "tree")
     nTips <- length(tree[["tip.label"]])
     align <- attr(paths, "align")
     # Generate the site mapping from reference
     reference <- attr(paths, "reference")
+    # Decide which miniminzing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
     # Get the 'minEffectiveSize' for each fixation
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <- nTips / length(unique(unlist(paths)))
@@ -343,6 +356,7 @@ fixationSites.lineagePath <- function(paths,
         nodeAlign = nodeAlign,
         divNodes = divNodes,
         reference = reference,
+        minimizeEntropy = minimizeEntropy,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
     )
@@ -638,6 +652,7 @@ multiFixationSites.lineagePath <- function(paths,
                                            samplingTimes = 100,
                                            minEffectiveSize = 0,
                                            searchDepth = 1,
+                                           method = c("compare", "insert", "delete"),
                                            ...) {
     # Get the tree and aligned sequences
     tree <- attr(paths, "tree")
@@ -669,6 +684,13 @@ multiFixationSites.lineagePath <- function(paths,
     } else {
         searchDepth <- ceiling(searchDepth)
     }
+    # Decide which miniminzing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
     # Generate the site mapping from reference
     reference <- attr(paths, "reference")
     # Extend the path
@@ -714,6 +736,7 @@ multiFixationSites.lineagePath <- function(paths,
             nodeAlign = sampledNodeAlign,
             divNodes = sampledDivNodes,
             reference = reference,
+            minimizeEntropy = minimizeEntropy,
             minEffectiveSize = minEffectiveSize,
             searchDepth = searchDepth
         )

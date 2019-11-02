@@ -98,7 +98,7 @@ Rcpp::IntegerVector tableAA(
 }
 
 // [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByInserting(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
         const unsigned int minEffectiveSize,
         const unsigned int searchDepth
@@ -110,7 +110,38 @@ Rcpp::ListOf<Rcpp::IntegerVector> minimizeEntropy(
             nodeSummaries
     );
     iSearch.search();
-    // return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+    return updatedSegmentation(nodeSummaries, iSearch.getFinal());
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByDeleting(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
+        const unsigned int minEffectiveSize,
+        const unsigned int searchDepth
+) {
+    using namespace MinEntropy;
+    SearchTree<Amalgamator> dSearch(
+            minEffectiveSize,
+            searchDepth,
+            nodeSummaries
+    );
+    dSearch.search();
+    return updatedSegmentation(nodeSummaries, dSearch.getFinal());
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByComparing(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
+        const unsigned int minEffectiveSize,
+        const unsigned int searchDepth
+) {
+    using namespace MinEntropy;
+    SearchTree<Segmentor> iSearch(
+            minEffectiveSize,
+            searchDepth,
+            nodeSummaries
+    );
+    iSearch.search();
     SearchTree<Amalgamator> dSearch(
             minEffectiveSize,
             searchDepth,

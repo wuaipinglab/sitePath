@@ -25,8 +25,16 @@ tableAA <- function(seqs, siteIndex) {
     .Call('_sitePath_tableAA', PACKAGE = 'sitePath', seqs, siteIndex)
 }
 
-minimizeEntropy <- function(nodeSummaries, minEffectiveSize, searchDepth) {
-    .Call('_sitePath_minimizeEntropy', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
+minEntropyByInserting <- function(nodeSummaries, minEffectiveSize, searchDepth) {
+    .Call('_sitePath_minEntropyByInserting', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
+}
+
+minEntropyByDeleting <- function(nodeSummaries, minEffectiveSize, searchDepth) {
+    .Call('_sitePath_minEntropyByDeleting', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
+}
+
+minEntropyByComparing <- function(nodeSummaries, minEffectiveSize, searchDepth) {
+    .Call('_sitePath_minEntropyByComparing', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
 }
 
 summarizeAA <- function(allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb) {
