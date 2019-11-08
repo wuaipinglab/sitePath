@@ -10,13 +10,12 @@ test_that("Topology-dependent trimming", {
     minSim <- min(simMatrix)
     step <- round(minSim - 1, 3) / 10
     for (s in seq(1, minSim, step)) {
-        grouping <-
-            groupTips(
-                tree,
-                similarity = s,
-                forbidTrivial = FALSE,
-                tipnames = FALSE
-            )
+        grouping <- groupTips(
+            tree,
+            similarity = s,
+            forbidTrivial = FALSE,
+            tipnames = FALSE
+        )
         expect_equal(sort(unlist(grouping, use.names = FALSE)), 1:length(tree$tip.label))
         for (g in names(grouping)) {
             an <- as.integer(g)
@@ -31,8 +30,7 @@ test_that("Topology-dependent trimming", {
             expect_equal(sort(descendant),
                          sort(sitePath:::.childrenTips(tree, an)))
         }
-        paths <-
-            lineagePath(tree,
+        paths <- lineagePath(tree,
                         similarity = s,
                         forbidTrivial = FALSE)
         for (p in paths) {

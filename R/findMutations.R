@@ -123,6 +123,7 @@ print.sitePath <- function(x, ...) {
     loci <- which(vapply(
         X = seq_along(reference),
         FUN = function(s) {
+            s <- reference[s]
             length(unique(substr(align, s, s))) > 1
         },
         FUN.VALUE = logical(1)
@@ -378,7 +379,7 @@ print.fixationSites <- function(x, ...) {
         cat("No multi-fixation found\n")
     } else {
         cat(paste(names(x), collapse = " "), "\n")
-        refSeqName <- attr(x, "refSeqName")
+        refSeqName <- attr(attr(x, "reference"), "refSeqName")
         if (is.null(refSeqName)) {
             cat("No reference sequence specified.",
                 "Using alignment numbering\n")
@@ -773,7 +774,7 @@ print.multiFixationSites <- function(x, ...) {
         cat("No multi-fixation found\n")
     } else {
         cat(paste(names(x), collapse = " "), "\n")
-        refSeqName <- attr(x, "refSeqName")
+        refSeqName <- attr(attr(x, "reference"), "refSeqName")
         if (is.null(refSeqName)) {
             cat("No reference sequence specified.",
                 "Using alignment numbering\n")
