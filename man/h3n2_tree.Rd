@@ -4,7 +4,9 @@
 \name{h3n2_tree}
 \alias{h3n2_tree}
 \title{Phylogenetic tree of H3N2's HA protein}
-\format{a \code{phylo} object}
+\format{
+a \code{phylo} object
+}
 \usage{
 data(h3n2_tree)
 }

@@ -6,11 +6,9 @@
 \alias{setSiteNumbering.lineagePath}
 \title{Set site numbering to the reference sequence}
 \usage{
-\method{setSiteNumbering}{phylo}(x, reference = NULL, gapChar = "-",
-  ...)
+\method{setSiteNumbering}{phylo}(x, reference = NULL, gapChar = "-", ...)
 
-\method{setSiteNumbering}{lineagePath}(x, reference = NULL,
-  gapChar = "-", ...)
+\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", ...)
 }
 \arguments{
 \item{x}{The object to set site numbering. It could be a \code{phylo} object

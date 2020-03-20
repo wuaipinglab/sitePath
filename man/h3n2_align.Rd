@@ -4,7 +4,9 @@
 \name{h3n2_align}
 \alias{h3n2_align}
 \title{Multiple sequence alignment of H3N2's HA protein}
-\format{a \code{alignment} object}
+\format{
+a \code{alignment} object
+}
 \usage{
 data(h3n2_align)
 }

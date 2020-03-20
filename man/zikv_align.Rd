@@ -4,7 +4,9 @@
 \name{zikv_align}
 \alias{zikv_align}
 \title{Multiple sequence alignment of Zika virus polyprotein}
-\format{a \code{alignment} object}
+\format{
+a \code{alignment} object
+}
 \usage{
 data(zikv_align)
 }

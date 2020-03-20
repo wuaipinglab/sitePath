@@ -4,7 +4,9 @@
 \name{zikv_tree}
 \alias{zikv_tree}
 \title{Phylogenetic tree of Zika virus polyprotein}
-\format{a \code{phylo} object}
+\format{
+a \code{phylo} object
+}
 \usage{
 data(zikv_tree)
 }

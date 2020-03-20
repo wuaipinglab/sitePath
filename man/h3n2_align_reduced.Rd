@@ -4,7 +4,9 @@
 \name{h3n2_align_reduced}
 \alias{h3n2_align_reduced}
 \title{Truncated data for runnable example}
-\format{a \code{alignment} object}
+\format{
+a \code{alignment} object
+}
 \usage{
 data(h3n2_align_reduced)
 }

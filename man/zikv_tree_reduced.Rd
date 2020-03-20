@@ -4,7 +4,9 @@
 \name{zikv_tree_reduced}
 \alias{zikv_tree_reduced}
 \title{Truncated data for runnable example}
-\format{a \code{phylo} object}
+\format{
+a \code{phylo} object
+}
 \usage{
 data(zikv_tree_reduced)
 }

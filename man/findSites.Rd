@@ -11,12 +11,23 @@
 \usage{
 SNPsites(tree, minSNP = NULL)
 
-\method{fixationSites}{lineagePath}(paths, minEffectiveSize = NULL,
-  searchDepth = 1, method = c("compare", "insert", "delete"), ...)
+\method{fixationSites}{lineagePath}(
+  paths,
+  minEffectiveSize = NULL,
+  searchDepth = 1,
+  method = c("compare", "insert", "delete"),
+  ...
+)
 
-\method{multiFixationSites}{lineagePath}(paths, samplingSize = NULL,
-  samplingTimes = 100, minEffectiveSize = 0, searchDepth = 1,
-  method = c("compare", "insert", "delete"), ...)
+\method{multiFixationSites}{lineagePath}(
+  paths,
+  samplingSize = NULL,
+  samplingTimes = 100,
+  minEffectiveSize = 0,
+  searchDepth = 1,
+  method = c("compare", "insert", "delete"),
+  ...
+)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}

@@ -4,7 +4,9 @@
 \name{zikv_align_reduced}
 \alias{zikv_align_reduced}
 \title{Truncated data for runnable example}
-\format{a \code{alignment} object}
+\format{
+a \code{alignment} object
+}
 \usage{
 data(zikv_align_reduced)
 }

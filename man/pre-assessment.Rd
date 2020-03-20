@@ -8,8 +8,7 @@
 \usage{
 similarityMatrix(tree)
 
-sneakPeek(tree, step = NULL, maxPath = NULL, minPath = 1,
-  makePlot = FALSE)
+sneakPeek(tree, step = NULL, maxPath = NULL, minPath = 1, makePlot = FALSE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}

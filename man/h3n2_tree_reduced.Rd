@@ -4,7 +4,9 @@
 \name{h3n2_tree_reduced}
 \alias{h3n2_tree_reduced}
 \title{Truncated data for runnable example}
-\format{a \code{phylo} object}
+\format{
+a \code{phylo} object
+}
 \usage{
 data(h3n2_tree_reduced)
 }

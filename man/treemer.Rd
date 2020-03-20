@@ -6,8 +6,7 @@
 \alias{lineagePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, similarity = NULL, forbidTrivial = TRUE,
-  tipnames = TRUE)
+groupTips(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = TRUE)
 
 lineagePath(tree, similarity = NULL, forbidTrivial = TRUE)
 }
