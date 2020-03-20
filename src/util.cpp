@@ -18,23 +18,23 @@ const float compare(const std::string &query, const std::string &subject) {
     return match / length;
 }
 
-float shannonEntropy(const aaSummary &values) {
+float shannonEntropy(const aaSummary &values, const unsigned int tipNum) {
     // The total number of tree tips within a group being
     // segmentated out by segment points
-    int total = 0;
-    for (
-            aaSummary::const_iterator it = values.begin();
-            it != values.end(); ++it
-    ) {
-        total += it->second;
-    }
-    float res = 0;
+    // int total = 0;
+    // for (
+    //         aaSummary::const_iterator it = values.begin();
+    //         it != values.end(); ++it
+    // ) {
+    //     total += it->second;
+    // }
+    float res = 0.0;
     for (
             aaSummary::const_iterator it = values.begin();
             it != values.end(); ++it
     ) {
         // Probability of drawing distinct AA
-        float p = it->second / static_cast<float>(total);
+        float p = it->second / static_cast<float>(tipNum);
         res -= p * std::log(p);
     }
     return res;

@@ -1,3 +1,16 @@
+CHANGES IN VERSION 1.2.2
+-------------------------
+    o Bug fix: infinity loop might occur when using 'fixationSites' or
+      'multiFixatoinSites' caused by internal function. There's no solution
+      for version 1.2.x, so choices are given to possibly avoid it.
+    o Bug fix: malfunctional 'setSiteNumbering'.
+
+CHANGES IN VERSION 1.2.1
+-------------------------
+    o Bug fix: plot warning caused by 'tab' character
+    o Bug fix: bad design causing 'multiFixationSites' extremely slow
+    o Bug fix: 'fixationSites' gives replicated tips when combined
+
 CHANGES IN VERSION 1.1.10
 -------------------------
     o Allow user to choose whether to show tip labels in the plot functions

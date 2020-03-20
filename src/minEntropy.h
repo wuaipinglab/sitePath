@@ -49,6 +49,10 @@ protected:
             const std::vector<aaSummary> &aaSummaries,
             const unsigned int minEffectiveSize
     );
+    // Fixation score integrating entropy and tip numbers
+    float fixationScore(
+            const std::vector<aaSummary> &aaSummaries
+    );
 protected:
     // A list of the segment points which must include the enclosed point
     segment m_used;

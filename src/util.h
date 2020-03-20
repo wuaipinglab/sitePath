@@ -10,8 +10,8 @@ typedef unsigned int segIndex;
 typedef std::vector<segIndex> segment;
 typedef std::map<std::string, int> aaSummary;
 
-float shannonEntropy(const aaSummary &values);
 const float compare(const std::string &query, const std::string &subject);
+float shannonEntropy(const aaSummary &values, const unsigned int tipNum);
 
 class TipSeqLinker {
 public:
