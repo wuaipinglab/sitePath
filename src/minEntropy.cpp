@@ -1,4 +1,18 @@
+#include <cmath>
 #include "minEntropy.h"
+
+float MinEntropy::shannonEntropy(const aaSummary &values, const unsigned int tipNum) {
+    float res = 0.0;
+    for (
+            aaSummary::const_iterator it = values.begin();
+            it != values.end(); ++it
+    ) {
+        // Probability of drawing distinct AA
+        float p = it->second / static_cast<float>(tipNum);
+        res -= p * std::log(p);
+    }
+    return res;
+}
 
 Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
         const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,

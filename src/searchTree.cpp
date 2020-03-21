@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "minEntropy.h"
 
 template <class T>
@@ -111,10 +112,14 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
 }
 
 template <class T>
-segment MinEntropy::SearchTree<T>::getFinal() const { return m_final; }
+MinEntropy::segment MinEntropy::SearchTree<T>::getFinal() const {
+    return m_final;
+}
 
 template <class T>
-float MinEntropy::SearchTree<T>::getMinEntropy() const { return m_minEntropy; }
+float MinEntropy::SearchTree<T>::getMinEntropy() const {
+    return m_minEntropy;
+}
 
 template <class T>
 T *MinEntropy::SearchTree<T>::updateParent() {

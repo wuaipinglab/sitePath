@@ -13,9 +13,46 @@
 #define SITEPATH_TREEMER_H
 
 #include <utility>
-#include "util.h"
+#include <string>
+#include <vector>
+#include <map>
+#include <Rcpp.h>
 
 namespace Treemer {
+
+float compare(const std::string &query, const std::string &subject);
+
+class TipSeqLinker {
+public:
+    TipSeqLinker(
+        const Rcpp::CharacterVector &sequence,
+        const Rcpp::IntegerVector &tipPath
+    );
+    void proceed();
+    int nextClade() const;
+    int currentClade() const;
+    int getTip() const;
+    int getRoot() const;
+    int getSeqLen() const;
+    Rcpp::IntegerVector getPath() const;
+    std::string getSeq() const;
+protected:
+    const std::string m_seq;
+    const Rcpp::IntegerVector m_path;
+    const int m_tipIndex;
+    int m_cIndex;
+};
+
+class TipSiteLinker: public TipSeqLinker {
+public:
+    TipSiteLinker(
+        const Rcpp::CharacterVector &sequence,
+        const Rcpp::IntegerVector &tipPath,
+        const int site
+    );
+private:
+    bool m_;
+};
 
 typedef std::vector<TipSeqLinker *> tips;
 typedef std::map<int, tips> clusters;
@@ -41,6 +78,11 @@ public:
     // Tips in the same cluster will have the same path
     std::vector<Rcpp::IntegerVector> getPaths() const;
 protected:
+    // Match tipPath and alignedSeq
+    void initTips(
+            const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+            const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
+    );
     // The actual trimming process happens here
     void pruneTree();
     // Whether the cluster of tips satisfy the extra constrain to be valid

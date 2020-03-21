@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm>
 #include "minEntropy.h"
 
 // Empty constructor
@@ -17,11 +18,21 @@ MinEntropy::TreeSearchNode::TreeSearchNode(
     m_entropy = this->totalEntropy(aaSummaries, minEffectiveSize);
 }
 
-segment MinEntropy::TreeSearchNode::getUsed() const { return m_used; }
+MinEntropy::segment MinEntropy::TreeSearchNode::getUsed() const {
+    return m_used;
+}
 
-float MinEntropy::TreeSearchNode::getEntropy() const { return m_entropy; }
+float MinEntropy::TreeSearchNode::getEntropy() const {
+    return m_entropy;
+}
 
-bool MinEntropy::TreeSearchNode::isQualified() const { return m_qualified; }
+bool MinEntropy::TreeSearchNode::isQualified() const {
+    return m_qualified;
+}
+
+float MinEntropy::TreeSearchNode::getScore() const {
+    return m_score;
+}
 
 float MinEntropy::TreeSearchNode::totalEntropy(
         const std::vector<aaSummary> &aaSummaries,
@@ -124,7 +135,7 @@ bool MinEntropy::Segmentor::isEndNode() const {
     return (m_open.empty()) ? true : false;
 }
 
-segment MinEntropy::Segmentor::newUsed(
+MinEntropy::segment MinEntropy::Segmentor::newUsed(
         const Segmentor *parent,
         const unsigned int i
 ) const {
@@ -137,7 +148,7 @@ segment MinEntropy::Segmentor::newUsed(
     return res;
 }
 
-segment MinEntropy::Segmentor::newOpen(
+MinEntropy::segment MinEntropy::Segmentor::newOpen(
         const Segmentor *parent,
         const unsigned int i
 ) const {
@@ -180,7 +191,7 @@ bool MinEntropy::Amalgamator::isEndNode() const {
     return (m_used.size() == 1) ? true : false;
 }
 
-segment MinEntropy::Amalgamator::newUsed(
+MinEntropy::segment MinEntropy::Amalgamator::newUsed(
         const Amalgamator *parent,
         const unsigned int i
 ) const {

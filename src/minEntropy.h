@@ -16,9 +16,23 @@
 #ifndef SITEPATH_MINENTROPY_H
 #define SITEPATH_MINENTROPY_H
 
-#include "util.h"
+#include <string>
+#include <vector>
+#include <map>
+#include <Rcpp.h>
 
 namespace MinEntropy {
+
+typedef std::map<std::string, int> aaSummary;
+typedef unsigned int segIndex;
+typedef std::vector<segIndex> segment;
+
+float shannonEntropy(const aaSummary &values, const unsigned int tipNum);
+
+Rcpp::ListOf<Rcpp::IntegerVector> updatedSegmentation(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
+        const segment &final
+);
 
 class TreeSearchNode {
     /*
@@ -35,6 +49,7 @@ public:
     segment getUsed() const;
     float getEntropy() const;
     bool isQualified() const;
+    float getScore() const;
 protected:
     // Empty constructor
     TreeSearchNode();
@@ -58,8 +73,10 @@ protected:
     segment m_used;
     // The Shannon Entropy of the search node
     float m_entropy;
-    // Whether the search node is qualified
+    // Whether the search node is qualified (minEffectiveSize)
     bool m_qualified;
+    // The fixation score integrating entropy and tip numbers
+    float m_score;
 };
 
 class Segmentor: public TreeSearchNode {
@@ -175,7 +192,7 @@ private:
     T *m_parent;
     // To keep track of current minimum entropy of the segmenting
     float m_minEntropy;
-    // The search list containin all the active search nodes
+    // The search list containing all the active search nodes
     std::vector<T *> m_segList;
     // The existing or dropped segment
     std::vector<segment> m_segListHistory;
@@ -198,11 +215,6 @@ template <> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
 // Not yet implemented
 template <> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
 template <> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
-
-Rcpp::ListOf<Rcpp::IntegerVector> updatedSegmentation(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &nodeSummaries,
-        const segment &final
-);
 
 }
 

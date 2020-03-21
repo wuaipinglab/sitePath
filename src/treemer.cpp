@@ -1,26 +1,87 @@
 #include "treemer.h"
 
+float Treemer::compare(const std::string &query, const std::string &subject) {
+    // Get the similarity between two aligned sequences.
+    // Site is skipped for total length if both are gaps in alignment
+    float match = 0.0, length = 0.0;
+    for (
+            std::string::const_iterator q = query.begin(), s = subject.begin();
+            q != query.end(); ++q, ++s
+    ) {
+        if (*q != '-' && *s != '-') {
+            length++;
+            if (*q == *s) { match++; }
+        }
+    }
+    return match / length;
+}
+
+Treemer::TipSeqLinker::TipSeqLinker(
+    const Rcpp::CharacterVector &sequence,
+    const Rcpp::IntegerVector &tipPath
+):
+    m_seq(Rcpp::as<std::string>(sequence)),
+    m_path(tipPath),
+    m_tipIndex(tipPath.size() - 1), // last node of a path is the tip node
+    m_cIndex(m_tipIndex) {}
+
+void Treemer::TipSeqLinker::proceed() {
+    // Proceed towards the root node along the path
+    // as the current index should decrement.
+    // An index of 0 means reaching the root node.
+    // Setting index greater than 1 is to prevent trivial trimming
+    if (m_cIndex > 1) { m_cIndex--; }
+}
+
+int Treemer::TipSeqLinker::currentClade() const {
+    // Current clade is the node at the current index of path
+    return m_path[m_cIndex];
+}
+
+int Treemer::TipSeqLinker::nextClade() const {
+    // Look up the immediate ancestral node
+    // aka fake 'proceed'
+    if (m_cIndex > 1) {
+        return m_path[m_cIndex - 1];
+    } else {
+        return currentClade(); // The current clade would be root
+    }
+}
+
+int Treemer::TipSeqLinker::getTip() const {
+    // Tip node is the last node in the path
+    return m_path[m_tipIndex];
+}
+
+int Treemer::TipSeqLinker::getRoot() const {
+    // Root node is the first node in the path
+    return m_path[0];
+}
+
+int Treemer::TipSeqLinker::getSeqLen() const {
+    // The length of the aligned sequence
+    // This is going to be done for every sequence to make sure they're aligned
+    return m_seq.size();
+}
+
+Rcpp::IntegerVector Treemer::TipSeqLinker::getPath() const {
+    // The path from current clade towards root node
+    return m_path[Rcpp::Range(0, m_cIndex)];
+}
+
+std::string Treemer::TipSeqLinker::getSeq() const {
+    // The aligned sequence
+    return m_seq;
+}
+
 Treemer::Base::Base(
     const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
     const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
 ):
     m_root(*(tipPaths[0].begin())),
     m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size()) {
-    // Iterate tipPaths and alignedSeqs to construct a list of TipSeqLinkers
-    for (int i = 0; i < tipPaths.size(); i++) {
-        TipSeqLinker *tip = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
-        m_tips.push_back(tip);
-        // The initial clustering is each tip as a cluster
-        m_clusters[tip->getTip()].push_back(tip);
-
-        // The root of each tipPath should be the same
-        // The sequences should be of the same length
-        if (m_tips[i]->getRoot() != m_root) {
-            throw std::invalid_argument("Root in tree paths not equal");
-        } else if (m_tips[i]->getSeqLen() != m_seqLen) {
-            throw std::invalid_argument("Sequence length not equal");
-        }
-    }
+    // Match tip and seq (tip class can be overridden by children class)
+    initTips(tipPaths, alignedSeqs);
 }
 
 Treemer::Base::~Base() {
@@ -47,6 +108,27 @@ std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
         res.push_back((*it)->getPath());
     }
     return res;
+}
+
+void Treemer::Base::initTips(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
+) {
+    // Iterate tipPaths and alignedSeqs to construct a list of TipSeqLinkers
+    for (int i = 0; i < tipPaths.size(); i++) {
+        TipSeqLinker *tip = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
+        m_tips.push_back(tip);
+        // The initial clustering is each tip as a cluster
+        m_clusters[tip->getTip()].push_back(tip);
+
+        // The root of each tipPath should be the same
+        // The sequences should be of the same length
+        if (m_tips[i]->getRoot() != m_root) {
+            throw std::invalid_argument("Root in tree paths not equal");
+        } else if (m_tips[i]->getSeqLen() != m_seqLen) {
+            throw std::invalid_argument("Sequence length not equal");
+        }
+    }
 }
 
 void Treemer::Base::pruneTree() {

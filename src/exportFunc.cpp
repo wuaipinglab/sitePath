@@ -1,4 +1,5 @@
 #include <set>
+#include <algorithm>
 #include "treemer.h"
 #include "minEntropy.h"
 
@@ -11,7 +12,7 @@ Rcpp::NumericMatrix getSimilarityMatrix(
     for (int i = 0; i < dim; ++i) {
         for (int j = i; j < dim; ++j) {
             if (i == j) { simMatrix(i, j) = 1; } else {
-                simMatrix(j, i) = simMatrix(i, j) = compare(
+                simMatrix(j, i) = simMatrix(i, j) = Treemer::compare(
                     Rcpp::as<std::string>(alignedSeqs[i]),
                     Rcpp::as<std::string>(alignedSeqs[j])
                 );
@@ -90,11 +91,11 @@ Rcpp::IntegerVector tableAA(
         const int siteIndex
 ) {
     // Summarize the AAs for tree tips of a node
-    std::map<std::string, int> aaSummary;
+    MinEntropy::aaSummary res;
     for (int i = 0; i < seqs.size(); ++i) {
-        aaSummary[std::string(1, seqs[i][siteIndex])]++;
+        res[std::string(1, seqs[i][siteIndex])]++;
     }
-    return Rcpp::wrap(aaSummary);
+    return Rcpp::wrap(res);
 }
 
 // [[Rcpp::export]]
