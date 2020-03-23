@@ -288,8 +288,9 @@ print.sitePath <- function(x, ...) {
 #' relatively common in RNA virus. There is chance that some site be fixed
 #' in one lineage but does not show fixation because of different
 #' sequence context.
-#' @param paths
+#' @param x
 #' a \code{lineagePath} object returned from \code{\link{lineagePath}} function
+#' or a \code{phylo} object after \code{\link{addMSA}}
 #' @param minEffectiveSize
 #' A vector of two integers to specifiy minimum tree tips involved
 #' before/after mutation. Otherwise the mutation will not be counted into
@@ -312,11 +313,12 @@ print.sitePath <- function(x, ...) {
 #' with names of the tips involved.
 #' @importFrom utils tail
 #' @export
-fixationSites.lineagePath <- function(paths,
+fixationSites.lineagePath <- function(x,
                                       minEffectiveSize = NULL,
                                       searchDepth = 1,
                                       method = c("compare", "insert", "delete"),
                                       ...) {
+    paths <- x
     tree <- attr(paths, "tree")
     nTips <- length(tree[["tip.label"]])
     align <- attr(paths, "align")
@@ -368,8 +370,25 @@ fixationSites.lineagePath <- function(paths,
     return(res)
 }
 
+fixationSites.phylo <- function(x, ...) {
+    align <- attr(x, "align")
+    # Generate the site mapping from reference
+    reference <- attr(x, "reference")
+    # Exclude the invariant sites
+    loci <- which(vapply(
+        X = seq_along(reference),
+        FUN = function(s) {
+            s <- reference[s]
+            length(unique(substr(align, s, s))) > 1
+        },
+        FUN.VALUE = logical(1)
+    ))
+    res <- runTreemerBySite(nodepath(x), align, loci)
+    return(res)
+}
+
 #' @export
-fixationSites <- function(paths, ...)
+fixationSites <- function(x, ...)
     UseMethod("fixationSites")
 
 #' @export

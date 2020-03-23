@@ -1,7 +1,10 @@
 #include <cmath>
 #include "minEntropy.h"
 
-float MinEntropy::shannonEntropy(const aaSummary &values, const unsigned int tipNum) {
+float MinEntropy::shannonEntropy(
+        const aaSummary &values,
+        const unsigned int tipNum
+) {
     float res = 0.0;
     for (
             aaSummary::const_iterator it = values.begin();

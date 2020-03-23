@@ -23,6 +23,23 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 }
 
 // [[Rcpp::export]]
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::IntegerVector &loci
+) {
+    std::map< int, std::map< int, std::vector<int> > > res;
+    for (
+            Rcpp::IntegerVector::const_iterator it = loci.begin();
+            it != loci.end(); it++
+    ) {
+        Treemer::BySite match(tipPaths, alignedSeqs, *it);
+        res[*it] = match.getTips();
+    }
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,

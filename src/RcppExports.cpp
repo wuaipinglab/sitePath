@@ -16,6 +16,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// runTreemerBySite
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::IntegerVector& loci);
+RcppExport SEXP _sitePath_runTreemerBySite(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP lociSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type loci(lociSEXP);
+    rcpp_result_gen = Rcpp::wrap(runTreemerBySite(tipPaths, alignedSeqs, loci));
+    return rcpp_result_gen;
+END_RCPP
+}
 // runTreemer
 Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, Rcpp::NumericMatrix& simMatrixInput, const float similarity, const bool getTips);
 RcppExport SEXP _sitePath_runTreemer(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixInputSEXP, SEXP similaritySEXP, SEXP getTipsSEXP) {
@@ -163,6 +176,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
+    {"_sitePath_runTreemerBySite", (DL_FUNC) &_sitePath_runTreemerBySite, 3},
     {"_sitePath_runTreemer", (DL_FUNC) &_sitePath_runTreemer, 5},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},

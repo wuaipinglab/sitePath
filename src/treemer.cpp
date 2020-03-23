@@ -74,6 +74,33 @@ std::string Treemer::TipSeqLinker::getSeq() const {
     return m_seq;
 }
 
+// void Treemer::TipSeqLinker::setSite(const int site) {
+//     m_site = site;
+//     m_segIndex = m_tipIndex;
+//     m_released = true;
+// }
+//
+// void Treemer::TipSeqLinker::hold() {
+//     m_segIndex = m_cIndex;
+//     m_released = false;
+// }
+//
+// void Treemer::TipSeqLinker::release() {
+//     m_released = true;
+// }
+//
+// bool Treemer::TipSeqLinker::isReleased() const {
+//     return m_released;
+// }
+//
+// char Treemer::TipSeqLinker::getSiteChar() const {
+//     return m_seq[m_site];
+// }
+//
+// int Treemer::TipSeqLinker::getIndex() const {
+//     return m_cIndex;
+// }
+
 Treemer::Base::Base(
     const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
     const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
@@ -188,13 +215,15 @@ Treemer::BySite::BySite(
     const int site
 ):
     Base(tipPaths, alignedSeqs),
-    m_site(site - 1) { pruneTree(); }
+    m_siteIndex(site - 1) { pruneTree(); }
 
 bool Treemer::BySite::qualified(const clusters::iterator &clusters_it) const {
     tips::const_iterator it  = clusters_it->second.begin();
-    char ref_value = (*it)->getSeq()[m_site];
+    char ref_value = (*it)->getSeq()[m_siteIndex];
     for (++it; it != clusters_it->second.end(); ++it) {
-        if ((*it)->getSeq()[m_site] != ref_value) { return false; }
+        if ((*it)->getSeq()[m_siteIndex] != ref_value) {
+            return false;
+        }
     }
     return true;
 }

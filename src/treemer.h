@@ -23,6 +23,11 @@ namespace Treemer {
 float compare(const std::string &query, const std::string &subject);
 
 class TipSeqLinker {
+    /*
+     * To hold all necessary data for a tree tip, including sequence,
+     * nodePath to the tree root and the current node during treemer.
+     * Provides way to store index of the 'kissed' node on the nodePath.
+     */
 public:
     TipSeqLinker(
         const Rcpp::CharacterVector &sequence,
@@ -36,22 +41,20 @@ public:
     int getSeqLen() const;
     Rcpp::IntegerVector getPath() const;
     std::string getSeq() const;
-protected:
+    // void setSite(const int site);
+    // void hold();
+    // void release();
+    // char getSiteChar() const;
+    // bool isReleased() const;
+    // int getIndex() const;
+private:
     const std::string m_seq;
     const Rcpp::IntegerVector m_path;
     const int m_tipIndex;
     int m_cIndex;
-};
-
-class TipSiteLinker: public TipSeqLinker {
-public:
-    TipSiteLinker(
-        const Rcpp::CharacterVector &sequence,
-        const Rcpp::IntegerVector &tipPath,
-        const int site
-    );
-private:
-    bool m_;
+    int m_site;
+    // int m_segIndex;
+    // bool m_released;
 };
 
 typedef std::vector<TipSeqLinker *> tips;
@@ -112,7 +115,7 @@ public:
 private:
     bool qualified(const clusters::iterator &clusters_it) const;
 private:
-    const int m_site;
+    const int m_siteIndex;
 };
 
 class BySimilarity: public Base {
