@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "minEntropy.h"
 
-// Empty constructor
+// Empty constructor for derived class
 MinEntropy::TreeSearchNode::TreeSearchNode(): m_qualified(true) {}
 
 MinEntropy::TreeSearchNode::~TreeSearchNode() {}

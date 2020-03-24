@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <Rcpp.h>
+#include "fixationSite.h"
 
 namespace Treemer {
 
