@@ -7,79 +7,81 @@
 #define SITEPATH_FIXATIONSITE_H
 
 #include <vector>
-#include <map>
 #include <utility>
 #include <Rcpp.h>
 
 namespace fixationSite {
 
-class MutPath {
+class NodePath {
     /*
      * For each site, tip clustered by treemerBySite each have a nodePath.
      * The adjacent clusters sometimes can be combined but usually not due to
      * tree topology. They will be further clustered as predicted fixation.
      */
 public:
-    MutPath(
-        const std::vector<Rcpp::IntegerVector> &path,
-        const std::map<char, int> siteSummary
+    NodePath(
+        const Rcpp::IntegerVector &path,
+        const int tipNum,
+        const char siteChar
     );
     // Getters
-    std::map<char, int> getSiteSummary() const;
-    std::vector<Rcpp::IntegerVector> getPaths() const;
-    // Merge another NodePath
-    void addPaths(const MutPath &other);
+    Rcpp::IntegerVector getPaths() const;
+    int getTipNum() const;
+    char getSiteChar() const;
 protected:
-    std::vector<Rcpp::IntegerVector> m_path;
-    const std::map<char, int> m_siteSummary;
+    const Rcpp::IntegerVector m_path;
+    const int m_tipNum;
+    const char m_siteChar;
 };
 
-typedef std::vector<MutPath *> sitePath;
-typedef std::pair<MutPath *, MutPath *> pairPaths;
+typedef std::vector<NodePath *> mutPath;
+typedef std::vector<mutPath> sitePath;
+typedef std::pair<int, int> duoIndices;
 
 class TreeSearchNode {
     /*
      * The node in the search tree, storing the combination of paths.
      * Each node will bind two paths (or combined paths) from the parent.
-     * But only the adjacent paths (monophyletic) can be combined.
+     * But only the adjacent paths (paraphyletic) can be combined.
      */
 public:
     // The starting node of the search tree
-    TreeSearchNode(const sitePath &allPaths);
+    TreeSearchNode(const std::vector<NodePath *> &allNodePaths);
     // The node in the progression of search
     TreeSearchNode(
         const TreeSearchNode &parent,
-        const pairPaths &toCombine
+        const duoIndices &toCombine
     );
     virtual ~TreeSearchNode();
     // Getters
+    sitePath getSitePath() const;
     float getScore() const;
-    sitePath getCombinedPaths() const;
     // For children node of the search
-    std::vector<pairPaths> allPairPaths() const;
+    std::vector<duoIndices> allToCombine() const;
 private:
     // The starting node
-    void pathsCombine(const sitePath &allPaths);
+    void pathsCombine(const std::vector<NodePath *> &allNodePaths);
     // The node in progression of search
     void pathsCombine(
             const TreeSearchNode &parent,
-            const pairPaths &toCombine
+            const duoIndices &toCombine
     );
     // Calculate the score
     void fixationScore() const;
 private:
-    sitePath m_combinedPaths;
+    sitePath m_sitePath;
     float m_fixationScore;
 };
 
 class TreeSearch {
 public:
     // TODO: not yet decided
-    TreeSearch(const sitePath &allPaths);
+    TreeSearch(const std::vector<NodePath *> &allNodePaths);
     virtual ~TreeSearch();
     // sitePath getFinal() const;
     void search();
 private:
+    const std::vector<NodePath *> m_allNodePaths;
     std::vector<TreeSearchNode *> m_searchNodes;
     const TreeSearchNode *m_parentNode;
     float m_bestScore;
