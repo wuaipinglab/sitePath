@@ -9,8 +9,9 @@
 #include <vector>
 #include <utility>
 #include <Rcpp.h>
+#include "treemer.h"
 
-namespace fixationSite {
+namespace FixationSite {
 
 class NodePath {
     /*
@@ -21,16 +22,21 @@ class NodePath {
 public:
     NodePath(
         const Rcpp::IntegerVector &path,
-        const int tipNum,
+        const std::vector<int> &tips,
         const char siteChar
     );
     // Getters
     Rcpp::IntegerVector getPaths() const;
-    int getTipNum() const;
+    std::vector<int> getTips() const;
     char getSiteChar() const;
+    int tipNum() const;
+    int getMonophyleticNode() const;
+    int getParaphyleticNode() const;
 protected:
     const Rcpp::IntegerVector m_path;
-    const int m_tipNum;
+    const std::vector<int> m_tips;
+    int m_monophyleticNode;
+    int m_paraphyleticNode;
     const char m_siteChar;
 };
 
@@ -52,7 +58,6 @@ public:
         const TreeSearchNode &parent,
         const duoIndices &toCombine
     );
-    virtual ~TreeSearchNode();
     // Getters
     sitePath getSitePath() const;
     float getScore() const;
@@ -67,21 +72,31 @@ private:
             const duoIndices &toCombine
     );
     // Calculate the score
-    void fixationScore() const;
+    void fixationScore();
 private:
     sitePath m_sitePath;
     float m_fixationScore;
 };
 
 class TreeSearch {
+    /*
+     * The branch and bound method for finding the best sitePath
+     */
 public:
-    // TODO: not yet decided
-    TreeSearch(const std::vector<NodePath *> &allNodePaths);
+    TreeSearch(
+        const Treemer::clusters &grouping,
+        const int site
+    );
     virtual ~TreeSearch();
-    // sitePath getFinal() const;
+    sitePath getFinal() const;
+    void initSearch(
+            const Treemer::clusters &grouping,
+            const int siteIndex
+    );
     void search();
 private:
-    const std::vector<NodePath *> m_allNodePaths;
+    std::vector<NodePath *> m_allNodePaths;
+    sitePath m_bestSitePath;
     std::vector<TreeSearchNode *> m_searchNodes;
     const TreeSearchNode *m_parentNode;
     float m_bestScore;

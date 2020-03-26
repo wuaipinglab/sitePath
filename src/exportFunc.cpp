@@ -1,6 +1,7 @@
 #include <set>
 #include <algorithm>
 #include "treemer.h"
+#include "fixationSite.h"
 #include "minEntropy.h"
 
 // [[Rcpp::export]]
@@ -22,19 +23,56 @@ Rcpp::NumericMatrix getSimilarityMatrix(
     return simMatrix;
 }
 
+// // [[Rcpp::export]]
+// Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(
+//         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+//         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+//         const Rcpp::IntegerVector &loci
+// ) {
+//     std::map< int, std::map< int, std::vector<int> > > res;
+    // for (
+    //         Rcpp::IntegerVector::const_iterator it = loci.begin();
+    //         it != loci.end(); it++
+    // ) {
+    //     Treemer::BySite match(tipPaths, alignedSeqs, *it);
+    //     res[*it] = match.getTips();
+    // }
+//     return Rcpp::wrap(res);
+// }
+
 // [[Rcpp::export]]
-Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > fixationSitesSearch(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::IntegerVector &loci
 ) {
-    std::map< int, std::map< int, std::vector<int> > > res;
+    std::map<int, std::vector< std::vector<int> > > res;
     for (
-            Rcpp::IntegerVector::const_iterator it = loci.begin();
-            it != loci.end(); it++
+            Rcpp::IntegerVector::const_iterator loci_itr = loci.begin();
+            loci_itr != loci.end(); loci_itr++
     ) {
-        Treemer::BySite match(tipPaths, alignedSeqs, *it);
-        res[*it] = match.getTips();
+        Treemer::BySite match(tipPaths, alignedSeqs, *loci_itr);
+        using namespace FixationSite;
+        TreeSearch ts(match.finalClusters(), *loci_itr);
+        const sitePath sp = ts.getFinal();
+        for (
+            sitePath::const_iterator sp_itr = sp.begin();
+            sp_itr != sp.end(); sp_itr++
+        ) {
+            std::vector<int> groupedTips;
+            for (
+                    mutPath::const_iterator mp_itr = sp_itr->begin();
+                    mp_itr != sp_itr->end(); mp_itr++
+            ) {
+                std::vector<int> tipNodes = (**mp_itr).getTips();
+                groupedTips.insert(
+                    groupedTips.end(),
+                    tipNodes.begin(),
+                    tipNodes.end()
+                );
+            }
+            res[*loci_itr].push_back(groupedTips);
+        }
     }
     return Rcpp::wrap(res);
 }

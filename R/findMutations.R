@@ -383,7 +383,7 @@ fixationSites.phylo <- function(x, ...) {
         },
         FUN.VALUE = logical(1)
     ))
-    res <- runTreemerBySite(nodepath(x), align, loci)
+    res <- fixationSitesSearch(nodepath(x), align, loci)
     return(res)
 }
 

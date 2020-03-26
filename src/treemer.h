@@ -17,7 +17,6 @@
 #include <vector>
 #include <map>
 #include <Rcpp.h>
-#include "fixationSite.h"
 
 namespace Treemer {
 
@@ -42,20 +41,13 @@ public:
     int getSeqLen() const;
     Rcpp::IntegerVector getPath() const;
     std::string getSeq() const;
-    // void setSite(const int site);
-    // void hold();
-    // void release();
-    // char getSiteChar() const;
-    // bool isReleased() const;
-    // int getIndex() const;
+    char getSiteChar(const int site) const;
 private:
     const std::string m_seq;
     const Rcpp::IntegerVector m_path;
     const int m_tipIndex;
     int m_cIndex;
     int m_site;
-    // int m_segIndex;
-    // bool m_released;
 };
 
 typedef std::vector<TipSeqLinker *> tips;
@@ -113,6 +105,7 @@ public:
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const int site
     );
+    clusters finalClusters();
 private:
     bool qualified(const clusters::iterator &clusters_it) const;
 private:

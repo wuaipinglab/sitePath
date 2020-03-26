@@ -169,7 +169,7 @@ void MinEntropy::SearchTree<T>::search() {
             // in the search list
             growTree(seg);
         }
-        // Delete the parent node as its pointer already removed
+        // Delete the parent node as its pointer already removed from m_segList
         delete m_parent;
         // Stop when there is no search node in the list
         if (m_segList.empty()) { break; }
@@ -184,7 +184,7 @@ void MinEntropy::SearchTree<T>::search() {
             // The search stops when the depth reaches the threshold
             if (depth >= maxDepth) { break; }
             // The candidate node stays unchanged if the new parent node
-            // cannot beat the it.
+            // cannot beat it.
         } else {
             // The new parent node will be the new candidate node
             // if the previous candidate is beaten by it.
