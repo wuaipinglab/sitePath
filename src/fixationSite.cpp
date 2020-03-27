@@ -11,7 +11,7 @@ FixationSite::NodePath::NodePath(
     m_tips(tips),
     m_siteChar(siteChar) {
     m_monophyleticNode = m_path[m_path.size() - 2];
-    m_paraphyleticNode = m_path.size() >= 3? m_path[m_path.size() - 2]: m_monophyleticNode;
+    m_paraphyleticNode = m_path.size() >= 3? m_path[m_path.size() - 3]: m_monophyleticNode;
 }
 
 Rcpp::IntegerVector FixationSite::NodePath::getPaths() const {
