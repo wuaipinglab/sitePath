@@ -26,16 +26,41 @@ char FixationSite::NodePath::getSiteChar() const {
     return m_siteChar;
 }
 
-int FixationSite::NodePath::tipNum() const {
-    return m_tips.size();
-}
-
 int FixationSite::NodePath::getMonophyleticNode() const {
     return m_monophyleticNode;
 }
 
 int FixationSite::NodePath::getParaphyleticNode() const {
     return m_paraphyleticNode;
+}
+
+int FixationSite::NodePath::tipNum() const {
+    return m_tips.size();
+}
+
+FixationSite::FixedTips::FixedTips(const NodePath *nodePath) {
+    m_nodePaths.push_back(nodePath);
+}
+
+std::map<char, int> FixationSite::FixedTips::getSiteSummary() const {
+    return m_siteSummary;
+}
+
+std::vector<int> FixationSite::FixedTips::getMonophyleticNodes() const {
+    return m_monophyleticNodes;
+}
+
+std::vector<int> FixationSite::FixedTips::getParaphyleticNodes() const {
+    return m_paraphyleticNodes;
+}
+
+void FixationSite::FixedTips::merge(const FixedTips &other) {
+    m_nodePaths.insert(
+        m_nodePaths.begin(),
+        other.getNodePaths()->begin(),
+        other.getNodePaths()->end()
+    );
+    // m_siteSummary, m_monophyleticNodes..
 }
 
 FixationSite::TreeSearchNode::TreeSearchNode(

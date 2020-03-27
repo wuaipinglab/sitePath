@@ -5,6 +5,10 @@ getSimilarityMatrix <- function(alignedSeqs) {
     .Call('_sitePath_getSimilarityMatrix', PACKAGE = 'sitePath', alignedSeqs)
 }
 
+runTreemerBySite <- function(tipPaths, alignedSeqs, loci) {
+    .Call('_sitePath_runTreemerBySite', PACKAGE = 'sitePath', tipPaths, alignedSeqs, loci)
+}
+
 fixationSitesSearch <- function(tipPaths, alignedSeqs, loci) {
     .Call('_sitePath_fixationSitesSearch', PACKAGE = 'sitePath', tipPaths, alignedSeqs, loci)
 }

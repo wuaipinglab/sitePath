@@ -12,7 +12,7 @@
 SNPsites(tree, minSNP = NULL)
 
 \method{fixationSites}{lineagePath}(
-  paths,
+  x,
   minEffectiveSize = NULL,
   searchDepth = 1,
   method = c("compare", "insert", "delete"),
@@ -34,7 +34,8 @@ SNPsites(tree, minSNP = NULL)
 
 \item{minSNP}{Minimum number of amino acid variation to be a SNP}
 
-\item{paths}{a \code{lineagePath} object returned from \code{\link{lineagePath}} function}
+\item{x}{a \code{lineagePath} object returned from \code{\link{lineagePath}} function
+or a \code{phylo} object after \code{\link{addMSA}}}
 
 \item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
 before/after mutation. Otherwise the mutation will not be counted into

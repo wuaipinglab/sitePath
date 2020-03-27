@@ -384,6 +384,24 @@ fixationSites.phylo <- function(x, ...) {
         FUN.VALUE = logical(1)
     ))
     res <- fixationSitesSearch(nodepath(x), align, loci)
+    res <- res[which(lengths(res) != 1)]
+    return(res)
+}
+
+treemerBySite <- function(x, ...) {
+    align <- attr(x, "align")
+    # Generate the site mapping from reference
+    reference <- attr(x, "reference")
+    # Exclude the invariant sites
+    loci <- which(vapply(
+        X = seq_along(reference),
+        FUN = function(s) {
+            s <- reference[s]
+            length(unique(substr(align, s, s))) > 1
+        },
+        FUN.VALUE = logical(1)
+    ))
+    res <- runTreemerBySite(nodepath(x), align, loci)
     return(res)
 }
 

@@ -29,9 +29,9 @@ public:
     Rcpp::IntegerVector getPaths() const;
     std::vector<int> getTips() const;
     char getSiteChar() const;
-    int tipNum() const;
     int getMonophyleticNode() const;
     int getParaphyleticNode() const;
+    int tipNum() const;
 protected:
     const Rcpp::IntegerVector m_path;
     const std::vector<int> m_tips;
@@ -40,9 +40,28 @@ protected:
     const char m_siteChar;
 };
 
+typedef std::pair<int, int> duoIndices;
+
+class FixedTips {
+public:
+    FixedTips(const NodePath *nodePath);
+    // Getters
+    const std::vector<NodePath *> *getNodePaths() const;
+    std::map<char, int> getSiteSummary() const;
+    std::vector<int> getMonophyleticNodes() const;
+    std::vector<int> getParaphyleticNodes() const;
+    // Functions
+    void merge(const FixedTips &other);
+    std::vector<int> allTips() const;
+private:
+    std::vector<const NodePath *> m_nodePaths;
+    std::map<char, int> m_siteSummary;
+    std::vector<int> m_monophyleticNodes;
+    std::vector<int> m_paraphyleticNodes;
+};
+
 typedef std::vector<NodePath *> mutPath;
 typedef std::vector<mutPath> sitePath;
-typedef std::pair<int, int> duoIndices;
 
 class TreeSearchNode {
     /*
