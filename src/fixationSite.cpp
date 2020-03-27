@@ -238,6 +238,8 @@ void FixationSite::TreeSearch::search() {
         // Free the root search node or if during the search, the old parent's
         // pointer already removed from search list and needs to be freed
         delete m_parentNode;
+        // Stop when there is no search node in the list
+        if (m_searchNodes.empty()) { break; }
         std::vector<TreeSearchNode *>::iterator
             searchNodes_itr = m_searchNodes.begin(), toRemove = searchNodes_itr;
         // Assume the first search node in the search list is the new parent node.
