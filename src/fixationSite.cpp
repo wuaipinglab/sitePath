@@ -2,6 +2,7 @@
 #include <cmath>
 #include "fixationSite.h"
 
+// NodePath definitions
 FixationSite::NodePath::NodePath(
     const Rcpp::IntegerVector &path,
     const std::vector<int> &tips,
@@ -38,8 +39,13 @@ int FixationSite::NodePath::tipNum() const {
     return m_tips.size();
 }
 
+// FixedTips definitions
 FixationSite::FixedTips::FixedTips(const NodePath *nodePath) {
     m_nodePaths.push_back(nodePath);
+}
+
+const std::vector<const FixationSite::NodePath *> *FixationSite::FixedTips::getNodePaths() const {
+    return &m_nodePaths;
 }
 
 std::map<char, int> FixationSite::FixedTips::getSiteSummary() const {
@@ -60,9 +66,22 @@ void FixationSite::FixedTips::merge(const FixedTips &other) {
         other.getNodePaths()->begin(),
         other.getNodePaths()->end()
     );
-    // m_siteSummary, m_monophyleticNodes..
+    // TODO: m_siteSummary, m_monophyleticNodes..
 }
 
+std::vector<int> FixationSite::FixedTips::allTips() const {
+    std::vector<int> res;
+    for (
+            std::vector<const NodePath *>::const_iterator it = m_nodePaths.begin();
+            it != m_nodePaths.end(); it++
+    ) {
+        std::vector<int> tips = (**it).getTips();
+        res.insert(res.begin(), tips.begin(), tips.end());
+    }
+    return res;
+}
+
+// TreeSearchNode definitions
 FixationSite::TreeSearchNode::TreeSearchNode(
     const std::vector<NodePath *> &allNodePaths
 ) {
@@ -195,6 +214,7 @@ void FixationSite::TreeSearchNode::fixationScore() {
     m_fixationScore = totalScore/entropyExpInv;
 }
 
+// TreeSearch definitions
 FixationSite::TreeSearch::TreeSearch(
     const Treemer::clusters &grouping,
     const int site

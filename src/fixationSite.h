@@ -46,7 +46,7 @@ class FixedTips {
 public:
     FixedTips(const NodePath *nodePath);
     // Getters
-    const std::vector<NodePath *> *getNodePaths() const;
+    const std::vector<const NodePath *> *getNodePaths() const;
     std::map<char, int> getSiteSummary() const;
     std::vector<int> getMonophyleticNodes() const;
     std::vector<int> getParaphyleticNodes() const;

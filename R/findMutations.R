@@ -288,7 +288,7 @@ print.sitePath <- function(x, ...) {
 #' relatively common in RNA virus. There is chance that some site be fixed
 #' in one lineage but does not show fixation because of different
 #' sequence context.
-#' @param x
+#' @param paths
 #' a \code{lineagePath} object returned from \code{\link{lineagePath}} function
 #' or a \code{phylo} object after \code{\link{addMSA}}
 #' @param minEffectiveSize
@@ -313,12 +313,11 @@ print.sitePath <- function(x, ...) {
 #' with names of the tips involved.
 #' @importFrom utils tail
 #' @export
-fixationSites.lineagePath <- function(x,
+fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
                                       searchDepth = 1,
                                       method = c("compare", "insert", "delete"),
                                       ...) {
-    paths <- x
     tree <- attr(paths, "tree")
     nTips <- length(tree[["tip.label"]])
     align <- attr(paths, "align")
@@ -370,10 +369,10 @@ fixationSites.lineagePath <- function(x,
     return(res)
 }
 
-fixationSites.phylo <- function(x, ...) {
-    align <- attr(x, "align")
+fixationSites.phylo <- function(paths, ...) {
+    align <- attr(paths, "align")
     # Generate the site mapping from reference
-    reference <- attr(x, "reference")
+    reference <- attr(paths, "reference")
     # Exclude the invariant sites
     loci <- which(vapply(
         X = seq_along(reference),
@@ -383,7 +382,7 @@ fixationSites.phylo <- function(x, ...) {
         },
         FUN.VALUE = logical(1)
     ))
-    res <- fixationSitesSearch(nodepath(x), align, loci)
+    res <- fixationSitesSearch(nodepath(paths), align, loci)
     res <- res[which(lengths(res) != 1)]
     return(res)
 }
@@ -406,7 +405,7 @@ treemerBySite <- function(x, ...) {
 }
 
 #' @export
-fixationSites <- function(x, ...)
+fixationSites <- function(paths, ...)
     UseMethod("fixationSites")
 
 #' @export
