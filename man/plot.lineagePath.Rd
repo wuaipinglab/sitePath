@@ -29,5 +29,5 @@ grey dashed line.
 data(zikv_tree)
 data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
-plot(lineagePath(tree, 0.996))
+plot(lineagePath(tree))
 }

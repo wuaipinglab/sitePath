@@ -71,10 +71,10 @@ plot(preassessment$similarity, preassessment$pathNum)
 
 ## Choose a threshold by yourself
 
-Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here we choose 0.995 as an example.
+Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here the default value is used.
 
 ```{r get_lineagePath}
-paths <- lineagePath(tree, 0.995)
+paths <- lineagePath(tree)
 paths
 ```
 

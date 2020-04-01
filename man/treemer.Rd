@@ -6,15 +6,29 @@
 \alias{lineagePath}
 \title{Topology-dependent tree trimming}
 \usage{
-groupTips(tree, similarity = NULL, forbidTrivial = TRUE, tipnames = TRUE)
+groupTips(
+  tree,
+  similarity = NULL,
+  simMatrix = NULL,
+  forbidTrivial = TRUE,
+  tipnames = TRUE
+)
 
-lineagePath(tree, similarity = NULL, forbidTrivial = TRUE)
+lineagePath(tree, similarity = NULL, simMatrix = NULL, forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
-\item{similarity}{Similarity threshold for tree trimming. If not provided, an average
-value of similarity among all sequences will be used.}
+\item{similarity}{Similarity threshold for tree trimming in \code{groupTips}.
+If not provided, the mean similarity substract standard deviation of all
+sequences will be used. And for \code{lineagePath}, this decides how minor
+SNPs are to remove. If provided as fraction between 0 and 1, then the
+minimum number of SNP will be total tips times \code{similariy}. If provided
+as integer greater than 1, the minimum number will be \code{similariy}. The
+default \code{similariy} is 0.1 for \code{lineagePath}.}
+
+\item{simMatrix}{A diagonal matrix of similarities for each pair of sequences. This parameter
+will not have effect in the function \code{lineagePath}.}
 
 \item{forbidTrivial}{Does not allow trivial trimming}
 
@@ -39,13 +53,8 @@ be divergent if the similarity is lower than the threshold.
 Tests among pair-wise distance could be introduced in the future)
 
 \code{lineagePath} finds the lineages of a phylogenetic tree providing
-the corresponding sequence alignment. This is done by trimming
-the tree to the ancestor node of tips in each group and then find
-the bifurcated terminals of the trimmed tree. The \code{\link{nodepath}}
-between root node and the bifurcated terminals is the lineages.
-In order to extend the search of mutational site. The lineages
-will tag some of its trailing nodes. Here nodes up to
-the ancestor of the tips with the longest \code{\link{nodepath}}
+the corresponding sequence alignment. This is done by finding 'major SNPs'
+which usually accumulate along the evolutionary pathways.
 are added.
 }
 \examples{
@@ -53,5 +62,5 @@ data('zikv_tree')
 data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 groupTips(tree, 0.996)
-lineagePath(tree, 0.996)
+lineagePath(tree)
 }

@@ -344,7 +344,7 @@ fixationSites.lineagePath <- function(paths,
         searchDepth <- ceiling(searchDepth)
     }
     divNodes <- divergentNode(paths)
-    paths <- .extendPaths(paths, tree)
+    # paths <- .extendPaths(paths, tree)
     nodeAlign <- .tipSeqsAlongPathNodes(
         paths = paths,
         divNodes = divNodes,
@@ -730,8 +730,8 @@ multiFixationSites.lineagePath <- function(paths,
     )
     # Generate the site mapping from reference
     reference <- attr(paths, "reference")
-    # Extend the path
-    paths <- .extendPaths(paths, tree)
+    # # Extend the path
+    # paths <- .extendPaths(paths, tree)
     divNodes <- divergentNode(paths)
     # Get the name and sequence of the children tips that
     # are descendant of the nodes.

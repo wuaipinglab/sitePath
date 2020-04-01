@@ -8,15 +8,13 @@
 \usage{
 similarityMatrix(tree)
 
-sneakPeek(tree, step = NULL, maxPath = NULL, minPath = 1, makePlot = FALSE)
+sneakPeek(tree, step = 10, maxPath = NULL, minPath = 1, makePlot = FALSE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
-\item{step}{the similarity window for calculating and ploting. To better
-see the impact of threshold on path number. This is preferably
-specified. The default is one 50th of the difference between 1
-and minimal pairwise sequence similarity.}
+\item{step}{the 'similarity' window for calculating and ploting. To better
+see the impact of threshold on path number. The default is 10.}
 
 \item{maxPath}{maximum number of path to return show in the plot. The number of path
 in the raw tree can be far greater than trimmed tree. To better
@@ -24,8 +22,7 @@ see the impact of threshold on path number. This is preferably
 specified. The default is one 20th of tree tip number.}
 
 \item{minPath}{minimum number of path to return show in the plot. To better
-see the impact of threshold on path number. This is preferably
-specified. The default is 1.}
+see the impact of threshold on path number. The default is 1.}
 
 \item{makePlot}{whether make a dot plot when return}
 }
@@ -42,13 +39,14 @@ There will be a simple dot plot between threshold and path number if
 The similarity matrix can be used in \code{\link{groupTips}}
 or \code{\link{lineagePath}}
 
-\code{sneakPeek} is intended to plot similarity as a threshold
-against number of output lineagePath. This plot is intended to give user
-a feel about how many sitePaths they should expect from
-the similarity threshold. The number of lineagePath should not
-be too many or too few. The result excludes where the number of lineagePath
-is greater than number of tips divided by 20 or self-defined maxPath.
-The zero lineagePath result will also be excluded
+\code{sneakPeek} is intended to plot 'similarity' (actually the least
+percentage of 'major SNP') as a threshold against number of output
+lineagePath. This plot is intended to give user a rought view about
+how many lineages they could expect from the 'similarity' threshold in
+the function \code{\link{lineagePath}}. The number of lineagePath is
+preferably not be too many or too few. The result excludes where the
+number of lineagePath is greater than number of tips divided by 20 or
+user-defined maxPath. The zero lineagePath result will also be excluded.
 }
 \examples{
 data('zikv_tree')

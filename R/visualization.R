@@ -19,7 +19,7 @@
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' plot(lineagePath(tree, 0.996))
+#' plot(lineagePath(tree))
 #' @importFrom ape plot.phylo
 #' @importFrom graphics title
 #' @export
@@ -29,9 +29,6 @@ plot.lineagePath <- function(x,
                              ...) {
     tree <- attr(x, "tree")
     tree <- ladderize(tree, right = FALSE)
-    if (y) {
-        x <- .extendPaths(x, tree)
-    }
     nEdges <- length(tree$edge.length)
     color <- rep("#d3d3d3", nEdges)
     lty <- rep(2, nEdges)
@@ -254,7 +251,7 @@ plot.sitePath <- function(x,
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' paths <- lineagePath(tree, 0.996)
+#' paths <- lineagePath(tree)
 #' plotSingleSite(paths, 139)
 #' @seealso \code{\link{plot.sitePath}}
 #' @importFrom ape ladderize

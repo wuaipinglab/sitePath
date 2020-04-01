@@ -57,6 +57,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// majorSNPtips
+Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(const Rcpp::CharacterVector& alignedSeqs, const int minSNPnum);
+RcppExport SEXP _sitePath_majorSNPtips(SEXP alignedSeqsSEXP, SEXP minSNPnumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< const int >::type minSNPnum(minSNPnumSEXP);
+    rcpp_result_gen = Rcpp::wrap(majorSNPtips(alignedSeqs, minSNPnum));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mergePaths
+Rcpp::ListOf<Rcpp::IntegerVector> mergePaths(const Rcpp::ListOf<Rcpp::IntegerVector>& paths);
+RcppExport SEXP _sitePath_mergePaths(SEXP pathsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type paths(pathsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mergePaths(paths));
+    return rcpp_result_gen;
+END_RCPP
+}
 // divergentNode
 Rcpp::IntegerVector divergentNode(const Rcpp::ListOf<Rcpp::IntegerVector>& paths);
 RcppExport SEXP _sitePath_divergentNode(SEXP pathsSEXP) {
@@ -77,18 +100,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type refSeq(refSeqSEXP);
     Rcpp::traits::input_parameter< const char >::type gapChar(gapCharSEXP);
     rcpp_result_gen = Rcpp::wrap(getReference(refSeq, gapChar));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ancestralPaths
-Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(const Rcpp::ListOf<Rcpp::IntegerVector>& paths, const int minLen);
-RcppExport SEXP _sitePath_ancestralPaths(SEXP pathsSEXP, SEXP minLenSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type paths(pathsSEXP);
-    Rcpp::traits::input_parameter< const int >::type minLen(minLenSEXP);
-    rcpp_result_gen = Rcpp::wrap(ancestralPaths(paths, minLen));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -192,9 +203,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_runTreemerBySite", (DL_FUNC) &_sitePath_runTreemerBySite, 3},
     {"_sitePath_fixationSitesSearch", (DL_FUNC) &_sitePath_fixationSitesSearch, 3},
     {"_sitePath_runTreemer", (DL_FUNC) &_sitePath_runTreemer, 5},
+    {"_sitePath_majorSNPtips", (DL_FUNC) &_sitePath_majorSNPtips, 2},
+    {"_sitePath_mergePaths", (DL_FUNC) &_sitePath_mergePaths, 1},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},
-    {"_sitePath_ancestralPaths", (DL_FUNC) &_sitePath_ancestralPaths, 2},
     {"_sitePath_tableAA", (DL_FUNC) &_sitePath_tableAA, 2},
     {"_sitePath_minEntropyByInserting", (DL_FUNC) &_sitePath_minEntropyByInserting, 3},
     {"_sitePath_minEntropyByDeleting", (DL_FUNC) &_sitePath_minEntropyByDeleting, 3},

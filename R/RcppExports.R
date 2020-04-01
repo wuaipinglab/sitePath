@@ -17,16 +17,20 @@ runTreemer <- function(tipPaths, alignedSeqs, simMatrixInput, similarity, getTip
     .Call('_sitePath_runTreemer', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
 }
 
+majorSNPtips <- function(alignedSeqs, minSNPnum) {
+    .Call('_sitePath_majorSNPtips', PACKAGE = 'sitePath', alignedSeqs, minSNPnum)
+}
+
+mergePaths <- function(paths) {
+    .Call('_sitePath_mergePaths', PACKAGE = 'sitePath', paths)
+}
+
 divergentNode <- function(paths) {
     .Call('_sitePath_divergentNode', PACKAGE = 'sitePath', paths)
 }
 
 getReference <- function(refSeq, gapChar) {
     .Call('_sitePath_getReference', PACKAGE = 'sitePath', refSeq, gapChar)
-}
-
-ancestralPaths <- function(paths, minLen) {
-    .Call('_sitePath_ancestralPaths', PACKAGE = 'sitePath', paths, minLen)
 }
 
 tableAA <- function(seqs, siteIndex) {

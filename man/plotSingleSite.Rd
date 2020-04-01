@@ -51,7 +51,7 @@ scheme as \code{plotSingleSite.lineagePath}
 data(zikv_tree)
 data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
-paths <- lineagePath(tree, 0.996)
+paths <- lineagePath(tree)
 plotSingleSite(paths, 139)
 fixations <- fixationSites(paths)
 plotSingleSite(fixations, 139)

@@ -99,6 +99,81 @@ Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(
 }
 
 // [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
+        const Rcpp::CharacterVector &alignedSeqs,
+        const int minSNPnum
+) {
+    const int totalTipNum = alignedSeqs.size();
+
+    std::vector< std::vector<int> > res;
+    // Select the major SNPs for each site (aa/nt)
+    for (unsigned int siteIndex = 0; siteIndex < alignedSeqs[0].size(); ++siteIndex) {
+        std::map<char, int> snpSummary;
+        for (int i = 0; i < totalTipNum; ++i) {
+            snpSummary[alignedSeqs[i][siteIndex]]++;
+        }
+        // Select major SNPs
+        for (
+                std::map<char, int>::iterator it = snpSummary.begin();
+                it != snpSummary.end(); it++
+        ) {
+            if (it->second > minSNPnum && it->second != totalTipNum) {
+                std::vector<int> tips;
+                // Find the tips with the SNP and record the site
+                for (int i = 0; i < totalTipNum; ++i) {
+                    if (alignedSeqs[i][siteIndex] == it->first) {
+                        tips.push_back(i+1);
+                    }
+                }
+                res.push_back(tips);
+            }
+        }
+    }
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> mergePaths(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &paths
+) {
+    std::vector<Rcpp::IntegerVector> res;
+    res.push_back(paths[0]);
+    for (unsigned int i = 1; i < paths.size(); ++i) {
+        bool toAddNew = true;
+        Rcpp::IntegerVector::const_iterator q, s;
+        for (
+                std::vector<Rcpp::IntegerVector>::iterator it = res.begin();
+                it != res.end(); ++it
+        ) {
+            bool toRemoveOld = false;
+            q = paths[i].begin(), s = it->begin();
+            while (*q == *s) {
+                ++q, ++s;
+                if (s == it->end()) {
+                    toRemoveOld = true;
+                    break;
+                }
+                if (q == paths[i].end()) {
+                    toAddNew = false;
+                    break;
+                }
+            }
+            if (toRemoveOld) {
+                res.erase(it);
+                break;
+            }
+            if (!toAddNew) {
+                break;
+            }
+        }
+        if (toAddNew) {
+            res.push_back(paths[i]);
+        }
+    }
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
 Rcpp::IntegerVector divergentNode(
         const Rcpp::ListOf<Rcpp::IntegerVector> &paths
 ) {
@@ -124,20 +199,6 @@ Rcpp::IntegerVector getReference(
         if (refSeq[i] != gapChar) { res.push_back(i + 1); }
     }
     return Rcpp::wrap(res);
-}
-
-// [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> ancestralPaths(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &paths,
-        const int minLen
-) {
-    std::vector<Rcpp::IntegerVector> res;
-    for (int i = 0; i < paths.size(); ++i) {
-        if (paths[i].size() >= minLen) {
-            res.push_back(paths[i][Rcpp::Range(0, minLen - 1)]);
-        }
-    }
-    return wrap(res);
 }
 
 // [[Rcpp::export]]
@@ -214,16 +275,6 @@ Rcpp::ListOf<Rcpp::IntegerVector> minEntropyByComparing(
         final = dFinal;
     }
     return updatedSegmentation(nodeSummaries, final);
-    // while (iSearch.getFinal() != dSearch.getFinal()) {
-    //     if (iMin > dMin) {
-    //         iSearch.resumeSearch();
-    //         iMin = iSearch.getMinEntropy();
-    //     } else {
-    //         dSearch.resumeSearch();
-    //         dMin = dSearch.getMinEntropy();
-    //     }
-    // }
-    // return updatedSegmentation(nodeSummaries, dSearch.getFinal());
 }
 
 // [[Rcpp::export]]

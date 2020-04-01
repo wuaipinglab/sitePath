@@ -67,10 +67,6 @@ addMSA <- function(tree,
     # Use the numbering of MSA as the default site numbering
     attr(tree, "reference") <-
         .checkReference(tree, align, NULL, "-")
-    # Similarity matrix
-    sim <- getSimilarityMatrix(align)
-    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
-    attr(tree, "simMatrix") <- sim
     return(tree)
 }
 
