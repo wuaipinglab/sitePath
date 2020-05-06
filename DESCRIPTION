@@ -1,7 +1,6 @@
 Package: sitePath
 Type: Package
-Title: Detection of sites with fixation of amino acid substitutions
-    in protein evolution
+Title: Detection of site fixation in molecular evolution
 Version: 1.5.0
 Author: Chengyang Ji, Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
@@ -28,6 +27,6 @@ LinkingTo: Rcpp
 RoxygenNote: 7.1.0
 Encoding: UTF-8
 VignetteBuilder: knitr
-URL: https://wuaipinglab.github.io/sitePath/
+URL: https://github.com/wuaipinglab/sitePath
 BugReports: https://github.com/wuaipinglab/sitePath/issues
 biocViews: Alignment, MultipleSequenceAlignment, Software
