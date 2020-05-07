@@ -6,7 +6,7 @@ test_that("setSiteNumbering works", {
     tree <- addMSA(zikv_tree, alignment = zikv_align)
     tipNames <- zikv_tree[["tip.label"]]
     align <- attr(tree, "align")
-    for (i in seq_along(tipNames)) {
+    for (i in grep('-', align)) {
         tip <- tipNames[[i]]
         refSeq <- align[[i]]
         expect_identical(refSeq,

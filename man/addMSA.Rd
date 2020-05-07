@@ -7,31 +7,30 @@
 addMSA(tree, msaPath = "", msaFormat = "", alignment = NULL)
 }
 \arguments{
-\item{tree}{a \code{phylo} object. This commonly can be from tree parsing function
-in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
+\item{tree}{a \code{phylo} object. This commonly can be from tree parsing
+function in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
 found in the sequence alignment.}
 
 \item{msaPath}{The file path to the multiple sequence alignment file}
 
 \item{msaFormat}{The format of the multiple sequence alignment file}
 
-\item{alignment}{an \code{alignment} object. This commonly can be
-from sequence parsing function in the \code{seqinr} package.
-Sequence names in the alignment should include all \code{tip.label}
-in the tree}
+\item{alignment}{an \code{alignment} object. This commonly can be from
+sequence parsing function in the \code{seqinr} package. Sequence names in
+the alignment should include all \code{tip.label} in the tree}
 }
 \value{
-\code{addMSA} returns a \code{phylo} object with matched
-multiple sequence alignment
+\code{addMSA} returns a \code{phylo} object with matched multiple
+  sequence alignment
 }
 \description{
-sitePath requires both tree and sequence alignment to do the analysis.
-\code{addMSA} wraps \code{read.alignment} function in \code{seqinr} package
-and helps match names in tree and sequence alignment. Either
-provide the file path to an alignment file and its format or an alignment
-object from the return of \code{read.alignment} function. If both the file
-path and alignment object are given, the function will use the sequence
-in the alignment file.
+sitePath requires both tree and sequence alignment to do the
+  analysis. \code{addMSA} wraps \code{read.alignment} function in
+  \code{seqinr} package and helps match names in tree and sequence alignment.
+  Either provide the file path to an alignment file and its format or an
+  alignment object from the return of \code{read.alignment} function. If both
+  the file path and alignment object are given, the function will use the
+  sequence in the alignment file.
 }
 \examples{
 data(zikv_tree)

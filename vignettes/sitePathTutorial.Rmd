@@ -6,7 +6,7 @@ output:
     BiocStyle::html_document:
         toc_float: true
 abstract: >
-    Detection of sites with fixation of amino acid substitutions in protein evolution.
+    Detection of site fixation in molecular evolution.
 vignette: >
   %\VignetteIndexEntry{A basic workflow for sitePath}
   %\VignetteEngine{knitr::rmarkdown}
@@ -100,7 +100,7 @@ fixations
 If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
 
 ```{r get_sitePath}
-extractSite(fixations, 139)
+sp <- extractSite(fixations, 139)
 ```
 
 It is also possible to retrieve the tips involved in the fixation of the site.
@@ -111,11 +111,19 @@ extractTips(fixations, 139)
 
 ## Visualize the result
 
-Use `plot` to visualize each fixation mutation. You'll have to specify which mutation to be visualized. Because the `names(fixationSites)` are the mutation names, you can also use one of them as function input
+Use `plot` on a `sitePath` object to visualize the fixation mutation of a single site. Alternatively, use `plotSingleSite` on an `fixationSites` object with the site specified.
 
-```{r plot_fixations}
+```{r plot_sitePath}
+plot(sp)
 plotSingleSite(fixations, 139)
 ```
+
+To have an overall view of the transition of fixation mutation, use `plot` on an `fixationSites` object.
+
+```{r plot_fixations}
+plot(fixations)
+```
+
 
 # Additional functions
 
@@ -138,15 +146,6 @@ An SNP site could potentially undergo fixation event. The `SNPsites` function pr
 snps <- SNPsites(tree)
 plotSingleSite(paths, snps[4])
 plotSingleSite(paths, snps[5])
-```
-
-## Use just the trimming function
-
-The function `groupTips` does the same on the tree as the function `lineagePath` does but it outputs clusters of tree tips instead of paths. This will give you a feel of the behavior of **tip-to-root** trimming algorithm. The `names` of the output is the internal node number in `phylo` object.
-
-```{r group_tips}
-grouping <- groupTips(tree)
-grouping
 ```
 
 # Session info {.unnumbered}

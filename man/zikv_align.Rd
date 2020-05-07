@@ -12,7 +12,7 @@ data(zikv_align)
 }
 \description{
 The raw protein sequences were downloaded from ViPR database
-(\url{https://www.viprbrc.org/}) and aliged using MAFFT.
-with default settings.
+  (\url{https://www.viprbrc.org/}) and aliged using MAFFT. with default
+  settings.
 }
 \keyword{datasets}

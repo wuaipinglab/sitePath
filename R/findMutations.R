@@ -1,13 +1,11 @@
 #' @rdname findSites
 #' @name findSites
 #' @title Finding sites with variation
-#' @description
-#' Single nucleotide polymorphism (SNP) in the whole package refers to
-#' variation of amino acid. \code{findSNPsite} will try to find SNP in
-#' the multiple sequence alignment. A reference sequence
-#' and gap character may be specified to number the site. This is
-#' irrelevant to the intended analysis but might be helpful to evaluate
-#' the performance of \code{fixationSites}.
+#' @description Single nucleotide polymorphism (SNP) in the whole package refers
+#'   to variation of amino acid. \code{findSNPsite} will try to find SNP in the
+#'   multiple sequence alignment. A reference sequence and gap character may be
+#'   specified to number the site. This is irrelevant to the intended analysis
+#'   but might be helpful to evaluate the performance of \code{fixationSites}.
 #' @param tree The return from \code{\link{addMSA}} function
 #' @param minSNP Minimum number of amino acid variation to be a SNP
 #' @examples
@@ -197,6 +195,8 @@ print.sitePath <- function(x, ...) {
                     attr(seg, "path") <- path
                     res[[site]][[targetIndex]] <- seg
                     attr(res[[site]], "site") <- i
+                    attr(res[[site]], "tree") <- tree
+                    class(res[[site]]) <- "sitePath"
                 }
             }
         }
@@ -204,114 +204,315 @@ print.sitePath <- function(x, ...) {
     return(res)
 }
 
-.combineFixations <- function(fixations, tree, align) {
-    # 'res' is going to be the return of this function. Each entry in
-    # the list is the 'sitePath' for a site. Each site ('sitePath')
-    # consists of 'mutPath' that is named by the starting node name.
-    # The fixed AA and number of non-dominant AA is also stored.
-    res <- list()
-    for (segs in fixations) {
-        i <- attr(segs, "site")
-        site <- as.character(i)
-        res[[site]][[1]] <- lapply(segs[[1]], function(tips) {
-            attr(tips, "tipsAA") <- substr(x = align[tips],
-                                           start = i,
-                                           stop = i)
-            return(tips)
-        })
-        attr(res[[site]], "site") <- i
-        attr(res[[site]], "tree") <- tree
-        class(res[[site]]) <- "sitePath"
-        for (seg in segs[-1]) {
-            # Assume a new fixation path is to add.
-            targetIndex <- length(res[[site]]) + 1
-            # The index to extract the terminal tips of the fixation.
-            endIndex <- length(seg)
-            finalAA <- attr(seg[[endIndex]], "AA")
-            # The following is to decide if any fixation path can be
-            # combined.
-            existPath <- res[[site]]
-            # The fixation before the temrinal tips should be identical
-            # and the final fixed amino acid should be the same.
-            toCombine <- vapply(
-                X = existPath,
-                FUN = function(ep) {
-                    identical(lapply(seg, c)[-endIndex],
-                              lapply(ep, c)[-endIndex]) &&
-                        finalAA == attr(ep[[endIndex]], "AA")
-                },
-                FUN.VALUE = logical(1)
-            )
-            if (any(toCombine)) {
-                existIndex <- which(toCombine)
-                # These are the candidates to combine. The additional
-                # condition be all the descendant tips are included.
-                toCombine <- unique(unlist(lapply(
-                    X = c(res[[site]][existIndex], list(seg)),
-                    FUN = "[[",
-                    ... = endIndex
-                )))
-                allTips <-
-                    .childrenTips(tree, getMRCA(tree, toCombine))
-                if (all(allTips %in% toCombine)) {
-                    seg[[endIndex]] <- toCombine
-                    attr(seg[[endIndex]], "AA") <- finalAA
-                    res[[site]] <- res[[site]][-existIndex]
-                    targetIndex <- length(res[[site]]) + 1
-                } else {
-                    # Add new fixation for the site if no existing
-                    # mutation path can be combined with
-                    targetIndex <- length(existPath) + 1
+.snpTracing <- function (fixations, paths, tree) {
+    groupByPath <- lapply(paths, function (p) {
+        terminalTips <- .childrenTips(tree, p[length(p)])
+        # Group fixation results by path rather than site
+        group <- list()
+        for (sp in fixations) {
+            site <- attr(sp, "site")
+            for (mp in sp) {
+                tips <- mp[[length(mp)]]
+                # Filter if not belong to the path
+                if (all(terminalTips %in% tips)) {
+                    toAdd <- lapply(mp, function (tips) {
+                        siteChar <- attr(tips, "AA")
+                        attributes(tips) <- NULL
+                        attr(tips, "site") <- siteChar
+                        names(attr(tips, "site")) <- site
+                        tips
+                    })
+                    group <- c(group, list(toAdd))
                 }
             }
-            seg <- lapply(seg, function(tips) {
-                attr(tips, "tipsAA") <- substr(x = align[tips],
-                                               start = i,
-                                               stop = i)
-                return(tips)
-            })
-            res[[site]][[targetIndex]] <- seg
-            attr(res[[site]], "site") <- i
-            attr(res[[site]], "tree") <- tree
-            class(res[[site]]) <- "sitePath"
+        }
+        # Group tips according to fixation points
+        res <- group[[1]]
+        for (p in group[-1]) {
+            for (tips in p) {
+                site <- attr(tips, "site")
+                # Update grouping for each tips by growing a new list
+                newGrouping <- list()
+                for (i in seq_along(res)) {
+                    gp <- res[[i]]
+                    common <- sort(intersect(tips, gp))
+                    if (length(common) == 0) {
+                        newGrouping <- res[1:i]
+                    } else if (identical(sort(gp), sort(tips))) {
+                        attr(gp, "site") <- c(attr(gp, "site"), site)
+                        if (i + 1 <= length(res)) {
+                            trailing <- res[(i + 1):length(res)]
+                        } else {
+                            trailing <- list()
+                        }
+                        newGrouping <-
+                            c(newGrouping, list(gp), trailing)
+                        break
+                    } else {
+                        if (identical(sort(gp), common)) {
+                            # The new coming tips includes the current group
+                            # The extra tips stay for the next loop
+                            tips <- setdiff(tips, gp)
+                            # Update the SNP site info for the current group
+                            attr(gp, "site") <-
+                                c(attr(gp, "site"), site)
+                            newGrouping <- c(newGrouping, list(gp))
+                        } else if (identical(sort(tips), common)) {
+                            # The new coming tips are included in the group
+                            # (they are used up at this point)
+                            separate <- setdiff(gp, tips)
+                            attributes(separate) <- attributes(gp)
+                            attr(tips, "site") <-
+                                c(attr(gp, "site"), site)
+                            if (i + 1 <= length(res)) {
+                                trailing <- res[(i + 1):length(res)]
+                            } else {
+                                trailing <- list()
+                            }
+                            newGrouping <-
+                                c(newGrouping,
+                                  list(tips),
+                                  list(separate),
+                                  trailing)
+                            # Go for the next new coming tips
+                            break
+                        } else {
+                            stop("Something's not right")
+                        }
+                    }
+                }
+                # The new coming tips are used up and update the grouping
+                res <- newGrouping
+            }
+        }
+        return(res)
+    })
+    # Find the divergent point and remove the overlapped part
+    grouping <- list(groupByPath[[1]])
+
+    for (gpIndex in seq_along(groupByPath)[-1]) {
+        gp <- groupByPath[[gpIndex]]
+        toMergeIndex <- NULL
+        divergedIndex <- 0L
+        # Loop through to find the most related group
+        for (i in seq_along(grouping)) {
+            allTips <- unlist(grouping[[i]])
+            for (j in seq_along(gp)[-1]) {
+                if (all(!gp[[j]] %in% allTips)) {
+                    m <- i
+                    d <- j
+                    break
+                }
+            }
+            if (d > divergedIndex) {
+                toMergeIndex <- m
+                divergedIndex <- d
+            }
+        }
+        # Find the tips before diverged
+        sharedTips <- gp[[divergedIndex - 1]]
+        refSites <- attr(sharedTips, "site")
+        # The non-shared part
+        divergedTips <- setdiff(sharedTips, allTips)
+        attr(divergedTips, "site") <- refSites
+        # Drop the overlapped part
+        grouping[[gpIndex]] <-
+            c(list(divergedTips), gp[divergedIndex:length(gp)])
+        # Find the most related group
+        toMerge <- grouping[[toMergeIndex]]
+        # To determine where to add the new (truncated) group
+        for (i in seq_along(toMerge)) {
+            gpTips <- unlist(gp)
+            if (all(!toMerge[[i]] %in% gpTips)) {
+                # Find the tips before diverged
+                sharedTips <- toMerge[[i - 1]]
+                sites <- attr(sharedTips, "site")
+                # The non-shared part
+                divergedTips <- setdiff(sharedTips, gpTips)
+                attr(divergedTips, "site") <- sites
+                # The shared part
+                sharedTips <- setdiff(sharedTips, divergedTips)
+                attr(sharedTips, "site") <- sites
+                attr(sharedTips, "toMerge") <- gpIndex
+                attr(sharedTips, "toMergeRefSites") <- refSites
+                # Reform
+                if (i == 2) {
+                    preTips <- list()
+                } else {
+                    preTips <- toMerge[1:(i - 2)]
+                }
+                grouping[[toMergeIndex]] <- c(preTips,
+                                              list(sharedTips),
+                                              list(divergedTips),
+                                              toMerge[i:length(toMerge)])
+                break
+            }
         }
     }
+    # The existing tips in the tree
+    tipClusters <- list()
+    # The edges and its SNP of the tree
+    parentNodes <- integer()
+    childrenNodes <- integer()
+    edgeSNPs <- list()
+
+    # Keep track of the newly added internal node
+    newParentNode <-
+        length(unlist(grouping, recursive = FALSE)) + 1L
+    parentNode <- newParentNode
+    # Keep track of the newly added tip node
+    tipNode <- 0L
+    # A list to record the fixation sites of the parent nodes
+    parentNodesSites <- list()
+
+    for (gpIndex in seq_along(grouping)) {
+        # The group to add onto the tree
+        gp <- grouping[[gpIndex]]
+
+        # The initial tips of the group
+        currentTips <- gp[[1]]
+        # Assume the initial reference site
+        refSites <- attr(currentTips, "site")
+        # Find where to merge and parent node, update reference site maybe
+        for (i in seq_along(tipClusters)) {
+            toMerge <- tipClusters[[i]]
+            toMergeIndex <- attr(toMerge, "toMerge")
+            if (!is.null(toMergeIndex) && toMergeIndex == gpIndex) {
+                refSites <- attr(toMerge, "toMergeRefSites")
+                parentNode <- parentNodes[which(childrenNodes == i)]
+                break
+            }
+        }
+        parentNodesSites[[as.character(parentNode)]] <- refSites
+
+        # Track the tip and internal node
+        tipNode <- tipNode + 1L
+        startingNode <- tipNode
+        tipClusters <- c(tipClusters, list(currentTips))
+        # Define the initial edge of the group
+        parentNodes <- c(parentNodes, parentNode)
+        childrenNodes <- c(childrenNodes, tipNode)
+        # SNP of the initial edge is set none
+        edgeSNPs <- c(edgeSNPs, list(character()))
+
+        # Grow the tree
+        for (tipIndex in seq_along(gp)[-1]) {
+            tipNode <- tipNode + 1L
+            currentTips <- gp[[tipIndex]]
+            currentSites <- attr(currentTips, "site")
+            # Attach the tip near the most related tips
+            # Assume the reference tips are the most related (least number of SNP)
+            mostRelatedTipNode <- startingNode
+            leastSNPnum <- sum(refSites != currentSites)
+            # Loop through the rest existing tip clusters
+            for (otherTipNode in seq_along(tipClusters)[-seq_len(startingNode)]) {
+                otherSites <- attr(tipClusters[[otherTipNode]], "site")
+                snpNum <- sum(otherSites != currentSites)
+                if (snpNum < leastSNPnum) {
+                    mostRelatedTipNode <- otherTipNode
+                    leastSNPnum <- snpNum
+                }
+            }
+            # Find the direct tree edge to the most related tips
+            edgeIndex <- which(childrenNodes == mostRelatedTipNode)
+            parentNode <- parentNodes[edgeIndex]
+            # Tree growing differs according to the edge SNP
+            parentSites <-
+                parentNodesSites[[as.character(parentNode)]]
+            snpSites <- as.character(na.omit(
+                vapply(
+                    X = names(parentSites),
+                    FUN = function (site) {
+                        ref <- parentSites[site]
+                        snp <- currentSites[site]
+                        if (ref == snp) {
+                            return(NA_character_)
+                        }
+                        return(paste0(ref, site, snp))
+                    },
+                    FUN.VALUE = character(1)
+                )
+            ))
+            edgeSNP <- edgeSNPs[[edgeIndex]]
+            sharedWithEdgeSNP <- intersect(snpSites, edgeSNP)
+            # A new internal node is needed when no SNP overlap
+            if (length(sharedWithEdgeSNP) != 0) {
+                newParentNode <- newParentNode + 1L
+                # Insert the new internal node to the target edge
+                parentNodes[edgeIndex] <- newParentNode
+                parentNodes <- c(parentNodes, parentNode)
+                childrenNodes <- c(childrenNodes, newParentNode)
+                edgeSNPs <- c(edgeSNPs, list(sharedWithEdgeSNP))
+                # Update SNP of the directly linked edge
+                edgeSNPs[[edgeIndex]] <-
+                    setdiff(edgeSNP, sharedWithEdgeSNP)
+                # Calculate the site for the new internal node
+                siteToChange <- substr(sharedWithEdgeSNP,
+                                       2,
+                                       nchar(sharedWithEdgeSNP) - 1)
+                parentSites[siteToChange] <- substr(
+                    sharedWithEdgeSNP,
+                    nchar(sharedWithEdgeSNP),
+                    nchar(sharedWithEdgeSNP)
+                )
+                parentNodesSites[[as.character(newParentNode)]] <-
+                    parentSites
+                # Update the parent node and edge SNP for the current tip node
+                parentNode <- newParentNode
+                snpSites <- setdiff(snpSites, sharedWithEdgeSNP)
+            }
+            # Add edge
+            parentNodes <- c(parentNodes, parentNode)
+            childrenNodes <- c(childrenNodes, tipNode)
+            # Add edge SNP
+            edgeSNPs <- c(edgeSNPs, list(snpSites))
+            # Add the current tips
+            tipClusters <- c(tipClusters, list(currentTips))
+        }
+    }
+    res <- list(
+        "edge" = cbind(parentNodes, childrenNodes),
+        "edge.length" = lengths(edgeSNPs) + 0.05,
+        "Nnode" = length(unique(parentNodes)),
+        "tip.label" = as.character(lengths(unlist(
+            grouping, recursive = FALSE
+        )))
+    )
+    attr(res, "tipClusters") <- tipClusters
+    attr(res, "edgeSNPs") <- edgeSNPs
+    class(res) <- "phylo"
     return(res)
 }
 
 #' @rdname findSites
 #' @name fixationSites
-#' @description
-#' After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-#' \code{fixationSites} uses the result to find those sites that show
-#' fixation on some, if not all, of the lineages. Parallel evolution is
-#' relatively common in RNA virus. There is chance that some site be fixed
-#' in one lineage but does not show fixation because of different
-#' sequence context.
-#' @param paths
-#' a \code{lineagePath} object returned from \code{\link{lineagePath}} function
-#' or a \code{phylo} object after \code{\link{addMSA}}
-#' @param minEffectiveSize
-#' A vector of two integers to specifiy minimum tree tips involved
-#' before/after mutation. Otherwise the mutation will not be counted into
-#' the return. If more than one number is given, the ancestral takes the first
-#' and descendant takes the second as the minimum. If only given one number,
-#' it's the minimum for both ancestral and descendant.
-#' @param searchDepth
-#' The function uses heuristic search but the termination of the search
-#' cannot be intrinsically decided. \code{searchDepth} is needed to tell
-#' the search when to stop.
-#' @param method
-#' The strategy for predicting the fixation. The basic approach is entropy
-#' minimization and can be achieved by adding or removing fixation point,
-#' or by comparing the two.
+#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
+#'   tree, \code{fixationSites} uses the result to find those sites that show
+#'   fixation on some, if not all, of the lineages. Parallel evolution is
+#'   relatively common in RNA virus. There is chance that some site be fixed in
+#'   one lineage but does not show fixation because of different sequence
+#'   context.
+#' @param paths a \code{lineagePath} object returned from
+#'   \code{\link{lineagePath}} function or a \code{phylo} object after
+#'   \code{\link{addMSA}}
+#' @param minEffectiveSize A vector of two integers to specifiy minimum tree
+#'   tips involved before/after mutation. Otherwise the mutation will not be
+#'   counted into the return. If more than one number is given, the ancestral
+#'   takes the first and descendant takes the second as the minimum. If only
+#'   given one number, it's the minimum for both ancestral and descendant.
+#' @param searchDepth The function uses heuristic search but the termination of
+#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
+#'   tell the search when to stop.
+#' @param method The strategy for predicting the fixation. The basic approach is
+#'   entropy minimization and can be achieved by adding or removing fixation
+#'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
 #' @examples
 #' fixationSites(lineagePath(tree))
-#' @return
-#' \code{fixationSites} returns a list of fixation mutations
-#' with names of the tips involved.
+#' @return \code{fixationSites} returns a list of fixation mutations with names
+#'   of the tips involved.
 #' @importFrom utils tail
+#' @importFrom stats na.omit
 #' @export
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
@@ -344,14 +545,13 @@ fixationSites.lineagePath <- function(paths,
         searchDepth <- ceiling(searchDepth)
     }
     divNodes <- divergentNode(paths)
-    # paths <- .extendPaths(paths, tree)
     nodeAlign <- .tipSeqsAlongPathNodes(
         paths = paths,
         divNodes = divNodes,
         tree = tree,
         align = align
     )
-    fixations <- .findFixationSite(
+    res <- .findFixationSite(
         paths = paths,
         tree = tree,
         align = align,
@@ -362,7 +562,7 @@ fixationSites.lineagePath <- function(paths,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
     )
-    res <- .combineFixations(fixations, tree, align)
+    attr(res, "snpTracing") <- .snpTracing(res, paths, tree)
     attr(res, "paths") <- paths
     attr(res, "reference") <- reference
     class(res) <- "fixationSites"
@@ -667,18 +867,15 @@ print.fixationSites <- function(x, ...) {
 
 #' @rdname findSites
 #' @name multiFixationSites
-#' @description
-#' After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-#' \code{multiFixationSites} uses random sampling on the original tree
-#' and applies the method used in \code{fixationSites} to each sampled
-#' tree and summarize the results from all the samples.
-#' @param samplingSize
-#' The number of tips sampled for each round of resampling. It shoud be
-#' at least 10th and at most nine 10ths of the tree tips.
-#' @param samplingTimes
-#' The total times of random sampling to do. It should be greater than 100.
-#' @return
-#' \code{multiFixationSites} returns sites with multiple fixations.
+#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
+#'   tree, \code{multiFixationSites} uses random sampling on the original tree
+#'   and applies the method used in \code{fixationSites} to each sampled tree
+#'   and summarize the results from all the samples.
+#' @param samplingSize The number of tips sampled for each round of resampling.
+#'   It shoud be at least 10th and at most nine 10ths of the tree tips.
+#' @param samplingTimes The total times of random sampling to do. It should be
+#'   greater than 100.
+#' @return \code{multiFixationSites} returns sites with multiple fixations.
 #' @importFrom ape drop.tip
 #' @importFrom utils flush.console
 #' @importFrom utils txtProgressBar

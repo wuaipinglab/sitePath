@@ -17,10 +17,10 @@
 \item{x}{A \code{fixationSites} object from \code{\link{fixationSites}} or
 the return from \code{\link{addMSA}} function.}
 
-\item{site}{One of the mutations in the \code{fixationSites} object. It should
-be from the \code{\link{names}} of the object. Or an integer to
-indicate a site could be provide. The numbering is consistent with
-the reference defined at \code{\link{fixationSites}}.}
+\item{site}{One of the mutations in the \code{fixationSites} object. It
+should be from the \code{\link{names}} of the object. Or an integer to
+indicate a site could be provide. The numbering is consistent with the
+reference defined at \code{\link{fixationSites}}.}
 
 \item{showPath}{If plot the lineage result from lineagePath.}
 
@@ -28,24 +28,24 @@ the reference defined at \code{\link{fixationSites}}.}
 
 \item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
 
-\item{select}{Select which fixation path in to plot. The default is NULL which
-will plot all the fixations.}
+\item{select}{Select which fixation path in to plot. The default is NULL
+which will plot all the fixations.}
 }
 \value{
-The function only makes plot and returns no value
-(It behaviors like the generic \code{\link{plot}} function).
+The function only makes plot and returns no value (It behaviors like
+  the generic \code{\link{plot}} function).
 }
 \description{
-For \code{lineagePath}, the tree will be colored according to the amino
-acid of the site. The color scheme tries to assign distinguishable
-color for each amino acid.
+For \code{lineagePath}, the tree will be colored according to
+  the amino acid of the site. The color scheme tries to assign
+  distinguishable color for each amino acid.
 
-For \code{fixationSites}, it will color the ancestral tips in red,
-descendant tips in blue and excluded tips in grey.
+For \code{fixationSites}, it will color the ancestral tips in
+  red, descendant tips in blue and excluded tips in grey.
 
 For \code{multiFixationSites}, it will color the tips which have
-their site fixed. The color will use the same amino acid color
-scheme as \code{plotSingleSite.lineagePath}
+  their site fixed. The color will use the same amino acid color scheme as
+  \code{plotSingleSite.lineagePath}
 }
 \examples{
 data(zikv_tree)

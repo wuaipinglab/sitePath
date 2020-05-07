@@ -12,25 +12,26 @@
 }
 \arguments{
 \item{x}{The object to set site numbering. It could be a \code{phylo} object
-after \code{\link{addMSA}} or a \code{lineagePath} object. The function
-for \code{fixaitonSites} and \code{multiFixationSites} will be
-added in later version.}
+after \code{\link{addMSA}} or a \code{lineagePath} object. The function for
+\code{fixaitonSites} and \code{multiFixationSites} will be added in later
+version.}
 
-\item{reference}{Name of reference for site numbering. The name has to be one of the
-sequences' name. The default uses the intrinsic alignment numbering}
+\item{reference}{Name of reference for site numbering. The name has to be one
+of the sequences' name. The default uses the intrinsic alignment numbering}
 
-\item{gapChar}{The character to indicate gap. The numbering will skip the gapChar
-for the reference sequence.}
+\item{gapChar}{The character to indicate gap. The numbering will skip the
+gapChar for the reference sequence.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A \code{phylo} object with site numbering mapped to reference sequence
+A \code{phylo} object with site numbering mapped to reference
+  sequence
 }
 \description{
-A reference sequence can be used to define a global site numbering
-scheme for multiple sequence alignment. The gap in the reference
-will be skipped so the site ignored in numbering.
+A reference sequence can be used to define a global site
+  numbering scheme for multiple sequence alignment. The gap in the reference
+  will be skipped so the site ignored in numbering.
 }
 \examples{
 data(zikv_tree)

@@ -1,19 +1,17 @@
 #' @rdname pre-assessment
 #' @name pre-assessment
 #' @title Things can be done before the analysis
-#' @description
-#' \code{similarityMatrix} calculates similarity between aligned sequences
-#' The similarity matrix can be used in \code{\link{groupTips}}
-#' or \code{\link{lineagePath}}
+#' @description \code{similarityMatrix} calculates similarity between aligned
+#'   sequences The similarity matrix can be used in \code{\link{groupTips}} or
+#'   \code{\link{lineagePath}}
 #' @param tree The return from \code{\link{addMSA}} function
 #' @examples
 #' data('zikv_tree')
 #' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' simMatrix <- similarityMatrix(tree)
-#' @return
-#' \code{similarityMatrix} returns a diagonal matrix of
-#' similarity between sequences
+#' @return \code{similarityMatrix} returns a diagonal matrix of similarity
+#'   between sequences
 #' @importFrom methods is
 #' @export
 similarityMatrix <- function(tree) {
@@ -30,30 +28,28 @@ similarityMatrix <- function(tree) {
 #' @rdname treemer
 #' @name treemer
 #' @title Topology-dependent tree trimming
-#' @description
-#' \code{groupTips} uses sequence similarity to group tree tips.
-#' Members in a group are always constrained to share the same
-#' ancestral node. Similarity between two tips is derived from
-#' their multiple sequence alignment. The site will not be counted
-#' into total length if both are gap. Similarity is calculated
-#' as number of matched divided by the corrected total length.
-#' So far the detection of divergence is based on one simple rule:
-#' the miminal pairwise similarity. The two branches are decided to
-#' be divergent if the similarity is lower than the threshold.
-#' (Other more statistical approaches such as Kolmogorov-Smirnov
-#' Tests among pair-wise distance could be introduced in the future)
+#' @description \code{groupTips} uses sequence similarity to group tree tips.
+#'   Members in a group are always constrained to share the same ancestral node.
+#'   Similarity between two tips is derived from their multiple sequence
+#'   alignment. The site will not be counted into total length if both are gap.
+#'   Similarity is calculated as number of matched divided by the corrected
+#'   total length. So far the detection of divergence is based on one simple
+#'   rule: the miminal pairwise similarity. The two branches are decided to be
+#'   divergent if the similarity is lower than the threshold. (Other more
+#'   statistical approaches such as Kolmogorov-Smirnov Tests among pair-wise
+#'   distance could be introduced in the future)
 #' @param tree The return from \code{\link{addMSA}} function
-#' @param similarity
-#' Similarity threshold for tree trimming in \code{groupTips}.
-#' If not provided, the mean similarity substract standard deviation of all
-#' sequences will be used. And for \code{lineagePath}, this decides how minor
-#' SNPs are to remove. If provided as fraction between 0 and 1, then the
-#' minimum number of SNP will be total tips times \code{similariy}. If provided
-#' as integer greater than 1, the minimum number will be \code{similariy}. The
-#' default \code{similariy} is 0.1 for \code{lineagePath}.
-#' @param simMatrix
-#' A diagonal matrix of similarities for each pair of sequences. This parameter
-#' will not have effect in the function \code{lineagePath}.
+#' @param similarity Similarity threshold for tree trimming in \code{groupTips}.
+#'   If not provided, the mean similarity substract standard deviation of all
+#'   sequences will be used. And for \code{lineagePath}, this decides how minor
+#'   SNPs are to remove. If provided as fraction between 0 and 1, then the
+#'   minimum number of SNP will be total tips times \code{similariy}. If
+#'   provided as integer greater than 1, the minimum number will be
+#'   \code{similariy}. The default \code{similariy} is 0.1 for
+#'   \code{lineagePath}.
+#' @param simMatrix A diagonal matrix of similarities for each pair of
+#'   sequences. This parameter will not have effect in the function
+#'   \code{lineagePath}.
 #' @param forbidTrivial Does not allow trivial trimming
 #' @param tipnames If return as tipnames
 #' @importFrom ape nodepath
@@ -117,11 +113,10 @@ groupTips <- function(tree,
 }
 
 #' @rdname treemer
-#' @description
-#' \code{lineagePath} finds the lineages of a phylogenetic tree providing
-#' the corresponding sequence alignment. This is done by finding 'major SNPs'
-#' which usually accumulate along the evolutionary pathways.
-#' are added.
+#' @description \code{lineagePath} finds the lineages of a phylogenetic tree
+#'   providing the corresponding sequence alignment. This is done by finding
+#'   'major SNPs' which usually accumulate along the evolutionary pathways. are
+#'   added.
 #' @importFrom ape nodepath
 #' @examples
 #' lineagePath(tree)
@@ -183,33 +178,28 @@ print.lineagePath <- function(x, ...) {
 }
 
 #' @rdname pre-assessment
-#' @description
-#' \code{sneakPeek} is intended to plot 'similarity' (actually the least
-#' percentage of 'major SNP') as a threshold against number of output
-#' lineagePath. This plot is intended to give user a rought view about
-#' how many lineages they could expect from the 'similarity' threshold in
-#' the function \code{\link{lineagePath}}. The number of lineagePath is
-#' preferably not be too many or too few. The result excludes where the
-#' number of lineagePath is greater than number of tips divided by 20 or
-#' user-defined maxPath. The zero lineagePath result will also be excluded.
-#' @param step
-#' the 'similarity' window for calculating and ploting. To better
-#' see the impact of threshold on path number. The default is 10.
-#' @param maxPath
-#' maximum number of path to return show in the plot. The number of path
-#' in the raw tree can be far greater than trimmed tree. To better
-#' see the impact of threshold on path number. This is preferably
-#' specified. The default is one 20th of tree tip number.
-#' @param minPath
-#' minimum number of path to return show in the plot. To better
-#' see the impact of threshold on path number. The default is 1.
+#' @description \code{sneakPeek} is intended to plot 'similarity' (actually the
+#'   least percentage of 'major SNP') as a threshold against number of output
+#'   lineagePath. This plot is intended to give user a rought view about how
+#'   many lineages they could expect from the 'similarity' threshold in the
+#'   function \code{\link{lineagePath}}. The number of lineagePath is preferably
+#'   not be too many or too few. The result excludes where the number of
+#'   lineagePath is greater than number of tips divided by 20 or user-defined
+#'   maxPath. The zero lineagePath result will also be excluded.
+#' @param step the 'similarity' window for calculating and ploting. To better
+#'   see the impact of threshold on path number. The default is 10.
+#' @param maxPath maximum number of path to return show in the plot. The number
+#'   of path in the raw tree can be far greater than trimmed tree. To better see
+#'   the impact of threshold on path number. This is preferably specified. The
+#'   default is one 20th of tree tip number.
+#' @param minPath minimum number of path to return show in the plot. To better
+#'   see the impact of threshold on path number. The default is 1.
 #' @param makePlot whether make a dot plot when return
 #' @examples
 #' sneakPeek(tree)
-#' @return
-#' \code{sneakPeek} return the similarity threhold against number of lineagePath.
-#' There will be a simple dot plot between threshold and path number if
-#' \code{makePlot} is TRUE.
+#' @return \code{sneakPeek} return the similarity threhold against number of
+#'   lineagePath. There will be a simple dot plot between threshold and path
+#'   number if \code{makePlot} is TRUE.
 #' @importFrom methods is
 #' @importFrom graphics plot
 #' @export

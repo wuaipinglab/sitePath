@@ -1,32 +1,29 @@
-#' @name plot.lineagePath
-#' @title Visualize phylogenetic lineages
-#' @description
-#' Visualize \code{\link{lineagePath}} object. A tree diagram will be plotted
-#' and paths are black solid line while the trimmed nodes and tips will use
-#' grey dashed line.
-#' @param x
-#' A \code{\link{lineagePath}} object
-#' @param y
-#' Whether plot the nodes from the \code{extendedSearch} in
-#' \code{\link{fixationSites}}
-#' @param showTips
-#' Whether to plot the tip labels. The default is \code{FALSE}.
+#' @name visualization
+#' @title Visualize results
+#' @description Visualize \code{\link{lineagePath}} object. A tree diagram will
+#'   be plotted and paths are black solid line while the trimmed nodes and tips
+#'   will use grey dashed line.
+#' @param x Could be a \code{\link{lineagePath}} object, a
+#'   \code{\link{fixationSites}} object or a \code{sitePath} object.
+#' @param y For \code{\link{lineagePath}} object, it is deprecated. For a
+#'   \code{\link{fixationSites}} object, it is whether to show the fixation
+#'   mutation between clusters. For a \code{sitePath} object, it can have more
+#'   than one fixation path. This is to select which path to plot. The default
+#'   is \code{NULL} which will plot all the paths.
+#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Arguments in \code{plot.phylo} functions.
-#' @return
-#' The function only makes plot and returns no value
-#' (It behaviors like the generic \code{\link{plot}} function).
+#' @return The function only makes plot and returns no value (It behaviors like
+#'   the generic \code{\link{plot}} function).
 #' @examples
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' plot(lineagePath(tree))
+#' paths <- lineagePath(tree)
+#' plot(paths)
+#' @importFrom graphics plot
 #' @importFrom ape plot.phylo
-#' @importFrom graphics title
 #' @export
-plot.lineagePath <- function(x,
-                             y = TRUE,
-                             showTips = FALSE,
-                             ...) {
+plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
     tree <- ladderize(tree, right = FALSE)
     nEdges <- length(tree$edge.length)
@@ -38,131 +35,73 @@ plot.lineagePath <- function(x,
     lty[targetEdges] <- 1
     width[targetEdges] <- 2
     # TODO: Emphaszie the nodes along the lineagePath
+    show.tip.label <- showTips
     plot.phylo(
         tree,
         edge.color = color,
         edge.lty = lty,
         edge.width = width,
-        show.tip.label = showTips,
+        show.tip.label = show.tip.label,
         ...
     )
 }
 
-AA_COLORS <- c(
-    His = "#8282D2",
-    Arg = "#9370DB",
-    Lys = "#145AFF",
-    Ile = "#55AE3A",
-    Phe = "#3232AA",
-    Leu = "#0F820F",
-    Trp = "#B45AB4",
-    Ala = "#C8C8C8",
-    Met = "#FFD700",
-    Pro = "#DC9682",
-    Val = "#2F4F2F",
-    Asn = "#00DCDC",
-    Cys = "#E6E600",
-    Gly = "#666666",
-    Ser = "#FF6347",
-    Tyr = "#ADD8E6",
-    Gln = "#0099CC",
-    Thr = "#FA9600",
-    Glu = "#8C1717",
-    Asp = "#E60A0A",
-    gap = "#000000",
-    unknown = "#d3d3d3",
-    Ile_or_Leu = "#d3d3d3",
-    Asp_or_Asn = "#d3d3d3",
-    Glu_or_Gln = "#d3d3d3"
-)
-
-AA_FULL_NAMES <- c(
-    h = "His",
-    r = "Arg",
-    k = "Lys",
-    i = "Ile",
-    f = "Phe",
-    l = "Leu",
-    w = "Trp",
-    a = "Ala",
-    m = "Met",
-    p = "Pro",
-    v = "Val",
-    n = "Asn",
-    c = "Cys",
-    g = "Gly",
-    s = "Ser",
-    y = "Tyr",
-    q = "Gln",
-    t = "Thr",
-    e = "Glu",
-    d = "Asp",
-    `-` = "gap",
-    x = "unknown",
-    j = "Ile_or_Leu",
-    b = "Asp_or_Asn",
-    z = "Glu_or_Gln"
-)
-
-AA_SHORT_NAMES <- c(
-    His = "H",
-    Arg = "R",
-    Lys = "K",
-    Ile = "I",
-    Phe = "F",
-    Leu = "L",
-    Trp = "W",
-    Ala = "A",
-    Met = "M",
-    Pro = "P",
-    Val = "V",
-    Asn = "N",
-    Cys = "C",
-    Gly = "G",
-    Ser = "S",
-    Tyr = "Y",
-    Gln = "Q",
-    Thr = "T",
-    Glu = "E",
-    Asp = "D",
-    gap = "-",
-    unknown = "X",
-    Ile_or_Leu = "J",
-    Asp_or_Asn = "B",
-    Glu_or_Gln = "Z"
-)
-
-#' @name plot.sitePath
-#' @title Plot the fixation mutation
-#' @description
-#' Visualize the \code{sitePath} object which is the basic unit of the
-#' result of \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
-#' @param x
-#' A \code{sitePath} object
-#' @param y
-#' A \code{sitePath} object can have more than one fixation path.
-#' This is to select which path to plot. The default is NULL which
-#' will plot all the paths.
-#' @param showTips
-#' Whether to plot the tip labels. The default is \code{FALSE}.
-#' @param ...
-#' Arguments in \code{plot.phylo} functions and other arguments.
-#' @return
-#' The function only makes plot and returns no value
-#' (It behaviors like the generic \code{\link{plot}} function).
+#' @name visualization
+#' @description Visualize \code{\link{fixationSites}} object. The tips are
+#'   clustered according to the fixation sites. The transition of fixation sites
+#'   will be plotted as a phylogenetic tree. The length of each branch
+#'   represents the number of fixation mutation between two clusters. The name
+#'   of the tree tips indicate the number of sequences in the cluster.
+#' @param recurringOnly whether to plot recurring fixation mutation only. The
+#'   default is FALSE.
 #' @examples
-#' data(zikv_align_reduced)
-#' data(zikv_tree_reduced)
-#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
-#' paths <- lineagePath(tree)
 #' fixations <- fixationSites(paths)
-#' plot(fixations[[1]])
-#' @seealso \code{\link{plotSingleSite}}
+#' plot(fixations)
+#' @importFrom ape edgelabels
 #' @export
-plot.sitePath <- function(x,
-                          y = NULL,
-                          showTips = FALSE,
-                          ...) {
+plot.fixationSites <- function(x,
+                               y = TRUE,
+                               showTips = FALSE,
+                               recurringOnly = FALSE,
+                               ...) {
+    snpTracing <- attr(x, "snpTracing")
+    edgeSNPs <- attr(snpTracing, "edgeSNPs")
+    if (recurringOnly) {
+        allMutSites <- unlist(edgeSNPs)
+        duplicatedSites <-
+            unique(allMutSites[which(duplicated(allMutSites))])
+        edgeSNPs <- lapply(edgeSNPs, function(sites) {
+            sites[which(sites %in% duplicatedSites)]
+        })
+    }
+    edge2show <- which(lengths(edgeSNPs) != 0)
+    show.tip.label <- showTips
+    plot.phylo(snpTracing, show.tip.label = show.tip.label, ...)
+    if (y) {
+        edgelabels(
+            text = vapply(
+                edgeSNPs[edge2show],
+                paste,
+                collapse = ", ",
+                FUN.VALUE = character(1)
+            ),
+            edge = edge2show
+        )
+    }
+}
+
+#' @name visualization
+#' @description Visualize the \code{sitePath} object which can be extracted by
+#'   using \code{\link{extractSite}} on the return of
+#'   \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
+#' @examples
+#' sp <- extractSite(fixations, 139)
+#' plot(sp)
+#' @importFrom graphics title
+#' @importFrom graphics legend
+#' @seealso \code{\link{plotSingleSite}}, \code{\link{extractSite}}
+#' @export
+plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
     # Prepare tree for plotting
     tree <- ladderize(tree, right = FALSE)
@@ -200,9 +139,10 @@ plot.sitePath <- function(x,
         plotName <-
             c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
+    show.tip.label <- showTips
     plot.phylo(
         tree,
-        show.tip.label = showTips,
+        show.tip.label = show.tip.label,
         edge.color = color,
         edge.lty = lty,
         edge.width = width,
@@ -226,27 +166,20 @@ plot.sitePath <- function(x,
 #' @rdname plotSingleSite
 #' @name plotSingleSite
 #' @title Color the tree by a single site
-#' @description
-#' For \code{lineagePath}, the tree will be colored according to the amino
-#' acid of the site. The color scheme tries to assign distinguishable
-#' color for each amino acid.
-#' @param x
-#' A \code{fixationSites} object from \code{\link{fixationSites}} or
-#' the return from \code{\link{addMSA}} function.
-#' @param site
-#' One of the mutations in the \code{fixationSites} object. It should
-#' be from the \code{\link{names}} of the object. Or an integer to
-#' indicate a site could be provide. The numbering is consistent with
-#' the reference defined at \code{\link{fixationSites}}.
-#' @param showPath
-#' If plot the lineage result from lineagePath.
-#' @param showTips
-#' Whether to plot the tip labels. The default is \code{FALSE}.
-#' @param ...
-#' Arguments in \code{plot.phylo} functions and other arguments.
-#' @return
-#' The function only makes plot and returns no value
-#' (It behaviors like the generic \code{\link{plot}} function).
+#' @description For \code{lineagePath}, the tree will be colored according to
+#'   the amino acid of the site. The color scheme tries to assign
+#'   distinguishable color for each amino acid.
+#' @param x A \code{fixationSites} object from \code{\link{fixationSites}} or
+#'   the return from \code{\link{addMSA}} function.
+#' @param site One of the mutations in the \code{fixationSites} object. It
+#'   should be from the \code{\link{names}} of the object. Or an integer to
+#'   indicate a site could be provide. The numbering is consistent with the
+#'   reference defined at \code{\link{fixationSites}}.
+#' @param showPath If plot the lineage result from lineagePath.
+#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
+#' @param ... Arguments in \code{plot.phylo} functions and other arguments.
+#' @return The function only makes plot and returns no value (It behaviors like
+#'   the generic \code{\link{plot}} function).
 #' @examples
 #' data(zikv_tree)
 #' data(zikv_align)
@@ -256,8 +189,6 @@ plot.sitePath <- function(x,
 #' @seealso \code{\link{plot.sitePath}}
 #' @importFrom ape ladderize
 #' @importFrom ape getMRCA
-#' @importFrom graphics plot
-#' @importFrom graphics legend
 #' @export
 plotSingleSite.lineagePath <- function(x,
                                        site,
@@ -298,9 +229,10 @@ plotSingleSite.lineagePath <- function(x,
         color[targetEdges] <- "#000000"
         width[targetEdges] <- 2
     }
+    show.tip.label <- showTips
     plot.phylo(
         tree,
-        show.tip.label = showTips,
+        show.tip.label = show.tip.label,
         edge.color = color,
         edge.width = width,
         main = site,
@@ -316,12 +248,10 @@ plotSingleSite.lineagePath <- function(x,
 }
 
 #' @rdname plotSingleSite
-#' @description
-#' For \code{fixationSites}, it will color the ancestral tips in red,
-#' descendant tips in blue and excluded tips in grey.
-#' @param select
-#' Select which fixation path in to plot. The default is NULL which
-#' will plot all the fixations.
+#' @description For \code{fixationSites}, it will color the ancestral tips in
+#'   red, descendant tips in blue and excluded tips in grey.
+#' @param select Select which fixation path in to plot. The default is NULL
+#'   which will plot all the fixations.
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
@@ -341,10 +271,9 @@ plotSingleSite.fixationSites <- function(x,
 }
 
 #' @rdname plotSingleSite
-#' @description
-#' For \code{multiFixationSites}, it will color the tips which have
-#' their site fixed. The color will use the same amino acid color
-#' scheme as \code{plotSingleSite.lineagePath}
+#' @description For \code{multiFixationSites}, it will color the tips which have
+#'   their site fixed. The color will use the same amino acid color scheme as
+#'   \code{plotSingleSite.lineagePath}
 #' @examples
 #' \dontrun{
 #' multiFixations <- multiFixationSites(paths)

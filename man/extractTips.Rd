@@ -21,31 +21,30 @@
 \method{extractSite}{multiFixationSites}(x, site, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} or a \code{multiFixationSites} or
-a \code{sitePath} object.}
+\item{x}{A \code{fixationSites} or a \code{multiFixationSites} or a
+\code{sitePath} object.}
 
 \item{site}{A site predicted to experience fixation.}
 
-\item{select}{For a site, there theoretically might be more than one
-fixation on different lineages. You may use this argument
-to extract for a specific fixation of a site. The default
-is the first fixation of the site.}
+\item{select}{For a site, there theoretically might be more than one fixation
+on different lineages. You may use this argument to extract for a specific
+fixation of a site. The default is the first fixation of the site.}
 
 \item{...}{Other arguments}
 }
 \value{
-The function \code{extractTips} returns the name of the
-tips involved in the fixation.
+The function \code{extractTips} returns the name of the tips involved
+  in the fixation.
 
 The function \code{extractSite} returns a \code{sitePath} object
 }
 \description{
-The result of \code{\link{fixationSites}} contains all the possible sites
-with fixation mutation. The function \code{extractTips} retrieves
-the name of the tips involved in the fixation.
+The result of \code{\link{fixationSites}} contains all the
+  possible sites with fixation mutation. The function \code{extractTips}
+  retrieves the name of the tips involved in the fixation.
 
-The function \code{extractSite} can be used to extract the fixation info
-of a single site.
+The function \code{extractSite} can be used to extract the
+  fixation info of a single site.
 }
 \examples{
 data(zikv_tree_reduced)

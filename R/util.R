@@ -1,30 +1,23 @@
 #' @rdname addMSA
 #' @name addMSA
 #' @title Prepare data for sitePath analysis
-#' @description
-#' sitePath requires both tree and sequence alignment to do the analysis.
-#' \code{addMSA} wraps \code{read.alignment} function in \code{seqinr} package
-#' and helps match names in tree and sequence alignment. Either
-#' provide the file path to an alignment file and its format or an alignment
-#' object from the return of \code{read.alignment} function. If both the file
-#' path and alignment object are given, the function will use the sequence
-#' in the alignment file.
-#' @param tree
-#' a \code{phylo} object. This commonly can be from tree parsing function
-#' in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
-#' found in the sequence alignment.
-#' @param msaPath
-#' The file path to the multiple sequence alignment file
-#' @param msaFormat
-#' The format of the multiple sequence alignment file
-#' @param alignment
-#' an \code{alignment} object. This commonly can be
-#' from sequence parsing function in the \code{seqinr} package.
-#' Sequence names in the alignment should include all \code{tip.label}
-#' in the tree
-#' @return
-#' \code{addMSA} returns a \code{phylo} object with matched
-#' multiple sequence alignment
+#' @description sitePath requires both tree and sequence alignment to do the
+#'   analysis. \code{addMSA} wraps \code{read.alignment} function in
+#'   \code{seqinr} package and helps match names in tree and sequence alignment.
+#'   Either provide the file path to an alignment file and its format or an
+#'   alignment object from the return of \code{read.alignment} function. If both
+#'   the file path and alignment object are given, the function will use the
+#'   sequence in the alignment file.
+#' @param tree a \code{phylo} object. This commonly can be from tree parsing
+#'   function in \code{ape} or \code{ggtree}. All the \code{tip.label} should be
+#'   found in the sequence alignment.
+#' @param msaPath The file path to the multiple sequence alignment file
+#' @param msaFormat The format of the multiple sequence alignment file
+#' @param alignment an \code{alignment} object. This commonly can be from
+#'   sequence parsing function in the \code{seqinr} package. Sequence names in
+#'   the alignment should include all \code{tip.label} in the tree
+#' @return \code{addMSA} returns a \code{phylo} object with matched multiple
+#'   sequence alignment
 #' @examples
 #' data(zikv_tree)
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
@@ -73,24 +66,20 @@ addMSA <- function(tree,
 #' @rdname setSiteNumbering
 #' @name setSiteNumbering
 #' @title Set site numbering to the reference sequence
-#' @description
-#' A reference sequence can be used to define a global site numbering
-#' scheme for multiple sequence alignment. The gap in the reference
-#' will be skipped so the site ignored in numbering.
-#' @param x
-#' The object to set site numbering. It could be a \code{phylo} object
-#' after \code{\link{addMSA}} or a \code{lineagePath} object. The function
-#' for \code{fixaitonSites} and \code{multiFixationSites} will be
-#' added in later version.
-#' @param reference
-#' Name of reference for site numbering. The name has to be one of the
-#' sequences' name. The default uses the intrinsic alignment numbering
-#' @param gapChar
-#' The character to indicate gap. The numbering will skip the gapChar
-#' for the reference sequence.
+#' @description A reference sequence can be used to define a global site
+#'   numbering scheme for multiple sequence alignment. The gap in the reference
+#'   will be skipped so the site ignored in numbering.
+#' @param x The object to set site numbering. It could be a \code{phylo} object
+#'   after \code{\link{addMSA}} or a \code{lineagePath} object. The function for
+#'   \code{fixaitonSites} and \code{multiFixationSites} will be added in later
+#'   version.
+#' @param reference Name of reference for site numbering. The name has to be one
+#'   of the sequences' name. The default uses the intrinsic alignment numbering
+#' @param gapChar The character to indicate gap. The numbering will skip the
+#'   gapChar for the reference sequence.
 #' @param ... further arguments passed to or from other methods.
-#' @return
-#' A \code{phylo} object with site numbering mapped to reference sequence
+#' @return A \code{phylo} object with site numbering mapped to reference
+#'   sequence
 #' @examples
 #' data(zikv_tree)
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
@@ -129,87 +118,6 @@ setSiteNumbering <- function(x, reference, gapChar, ...)
     UseMethod("setSiteNumbering")
 
 # TODO: Need a class called "reference" for site numbering
-
-#' @name zikv_align
-#' @title Multiple sequence alignment of Zika virus polyprotein
-#' @description
-#' The raw protein sequences were downloaded from ViPR database
-#' (\url{https://www.viprbrc.org/}) and aliged using MAFFT.
-#' with default settings.
-#' @format a \code{alignment} object
-#' @usage data(zikv_align)
-#' @docType data
-"zikv_align"
-
-#' @name zikv_tree
-#' @title Phylogenetic tree of Zika virus polyprotein
-#' @description
-#' Tree was built from \code{\link{zikv_align}} using RAxML
-#' with default settings.The tip ANK57896 was used as
-#' outgroup to root the tree.
-#' @format a \code{phylo} object
-#' @usage data(zikv_tree)
-#' @docType data
-"zikv_tree"
-
-#' @name h3n2_align
-#' @title Multiple sequence alignment of H3N2's HA protein
-#' @description
-#' The raw protein sequences were downloaded from NCBI database.
-#' @format a \code{alignment} object
-#' @usage data(h3n2_align)
-#' @docType data
-"h3n2_align"
-
-#' @name h3n2_tree
-#' @title Phylogenetic tree of H3N2's HA protein
-#' @description
-#' Tree was built from \code{\link{h3n2_align}} using RAxML
-#' with default settings.
-#' @format a \code{phylo} object
-#' @usage data(h3n2_tree)
-#' @docType data
-"h3n2_tree"
-
-#' @name zikv_align_reduced
-#' @title Truncated data for runnable example
-#' @description
-#' This is a truncated version of \code{\link{zikv_align}}
-#' @format a \code{alignment} object
-#' @usage data(zikv_align_reduced)
-#' @docType data
-"zikv_align_reduced"
-
-#' @name zikv_tree_reduced
-#' @title Truncated data for runnable example
-#' @description
-#' This is a truncated version of \code{\link{zikv_tree}}
-#' @format a \code{phylo} object
-#' @usage data(zikv_tree_reduced)
-#' @docType data
-"zikv_tree_reduced"
-
-#' @name h3n2_align_reduced
-#' @title Truncated data for runnable example
-#' @description
-#' This is a truncated version of \code{\link{h3n2_align}}
-#' @format a \code{alignment} object
-#' @usage data(h3n2_align_reduced)
-#' @docType data
-"h3n2_align_reduced"
-
-#' @name h3n2_tree_reduced
-#' @title Truncated data for runnable example
-#' @description
-#' This is a truncated version of \code{\link{h3n2_tree}}
-#' @format a \code{phylo} object
-#' @usage data(h3n2_tree_reduced)
-#' @docType data
-"h3n2_tree_reduced"
-
-#' @useDynLib sitePath
-#' @importFrom Rcpp sourceCpp
-NULL
 
 .checkReference <- function(tree, align, reference, gapChar) {
     if (is.null(reference)) {
@@ -278,3 +186,159 @@ NULL
     attributes(paths) <- attrs
     return(paths)
 }
+
+#' @name zikv_align
+#' @title Multiple sequence alignment of Zika virus polyprotein
+#' @description The raw protein sequences were downloaded from ViPR database
+#'   (\url{https://www.viprbrc.org/}) and aliged using MAFFT. with default
+#'   settings.
+#' @format a \code{alignment} object
+#' @usage data(zikv_align)
+#' @docType data
+"zikv_align"
+
+#' @name zikv_tree
+#' @title Phylogenetic tree of Zika virus polyprotein
+#' @description Tree was built from \code{\link{zikv_align}} using RAxML with
+#'   default settings.The tip ANK57896 was used as outgroup to root the tree.
+#' @format a \code{phylo} object
+#' @usage data(zikv_tree)
+#' @docType data
+"zikv_tree"
+
+#' @name h3n2_align
+#' @title Multiple sequence alignment of H3N2's HA protein
+#' @description The raw protein sequences were downloaded from NCBI database.
+#' @format a \code{alignment} object
+#' @usage data(h3n2_align)
+#' @docType data
+"h3n2_align"
+
+#' @name h3n2_tree
+#' @title Phylogenetic tree of H3N2's HA protein
+#' @description Tree was built from \code{\link{h3n2_align}} using RAxML with
+#'   default settings.
+#' @format a \code{phylo} object
+#' @usage data(h3n2_tree)
+#' @docType data
+"h3n2_tree"
+
+#' @name zikv_align_reduced
+#' @title Truncated data for runnable example
+#' @description This is a truncated version of \code{\link{zikv_align}}
+#' @format a \code{alignment} object
+#' @usage data(zikv_align_reduced)
+#' @docType data
+"zikv_align_reduced"
+
+#' @name zikv_tree_reduced
+#' @title Truncated data for runnable example
+#' @description This is a truncated version of \code{\link{zikv_tree}}
+#' @format a \code{phylo} object
+#' @usage data(zikv_tree_reduced)
+#' @docType data
+"zikv_tree_reduced"
+
+#' @name h3n2_align_reduced
+#' @title Truncated data for runnable example
+#' @description This is a truncated version of \code{\link{h3n2_align}}
+#' @format a \code{alignment} object
+#' @usage data(h3n2_align_reduced)
+#' @docType data
+"h3n2_align_reduced"
+
+#' @name h3n2_tree_reduced
+#' @title Truncated data for runnable example
+#' @description This is a truncated version of \code{\link{h3n2_tree}}
+#' @format a \code{phylo} object
+#' @usage data(h3n2_tree_reduced)
+#' @docType data
+"h3n2_tree_reduced"
+
+#' @useDynLib sitePath
+#' @importFrom Rcpp sourceCpp
+NULL
+
+AA_COLORS <- c(
+    His = "#8282D2",
+    Arg = "#9370DB",
+    Lys = "#145AFF",
+    Ile = "#55AE3A",
+    Phe = "#3232AA",
+    Leu = "#0F820F",
+    Trp = "#B45AB4",
+    Ala = "#C8C8C8",
+    Met = "#FFD700",
+    Pro = "#DC9682",
+    Val = "#2F4F2F",
+    Asn = "#00DCDC",
+    Cys = "#E6E600",
+    Gly = "#666666",
+    Ser = "#FF6347",
+    Tyr = "#ADD8E6",
+    Gln = "#0099CC",
+    Thr = "#FA9600",
+    Glu = "#8C1717",
+    Asp = "#E60A0A",
+    gap = "#000000",
+    unknown = "#d3d3d3",
+    Ile_or_Leu = "#d3d3d3",
+    Asp_or_Asn = "#d3d3d3",
+    Glu_or_Gln = "#d3d3d3"
+)
+
+AA_FULL_NAMES <- c(
+    h = "His",
+    r = "Arg",
+    k = "Lys",
+    i = "Ile",
+    f = "Phe",
+    l = "Leu",
+    w = "Trp",
+    a = "Ala",
+    m = "Met",
+    p = "Pro",
+    v = "Val",
+    n = "Asn",
+    c = "Cys",
+    g = "Gly",
+    s = "Ser",
+    y = "Tyr",
+    q = "Gln",
+    t = "Thr",
+    e = "Glu",
+    d = "Asp",
+    `-` = "gap",
+    x = "unknown",
+    j = "Ile_or_Leu",
+    b = "Asp_or_Asn",
+    z = "Glu_or_Gln"
+)
+
+AA_SHORT_NAMES <- c(
+    His = "H",
+    Arg = "R",
+    Lys = "K",
+    Ile = "I",
+    Phe = "F",
+    Leu = "L",
+    Trp = "W",
+    Ala = "A",
+    Met = "M",
+    Pro = "P",
+    Val = "V",
+    Asn = "N",
+    Cys = "C",
+    Gly = "G",
+    Ser = "S",
+    Tyr = "Y",
+    Gln = "Q",
+    Thr = "T",
+    Glu = "E",
+    Asp = "D",
+    gap = "-",
+    unknown = "X",
+    Ile_or_Leu = "J",
+    Asp_or_Asn = "B",
+    Glu_or_Gln = "Z"
+)

@@ -34,57 +34,58 @@ SNPsites(tree, minSNP = NULL)
 
 \item{minSNP}{Minimum number of amino acid variation to be a SNP}
 
-\item{paths}{a \code{lineagePath} object returned from \code{\link{lineagePath}} function
-or a \code{phylo} object after \code{\link{addMSA}}}
+\item{paths}{a \code{lineagePath} object returned from
+\code{\link{lineagePath}} function or a \code{phylo} object after
+\code{\link{addMSA}}}
 
-\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree tips involved
-before/after mutation. Otherwise the mutation will not be counted into
-the return. If more than one number is given, the ancestral takes the first
-and descendant takes the second as the minimum. If only given one number,
-it's the minimum for both ancestral and descendant.}
+\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree
+tips involved before/after mutation. Otherwise the mutation will not be
+counted into the return. If more than one number is given, the ancestral
+takes the first and descendant takes the second as the minimum. If only
+given one number, it's the minimum for both ancestral and descendant.}
 
-\item{searchDepth}{The function uses heuristic search but the termination of the search
-cannot be intrinsically decided. \code{searchDepth} is needed to tell
-the search when to stop.}
+\item{searchDepth}{The function uses heuristic search but the termination of
+the search cannot be intrinsically decided. \code{searchDepth} is needed to
+tell the search when to stop.}
 
-\item{method}{The strategy for predicting the fixation. The basic approach is entropy
-minimization and can be achieved by adding or removing fixation point,
-or by comparing the two.}
+\item{method}{The strategy for predicting the fixation. The basic approach is
+entropy minimization and can be achieved by adding or removing fixation
+point, or by comparing the two.}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{samplingSize}{The number of tips sampled for each round of resampling. It shoud be
-at least 10th and at most nine 10ths of the tree tips.}
+\item{samplingSize}{The number of tips sampled for each round of resampling.
+It shoud be at least 10th and at most nine 10ths of the tree tips.}
 
-\item{samplingTimes}{The total times of random sampling to do. It should be greater than 100.}
+\item{samplingTimes}{The total times of random sampling to do. It should be
+greater than 100.}
 }
 \value{
 \code{SNPsite} returns a list of qualified SNP site
 
-\code{fixationSites} returns a list of fixation mutations
-with names of the tips involved.
+\code{fixationSites} returns a list of fixation mutations with names
+  of the tips involved.
 
 \code{multiFixationSites} returns sites with multiple fixations.
 }
 \description{
-Single nucleotide polymorphism (SNP) in the whole package refers to
-variation of amino acid. \code{findSNPsite} will try to find SNP in
-the multiple sequence alignment. A reference sequence
-and gap character may be specified to number the site. This is
-irrelevant to the intended analysis but might be helpful to evaluate
-the performance of \code{fixationSites}.
+Single nucleotide polymorphism (SNP) in the whole package refers
+  to variation of amino acid. \code{findSNPsite} will try to find SNP in the
+  multiple sequence alignment. A reference sequence and gap character may be
+  specified to number the site. This is irrelevant to the intended analysis
+  but might be helpful to evaluate the performance of \code{fixationSites}.
 
-After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-\code{fixationSites} uses the result to find those sites that show
-fixation on some, if not all, of the lineages. Parallel evolution is
-relatively common in RNA virus. There is chance that some site be fixed
-in one lineage but does not show fixation because of different
-sequence context.
+After finding the \code{\link{lineagePath}} of a phylogenetic
+  tree, \code{fixationSites} uses the result to find those sites that show
+  fixation on some, if not all, of the lineages. Parallel evolution is
+  relatively common in RNA virus. There is chance that some site be fixed in
+  one lineage but does not show fixation because of different sequence
+  context.
 
-After finding the \code{\link{lineagePath}} of a phylogenetic tree,
-\code{multiFixationSites} uses random sampling on the original tree
-and applies the method used in \code{fixationSites} to each sampled
-tree and summarize the results from all the samples.
+After finding the \code{\link{lineagePath}} of a phylogenetic
+  tree, \code{multiFixationSites} uses random sampling on the original tree
+  and applies the method used in \code{fixationSites} to each sampled tree
+  and summarize the results from all the samples.
 }
 \examples{
 data(zikv_tree_reduced)

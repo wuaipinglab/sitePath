@@ -1,25 +1,18 @@
 #' @rdname extractTips
 #' @name extractTips
 #' @title Extract info for fixation of a single site
-#' @description
-#' The result of \code{\link{fixationSites}} contains all the possible sites
-#' with fixation mutation. The function \code{extractTips} retrieves
-#' the name of the tips involved in the fixation.
-#' @param x
-#' A \code{fixationSites} or a \code{multiFixationSites} or
-#' a \code{sitePath} object.
-#' @param site
-#' A site predicted to experience fixation.
-#' @param select
-#' For a site, there theoretically might be more than one
-#' fixation on different lineages. You may use this argument
-#' to extract for a specific fixation of a site. The default
-#' is the first fixation of the site.
-#' @param ...
-#' Other arguments
-#' @return
-#' The function \code{extractTips} returns the name of the
-#' tips involved in the fixation.
+#' @description The result of \code{\link{fixationSites}} contains all the
+#'   possible sites with fixation mutation. The function \code{extractTips}
+#'   retrieves the name of the tips involved in the fixation.
+#' @param x A \code{fixationSites} or a \code{multiFixationSites} or a
+#'   \code{sitePath} object.
+#' @param site A site predicted to experience fixation.
+#' @param select For a site, there theoretically might be more than one fixation
+#'   on different lineages. You may use this argument to extract for a specific
+#'   fixation of a site. The default is the first fixation of the site.
+#' @param ... Other arguments
+#' @return The function \code{extractTips} returns the name of the tips involved
+#'   in the fixation.
 #' @examples
 #' data(zikv_tree_reduced)
 #' data(zikv_align_reduced)
@@ -57,11 +50,9 @@ extractTips <- function(x, ...)
 
 #' @rdname extractTips
 #' @name extractSite
-#' @description
-#' The function \code{extractSite} can be used to extract the fixation info
-#' of a single site.
-#' @return
-#' The function \code{extractSite} returns a \code{sitePath} object
+#' @description The function \code{extractSite} can be used to extract the
+#'   fixation info of a single site.
+#' @return The function \code{extractSite} returns a \code{sitePath} object
 #' @examples
 #' extractSite(mutations, 139)
 #' @export
