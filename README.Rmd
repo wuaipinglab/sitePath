@@ -1,6 +1,7 @@
 ---
 output: 
-    rmarkdown::md_document
+    rmarkdown::md_document:
+        variant: gfm
 ---
 
 # sitePath: an R package for detection of site fixation in molecular evolution
@@ -87,7 +88,6 @@ Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePat
 
 ```{r get_sitePath}
 paths <- lineagePath(tree, 0.05)
-paths
 ```
 
 ## 4 Hierarchical search for fixation events
@@ -96,28 +96,17 @@ Now you're ready to find fixation events.
 
 ### 4.1 Fixation mutations
 
-The hierarchical search with resampling method is done by `multiFixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation.
+The hierarchical search with resampling method is done by `multiFixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation. The hiearchy search without resampling is `fixationSites`.
 
-<!-- ```{r find_fixations, results='hide'} -->
-<!-- fixations <- multiFixationSites(paths) -->
-<!-- ``` -->
-
-The hiearchy search without resampling is `fixationSites`. Here we use HA protein fragment of influenza H3N2 as an example
-
-```{r no_resampling}
-data(h3n2_align)
-data(h3n2_tree)
-
-h3n2 <- addMSA(h3n2_tree, alignment = h3n2_align)
-h3n2_paths <- lineagePath(h3n2)
-h3n2_fixations <- fixationSites(h3n2_paths)
+```{r fixationSites}
+fixations <- fixationSites(paths)
 ```
 
-### 4.2 Visualize the result
+### 4.2 View the result
 
 If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractTips` function. The output is a `sitePath` object which stores the tip names. A `sitePath` object can be visualized by using `plot` function.
 
 ```{r get_tipNames}
-print(h3n2_fixations)
-extractSite(h3n2_fixations, 208)
+print(fixations)
+extractSite(fixations, 139)
 ```

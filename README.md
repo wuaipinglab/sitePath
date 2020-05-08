@@ -1,10 +1,8 @@
-sitePath: an R package for detection of site fixation in molecular evolution
-============================================================================
+# sitePath: an R package for detection of site fixation in molecular evolution
 
-1 How to install
-----------------
+## 1 How to install
 
-You’ll need [R programming language](https://cran.r-project.org/) &gt;=
+You’ll need [R programming language](https://cran.r-project.org/) \>=
 3.6.0 to use sitePath.
 
 ### 1.1 Dependencies
@@ -16,14 +14,14 @@ Some dependencies are required before installation.
 Please make sure the external tool is installed accordingly or **the
 installation from source code will fail definitely**:
 
--   For windows,
+  - For windows,
     [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
--   For Mac, **Xcode command line tools** or
+  - For Mac, **Xcode command line tools** or
     [tools](https://cran.r-project.org/bin/macosx/tools/) provided by
     CRAN.
 
--   For Ubuntu/Debian, `r-devel` or `r-base-dev` package from the apt
+  - For Ubuntu/Debian, `r-devel` or `r-base-dev` package from the apt
     repository.
 
 #### 1.1.2 R packages
@@ -31,7 +29,9 @@ installation from source code will fail definitely**:
 You can install the dependency R packages manually using the code below
 if R doesn’t automatically install them for you.
 
-    install.packages(c("ape", "seqinr", "Rcpp"))
+``` r
+install.packages(c("ape", "seqinr", "Rcpp"))
+```
 
 ### 1.2 Installation
 
@@ -43,7 +43,9 @@ find the file named ‘**Source code** (tar.gz)’. Download the file and
 save the file to `path_to_source_code` and use the code below to finish
 the installtion.
 
-    install.packages(path_to_source_code, repos = NULL)
+``` r
+install.packages(path_to_source_code, repos = NULL)
+```
 
 #### 1.2.2 Install from GitHub
 
@@ -51,11 +53,12 @@ To install the package from GitHub, you’ll need to install `devtools` R
 package. The package is still in the experimental stage but will give
 you the newest feature:
 
-    install.packages("devtools")
-    devtools::install_github("wuaipinglab/sitePath")
+``` r
+install.packages("devtools")
+devtools::install_github("wuaipinglab/sitePath")
+```
 
-2 Import tree and sequence alignment
-------------------------------------
+## 2 Import tree and sequence alignment
 
 There’re various R packages for parsing phylogenetic tree and multiple
 sequence alignment files. For now, `sitepath` accepts `phylo` object and
@@ -71,9 +74,11 @@ basic parsing function for reading tree files. The Bioconductor package
 [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html)
 provides more comprehensive parsing utilities.
 
-    library(ape)
+``` r
+library(ape)
 
-    tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
+tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
+```
 
 It is highly recommended that the file store a rooted tree as R would
 consider the tree is rooted by default and re-rooting the tree in R is
@@ -86,13 +91,14 @@ Most multiple sequence alignment format can be parsed by
 `sitePath` has a wrapper functin for parsing and adding the sequence
 alignment
 
-    library(sitePath)
+``` r
+library(sitePath)
 
-    alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
-    tree <- addMSA(tree, alignment_file, "fasta")
+alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
+tree <- addMSA(tree, alignment_file, "fasta")
+```
 
-3 Resolve phylogenetic lineages
--------------------------------
+## 3 Resolve phylogenetic lineages
 
 The names in tree and aligment must be matched. The fundamental approach
 in identifying phylogenetic lineages is trimming tree leaves/tips to
@@ -109,7 +115,9 @@ the tree topology hence there is no universal choice. The function
 paths. *The use of this function can be of great help in choosing the
 threshold.*
 
-    sneakPeek(tree, makePlot = FALSE)
+``` r
+sneakPeek(tree, makePlot = FALSE)
+```
 
     ##    similarity pathNum
     ## 1  0.30000000       1
@@ -125,18 +133,16 @@ threshold.*
 
 ### 3.2 Choose a threshold
 
-Use the function `lineagePath` to get a S3 sitePath class object[1] for
-downstream analysis. The choice of the threshold really depends. You can
-use the result from `sneakPeak` as a reference for threhold choosing.
-The result can be visualized by `plot` function.
+Use the function `lineagePath` to get a S3 sitePath class object\[1\]
+for downstream analysis. The choice of the threshold really depends. You
+can use the result from `sneakPeak` as a reference for threhold
+choosing. The result can be visualized by `plot` function.
 
-    paths <- lineagePath(tree, 0.05)
-    paths
+``` r
+paths <- lineagePath(tree, 0.05)
+```
 
-    ## 3 paths
-
-4 Hierarchical search for fixation events
------------------------------------------
+## 4 Hierarchical search for fixation events
 
 Now you’re ready to find fixation events.
 
@@ -144,22 +150,14 @@ Now you’re ready to find fixation events.
 
 The hierarchical search with resampling method is done by
 `multiFixationSites` function. The function outputs a list of mutations
-with the sequence names involved before and after the fixation.
+with the sequence names involved before and after the fixation. The
+hiearchy search without resampling is `fixationSites`.
 
-<!-- ```{r find_fixations, results='hide'} -->
-<!-- fixations <- multiFixationSites(paths) -->
-<!-- ``` -->
-The hiearchy search without resampling is `fixationSites`. Here we use
-HA protein fragment of influenza H3N2 as an example
+``` r
+fixations <- fixationSites(paths)
+```
 
-    data(h3n2_align)
-    data(h3n2_tree)
-
-    h3n2 <- addMSA(h3n2_tree, alignment = h3n2_align)
-    h3n2_paths <- lineagePath(h3n2)
-    h3n2_fixations <- fixationSites(h3n2_paths)
-
-### 4.2 Visualize the result
+### 4.2 View the result
 
 If you want to retrieve the tip names involved in the fixation of a
 site, you can pass the result of `fixationSites` and the site index to
@@ -167,20 +165,26 @@ site, you can pass the result of `fixationSites` and the site index to
 the tip names. A `sitePath` object can be visualized by using `plot`
 function.
 
-    print(h3n2_fixations)
+``` r
+print(fixations)
+```
 
     ## Result for 3 paths:
     ## 
-    ## 43 68 75 93 100 101 112 139 149 153 155 158 174 176 179 191 192 205 208 209 211 212 216 221 231 241 244 245 246 281 295 297 380 394 405 469 471 549 8 10 15 23 28 49 71 110 119 140 151 248 280 397 403 525 
+    ## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 
     ## No reference sequence specified. Using alignment numbering
 
-    extractSite(h3n2_fixations, 208)
+``` r
+extractSite(fixations, 139)
+```
 
-    ## Site 208 may experience fixation on 1 path(s):
+    ## Site 139 may experience fixation on 3 path(s):
     ## 
-    ## K(23) -> R(52) -> S(290) -> N(252) -> K(736) 
+    ## S139N (119->85) 
+    ## S139N (119->136) 
+    ## S139N (119->129) 
     ## 
     ## In the bracket are the number of tips involved before and after the fixation
 
-[1] The S3 sitePath object contains the nodes to represent phylogenetic
-lineages
+1.  The S3 sitePath object contains the nodes to represent phylogenetic
+    lineages
