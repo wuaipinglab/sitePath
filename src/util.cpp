@@ -207,7 +207,7 @@ Rcpp::IntegerVector tableAA(
         const int siteIndex
 ) {
     // Summarize the AAs for tree tips of a node
-    MinEntropy::aaSummary res;
+    std::map<std::string, int> res;
     for (int i = 0; i < seqs.size(); ++i) {
         res[std::string(1, seqs[i][siteIndex])]++;
     }

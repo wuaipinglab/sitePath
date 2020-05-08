@@ -23,12 +23,14 @@ lineagePath(tree, similarity = NULL, simMatrix = NULL, forbidTrivial = TRUE)
 If not provided, the mean similarity substract standard deviation of all
 sequences will be used. And for \code{lineagePath}, this decides how minor
 SNPs are to remove. If provided as fraction between 0 and 1, then the
-minimum number of SNP will be total tips times \code{similariy}. If provided
-as integer greater than 1, the minimum number will be \code{similariy}. The
-default \code{similariy} is 0.1 for \code{lineagePath}.}
+minimum number of SNP will be total tips times \code{similariy}. If
+provided as integer greater than 1, the minimum number will be
+\code{similariy}. The default \code{similariy} is 0.1 for
+\code{lineagePath}.}
 
-\item{simMatrix}{A diagonal matrix of similarities for each pair of sequences. This parameter
-will not have effect in the function \code{lineagePath}.}
+\item{simMatrix}{A diagonal matrix of similarities for each pair of
+sequences. This parameter will not have effect in the function
+\code{lineagePath}.}
 
 \item{forbidTrivial}{Does not allow trivial trimming}
 
@@ -41,21 +43,20 @@ path represent by node number
 }
 \description{
 \code{groupTips} uses sequence similarity to group tree tips.
-Members in a group are always constrained to share the same
-ancestral node. Similarity between two tips is derived from
-their multiple sequence alignment. The site will not be counted
-into total length if both are gap. Similarity is calculated
-as number of matched divided by the corrected total length.
-So far the detection of divergence is based on one simple rule:
-the miminal pairwise similarity. The two branches are decided to
-be divergent if the similarity is lower than the threshold.
-(Other more statistical approaches such as Kolmogorov-Smirnov
-Tests among pair-wise distance could be introduced in the future)
+  Members in a group are always constrained to share the same ancestral node.
+  Similarity between two tips is derived from their multiple sequence
+  alignment. The site will not be counted into total length if both are gap.
+  Similarity is calculated as number of matched divided by the corrected
+  total length. So far the detection of divergence is based on one simple
+  rule: the miminal pairwise similarity. The two branches are decided to be
+  divergent if the similarity is lower than the threshold. (Other more
+  statistical approaches such as Kolmogorov-Smirnov Tests among pair-wise
+  distance could be introduced in the future)
 
-\code{lineagePath} finds the lineages of a phylogenetic tree providing
-the corresponding sequence alignment. This is done by finding 'major SNPs'
-which usually accumulate along the evolutionary pathways.
-are added.
+\code{lineagePath} finds the lineages of a phylogenetic tree
+  providing the corresponding sequence alignment. This is done by finding
+  'major SNPs' which usually accumulate along the evolutionary pathways. are
+  added.
 }
 \examples{
 data('zikv_tree')

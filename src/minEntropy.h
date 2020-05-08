@@ -1,16 +1,16 @@
 /*
- * Try to use branch and bound algorithm for finding the best segmenting
- * against tree tips along a lineage path. The basic idea is that a path
- * contains several segmenting points alongside. And by adding or removing
- * those points, the tree tips will be segmented into groups.
+ * Try to use branch and bound algorithm for finding the best segmenting against
+ * tree tips along a lineage path. The basic idea is that a path contains
+ * several segmenting points alongside. And by adding or removing those points,
+ * the tree tips will be segmented into groups.
  *
- * By calculating Shannon Entropy, the purity of amino acid in all groups
- * amount to the total entropy. If using brute force, there is a max
- * number of 2^n calculations to find the minimum entropy.
+ * By calculating Shannon Entropy, the purity of amino acid in all groups amount
+ * to the total entropy. If using brute force, there is a max number of 2^n
+ * calculations to find the minimum entropy.
  *
- * In branch and bound algorithm, each node represent a combination of
- * segment points. We start from no points and all points and converge
- * the result of two search trees.
+ * In branch and bound algorithm, each node represent a combination of segment
+ * points. We start from no points and all points and converge the result of two
+ * search trees.
  */
 
 #ifndef SITEPATH_MINENTROPY_H
@@ -64,10 +64,6 @@ protected:
             const std::vector<aaSummary> &aaSummaries,
             const unsigned int minEffectiveSize
     );
-    // Fixation score integrating entropy and tip numbers
-    float fixationScore(
-            const std::vector<aaSummary> &aaSummaries
-    );
 protected:
     // A list of the segment points which must include the enclosed point
     segment m_used;
@@ -75,8 +71,6 @@ protected:
     float m_entropy;
     // Whether the search node is qualified (minEffectiveSize)
     bool m_qualified;
-    // The fixation score integrating entropy and tip numbers
-    float m_score;
 };
 
 class Segmentor: public TreeSearchNode {

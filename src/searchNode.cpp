@@ -30,10 +30,6 @@ bool MinEntropy::TreeSearchNode::isQualified() const {
     return m_qualified;
 }
 
-float MinEntropy::TreeSearchNode::getScore() const {
-    return m_score;
-}
-
 float MinEntropy::TreeSearchNode::totalEntropy(
         const std::vector<aaSummary> &aaSummaries,
         const unsigned int minEffectiveSize
@@ -65,38 +61,6 @@ float MinEntropy::TreeSearchNode::totalEntropy(
         if (tipNum < minEffectiveSize) { m_qualified = false; }
         // TODO: tipNum can be used as total in calculating entropy
         res += shannonEntropy(values, tipNum);
-        // Update the starting segment point
-        start = *m_used_itr;
-    }
-    return res;
-}
-
-float MinEntropy::TreeSearchNode::fixationScore(
-        const std::vector<aaSummary> &aaSummaries
-) {
-    float res = 0.0;
-    segIndex start = 0;
-    // Iterate through all the used segment points
-    for (
-            segment::const_iterator m_used_itr = m_used.begin();
-            m_used_itr != m_used.end(); ++m_used_itr
-    ) {
-        unsigned int tipNum = 0;
-        aaSummary values;
-        // Iterate throught the tree nodes between the segment points
-        for (unsigned int i = start; i < *m_used_itr; ++i) {
-            // Get the tree node and its summary on amino acid of tips
-            // And combine them into a segment
-            const aaSummary toBeCombined = aaSummaries.at(i);
-            for (
-                    aaSummary::const_iterator it = toBeCombined.begin();
-                    it != toBeCombined.end(); ++it
-            ) {
-                values[it->first] += it->second;
-                tipNum += it->second;
-            }
-        }
-        res += std::exp(shannonEntropy(values, tipNum)) / tipNum;
         // Update the starting segment point
         start = *m_used_itr;
     }
