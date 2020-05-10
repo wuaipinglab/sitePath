@@ -9,7 +9,14 @@
 \usage{
 \method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
 
-\method{plot}{fixationSites}(x, y = TRUE, showTips = FALSE, recurringOnly = FALSE, ...)
+\method{plot}{fixationSites}(
+  x,
+  y = TRUE,
+  showTips = FALSE,
+  recurringOnly = FALSE,
+  minEffectiveSize = NULL,
+  ...
+)
 
 \method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 }
@@ -27,8 +34,10 @@ is \code{NULL} which will plot all the paths.}
 
 \item{...}{Arguments in \code{plot.phylo} functions.}
 
-\item{recurringOnly}{whether to plot recurring fixation mutation only. The
+\item{recurringOnly}{Whether to plot recurring fixation mutation only. The
 default is FALSE.}
+
+\item{minEffectiveSize}{The minimum size for a tip cluster in the plot}
 }
 \value{
 The function only makes plot and returns no value (It behaviors like
