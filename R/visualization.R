@@ -349,7 +349,11 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
         )))
     )
     attr(res, "tipClusters") <- tipClusters
-    attr(res, "edgeSNPs") <- edgeSNPs
+    attr(res, "edgeSNPs") <- lapply(seq_along(edgeSNPs), function(i) {
+        snp <- edgeSNPs[[i]]
+        attr(snp, "edge") <- res[["edge"]][i,]
+        return(snp)
+    })
     class(res) <- "phylo"
     return(res)
 }
@@ -377,7 +381,8 @@ plot.fixationSites <- function(x,
                                ...) {
     grouping <- .transitionClusters(x)
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- mean(lengths(unlist(grouping, recursive = FALSE)))
+        minEffectiveSize <-
+            mean(lengths(unlist(grouping, recursive = FALSE)))
     }
     snpTracing <- .snpTracing(grouping, minEffectiveSize)
     edgeSNPs <- attr(snpTracing, "edgeSNPs")
@@ -386,7 +391,9 @@ plot.fixationSites <- function(x,
         duplicatedSites <-
             unique(allMutSites[which(duplicated(allMutSites))])
         edgeSNPs <- lapply(edgeSNPs, function(sites) {
-            sites[which(sites %in% duplicatedSites)]
+            res <- sites[which(sites %in% duplicatedSites)]
+            attributes(res) <- attributes(sites)
+            return(res)
         })
     }
     edge2show <- which(lengths(edgeSNPs) != 0)
@@ -396,12 +403,18 @@ plot.fixationSites <- function(x,
     if (y) {
         edgelabels(
             text = vapply(
-                edgeSNPs[edge2show],
-                paste,
+                X = edgeSNPs[edge2show],
+                FUN = paste,
                 collapse = ", ",
                 FUN.VALUE = character(1)
             ),
-            edge = edge2show
+            edge = vapply(
+                X = edgeSNPs[edge2show],
+                FUN = function(i) {
+                    which(snpTracing[["edge"]][, 2] == attr(i, "edge")[2])
+                },
+                FUN.VALUE = integer(1)
+            )
         )
     }
 }
