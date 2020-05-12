@@ -70,5 +70,7 @@ sp <- extractSite(fixations, 139)
 plot(sp)
 }
 \seealso{
+\code{\link{as.phylo.fixationSites}}
+
 \code{\link{plotSingleSite}}, \code{\link{extractSite}}
 }

@@ -73,6 +73,106 @@ print.sitePath <- function(x, ...) {
         "involved before and after the fixation\n")
 }
 
+#' @rdname findSites
+#' @name fixationSites
+#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
+#'   tree, \code{fixationSites} uses the result to find those sites that show
+#'   fixation on some, if not all, of the lineages. Parallel evolution is
+#'   relatively common in RNA virus. There is chance that some site be fixed in
+#'   one lineage but does not show fixation because of different sequence
+#'   context.
+#' @param paths a \code{lineagePath} object returned from
+#'   \code{\link{lineagePath}} function or a \code{phylo} object after
+#'   \code{\link{addMSA}}
+#' @param minEffectiveSize A vector of two integers to specifiy minimum tree
+#'   tips involved before/after mutation. Otherwise the mutation will not be
+#'   counted into the return. If more than one number is given, the ancestral
+#'   takes the first and descendant takes the second as the minimum. If only
+#'   given one number, it's the minimum for both ancestral and descendant.
+#' @param searchDepth The function uses heuristic search but the termination of
+#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
+#'   tell the search when to stop.
+#' @param method The strategy for predicting the fixation. The basic approach is
+#'   entropy minimization and can be achieved by adding or removing fixation
+#'   point, or by comparing the two.
+#' @param ... further arguments passed to or from other methods.
+#' @examples
+#' fixationSites(lineagePath(tree))
+#' @return \code{fixationSites} returns a list of fixation mutations with names
+#'   of the tips involved.
+#' @importFrom utils tail
+#' @importFrom stats na.omit
+#' @export
+fixationSites.lineagePath <- function(paths,
+                                      minEffectiveSize = NULL,
+                                      searchDepth = 1,
+                                      method = c("compare", "insert", "delete"),
+                                      ...) {
+    tree <- attr(paths, "tree")
+    nTips <- length(tree[["tip.label"]])
+    align <- attr(paths, "align")
+    # Generate the site mapping from reference
+    reference <- attr(paths, "reference")
+    # Decide which miniminzing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
+    # Get the 'minEffectiveSize' for each fixation
+    if (is.null(minEffectiveSize)) {
+        minEffectiveSize <- nTips / length(unique(unlist(paths)))
+    } else if (!is.numeric(minEffectiveSize)) {
+        stop("\"minEffectiveSize\" only accepts numeric")
+    }
+    minEffectiveSize <- ceiling(minEffectiveSize)
+    # Get the 'searchDepth' for heuristic search
+    if (searchDepth < 1) {
+        stop("\"searchDepth\" should be at least 1")
+    } else {
+        searchDepth <- ceiling(searchDepth)
+    }
+    divNodes <- divergentNode(paths)
+    nodeAlign <- .tipSeqsAlongPathNodes(
+        paths = paths,
+        divNodes = divNodes,
+        tree = tree,
+        align = align
+    )
+    res <- .findFixationSite(
+        paths = paths,
+        tree = tree,
+        align = align,
+        nodeAlign = nodeAlign,
+        divNodes = divNodes,
+        reference = reference,
+        minimizeEntropy = minimizeEntropy,
+        minEffectiveSize = minEffectiveSize,
+        searchDepth = searchDepth
+    )
+    attr(res, "paths") <- paths
+    attr(res, "reference") <- reference
+    class(res) <- "fixationSites"
+    return(res)
+}
+
+.childrenTips <- function(tree, node) {
+    maxTip <- length(tree$tip.label)
+    children <- integer(0)
+    getChildren <- function(edges, parent) {
+        children <<- c(children, parent[which(parent <= maxTip)])
+        i <- which(edges[, 1] %in% parent)
+        if (length(i) == 0L) {
+            return(children)
+        } else {
+            parent <- edges[i, 2]
+            return(getChildren(edges, parent))
+        }
+    }
+    return(getChildren(tree$edge, node))
+}
+
 .tipSeqsAlongPathNodes <- function(paths, divNodes, tree, align) {
     allNodes <- unlist(paths)
     terminalNodes <- vapply(
@@ -204,90 +304,6 @@ print.sitePath <- function(x, ...) {
     return(res)
 }
 
-#' @rdname findSites
-#' @name fixationSites
-#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
-#'   tree, \code{fixationSites} uses the result to find those sites that show
-#'   fixation on some, if not all, of the lineages. Parallel evolution is
-#'   relatively common in RNA virus. There is chance that some site be fixed in
-#'   one lineage but does not show fixation because of different sequence
-#'   context.
-#' @param paths a \code{lineagePath} object returned from
-#'   \code{\link{lineagePath}} function or a \code{phylo} object after
-#'   \code{\link{addMSA}}
-#' @param minEffectiveSize A vector of two integers to specifiy minimum tree
-#'   tips involved before/after mutation. Otherwise the mutation will not be
-#'   counted into the return. If more than one number is given, the ancestral
-#'   takes the first and descendant takes the second as the minimum. If only
-#'   given one number, it's the minimum for both ancestral and descendant.
-#' @param searchDepth The function uses heuristic search but the termination of
-#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
-#'   tell the search when to stop.
-#' @param method The strategy for predicting the fixation. The basic approach is
-#'   entropy minimization and can be achieved by adding or removing fixation
-#'   point, or by comparing the two.
-#' @param ... further arguments passed to or from other methods.
-#' @examples
-#' fixationSites(lineagePath(tree))
-#' @return \code{fixationSites} returns a list of fixation mutations with names
-#'   of the tips involved.
-#' @importFrom utils tail
-#' @importFrom stats na.omit
-#' @export
-fixationSites.lineagePath <- function(paths,
-                                      minEffectiveSize = NULL,
-                                      searchDepth = 1,
-                                      method = c("compare", "insert", "delete"),
-                                      ...) {
-    tree <- attr(paths, "tree")
-    nTips <- length(tree[["tip.label"]])
-    align <- attr(paths, "align")
-    # Generate the site mapping from reference
-    reference <- attr(paths, "reference")
-    # Decide which miniminzing strategy
-    minimizeEntropy <- switch(
-        match.arg(method),
-        "compare" = minEntropyByComparing,
-        "insert" = minEntropyByInserting,
-        "delete" = minEntropyByDeleting
-    )
-    # Get the 'minEffectiveSize' for each fixation
-    if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- nTips / length(unique(unlist(paths)))
-    } else if (!is.numeric(minEffectiveSize)) {
-        stop("\"minEffectiveSize\" only accepts numeric")
-    }
-    minEffectiveSize <- ceiling(minEffectiveSize)
-    # Get the 'searchDepth' for heuristic search
-    if (searchDepth < 1) {
-        stop("\"searchDepth\" should be at least 1")
-    } else {
-        searchDepth <- ceiling(searchDepth)
-    }
-    divNodes <- divergentNode(paths)
-    nodeAlign <- .tipSeqsAlongPathNodes(
-        paths = paths,
-        divNodes = divNodes,
-        tree = tree,
-        align = align
-    )
-    res <- .findFixationSite(
-        paths = paths,
-        tree = tree,
-        align = align,
-        nodeAlign = nodeAlign,
-        divNodes = divNodes,
-        reference = reference,
-        minimizeEntropy = minimizeEntropy,
-        minEffectiveSize = minEffectiveSize,
-        searchDepth = searchDepth
-    )
-    attr(res, "paths") <- paths
-    attr(res, "reference") <- reference
-    class(res) <- "fixationSites"
-    return(res)
-}
-
 fixationSites.phylo <- function(paths, ...) {
     align <- attr(paths, "align")
     # Generate the site mapping from reference
@@ -342,6 +358,136 @@ print.fixationSites <- function(x, ...) {
             cat("Reference sequence: ", refSeqName, "\n", sep = "")
         }
     }
+}
+
+#' @rdname findSites
+#' @name multiFixationSites
+#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
+#'   tree, \code{multiFixationSites} uses random sampling on the original tree
+#'   and applies the method used in \code{fixationSites} to each sampled tree
+#'   and summarize the results from all the samples.
+#' @param samplingSize The number of tips sampled for each round of resampling.
+#'   It shoud be at least 10th and at most nine 10ths of the tree tips.
+#' @param samplingTimes The total times of random sampling to do. It should be
+#'   greater than 100.
+#' @return \code{multiFixationSites} returns sites with multiple fixations.
+#' @importFrom ape drop.tip
+#' @importFrom utils flush.console
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
+#' @export
+multiFixationSites.lineagePath <- function(paths,
+                                           samplingSize = NULL,
+                                           samplingTimes = 100,
+                                           minEffectiveSize = 0,
+                                           searchDepth = 1,
+                                           method = c("compare", "insert", "delete"),
+                                           ...) {
+    # Get the tree and aligned sequences
+    tree <- attr(paths, "tree")
+    nTips <- length(tree[["tip.label"]])
+    align <- attr(paths, "align")
+    # Check the parameters for resampling
+    if (is.null(samplingSize)) {
+        samplingSize <- nTips / 2
+    } else if (!is.numeric(samplingSize)) {
+        stop("\"samplingSize\" only accept numeric")
+    } else if (samplingSize > 9 * nTips / 10 ||
+               samplingSize < nTips / 10) {
+        stop("\"samplingSize\" should be within",
+             " one 10th and nine 10ths of tree size")
+    } else {
+        samplingSize <- as.integer(samplingSize)
+    }
+    if (samplingTimes < 100) {
+        warning("\"samplingTimes\" is preferably over 100.")
+    }
+    if (!is.numeric(minEffectiveSize)) {
+        stop("\"minEffectiveSize\" only accepts numeric")
+    } else {
+        minEffectiveSize <- ceiling(minEffectiveSize)
+    }
+    # Get the 'searchDepth' for heuristic search
+    if (searchDepth < 1) {
+        stop("\"searchDepth\" should be at least 1")
+    } else {
+        searchDepth <- ceiling(searchDepth)
+    }
+    # Decide which miniminzing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
+    # Generate the site mapping from reference
+    reference <- attr(paths, "reference")
+    # Find all crossing nodes
+    divNodes <- divergentNode(paths)
+    # Get the name and sequence of the children tips that
+    # are descendant of the nodes.
+    nodeAlign <- .tipSeqsAlongPathNodes(
+        paths = paths,
+        divNodes = divNodes,
+        tree = tree,
+        align = align
+    )
+    cat("\nResampling...\n")
+    flush.console()
+    # The resampling process
+    pb <- txtProgressBar(min = 0,
+                         max = samplingTimes,
+                         style = 3)
+    allMutations <- lapply(seq_len(samplingTimes), function(iter) {
+        # Sampled tree
+        sampledTree <-
+            drop.tip(tree, sample(seq_len(nTips), nTips - samplingSize))
+        # The matching between original and sampled tips
+        original2sampled <-
+            match(sampledTree[["tip.label"]], tree[["tip.label"]])
+        # Sampled aligned sequence
+        sampledAlign <- align[original2sampled]
+        # The corresponding path on the sampled tree subject to
+        # path on original tree
+        sampledPaths <- .originalPath2sampled(
+            nodeAlign = nodeAlign,
+            original2sampled = original2sampled,
+            sampledTree = sampledTree
+        )
+        # Find the fixation site for the sampled tree
+        sampledDivNodes <- divergentNode(sampledPaths)
+        sampledNodeAlign <- attr(sampledPaths, "nodeAlign")
+        res <- .findFixationSite(
+            paths = sampledPaths,
+            tree = sampledTree,
+            align = sampledAlign,
+            nodeAlign = sampledNodeAlign,
+            divNodes = sampledDivNodes,
+            reference = reference,
+            minimizeEntropy = minimizeEntropy,
+            minEffectiveSize = minEffectiveSize,
+            searchDepth = searchDepth
+        )
+        attr(sampledPaths, "tree") <- sampledTree
+        attr(res, "paths") <- sampledPaths
+        setTxtProgressBar(pb, iter)
+        return(res)
+    })
+    close(pb)
+    # Summarize the fixed amino acid for tips from resampling
+    sampleSummary <- .sampleSummarize(allMutations, nodeAlign, tree)
+    # Rebuild the fixation path
+    res <- .assembleFixation(
+        x = sampleSummary,
+        tree = tree,
+        align = align,
+        paths = paths,
+        divNodes = divNodes
+    )
+    attr(res, "paths") <- paths
+    attr(res, "reference") <- reference
+    class(res) <- "multiFixationSites"
+    return(res)
 }
 
 .originalPath2sampled <- function(nodeAlign,
@@ -581,137 +727,6 @@ print.fixationSites <- function(x, ...) {
             }
         }
     }
-    return(res)
-}
-
-#' @rdname findSites
-#' @name multiFixationSites
-#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
-#'   tree, \code{multiFixationSites} uses random sampling on the original tree
-#'   and applies the method used in \code{fixationSites} to each sampled tree
-#'   and summarize the results from all the samples.
-#' @param samplingSize The number of tips sampled for each round of resampling.
-#'   It shoud be at least 10th and at most nine 10ths of the tree tips.
-#' @param samplingTimes The total times of random sampling to do. It should be
-#'   greater than 100.
-#' @return \code{multiFixationSites} returns sites with multiple fixations.
-#' @importFrom ape drop.tip
-#' @importFrom utils flush.console
-#' @importFrom utils txtProgressBar
-#' @importFrom utils setTxtProgressBar
-#' @export
-multiFixationSites.lineagePath <- function(paths,
-                                           samplingSize = NULL,
-                                           samplingTimes = 100,
-                                           minEffectiveSize = 0,
-                                           searchDepth = 1,
-                                           method = c("compare", "insert", "delete"),
-                                           ...) {
-    # Get the tree and aligned sequences
-    tree <- attr(paths, "tree")
-    nTips <- length(tree[["tip.label"]])
-    align <- attr(paths, "align")
-    # Check the parameters for resampling
-    if (is.null(samplingSize)) {
-        samplingSize <- nTips / 2
-    } else if (!is.numeric(samplingSize)) {
-        stop("\"samplingSize\" only accept numeric")
-    } else if (samplingSize > 9 * nTips / 10 ||
-               samplingSize < nTips / 10) {
-        stop("\"samplingSize\" should be within",
-             " one 10th and nine 10ths of tree size")
-    } else {
-        samplingSize <- as.integer(samplingSize)
-    }
-    if (samplingTimes < 100) {
-        warning("\"samplingTimes\" is preferably over 100.")
-    }
-    if (!is.numeric(minEffectiveSize)) {
-        stop("\"minEffectiveSize\" only accepts numeric")
-    } else {
-        minEffectiveSize <- ceiling(minEffectiveSize)
-    }
-    # Get the 'searchDepth' for heuristic search
-    if (searchDepth < 1) {
-        stop("\"searchDepth\" should be at least 1")
-    } else {
-        searchDepth <- ceiling(searchDepth)
-    }
-    # Decide which miniminzing strategy
-    minimizeEntropy <- switch(
-        match.arg(method),
-        "compare" = minEntropyByComparing,
-        "insert" = minEntropyByInserting,
-        "delete" = minEntropyByDeleting
-    )
-    # Generate the site mapping from reference
-    reference <- attr(paths, "reference")
-    # # Extend the path
-    # paths <- .extendPaths(paths, tree)
-    divNodes <- divergentNode(paths)
-    # Get the name and sequence of the children tips that
-    # are descendant of the nodes.
-    nodeAlign <- .tipSeqsAlongPathNodes(
-        paths = paths,
-        divNodes = divNodes,
-        tree = tree,
-        align = align
-    )
-    cat("\nResampling...\n")
-    flush.console()
-    # The resampling process
-    pb <- txtProgressBar(min = 0,
-                         max = samplingTimes,
-                         style = 3)
-    allMutations <- lapply(seq_len(samplingTimes), function(iter) {
-        # Sampled tree
-        sampledTree <-
-            drop.tip(tree, sample(seq_len(nTips), nTips - samplingSize))
-        # The matching between original and sampled tips
-        original2sampled <-
-            match(sampledTree[["tip.label"]], tree[["tip.label"]])
-        # Sampled aligned sequence
-        sampledAlign <- align[original2sampled]
-        # The corresponding path on the sampled tree subject to
-        # path on original tree
-        sampledPaths <- .originalPath2sampled(
-            nodeAlign = nodeAlign,
-            original2sampled = original2sampled,
-            sampledTree = sampledTree
-        )
-        # Find the fixation site for the sampled tree
-        sampledDivNodes <- divergentNode(sampledPaths)
-        sampledNodeAlign <- attr(sampledPaths, "nodeAlign")
-        res <- .findFixationSite(
-            paths = sampledPaths,
-            tree = sampledTree,
-            align = sampledAlign,
-            nodeAlign = sampledNodeAlign,
-            divNodes = sampledDivNodes,
-            reference = reference,
-            minimizeEntropy = minimizeEntropy,
-            minEffectiveSize = minEffectiveSize,
-            searchDepth = searchDepth
-        )
-        attr(sampledPaths, "tree") <- sampledTree
-        attr(res, "paths") <- sampledPaths
-        setTxtProgressBar(pb, iter)
-        return(res)
-    })
-    close(pb)
-    # Summarize the fixed amino acid for tips from resampling
-    sampleSummary <- .sampleSummarize(allMutations, nodeAlign, tree)
-    # Rebuild the fixation path
-    res <- .assembleFixation(
-        x = sampleSummary,
-        tree = tree,
-        align = align,
-        paths = paths,
-        divNodes = divNodes
-    )
-    attr(res, "paths") <- paths
-    attr(res, "reference") <- reference
-    class(res) <- "multiFixationSites"
     return(res)
 }
 

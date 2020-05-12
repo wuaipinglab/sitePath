@@ -1,30 +1,3 @@
-#' @rdname pre-assessment
-#' @name pre-assessment
-#' @title Things can be done before the analysis
-#' @description \code{similarityMatrix} calculates similarity between aligned
-#'   sequences The similarity matrix can be used in \code{\link{groupTips}} or
-#'   \code{\link{lineagePath}}
-#' @param tree The return from \code{\link{addMSA}} function
-#' @examples
-#' data('zikv_tree')
-#' data('zikv_align')
-#' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' simMatrix <- similarityMatrix(tree)
-#' @return \code{similarityMatrix} returns a diagonal matrix of similarity
-#'   between sequences
-#' @importFrom methods is
-#' @export
-similarityMatrix <- function(tree) {
-    if (!inherits(tree, "phylo")) {
-        stop("\"tree\" is not class phylo")
-    } else if (is.null(attr(tree, "align"))) {
-        stop("No alignment found in \"tree\"")
-    }
-    sim <- getSimilarityMatrix(attr(tree, "align"))
-    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
-    return(sim)
-}
-
 #' @rdname treemer
 #' @name treemer
 #' @title Topology-dependent tree trimming
@@ -175,6 +148,33 @@ lineagePath <- function(tree,
 #' @export
 print.lineagePath <- function(x, ...) {
     cat(length(x), "paths\n")
+}
+
+#' @rdname pre-assessment
+#' @name pre-assessment
+#' @title Things can be done before the analysis
+#' @description \code{similarityMatrix} calculates similarity between aligned
+#'   sequences The similarity matrix can be used in \code{\link{groupTips}} or
+#'   \code{\link{lineagePath}}
+#' @param tree The return from \code{\link{addMSA}} function
+#' @examples
+#' data('zikv_tree')
+#' data('zikv_align')
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' simMatrix <- similarityMatrix(tree)
+#' @return \code{similarityMatrix} returns a diagonal matrix of similarity
+#'   between sequences
+#' @importFrom methods is
+#' @export
+similarityMatrix <- function(tree) {
+    if (!inherits(tree, "phylo")) {
+        stop("\"tree\" is not class phylo")
+    } else if (is.null(attr(tree, "align"))) {
+        stop("No alignment found in \"tree\"")
+    }
+    sim <- getSimilarityMatrix(attr(tree, "align"))
+    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
+    return(sim)
 }
 
 #' @rdname pre-assessment

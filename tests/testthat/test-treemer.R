@@ -1,4 +1,4 @@
-context("test-treemer")
+context("test-lineagPath")
 
 data(zikv_align)
 data(zikv_tree)
@@ -44,6 +44,8 @@ test_that("SNP-dependent trimming", {
         expect_true(any(siteSummary > similarity))
     }
 })
+
+context("test-treemer")
 
 test_that("Topology-dependent trimming", {
     simMatrix <- similarityMatrix(tree)
