@@ -18,7 +18,7 @@
 #'   SNPs are to remove. If provided as fraction between 0 and 1, then the
 #'   minimum number of SNP will be total tips times \code{similariy}. If
 #'   provided as integer greater than 1, the minimum number will be
-#'   \code{similariy}. The default \code{similariy} is 0.1 for
+#'   \code{similariy}. The default \code{similariy} is 0.05 for
 #'   \code{lineagePath}.
 #' @param simMatrix A diagonal matrix of similarities for each pair of
 #'   sequences. This parameter will not have effect in the function
@@ -101,7 +101,7 @@ lineagePath <- function(tree,
                         forbidTrivial = TRUE) {
     nTips <- length(tree[["tip.label"]])
     if (is.null(similarity)) {
-        minSNP <- nTips * 0.1
+        minSNP <- nTips * 0.05
     } else if (!is.numeric(similarity) || similarity <= 0) {
         stop("\"similarity\" only accepts positive numeric")
     } else if (similarity > 0 && similarity < 1) {
@@ -220,7 +220,7 @@ sneakPeek <- function(tree,
     }
     similarity <- numeric(0)
     pathNum <- integer(0)
-    for (s in seq(from = 0.3, to = 0.01, length.out = step)) {
+    for (s in seq(from = 0.05, to = 0.01, length.out = step)) {
         paths <- lineagePath(tree,
                              similarity = s,
                              forbidTrivial = FALSE)
