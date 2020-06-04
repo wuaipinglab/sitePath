@@ -116,11 +116,3 @@ extractSite <- function(x, site, ...)
     }
     return(res)
 }
-
-as.data.frame.fixationSites <- function(x, ...) {
-    cat("Under development\n")
-}
-
-as.data.frame.multiFixationSites <- function(x, ...) {
-    cat("Under development\n")
-}

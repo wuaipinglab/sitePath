@@ -6,7 +6,7 @@ test_that("Constrains in multiFixationSites work", {
     tree <-
         addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
     nTips <- length(tree$tip.label)
-    paths <- lineagePath(tree)
+    paths <- lineagePath(tree, similarity = 0.1)
     expect_warning(object = mutations <-
                        multiFixationSites(paths, samplingTimes = 10))
     for (sp in mutations) {

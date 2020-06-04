@@ -164,7 +164,6 @@ print.lineagePath <- function(x, ...) {
 #' simMatrix <- similarityMatrix(tree)
 #' @return \code{similarityMatrix} returns a diagonal matrix of similarity
 #'   between sequences
-#' @importFrom methods is
 #' @export
 similarityMatrix <- function(tree) {
     if (!inherits(tree, "phylo")) {
@@ -200,14 +199,12 @@ similarityMatrix <- function(tree) {
 #' @return \code{sneakPeek} return the similarity threhold against number of
 #'   lineagePath. There will be a simple dot plot between threshold and path
 #'   number if \code{makePlot} is TRUE.
-#' @importFrom methods is
-#' @importFrom graphics plot
 #' @export
 sneakPeek <- function(tree,
                       step = 10,
                       maxPath = NULL,
                       minPath = 1,
-                      makePlot = FALSE) {
+                      makePlot = TRUE) {
     if (is.null(maxPath)) {
         maxPath <- length(tree$tip.label) / 20
     } else if (maxPath <= 0) {
@@ -218,8 +215,9 @@ sneakPeek <- function(tree,
     } else if (minPath < 0) {
         stop("Invalid \"minPath\": less than zero")
     }
-    similarity <- numeric(0)
-    pathNum <- integer(0)
+    similarity <- numeric()
+    pathNum <- integer()
+    allPaths <- list()
     for (s in seq(from = 0.05, to = 0.01, length.out = step)) {
         paths <- lineagePath(tree,
                              similarity = s,
@@ -233,9 +231,13 @@ sneakPeek <- function(tree,
         }
         similarity <- c(similarity, s)
         pathNum <- c(pathNum, length(paths))
+        allPaths[[as.character(similarity)]] <- paths
     }
+    res <- data.frame(similarity, pathNum)
+    attr(res, "allPaths") <- allPaths
+    class(res) <- "lineagePathSP"
     if (makePlot) {
         plot(similarity, pathNum)
     }
-    return(data.frame(similarity, pathNum))
+    return(res)
 }
