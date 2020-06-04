@@ -25,7 +25,7 @@ sequences will be used. And for \code{lineagePath}, this decides how minor
 SNPs are to remove. If provided as fraction between 0 and 1, then the
 minimum number of SNP will be total tips times \code{similariy}. If
 provided as integer greater than 1, the minimum number will be
-\code{similariy}. The default \code{similariy} is 0.1 for
+\code{similariy}. The default \code{similariy} is 0.05 for
 \code{lineagePath}.}
 
 \item{simMatrix}{A diagonal matrix of similarities for each pair of

@@ -20,30 +20,25 @@
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
 #' plot(paths)
-#' @importFrom graphics plot
-#' @importFrom ape plot.phylo
+#' @importFrom ggtree ggtree aes theme scale_color_manual geom_tiplab
 #' @export
 plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
-    tree <- ladderize(tree, right = FALSE)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(1, nEdges)
-    targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
-    color[targetEdges] <- "#000000"
-    lty[targetEdges] <- 1
-    width[targetEdges] <- 2
-    # TODO: Emphaszie the nodes along the lineagePath
-    show.tip.label <- showTips
-    plot.phylo(
-        tree,
-        edge.color = color,
-        edge.lty = lty,
-        edge.width = width,
-        show.tip.label = show.tip.label,
-        ...
-    )
+    nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
+    attr(tree, "group") <- rep(1, times = nNodes)
+    attr(tree, "group")[unique(unlist(paths))] <- 0
+    attr(tree, "group") <- factor(attr(tree, "group"))
+
+    attr(tree, "size") <- rep(0.5, times = nNodes)
+    attr(tree, "size")[unique(unlist(paths))] <- 1
+
+    p <- ggtree(tree, aes(color = group, linetype = group, size = size)) +
+        scale_color_manual(values = c("black", "grey")) +
+        theme(legend.position = "none")
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
 }
 
 #' @name visualization
@@ -58,6 +53,7 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
+#' @importFrom tidytree as_tibble
 #' @importFrom ape edgelabels
 #' @importFrom ape axisPhylo
 #' @seealso \code{\link{as.phylo.fixationSites}}
@@ -110,8 +106,10 @@ plot.fixationSites <- function(x,
 #' @examples
 #' sp <- extractSite(fixations, 139)
 #' plot(sp)
+#' @importFrom graphics plot
 #' @importFrom graphics title
 #' @importFrom graphics legend
+#' @importFrom ape plot.phylo
 #' @seealso \code{\link{plotSingleSite}}, \code{\link{extractSite}}
 #' @export
 plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
