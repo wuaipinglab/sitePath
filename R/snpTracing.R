@@ -25,6 +25,7 @@ as.phylo.fixationSites <- function(x, minEffectiveSize = NULL, ...) {
         minEffectiveSize <-
             mean(lengths(unlist(grouping, recursive = FALSE)))
     }
+    # Filter out small sized cluster except the divegent point
     grouping <- lapply(grouping, function(g) {
         g[which(vapply(
             X = g,
@@ -190,6 +191,7 @@ as.phylo.fixationSites <- function(x, minEffectiveSize = NULL, ...) {
 .transitionClusters <- function(fixations) {
     paths <- attr(fixations, "paths")
     tree <- attr(paths, "tree")
+    # Find the clustering for each lineage path
     groupByPath <- lapply(paths, function(p) {
         terminalTips <- .childrenTips(tree, p[length(p)])
         # Group fixation results by path rather than site
@@ -221,8 +223,10 @@ as.phylo.fixationSites <- function(x, minEffectiveSize = NULL, ...) {
                 for (i in seq_along(res)) {
                     gp <- res[[i]]
                     common <- sort(intersect(tips, gp))
+                    # No new cluster when the coming tips have no overlap or are
+                    # identical to tips in an existing cluster
                     if (length(common) == 0) {
-                        newGrouping <- res[1:i]
+                        newGrouping <- res[seq_len(i)]
                     } else if (identical(sort(gp), sort(tips))) {
                         attr(gp, "site") <- c(attr(gp, "site"), site)
                         if (i + 1 <= length(res)) {
@@ -234,6 +238,8 @@ as.phylo.fixationSites <- function(x, minEffectiveSize = NULL, ...) {
                             c(newGrouping, list(gp), trailing)
                         break
                     } else {
+                        # A new cluster formed when there is overlapped between
+                        # new coming tips and existing tips in a cluster
                         if (identical(sort(gp), common)) {
                             # The new coming tips includes the current group
                             # The extra tips stay for the next loop
@@ -324,7 +330,7 @@ as.phylo.fixationSites <- function(x, minEffectiveSize = NULL, ...) {
                 if (i == 2) {
                     preTips <- list()
                 } else {
-                    preTips <- toMerge[1:(i - 2)]
+                    preTips <- toMerge[seq_len(i - 2)]
                 }
                 grouping[[toMergeIndex]] <- c(preTips,
                                               list(sharedTips),
