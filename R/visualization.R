@@ -14,14 +14,14 @@
 #' @param ... Arguments in \code{plot.phylo} functions.
 #' @return The function only makes plot and returns no value (It behaviors like
 #'   the generic \code{\link{plot}} function).
+#' @importFrom ggtree ggtree aes theme scale_color_manual geom_tiplab
+#' @export
 #' @examples
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
 #' plot(paths)
-#' @importFrom ggtree ggtree aes theme scale_color_manual geom_tiplab
-#' @export
 plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
     nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
@@ -50,14 +50,14 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
 #' @param recurringOnly Whether to plot recurring fixation mutation only. The
 #'   default is FALSE.
 #' @param minEffectiveSize The minimum size for a tip cluster in the plot
-#' @examples
-#' fixations <- fixationSites(paths)
-#' plot(fixations)
+#' @seealso \code{\link{as.phylo.fixationSites}}
 #' @importFrom tidytree as_tibble
 #' @importFrom ape edgelabels
 #' @importFrom ape axisPhylo
-#' @seealso \code{\link{as.phylo.fixationSites}}
 #' @export
+#' @examples
+#' fixations <- fixationSites(paths)
+#' plot(fixations)
 plot.fixationSites <- function(x,
                                y = TRUE,
                                showTips = FALSE,
@@ -103,15 +103,15 @@ plot.fixationSites <- function(x,
 #' @description Visualize the \code{sitePath} object which can be extracted by
 #'   using \code{\link{extractSite}} on the return of
 #'   \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
-#' @examples
-#' sp <- extractSite(fixations, 139)
-#' plot(sp)
 #' @importFrom graphics plot
 #' @importFrom graphics title
 #' @importFrom graphics legend
 #' @importFrom ape plot.phylo
-#' @seealso \code{\link{plotSingleSite}}, \code{\link{extractSite}}
 #' @export
+#' @seealso \code{\link{plotSingleSite}}, \code{\link{extractSite}}
+#' @examples
+#' sp <- extractSite(fixations, 139)
+#' plot(sp)
 plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
     # Prepare tree for plotting

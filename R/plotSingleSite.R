@@ -15,16 +15,16 @@
 #' @param ... Arguments in \code{plot.phylo} functions and other arguments.
 #' @return The function only makes plot and returns no value (It behaviors like
 #'   the generic \code{\link{plot}} function).
+#' @seealso \code{\link{plot.sitePath}}
+#' @importFrom ape ladderize
+#' @importFrom ape getMRCA
+#' @export
 #' @examples
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
 #' plotSingleSite(paths, 139)
-#' @seealso \code{\link{plot.sitePath}}
-#' @importFrom ape ladderize
-#' @importFrom ape getMRCA
-#' @export
 plotSingleSite.lineagePath <- function(x,
                                        site,
                                        showPath = FALSE,
@@ -87,10 +87,10 @@ plotSingleSite.lineagePath <- function(x,
 #'   red, descendant tips in blue and excluded tips in grey.
 #' @param select Select which fixation path in to plot. The default is NULL
 #'   which will plot all the fixations.
+#' @export
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
-#' @export
 plotSingleSite.fixationSites <- function(x,
                                          site,
                                          select = NULL,
@@ -109,12 +109,12 @@ plotSingleSite.fixationSites <- function(x,
 #' @description For \code{multiFixationSites}, it will color the tips which have
 #'   their site fixed. The color will use the same amino acid color scheme as
 #'   \code{plotSingleSite.lineagePath}
+#' @export
 #' @examples
 #' \dontrun{
 #' multiFixations <- multiFixationSites(paths)
 #' plotSingleSite(multiFixations, 1542)
 #' }
-#' @export
 plotSingleSite.multiFixationSites <- function(x,
                                               site,
                                               select = NULL,

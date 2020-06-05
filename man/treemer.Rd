@@ -2,10 +2,12 @@
 % Please edit documentation in R/treemer.R
 \name{treemer}
 \alias{treemer}
+\alias{similarityMatrix}
 \alias{groupTips}
-\alias{lineagePath}
 \title{Topology-dependent tree trimming}
 \usage{
+similarityMatrix(tree)
+
 groupTips(
   tree,
   similarity = NULL,
@@ -13,35 +15,32 @@ groupTips(
   forbidTrivial = TRUE,
   tipnames = TRUE
 )
-
-lineagePath(tree, similarity = NULL, simMatrix = NULL, forbidTrivial = TRUE)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} function}
 
 \item{similarity}{Similarity threshold for tree trimming in \code{groupTips}.
 If not provided, the mean similarity substract standard deviation of all
-sequences will be used. And for \code{lineagePath}, this decides how minor
-SNPs are to remove. If provided as fraction between 0 and 1, then the
-minimum number of SNP will be total tips times \code{similariy}. If
-provided as integer greater than 1, the minimum number will be
-\code{similariy}. The default \code{similariy} is 0.05 for
-\code{lineagePath}.}
+sequences will be used.}
 
 \item{simMatrix}{A diagonal matrix of similarities for each pair of
-sequences. This parameter will not have effect in the function
-\code{lineagePath}.}
+sequences.}
 
 \item{forbidTrivial}{Does not allow trivial trimming}
 
 \item{tipnames}{If return as tipnames}
 }
 \value{
-grouping of tips
+\code{similarityMatrix} returns a diagonal matrix of similarity
+  between sequences
 
-path represent by node number
+\code{groupTips} returns grouping of tips
 }
 \description{
+\code{similarityMatrix} calculates similarity between aligned
+  sequences The similarity matrix can be used in \code{\link{groupTips}} or
+  \code{\link{lineagePath}}
+
 \code{groupTips} uses sequence similarity to group tree tips.
   Members in a group are always constrained to share the same ancestral node.
   Similarity between two tips is derived from their multiple sequence
@@ -49,19 +48,12 @@ path represent by node number
   Similarity is calculated as number of matched divided by the corrected
   total length. So far the detection of divergence is based on one simple
   rule: the miminal pairwise similarity. The two branches are decided to be
-  divergent if the similarity is lower than the threshold. (Other more
-  statistical approaches such as Kolmogorov-Smirnov Tests among pair-wise
-  distance could be introduced in the future)
-
-\code{lineagePath} finds the lineages of a phylogenetic tree
-  providing the corresponding sequence alignment. This is done by finding
-  'major SNPs' which usually accumulate along the evolutionary pathways. are
-  added.
+  divergent if the similarity is lower than the threshold.
 }
 \examples{
 data('zikv_tree')
 data('zikv_align')
 tree <- addMSA(zikv_tree, alignment = zikv_align)
-groupTips(tree, 0.996)
-lineagePath(tree)
+simMatrix <- similarityMatrix(tree)
+groupTips(tree, 0.996, simMatrix)
 }

@@ -18,13 +18,13 @@
 #'   the alignment should include all \code{tip.label} in the tree
 #' @return \code{addMSA} returns a \code{phylo} object with matched multiple
 #'   sequence alignment
+#' @importFrom seqinr read.alignment
+#' @importFrom methods is
+#' @export
 #' @examples
 #' data(zikv_tree)
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
-#' @importFrom seqinr read.alignment
-#' @importFrom methods is
-#' @export
 addMSA <- function(tree,
                    msaPath = "",
                    msaFormat = "",
@@ -94,12 +94,12 @@ addMSA <- function(tree,
 #' @param ... further arguments passed to or from other methods.
 #' @return A \code{phylo} object with site numbering mapped to reference
 #'   sequence
+#' @export
 #' @examples
 #' data(zikv_tree)
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
-#' @export
 setSiteNumbering.phylo <- function(x,
                                    reference = NULL,
                                    gapChar = "-",

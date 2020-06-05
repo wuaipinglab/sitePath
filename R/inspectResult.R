@@ -13,13 +13,13 @@
 #' @param ... Other arguments
 #' @return The function \code{extractTips} returns the name of the tips involved
 #'   in the fixation.
+#' @export
 #' @examples
 #' data(zikv_tree_reduced)
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
-#' @export
 extractTips.fixationSites <- function(x,
                                       site,
                                       select = 1,
@@ -53,9 +53,9 @@ extractTips <- function(x, ...)
 #' @description The function \code{extractSite} can be used to extract the
 #'   fixation info of a single site.
 #' @return The function \code{extractSite} returns a \code{sitePath} object
+#' @export
 #' @examples
 #' extractSite(mutations, 139)
-#' @export
 extractSite.fixationSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))
 }

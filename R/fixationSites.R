@@ -8,13 +8,13 @@
 #'   but might be helpful to evaluate the performance of \code{fixationSites}.
 #' @param tree The return from \code{\link{addMSA}} function
 #' @param minSNP Minimum number of amino acid variation to be a SNP
+#' @return \code{SNPsite} returns a list of qualified SNP site
+#' @export
 #' @examples
 #' data(zikv_tree_reduced)
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
-#' @return \code{SNPsite} returns a list of qualified SNP site
-#' @export
 SNPsites <- function(tree, minSNP = NULL) {
     if (is.null(minSNP)) {
         minSNP <- length(tree[["tip.label"]]) / 10
@@ -96,13 +96,13 @@ print.sitePath <- function(x, ...) {
 #'   entropy minimization and can be achieved by adding or removing fixation
 #'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
-#' @examples
-#' fixationSites(lineagePath(tree))
 #' @return \code{fixationSites} returns a list of fixation mutations with names
 #'   of the tips involved.
 #' @importFrom utils tail
 #' @importFrom stats na.omit
 #' @export
+#' @examples
+#' fixationSites(lineagePath(tree))
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
                                       searchDepth = 1,
