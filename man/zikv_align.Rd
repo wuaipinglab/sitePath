@@ -3,16 +3,24 @@
 \docType{data}
 \name{zikv_align}
 \alias{zikv_align}
+\alias{zikv_align_reduced}
 \title{Multiple sequence alignment of Zika virus polyprotein}
 \format{
-a \code{alignment} object
+an \code{alignment} object
+
+an \code{alignment} object
 }
 \usage{
 data(zikv_align)
+
+data(zikv_align_reduced)
 }
 \description{
 The raw protein sequences were downloaded from ViPR database
-  (\url{https://www.viprbrc.org/}) and aliged using MAFFT. with default
-  settings.
+  (\url{https://www.viprbrc.org/}) and aliged using MAFFT
+  (\url{https://mafft.cbrc.jp/alignment/software/}). with default settings.
+
+\code{zikv_align_reduced} is a truncated version of
+  \code{zikv_align}
 }
 \keyword{datasets}

@@ -3,14 +3,23 @@
 \docType{data}
 \name{h3n2_align}
 \alias{h3n2_align}
+\alias{h3n2_align_reduced}
 \title{Multiple sequence alignment of H3N2's HA protein}
 \format{
-a \code{alignment} object
+an \code{alignment} object
+
+an \code{alignment} object
 }
 \usage{
 data(h3n2_align)
+
+data(h3n2_align_reduced)
 }
 \description{
-The raw protein sequences were downloaded from NCBI database.
+The raw protein sequences were downloaded from NCBI database and
+  aligned using MAFFT (\url{https://mafft.cbrc.jp/alignment/software/}).
+
+\code{h3n2_align_reduced} is a truncated version of
+  \code{h3n2_align}
 }
 \keyword{datasets}

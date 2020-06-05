@@ -3,15 +3,23 @@
 \docType{data}
 \name{h3n2_tree}
 \alias{h3n2_tree}
+\alias{h3n2_tree_reduced}
 \title{Phylogenetic tree of H3N2's HA protein}
 \format{
+a \code{phylo} object
+
 a \code{phylo} object
 }
 \usage{
 data(h3n2_tree)
+
+data(h3n2_tree_reduced)
 }
 \description{
-Tree was built from \code{\link{h3n2_align}} using RAxML with
-  default settings.
+Tree was built from \code{\link{h3n2_align}} using RAxML
+  (\url{http://www.exelixis-lab.org/}) with default settings.
+
+\code{h3n2_tree_reduced} is a truncated version of
+  \code{h3n2_tree}
 }
 \keyword{datasets}

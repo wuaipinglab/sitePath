@@ -3,15 +3,24 @@
 \docType{data}
 \name{zikv_tree}
 \alias{zikv_tree}
+\alias{zikv_tree_reduced}
 \title{Phylogenetic tree of Zika virus polyprotein}
 \format{
+a \code{phylo} object
+
 a \code{phylo} object
 }
 \usage{
 data(zikv_tree)
+
+data(zikv_tree_reduced)
 }
 \description{
-Tree was built from \code{\link{zikv_align}} using RAxML with
-  default settings.The tip ANK57896 was used as outgroup to root the tree.
+Tree was built from \code{\link{zikv_align}} using RAxML
+  (\url{http://www.exelixis-lab.org/}) with default settings. The tip
+  ANK57896 was used as outgroup to root the tree.
+
+\code{zikv_tree_reduced} is a truncated version of
+  \code{zikv_tree}
 }
 \keyword{datasets}

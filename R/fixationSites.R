@@ -1,5 +1,4 @@
 #' @rdname findSites
-#' @name findSites
 #' @title Finding sites with variation
 #' @description Single nucleotide polymorphism (SNP) in the whole package refers
 #'   to variation of amino acid. \code{findSNPsite} will try to find SNP in the
@@ -74,7 +73,6 @@ print.sitePath <- function(x, ...) {
 }
 
 #' @rdname findSites
-#' @name fixationSites
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{fixationSites} uses the result to find those sites that show
 #'   fixation on some, if not all, of the lineages. Parallel evolution is
@@ -357,5 +355,71 @@ print.fixationSites <- function(x, ...) {
         } else {
             cat("Reference sequence: ", refSeqName, "\n", sep = "")
         }
+    }
+}
+
+#' @rdname viewFixation
+#' @title Visualize fixation sites
+#' @description Visualize \code{\link{fixationSites}} object. The tips are
+#'   clustered according to the fixation sites. The transition of fixation sites
+#'   will be plotted as a phylogenetic tree. The length of each branch
+#'   represents the number of fixation mutation between two clusters. The name
+#'   of the tree tips indicate the number of sequences in the cluster.
+#' @param x Could be a \code{\link{fixationSites}} object or a \code{sitePath}
+#'   object.
+#' @param y For a \code{\link{fixationSites}} object, it is whether to show the
+#'   fixation mutation between clusters. For a \code{sitePath} object, it can
+#'   have more than one fixation path. This is to select which path to plot. The
+#'   default is \code{NULL} which will plot all the paths.
+#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
+#' @param recurringOnly Whether to plot recurring fixation mutation only. The
+#'   default is FALSE.
+#' @param minEffectiveSize The minimum size for a tip cluster in the plot
+#' @seealso \code{\link{as.phylo.fixationSites}}
+#' @importFrom tidytree as_tibble
+#' @importFrom ape edgelabels
+#' @importFrom ape axisPhylo
+#' @export
+#' @examples
+#' fixations <- fixationSites(paths)
+#' plot(fixations)
+plot.fixationSites <- function(x,
+                               y = TRUE,
+                               showTips = FALSE,
+                               recurringOnly = FALSE,
+                               minEffectiveSize = NULL,
+                               ...) {
+    snpTracing <- as.phylo.fixationSites(x, minEffectiveSize)
+    edgeSNPs <- attr(snpTracing, "edgeSNPs")
+    if (recurringOnly) {
+        allMutSites <- unlist(edgeSNPs)
+        duplicatedSites <-
+            unique(allMutSites[which(duplicated(allMutSites))])
+        edgeSNPs <- lapply(edgeSNPs, function(sites) {
+            res <- sites[which(sites %in% duplicatedSites)]
+            attributes(res) <- attributes(sites)
+            return(res)
+        })
+    }
+    edge2show <- which(lengths(edgeSNPs) != 0)
+    show.tip.label <- showTips
+    plot.phylo(snpTracing, show.tip.label = show.tip.label, ...)
+    axisPhylo(backward = FALSE)
+    if (y) {
+        edgelabels(
+            text = vapply(
+                X = edgeSNPs[edge2show],
+                FUN = paste,
+                collapse = ", ",
+                FUN.VALUE = character(1)
+            ),
+            edge = vapply(
+                X = edgeSNPs[edge2show],
+                FUN = function(i) {
+                    which(snpTracing[["edge"]][, 2] == attr(i, "edge")[2])
+                },
+                FUN.VALUE = integer(1)
+            )
+        )
     }
 }
