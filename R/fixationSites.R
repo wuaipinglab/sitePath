@@ -1,13 +1,14 @@
-#' @rdname findSites
+#' @rdname SNPsites
 #' @title Finding sites with variation
 #' @description Single nucleotide polymorphism (SNP) in the whole package refers
-#'   to variation of amino acid. \code{findSNPsite} will try to find SNP in the
+#'   to variation of amino acid. \code{SNPsite} will try to find SNP in the
 #'   multiple sequence alignment. A reference sequence and gap character may be
 #'   specified to number the site. This is irrelevant to the intended analysis
-#'   but might be helpful to evaluate the performance of \code{fixationSites}.
-#' @param tree The return from \code{\link{addMSA}} function
-#' @param minSNP Minimum number of amino acid variation to be a SNP
-#' @return \code{SNPsite} returns a list of qualified SNP site
+#'   but might be helpful to evaluate the performance of
+#'   \code{\link{fixationSites}}.
+#' @param tree The return from \code{\link{addMSA}} function.
+#' @param minSNP Minimum number of amino acid variation to be a SNP.
+#' @return \code{SNPsite} returns a list of qualified SNP site.
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -42,37 +43,9 @@ SNPsites <- function(tree, minSNP = NULL) {
     return(qualified)
 }
 
-#' @export
-print.sitePath <- function(x, ...) {
-    cat("Site",
-        attr(x, "site"),
-        "may experience fixation on",
-        length(x),
-        "path(s):\n\n")
-    # A 'sitePath' composes of all the fixation paths for a single site.
-    #  So each 'm' represent a single fixation path
-    for (m in x) {
-        if (length(m) == 2) {
-            mutName <-
-                paste0(attr(m[[1]], "AA"), attr(x, "site"), attr(m[[2]], "AA"))
-            cat(mutName,
-                paste0("(", length(m[[1]]), "->", length(m[[2]]), ")"),
-                "\n")
-        } else {
-            mutName <- character(0)
-            for (tips in m) {
-                aa <- attr(tips, "AA")
-                mutName <-
-                    c(mutName, paste0(aa, "(", length(tips), ")"))
-            }
-            cat(paste0(mutName, collapse = " -> "), "\n")
-        }
-    }
-    cat("\nIn the bracket are the number of tips",
-        "involved before and after the fixation\n")
-}
-
-#' @rdname findSites
+#' @rdname fixationSites
+#' @name fixationSites
+#' @title Fixation sites prediction
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{fixationSites} uses the result to find those sites that show
 #'   fixation on some, if not all, of the lineages. Parallel evolution is
@@ -100,6 +73,9 @@ print.sitePath <- function(x, ...) {
 #' @importFrom stats na.omit
 #' @export
 #' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' fixationSites(lineagePath(tree))
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
@@ -302,6 +278,36 @@ fixationSites.lineagePath <- function(paths,
     return(res)
 }
 
+#' @export
+print.sitePath <- function(x, ...) {
+    cat("Site",
+        attr(x, "site"),
+        "may experience fixation on",
+        length(x),
+        "path(s):\n\n")
+    # A 'sitePath' composes of all the fixation paths for a single site.
+    #  So each 'm' represent a single fixation path
+    for (m in x) {
+        if (length(m) == 2) {
+            mutName <-
+                paste0(attr(m[[1]], "AA"), attr(x, "site"), attr(m[[2]], "AA"))
+            cat(mutName,
+                paste0("(", length(m[[1]]), "->", length(m[[2]]), ")"),
+                "\n")
+        } else {
+            mutName <- character(0)
+            for (tips in m) {
+                aa <- attr(tips, "AA")
+                mutName <-
+                    c(mutName, paste0(aa, "(", length(tips), ")"))
+            }
+            cat(paste0(mutName, collapse = " -> "), "\n")
+        }
+    }
+    cat("\nIn the bracket are the number of tips",
+        "involved before and after the fixation\n")
+}
+
 fixationSites.phylo <- function(paths, ...) {
     align <- attr(paths, "align")
     # Generate the site mapping from reference
@@ -358,7 +364,7 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
-#' @rdname viewFixation
+#' @rdname plotFixation
 #' @title Visualize fixation sites
 #' @description Visualize \code{\link{fixationSites}} object. The tips are
 #'   clustered according to the fixation sites. The transition of fixation sites
@@ -374,15 +380,22 @@ print.fixationSites <- function(x, ...) {
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param recurringOnly Whether to plot recurring fixation mutation only. The
 #'   default is FALSE.
-#' @param minEffectiveSize The minimum size for a tip cluster in the plot
+#' @param minEffectiveSize The minimum size for a tip cluster in the plot.
+#' @param ... Other arguments.
+#' @return The function only makes plot and returns no value (It behaviors like
+#'   the generic \code{\link{plot}} function).
 #' @seealso \code{\link{as.phylo.fixationSites}}
 #' @importFrom tidytree as_tibble
 #' @importFrom ape edgelabels
 #' @importFrom ape axisPhylo
 #' @export
 #' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' paths <- lineagePath(tree)
 #' fixations <- fixationSites(paths)
-#' plot(fixations)
+#' plot(fixations, minEffectiveSize = 0)
 plot.fixationSites <- function(x,
                                y = TRUE,
                                showTips = FALSE,

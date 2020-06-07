@@ -1,4 +1,4 @@
-#' @rdname findSites
+#' @rdname fixationSites
 #' @name multiFixationSites
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{multiFixationSites} uses random sampling on the original tree

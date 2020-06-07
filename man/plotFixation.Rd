@@ -27,7 +27,13 @@ default is \code{NULL} which will plot all the paths.}
 \item{recurringOnly}{Whether to plot recurring fixation mutation only. The
 default is FALSE.}
 
-\item{minEffectiveSize}{The minimum size for a tip cluster in the plot}
+\item{minEffectiveSize}{The minimum size for a tip cluster in the plot.}
+
+\item{...}{Other arguments.}
+}
+\value{
+The function only makes plot and returns no value (It behaviors like
+  the generic \code{\link{plot}} function).
 }
 \description{
 Visualize \code{\link{fixationSites}} object. The tips are
@@ -37,8 +43,12 @@ Visualize \code{\link{fixationSites}} object. The tips are
   of the tree tips indicate the number of sequences in the cluster.
 }
 \examples{
+data(zikv_tree_reduced)
+data(zikv_align_reduced)
+tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+paths <- lineagePath(tree)
 fixations <- fixationSites(paths)
-plot(fixations)
+plot(fixations, minEffectiveSize = 0)
 }
 \seealso{
 \code{\link{as.phylo.fixationSites}}

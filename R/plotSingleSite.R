@@ -1,4 +1,5 @@
 #' @rdname plotSingleSite
+#' @name plotSingleSite
 #' @title Color the tree by a single site
 #' @description For \code{lineagePath}, the tree will be colored according to
 #'   the amino acid of the site. The color scheme tries to assign

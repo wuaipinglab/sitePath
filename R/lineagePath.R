@@ -1,9 +1,10 @@
 #' @rdname lineagePath
+#' @name lineagePath
 #' @title Resolving lineage paths using SNP
 #' @description \code{lineagePath} finds the lineages of a phylogenetic tree
 #'   providing the corresponding sequence alignment. This is done by finding
 #'   'major SNPs' which usually accumulate along the evolutionary pathways.
-#' @param tree The return from \code{\link{addMSA}} or \code{\link{sneekPeak}}
+#' @param tree The return from \code{\link{addMSA}} or \code{sneakPeek}
 #'   function.
 #' @param similarity This decides how minor SNPs are to remove. If provided as
 #'   fraction between 0 and 1, then the minimum number of SNP will be total tips
@@ -12,6 +13,7 @@
 #'   \code{lineagePath}.
 #' @param simMatrix Deprecated and will not have effect.
 #' @param forbidTrivial Does not allow trivial trimming.
+#' @param ... Other arguments.
 #' @return path represent by node number
 #' @importFrom ape nodepath
 #' @export
@@ -23,16 +25,19 @@
 lineagePath.phylo <- function(tree,
                               similarity = NULL,
                               simMatrix = NULL,
-                              forbidTrivial = TRUE) {
+                              forbidTrivial = TRUE,
+                              ...) {
     nTips <- length(tree[["tip.label"]])
     if (is.null(similarity)) {
         minSNP <- nTips * 0.05
+        similarity <- 0.05
     } else if (!is.numeric(similarity) || similarity <= 0) {
         stop("\"similarity\" only accepts positive numeric")
     } else if (similarity > 0 && similarity < 1) {
         minSNP <- nTips * similarity
     } else if (similarity > 1 && similarity < nTips) {
         minSNP <- ceiling(similarity)
+        similarity <- minSNP / nTips
     } else {
         stop(
             "\"similarity\" cannot be greater than total tips. ",
@@ -65,7 +70,7 @@ lineagePath.phylo <- function(tree,
     attr(tree, "reference") <- NULL
     attr(paths, "tree") <- tree
     attr(paths, "align") <- align
-    attr(paths, "similarity") <- minSNP / nTips
+    attr(paths, "similarity") <- similarity
     attr(paths, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
     class(paths) <- "lineagePath"
     return(paths)
@@ -86,7 +91,7 @@ print.lineagePath <- function(x, ...) {
     )
 }
 
-#' @rdname viewPath
+#' @rdname plotPath
 #' @title Visualize phylogenetic lineages
 #' @description Visualize \code{\link{lineagePath}} object. A tree diagram will
 #'   be plotted and paths are black solid line while the trimmed nodes and tips
@@ -100,6 +105,7 @@ print.lineagePath <- function(x, ...) {
 #'   branches. The function does not behave like generic \code{\link{plot}}
 #'   function.
 #' @importFrom ggtree ggtree aes theme scale_color_manual geom_tiplab
+#' @importFrom ggplot2 ggtitle
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -119,9 +125,15 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
     } else {
         size <- NULL
     }
-    p <- ggtree(tree, aes(color = group, linetype = group, size = size)) +
+    p <-
+        ggtree(tree, aes(
+            color = group,
+            linetype = group,
+            size = size
+        )) +
         scale_color_manual(values = c("black", "grey")) +
-        theme(legend.position = "none")
+        theme(legend.position = "none") +
+        ggtitle(attr(x, "similarity"))
     if (showTips) {
         p <- p + geom_tiplab()
     }
@@ -154,7 +166,7 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
 #' @examples
 #' sneakPeek(tree, step = 3)
 sneakPeek <- function(tree,
-                      step = 10,
+                      step = 9,
                       maxPath = NULL,
                       minPath = 1,
                       makePlot = FALSE) {
@@ -171,7 +183,9 @@ sneakPeek <- function(tree,
     similarity <- numeric()
     pathNum <- integer()
     allPaths <- list()
-    for (s in seq(from = 0.05, to = 0.01, length.out = step)) {
+    for (s in seq(from = 0.05,
+                  to = 0.01,
+                  length.out = step)) {
         paths <- lineagePath(tree,
                              similarity = s,
                              forbidTrivial = FALSE)
@@ -197,15 +211,16 @@ sneakPeek <- function(tree,
 }
 
 #' @rdname lineagePath
-#' @description When used on the return of \code{\link{sneakPeek}}, a
+#' @description When used on the return of \code{sneakPeek}, a
 #'   \code{lineagePath} with the closest \code{similarity} will be retrived from
 #'   the returned value.
 #' @export
 #' @examples
 #' x <- sneakPeek(tree, step = 3)
 #' lineagePath(x, similarity = 0.05)
-lineagePath.sneakPeekedPaths <- function(tree, similarity) {
+lineagePath.sneakPeekedPaths <- function(tree, similarity, ...) {
     allPaths <- attr(tree, "allPaths")
-    res <- allPaths[which.min(abs(as.numeric(names(allPaths)) - similarity))]
+    res <-
+        allPaths[which.min(abs(as.numeric(names(allPaths)) - similarity))]
     return(res)
 }
