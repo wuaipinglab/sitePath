@@ -49,7 +49,7 @@ see the impact of threshold on path number. The default is 1.}
 \item{makePlot}{Whether make a plot when return.}
 }
 \value{
-path represent by node number
+Lineage path represent by node number.
 
 \code{sneakPeek} return the similarity threhold against number of
   lineagePath. There will be a simple dot plot between threshold and path

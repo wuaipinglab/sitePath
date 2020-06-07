@@ -65,8 +65,7 @@ The names in tree and aligment must be matched. We use a **tip-to-root** algorit
 In the current version, the resolving function only takes sequence similarity as one single threshold. The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can be of great help in choosing the threshold.*
 
 ```{r sneakPeek_plot}
-preassessment <- sneakPeek(tree)
-plot(preassessment$similarity, preassessment$pathNum)
+preassessment <- sneakPeek(tree, makePlot = TRUE)
 ```
 
 ## Choose a threshold by yourself

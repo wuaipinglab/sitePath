@@ -1,23 +1,33 @@
+CHANGES IN VERSION 1.5.5
+-------------------------
+    o Add 'plotMutSites' function to visualize mutations of each tree tip.
+
 CHANGES IN VERSION 1.5.4
+-------------------------
     o Use 'ggtree' for 'plot.lineagePath'.
     o More informative plot for 'sneakPeek' and add 'lineagePath' function
       for its return.
 
 CHANGES IN VERSION 1.5.3
+-------------------------
     o Add 'as.phylo.fixationSites' function that represent site fixations
       as simplified phylgenetic tree.
 
 CHANGES IN VERSION 1.5.2
+-------------------------
     o Add 'minEffectiveSize' in 'plot.fixationSites' for filtering
       small sized tip clusters.
 
 CHANGES IN VERSION 1.5.1
+-------------------------
     o Add 'plot.fixationSites' function.
 
 CHANGES IN VERSION 1.4.1
+-------------------------
     o Fix: broken link in the DESCRIPTION.
 
 CHANGES IN VERSION 1.3.1
+-------------------------
     o Bug fix: using sequence similarity failed to find 'lineagePath'.
 
 CHANGES IN VERSION 1.2.2

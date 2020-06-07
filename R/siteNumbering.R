@@ -47,15 +47,16 @@ addMSA <- function(tree,
         stop("\"alignment\" is not class alignment")
     }
     # Map the names between tree and alignment
-    m <- match(tree$tip.label, alignment$nam)
+    m <- match(tree[["tip.label"]], alignment[["nam"]])
     if (any(is.na(m))) {
         stop("Tree tips and alignment names are not matched")
     } else {
-        align <- toupper(alignment$seq[m])
+        align <- toupper(alignment[["seq"]][m])
         if (length(unique(nchar(align))) > 1) {
             stop("Sequence lengths are not the same in alignment")
         }
     }
+    names(align) <- tree[["tip.label"]]
     attr(tree, "align") <- align
     # Use the numbering of MSA as the default site numbering
     attr(tree, "reference") <-
@@ -72,7 +73,7 @@ addMSA <- function(tree,
             stop("\"gapChar\" only accepts one single character")
         }
         reference <-
-            getReference(align[which(tree$tip.label == reference)], gapChar)
+            getReference(align[which(tree[["tip.label"]] == reference)], gapChar)
     }
     return(reference)
 }

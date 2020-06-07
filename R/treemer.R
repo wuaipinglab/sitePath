@@ -57,11 +57,9 @@ groupTips <- function(tree,
         colMatch <- match(tree$tip.label, colnames(simMatrix))
         rowMatch <- match(tree$tip.label, rownames(simMatrix))
         if (is.null(simMatrix)) {
-            simMatrix <- matrix(
-                NA,
-                ncol = length(tree$tip.label),
-                nrow = length(tree$tip.label)
-            )
+            simMatrix <- matrix(NA,
+                                ncol = length(tree$tip.label),
+                                nrow = length(tree$tip.label))
         } else {
             simMatrix <- simMatrix[rowMatch, colMatch]
         }

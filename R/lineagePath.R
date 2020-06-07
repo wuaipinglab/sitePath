@@ -14,7 +14,7 @@
 #' @param simMatrix Deprecated and will not have effect.
 #' @param forbidTrivial Does not allow trivial trimming.
 #' @param ... Other arguments.
-#' @return path represent by node number
+#' @return Lineage path represent by node number.
 #' @importFrom ape nodepath
 #' @export
 #' @examples
@@ -125,12 +125,11 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
     } else {
         size <- NULL
     }
-    p <-
-        ggtree(tree, aes(
-            color = group,
-            linetype = group,
-            size = size
-        )) +
+    p <- ggtree(tree, aes(
+        color = group,
+        linetype = group,
+        size = size
+    )) +
         scale_color_manual(values = c("black", "grey")) +
         theme(legend.position = "none") +
         ggtitle(attr(x, "similarity"))
@@ -171,7 +170,7 @@ sneakPeek <- function(tree,
                       minPath = 1,
                       makePlot = FALSE) {
     if (is.null(maxPath)) {
-        maxPath <- length(tree$tip.label) / 20
+        maxPath <- length(tree[["tip.label"]]) / 20
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
