@@ -5,10 +5,12 @@
 \alias{plotMutSites.SNPsites}
 \title{Plot tree and mutation sites}
 \usage{
-\method{plotMutSites}{SNPsites}(x, ...)
+\method{plotMutSites}{SNPsites}(x, showTips = FALSE, ...)
 }
 \arguments{
 \item{x}{An \code{\link{SNPsites}} object.}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{...}{Other arguments}
 }

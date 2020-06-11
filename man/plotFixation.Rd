@@ -2,45 +2,27 @@
 % Please edit documentation in R/fixationSites.R
 \name{plot.fixationSites}
 \alias{plot.fixationSites}
-\title{Visualize fixation sites}
+\title{Visualize fixation sites on tree}
 \usage{
-\method{plot}{fixationSites}(
-  x,
-  y = TRUE,
-  showTips = FALSE,
-  recurringOnly = FALSE,
-  minEffectiveSize = NULL,
-  ...
-)
+\method{plot}{fixationSites}(x, y = FALSE, color = NULL, ...)
 }
 \arguments{
-\item{x}{Could be a \code{\link{fixationSites}} object or a \code{sitePath}
-object.}
+\item{x}{A \code{\link{fixationSites}} object.}
 
-\item{y}{For a \code{\link{fixationSites}} object, it is whether to show the
-fixation mutation between clusters. For a \code{sitePath} object, it can
-have more than one fixation path. This is to select which path to plot. The
-default is \code{NULL} which will plot all the paths.}
+\item{y}{For a \code{\link{fixationSites}} object, it is whether to plot
+recurring fixation mutation only. The default is FALSE.}
 
-\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
-
-\item{recurringOnly}{Whether to plot recurring fixation mutation only. The
-default is FALSE.}
-
-\item{minEffectiveSize}{The minimum size for a tip cluster in the plot.}
+\item{color}{The color for the clusters. The default uses ggplot2's color
+schem.e}
 
 \item{...}{Other arguments.}
 }
 \value{
-The function only makes plot and returns no value (It behaviors like
-  the generic \code{\link{plot}} function).
+A phylogenetic tree plot marked with site fixation. The function does
+  not behave like generic \code{\link{plot}} function.
 }
 \description{
-Visualize \code{\link{fixationSites}} object. The tips are
-  clustered according to the fixation sites. The transition of fixation sites
-  will be plotted as a phylogenetic tree. The length of each branch
-  represents the number of fixation mutation between two clusters. The name
-  of the tree tips indicate the number of sequences in the cluster.
+Mark fixation sites on the original phylogenetic tree.
 }
 \examples{
 data(zikv_tree_reduced)
@@ -48,8 +30,5 @@ data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 paths <- lineagePath(tree)
 fixations <- fixationSites(paths)
-plot(fixations, minEffectiveSize = 0)
-}
-\seealso{
-\code{\link{as.phylo.fixationSites}}
+plot(fixations)
 }

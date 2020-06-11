@@ -80,14 +80,17 @@ fixationSites.lineagePath <- function(paths,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
     )
+    groupingByPath <- .transitionClusters(res, paths, tree)
+    res <- .combineFixations(res, tree, align)
     attr(res, "paths") <- paths
     attr(res, "reference") <- reference
+    attr(res, "clustersByPath") <- groupingByPath
     class(res) <- "fixationSites"
     return(res)
 }
 
 .childrenTips <- function(tree, node) {
-    maxTip <- length(tree$tip.label)
+    maxTip <- length(tree[["tip.label"]])
     children <- integer(0)
     getChildren <- function(edges, parent) {
         children <<- c(children, parent[which(parent <= maxTip)])
@@ -99,7 +102,7 @@ fixationSites.lineagePath <- function(paths,
             return(getChildren(edges, parent))
         }
     }
-    return(getChildren(tree$edge, node))
+    return(getChildren(tree[["edge"]], node))
 }
 
 .tipSeqsAlongPathNodes <- function(paths, divNodes, tree, align) {
@@ -122,7 +125,7 @@ fixationSites.lineagePath <- function(paths,
             childrenNode <- n
             isTerminal <- TRUE
         } else {
-            childrenNode <- tree$edge[which(tree$edge[, 1] == n), 2]
+            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
             # Keep the node that is not on the path.
             childrenNode <- setdiff(childrenNode, allNodes)
         }
@@ -233,6 +236,233 @@ fixationSites.lineagePath <- function(paths,
     return(res)
 }
 
+.transitionClusters <- function(fixations, paths, tree) {
+    # Find the clustering for each lineage path
+    groupByPath <- lapply(paths, function(p) {
+        terminalTips <- .childrenTips(tree, p[length(p)])
+        # Group fixation results by path rather than site
+        group <- list()
+        for (sp in fixations) {
+            site <- attr(sp, "site")
+            for (mp in sp) {
+                tips <- mp[[length(mp)]]
+                # Filter if not belong to the path
+                if (all(terminalTips %in% tips)) {
+                    toAdd <- lapply(mp, function(tips) {
+                        siteChar <- attr(tips, "AA")
+                        attributes(tips) <- NULL
+                        attr(tips, "site") <- siteChar
+                        names(attr(tips, "site")) <- site
+                        tips
+                    })
+                    group <- c(group, list(toAdd))
+                }
+            }
+        }
+        # Group tips according to fixation points
+        res <- group[[1]]
+        for (p in group[-1]) {
+            for (tips in p) {
+                site <- attr(tips, "site")
+                # Update grouping for each tips by growing a new list
+                newGrouping <- list()
+                for (i in seq_along(res)) {
+                    gp <- res[[i]]
+                    common <- sort(intersect(tips, gp))
+                    # No new cluster when the coming tips have no overlap or are
+                    # identical to tips in an existing cluster
+                    if (length(common) == 0) {
+                        newGrouping <- res[seq_len(i)]
+                    } else if (identical(sort(gp), sort(tips))) {
+                        attr(gp, "site") <- c(attr(gp, "site"), site)
+                        if (i + 1 <= length(res)) {
+                            trailing <- res[(i + 1):length(res)]
+                        } else {
+                            trailing <- list()
+                        }
+                        newGrouping <-
+                            c(newGrouping, list(gp), trailing)
+                        break
+                    } else {
+                        # A new cluster formed when there is overlapped between
+                        # new coming tips and existing tips in a cluster
+                        if (identical(sort(gp), common)) {
+                            # The new coming tips includes the current group
+                            # The extra tips stay for the next loop
+                            tips <- setdiff(tips, gp)
+                            # Update the SNP site info for the current group
+                            attr(gp, "site") <-
+                                c(attr(gp, "site"), site)
+                            newGrouping <- c(newGrouping, list(gp))
+                        } else if (identical(sort(tips), common)) {
+                            # The new coming tips are included in the group
+                            # (they are used up at this point)
+                            separate <- setdiff(gp, tips)
+                            attributes(separate) <- attributes(gp)
+                            attr(tips, "site") <-
+                                c(attr(gp, "site"), site)
+                            if (i + 1 <= length(res)) {
+                                trailing <- res[(i + 1):length(res)]
+                            } else {
+                                trailing <- list()
+                            }
+                            newGrouping <- c(newGrouping,
+                                             list(tips),
+                                             list(separate),
+                                             trailing)
+                            # Go for the next new coming tips
+                            break
+                        } else {
+                            stop("Something's not right")
+                        }
+                    }
+                }
+                # The new coming tips are used up and update the grouping
+                res <- newGrouping
+            }
+        }
+        return(res)
+    })
+    # Find the divergent point and remove the overlapped part
+    grouping <- list(groupByPath[[1]])
+
+    for (gpIndex in seq_along(groupByPath)[-1]) {
+        gp <- groupByPath[[gpIndex]]
+        toMergeIndex <- NULL
+        divergedIndex <- 0L
+        # Loop through to find the most related group
+        for (i in seq_along(grouping)) {
+            allTips <- unlist(grouping[[i]])
+            for (j in seq_along(gp)[-1]) {
+                if (all(!gp[[j]] %in% allTips)) {
+                    m <- i
+                    d <- j
+                    break
+                }
+            }
+            if (d > divergedIndex) {
+                toMergeIndex <- m
+                divergedIndex <- d
+            }
+        }
+        # Find the tips before diverged
+        sharedTips <- gp[[divergedIndex - 1]]
+        refSites <- attr(sharedTips, "site")
+        # The non-shared part
+        divergedTips <- setdiff(sharedTips, allTips)
+        attr(divergedTips, "site") <- refSites
+        # Drop the overlapped part
+        grouping[[gpIndex]] <-
+            c(list(divergedTips), gp[divergedIndex:length(gp)])
+        # Find the most related group
+        toMerge <- grouping[[toMergeIndex]]
+        # To determine where to add the new (truncated) group
+        for (i in seq_along(toMerge)) {
+            gpTips <- unlist(gp)
+            if (all(!toMerge[[i]] %in% gpTips)) {
+                # Find the tips before diverged
+                sharedTips <- toMerge[[i - 1]]
+                sites <- attr(sharedTips, "site")
+                # The non-shared part
+                divergedTips <- setdiff(sharedTips, gpTips)
+                attr(divergedTips, "site") <- sites
+                # The shared part
+                sharedTips <- setdiff(sharedTips, divergedTips)
+                attr(sharedTips, "site") <- sites
+                attr(sharedTips, "toMerge") <- gpIndex
+                attr(sharedTips, "toMergeRefSites") <- refSites
+                # Reform
+                if (i == 2) {
+                    preTips <- list()
+                } else {
+                    preTips <- toMerge[seq_len(i - 2)]
+                }
+                grouping[[toMergeIndex]] <- c(preTips,
+                                              list(sharedTips),
+                                              list(divergedTips),
+                                              toMerge[i:length(toMerge)])
+                break
+            }
+        }
+    }
+    return(grouping)
+}
+
+.combineFixations <- function(fixations, tree, align) {
+    # 'res' is going to be the return of this function. Each entry in
+    # the list is the 'sitePath' for a site. Each site ('sitePath')
+    # consists of 'mutPath' that is named by the starting node name.
+    # The fixed AA and number of non-dominant AA is also stored.
+    res <- list()
+    for (segs in fixations) {
+        i <- attr(segs, "site")
+        site <- as.character(i)
+        res[[site]][[1]] <- lapply(segs[[1]], function(tips) {
+            attr(tips, "tipsAA") <- substr(x = align[tips],
+                                           start = i,
+                                           stop = i)
+            return(tips)
+        })
+        attr(res[[site]], "site") <- i
+        attr(res[[site]], "tree") <- tree
+        class(res[[site]]) <- "sitePath"
+        for (seg in segs[-1]) {
+            # Assume a new fixation path is to add.
+            targetIndex <- length(res[[site]]) + 1
+            # The index to extract the terminal tips of the fixation.
+            endIndex <- length(seg)
+            finalAA <- attr(seg[[endIndex]], "AA")
+            # The following is to decide if any fixation path can be
+            # combined.
+            existPath <- res[[site]]
+            # The fixation before the temrinal tips should be identical
+            # and the final fixed amino acid should be the same.
+            toCombine <- vapply(
+                X = existPath,
+                FUN = function(ep) {
+                    identical(lapply(seg, c)[-endIndex],
+                              lapply(ep, c)[-endIndex]) &&
+                        finalAA == attr(ep[[endIndex]], "AA")
+                },
+                FUN.VALUE = logical(1)
+            )
+            if (any(toCombine)) {
+                existIndex <- which(toCombine)
+                # These are the candidates to combine. The additional
+                # condition be all the descendant tips are included.
+                toCombine <- unique(unlist(lapply(
+                    X = c(res[[site]][existIndex], list(seg)),
+                    FUN = "[[",
+                    ... = endIndex
+                )))
+                allTips <-
+                    .childrenTips(tree, getMRCA(tree, toCombine))
+                if (all(allTips %in% toCombine)) {
+                    seg[[endIndex]] <- toCombine
+                    attr(seg[[endIndex]], "AA") <- finalAA
+                    res[[site]] <- res[[site]][-existIndex]
+                    targetIndex <- length(res[[site]]) + 1
+                } else {
+                    # Add new fixation for the site if no existing
+                    # mutation path can be combined with
+                    targetIndex <- length(existPath) + 1
+                }
+            }
+            seg <- lapply(seg, function(tips) {
+                attr(tips, "tipsAA") <- substr(x = align[tips],
+                                               start = i,
+                                               stop = i)
+                return(tips)
+            })
+            res[[site]][[targetIndex]] <- seg
+            attr(res[[site]], "site") <- i
+            attr(res[[site]], "tree") <- tree
+            class(res[[site]]) <- "sitePath"
+        }
+    }
+    return(res)
+}
+
 #' @export
 print.sitePath <- function(x, ...) {
     cat("Site",
@@ -320,29 +550,18 @@ print.fixationSites <- function(x, ...) {
 }
 
 #' @rdname plotFixation
-#' @title Visualize fixation sites
-#' @description Visualize \code{\link{fixationSites}} object. The tips are
-#'   clustered according to the fixation sites. The transition of fixation sites
-#'   will be plotted as a phylogenetic tree. The length of each branch
-#'   represents the number of fixation mutation between two clusters. The name
-#'   of the tree tips indicate the number of sequences in the cluster.
-#' @param x Could be a \code{\link{fixationSites}} object or a \code{sitePath}
-#'   object.
-#' @param y For a \code{\link{fixationSites}} object, it is whether to show the
-#'   fixation mutation between clusters. For a \code{sitePath} object, it can
-#'   have more than one fixation path. This is to select which path to plot. The
-#'   default is \code{NULL} which will plot all the paths.
-#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
-#' @param recurringOnly Whether to plot recurring fixation mutation only. The
-#'   default is FALSE.
-#' @param minEffectiveSize The minimum size for a tip cluster in the plot.
+#' @title Visualize fixation sites on tree
+#' @description Mark fixation sites on the original phylogenetic tree.
+#' @param x A \code{\link{fixationSites}} object.
+#' @param y For a \code{\link{fixationSites}} object, it is whether to plot
+#'   recurring fixation mutation only. The default is FALSE.
+#' @param color The color for the clusters. The default uses ggplot2's color
+#'   schem.e
 #' @param ... Other arguments.
-#' @return The function only makes plot and returns no value (It behaviors like
-#'   the generic \code{\link{plot}} function).
-#' @seealso \code{\link{as.phylo.fixationSites}}
-#' @importFrom tidytree as_tibble
-#' @importFrom ape edgelabels
-#' @importFrom ape axisPhylo
+#' @return A phylogenetic tree plot marked with site fixation. The function does
+#'   not behave like generic \code{\link{plot}} function.
+#' @importFrom tidytree groupOTU
+#' @importFrom ggplot2 scale_color_manual
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -350,44 +569,33 @@ print.fixationSites <- function(x, ...) {
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' paths <- lineagePath(tree)
 #' fixations <- fixationSites(paths)
-#' plot(fixations, minEffectiveSize = 0)
+#' plot(fixations)
 plot.fixationSites <- function(x,
-                               y = TRUE,
-                               showTips = FALSE,
-                               recurringOnly = FALSE,
-                               minEffectiveSize = NULL,
+                               y = FALSE,
+                               color = NULL,
                                ...) {
-    snpTracing <- as.phylo.fixationSites(x, minEffectiveSize)
-    edgeSNPs <- attr(snpTracing, "edgeSNPs")
-    if (recurringOnly) {
-        allMutSites <- unlist(edgeSNPs)
-        duplicatedSites <-
-            unique(allMutSites[which(duplicated(allMutSites))])
-        edgeSNPs <- lapply(edgeSNPs, function(sites) {
-            res <- sites[which(sites %in% duplicatedSites)]
-            attributes(res) <- attributes(sites)
-            return(res)
-        })
+    tree <- as.phylo.fixationSites(x)
+    grp <- sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
+    grp <- as.list.sitewiseClusters(grp)
+    # if (y) {
+    #     allMutSites <- tr@data[["SNPs"]]
+    #     duplicatedSites <-
+    #         unique(allMutSites[which(duplicated(allMutSites))])
+    #     edgeSNPs <- lapply(edgeSNPs, function(sites) {
+    #         res <- sites[which(sites %in% duplicatedSites)]
+    #         attributes(res) <- attributes(sites)
+    #         return(res)
+    #     })
+    # }
+    p <- ggtree(
+        groupOTU(tree, grp, group_name = "Groups"),
+        aes(color = Groups)
+    )
+    if (!is.null(color)) {
+        names(color) <- names(grp)
+        colors["0"] <- "#000000"
+        p <- p + scale_color_manual(values = as.list(color))
+
     }
-    edge2show <- which(lengths(edgeSNPs) != 0)
-    show.tip.label <- showTips
-    plot.phylo(snpTracing, show.tip.label = show.tip.label, ...)
-    axisPhylo(backward = FALSE)
-    if (y) {
-        edgelabels(
-            text = vapply(
-                X = edgeSNPs[edge2show],
-                FUN = paste,
-                collapse = ", ",
-                FUN.VALUE = character(1)
-            ),
-            edge = vapply(
-                X = edgeSNPs[edge2show],
-                FUN = function(i) {
-                    which(snpTracing[["edge"]][, 2] == attr(i, "edge")[2])
-                },
-                FUN.VALUE = integer(1)
-            )
-        )
-    }
+    return(p)
 }

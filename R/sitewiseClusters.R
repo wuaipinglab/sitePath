@@ -1,0 +1,278 @@
+#' @rdname sitewiseClusters
+#' @name sitewiseClusters
+#' @title Accumulation of fixed mutation as a tree
+#' @description The tips are clustered according to the fixation sites. The
+#'   transition of fixation sites will be plotted as a phylogenetic tree. The
+#'   length of each branch represents the number of fixation mutation between
+#'   two clusters. The name of the tree tips indicate the number of sequences in
+#'   the cluster.
+#' @param x The return from \code{\link{fixationSites}} function.
+#' @param minEffectiveSize The minimum size for a tip cluster.
+#' @param ... Further arguments passed to or from other methods.
+#' @return An \code{sitewiseClusters} object
+#' @importFrom tidytree as_tibble full_join as.treedata
+#' @export
+#' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' paths <- lineagePath(tree)
+#' mutations <- fixationSites(paths)
+#' sitewiseClusters(mutations)
+sitewiseClusters.fixationSites <- function(x,
+                                           minEffectiveSize = NULL,
+                                           ...) {
+    grouping <- attr(x, "clustersByPath")
+    if (is.null(minEffectiveSize)) {
+        minEffectiveSize <-
+            mean(lengths(unlist(grouping, recursive = FALSE)))
+    }
+    # Filter out small sized cluster except the divegent points
+    grouping <- lapply(grouping, function(g) {
+        g[which(vapply(
+            X = g,
+            FUN = function(tips) {
+                length(tips) > minEffectiveSize || !is.null(attr(tips, "toMerge"))
+            },
+            FUN.VALUE = logical(1)
+        ))]
+    })
+    grouping <- grouping[which(lengths(grouping) != 0)]
+    # The existing tips in the tree
+    tipClusters <- list()
+    # The edges and its SNP of the tree
+    parentNodes <- integer()
+    childrenNodes <- integer()
+    edgeSNPs <- list()
+
+    # Keep track of the newly added internal node
+    newParentNode <-
+        length(unlist(grouping, recursive = FALSE)) + 1L
+    parentNode <- newParentNode
+    # Keep track of the newly added tip node
+    tipNode <- 0L
+    # A list to record the fixation sites of the parent nodes
+    parentNodesSites <- list()
+
+    for (gpIndex in seq_along(grouping)) {
+        # The group to add onto the tree
+        gp <- grouping[[gpIndex]]
+
+        # The initial tips of the group
+        currentTips <- gp[[1]]
+        # Assume the initial reference site
+        refSites <- attr(currentTips, "site")
+        # Find where to merge and parent node, update reference site maybe
+        for (i in seq_along(tipClusters)) {
+            toMerge <- tipClusters[[i]]
+            toMergeIndex <- attr(toMerge, "toMerge")
+            if (!is.null(toMergeIndex) &&
+                toMergeIndex == gpIndex) {
+                refSites <- attr(toMerge, "toMergeRefSites")
+                parentNode <-
+                    parentNodes[which(childrenNodes == i)]
+                break
+            }
+        }
+        parentNodesSites[[as.character(parentNode)]] <- refSites
+
+        # Track the tip and internal node
+        tipNode <- tipNode + 1L
+        startingNode <- tipNode
+        tipClusters <- c(tipClusters, list(currentTips))
+        # Define the initial edge of the group
+        parentNodes <- c(parentNodes, parentNode)
+        childrenNodes <- c(childrenNodes, tipNode)
+        # SNP of the initial edge is set none
+        edgeSNPs <- c(edgeSNPs, list(as.character(na.omit(
+            vapply(
+                X = names(refSites),
+                FUN = function(site) {
+                    ref <- refSites[site]
+                    snp <- attr(currentTips, "site")[site]
+                    if (ref == snp) {
+                        return(NA_character_)
+                    }
+                    return(paste0(ref, site, snp))
+                },
+                FUN.VALUE = character(1)
+            )
+        ))))
+
+        # Grow the tree
+        for (tipIndex in seq_along(gp)[-1]) {
+            tipNode <- tipNode + 1L
+            currentTips <- gp[[tipIndex]]
+            currentSites <- attr(currentTips, "site")
+            # Attach the tip near the most related tips. Assume the reference
+            # tips are the most related (least number of SNP)
+            mostRelatedTipNode <- startingNode
+            leastSNPnum <- sum(refSites != currentSites)
+            # Loop through the rest existing tip clusters
+            for (otherTipNode in seq_along(tipClusters)[-seq_len(startingNode)]) {
+                otherSites <- attr(tipClusters[[otherTipNode]], "site")
+                snpNum <- sum(otherSites != currentSites)
+                if (snpNum < leastSNPnum) {
+                    mostRelatedTipNode <- otherTipNode
+                    leastSNPnum <- snpNum
+                }
+            }
+            # Find the direct tree edge to the most related tips
+            edgeIndex <-
+                which(childrenNodes == mostRelatedTipNode)
+            parentNode <- parentNodes[edgeIndex]
+            # Tree growing differs according to the edge SNP
+            parentSites <-
+                parentNodesSites[[as.character(parentNode)]]
+            snpSites <- as.character(na.omit(
+                vapply(
+                    X = names(parentSites),
+                    FUN = function(site) {
+                        ref <- parentSites[site]
+                        snp <- currentSites[site]
+                        if (ref == snp) {
+                            return(NA_character_)
+                        }
+                        return(paste0(ref, site, snp))
+                    },
+                    FUN.VALUE = character(1)
+                )
+            ))
+            edgeSNP <- edgeSNPs[[edgeIndex]]
+            sharedWithEdgeSNP <- intersect(snpSites, edgeSNP)
+            # A new internal node is needed when no SNP overlap
+            if (length(sharedWithEdgeSNP) != 0) {
+                newParentNode <- newParentNode + 1L
+                # Insert the new internal node to the target edge
+                parentNodes[edgeIndex] <- newParentNode
+                parentNodes <- c(parentNodes, parentNode)
+                childrenNodes <- c(childrenNodes, newParentNode)
+                edgeSNPs <- c(edgeSNPs, list(sharedWithEdgeSNP))
+                # Update SNP of the directly linked edge
+                edgeSNPs[[edgeIndex]] <-
+                    setdiff(edgeSNP, sharedWithEdgeSNP)
+                # Calculate the site for the new internal node
+                siteToChange <- substr(sharedWithEdgeSNP,
+                                       2,
+                                       nchar(sharedWithEdgeSNP) - 1)
+                parentSites[siteToChange] <- substr(
+                    sharedWithEdgeSNP,
+                    nchar(sharedWithEdgeSNP),
+                    nchar(sharedWithEdgeSNP)
+                )
+                parentNodesSites[[as.character(newParentNode)]] <-
+                    parentSites
+                # Update the parent node and edge SNP for the current tip node
+                parentNode <- newParentNode
+                snpSites <- setdiff(snpSites, sharedWithEdgeSNP)
+            }
+            # Add edge
+            parentNodes <- c(parentNodes, parentNode)
+            childrenNodes <- c(childrenNodes, tipNode)
+            # Add edge SNP
+            edgeSNPs <- c(edgeSNPs, list(snpSites))
+            # Add the current tips
+            tipClusters <- c(tipClusters, list(currentTips))
+        }
+    }
+    # TODO: left padding with 0
+    names(tipClusters) <- paste0("c",
+                                 seq_along(tipClusters),
+                                 " [",
+                                 lengths(tipClusters),
+                                 "]")
+    SNPtracing <- list(
+        "edge" = cbind(parentNodes, childrenNodes),
+        "edge.length" = lengths(edgeSNPs),
+        "Nnode" = length(unique(parentNodes)),
+        "tip.label" = names(tipClusters)
+    )
+    class(SNPtracing) <- "phylo"
+    d <- as_tibble(t(vapply(
+        X = seq_along(edgeSNPs),
+        FUN = function(n) {
+            snp <- edgeSNPs[[n]]
+            if (length(snp) == 0) {
+                res <- NA_character_
+            } else {
+                res <- character()
+                snpNum <- length(snp)
+                for (i in seq_len(snpNum)) {
+                    res <- paste0(res, snp[i])
+                    if (i < snpNum) {
+                        if (i %% 4 == 0) {
+                            res <- paste0(res, ",\n")
+                        } else {
+                            res <- paste0(res, ", ")
+                        }
+                    }
+                }
+            }
+            res <- c(res, SNPtracing[["edge"]][n, 2])
+            # res <- c(res, attr(snp, "edge")[2])
+            names(res) <- c("SNPs", "node")
+            return(res)
+        },
+        FUN.VALUE = c(character(1), integer(1))
+    )))
+    d[["node"]] <- as.integer(d[["node"]])
+    SNPtracing <- as_tibble(SNPtracing)
+    SNPtracing <- full_join(SNPtracing, d, by = "node")
+    attr(tipClusters, "SNPtracing") <- as.treedata(SNPtracing)
+    class(tipClusters) <- "sitewiseClusters"
+    return(tipClusters)
+}
+
+#' @export
+sitewiseClusters <- function(x, ...) {
+    UseMethod("sitewiseClusters")
+}
+
+#' @export
+print.sitewiseClusters <- function(x, ...) {
+    print(names(x))
+}
+
+#' @rdname plotsitewiseClusters
+#' @title Visualize fixation sites
+#' @description Visualize \code{\link{fixationSites}} object. The tips are
+#'   clustered according to the fixation sites. The transition of fixation sites
+#'   will be plotted as a phylogenetic tree. The length of each branch
+#'   represents the number of fixation mutation between two clusters. The name
+#'   of the tree tips indicate the number of sequences in the cluster.
+#' @param x Could be a \code{\link{fixationSites}} object or a \code{sitePath}
+#'   object.
+#' @param y For a \code{\link{sitewiseClusters}} object, it is whether to show
+#'   the fixation mutation between clusters. For a \code{sitePath} object, it
+#'   can have more than one fixation path. This is to select which path to plot.
+#'   The default is \code{NULL} which will plot all the paths.
+#' @param ... Other arguments.
+#' @return The function only makes plot and returns no value (It behaviors like
+#'   the generic \code{\link{plot}} function).
+#' @importFrom ggtree theme_tree2
+#' @importFrom ggrepel geom_label_repel
+#' @export
+#' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' paths <- lineagePath(tree)
+#' fixations <- fixationSites(paths)
+#' plot(fixations)
+plot.sitewiseClusters <- function(x,
+                                  y = TRUE,
+                                  ...) {
+    tr <- attr(x, "SNPtracing")
+    p <- ggtree(tr) +
+        geom_tiplab(align = TRUE) +
+        theme_tree2()
+    if (y) {
+        p <- p + geom_label_repel(
+            aes(x = branch, label = SNPs),
+            fill = 'lightgreen',
+            min.segment.length = 0,
+            na.rm = TRUE
+        )
+    }
+    return(p)
+}
