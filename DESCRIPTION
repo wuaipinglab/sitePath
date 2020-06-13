@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Detection of site fixation in molecular evolution
-Version: 1.5.5
+Version: 1.5.6
 Author: Chengyang Ji, Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
 Description: The package does hierarchical search for fixation events given

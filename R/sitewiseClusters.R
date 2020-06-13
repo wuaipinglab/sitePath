@@ -10,6 +10,7 @@
 #' @param minEffectiveSize The minimum size for a tip cluster.
 #' @param ... Further arguments passed to or from other methods.
 #' @return An \code{sitewiseClusters} object
+#' @importFrom stats na.omit
 #' @importFrom tidytree as_tibble full_join as.treedata
 #' @export
 #' @examples
@@ -37,7 +38,6 @@ sitewiseClusters.fixationSites <- function(x,
             FUN.VALUE = logical(1)
         ))]
     })
-    grouping <- grouping[which(lengths(grouping) != 0)]
     # The existing tips in the tree
     tipClusters <- list()
     # The edges and its SNP of the tree
@@ -57,7 +57,10 @@ sitewiseClusters.fixationSites <- function(x,
     for (gpIndex in seq_along(grouping)) {
         # The group to add onto the tree
         gp <- grouping[[gpIndex]]
-
+        # Skip the path if none of its group is qualified
+        if (length(gp) == 0) {
+            next
+        }
         # The initial tips of the group
         currentTips <- gp[[1]]
         # Assume the initial reference site

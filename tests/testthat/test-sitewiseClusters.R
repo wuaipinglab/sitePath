@@ -1,6 +1,6 @@
-context("test-typeconversion")
+context("test-sitewiseClusters")
 
-test_that("Conversion to phylo works", {
+test_that("The output is valid phylo", {
     data(h3n2_tree_reduced)
     data(h3n2_align_reduced)
     tree <- addMSA(tree = h3n2_tree_reduced,

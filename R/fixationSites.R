@@ -24,8 +24,6 @@
 #' @param ... further arguments passed to or from other methods.
 #' @return \code{fixationSites} returns a list of fixation mutations with names
 #'   of the tips involved.
-#' @importFrom utils tail
-#' @importFrom stats na.omit
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
