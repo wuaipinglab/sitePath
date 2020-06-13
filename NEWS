@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.5.7
+-------------------------
+    o Left padding with 0 for the cluster name.
+    o Add mutation label when plot 'fixationSites'.
+
+CHANGES IN VERSION 1.5.6
+-------------------------
+    o Add 'sitewiseClusters' function and plot function for its visualization.
+
 CHANGES IN VERSION 1.5.5
 -------------------------
     o Add 'plotMutSites' function to visualize mutations of each tree tip.

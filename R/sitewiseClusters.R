@@ -178,9 +178,18 @@ sitewiseClusters.fixationSites <- function(x,
             tipClusters <- c(tipClusters, list(currentTips))
         }
     }
-    # TODO: left padding with 0
+    # Left padding with 0 for cluster ID
+    groupID <- as.character(seq_along(tipClusters))
+    idLen <- nchar(groupID)
+    padding <- vapply(
+        X = max(idLen) - idLen,
+        FUN = function(n) {
+            paste0(rep("0", n), collapse = "")
+        },
+        FUN.VALUE = character(1)
+    )
     names(tipClusters) <- paste0("c",
-                                 seq_along(tipClusters),
+                                 paste0(padding, groupID),
                                  " [",
                                  lengths(tipClusters),
                                  "]")

@@ -123,6 +123,13 @@ To have an overall view of the transition of fixation mutation, use `plot` on an
 plot(fixations)
 ```
 
+To have a simplified view of mutation accumulations. It might help to use `sitewiseClusters` function and visualize it.
+
+```{r}
+x <- sitewiseClusters(fixations)
+plot(x)
+```
+
 
 # Additional functions
 
@@ -139,10 +146,11 @@ plotSingleSite(paths, 763)
 
 ## SNP sites
 
-An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP sites and the result could be what you'll expect to be fixation mutation.
+An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP sites and the result could be what you'll expect to be fixation mutation. Also, a tree plot with mutation could be visualized with `plotMutSites` function.
 
 ```{r find_SNP}
 snps <- SNPsites(tree)
+plotMutSites(snps)
 plotSingleSite(paths, snps[4])
 plotSingleSite(paths, snps[5])
 ```

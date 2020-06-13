@@ -553,13 +553,13 @@ print.fixationSites <- function(x, ...) {
 #' @param x A \code{\link{fixationSites}} object.
 #' @param y For a \code{\link{fixationSites}} object, it is whether to plot
 #'   recurring fixation mutation only. The default is FALSE.
-#' @param color The color for the clusters. The default uses ggplot2's color
-#'   schem.e
+#' @param color The color list for the clusters. The default uses ggplot2's
+#'   color scheme.
 #' @param ... Other arguments.
 #' @return A phylogenetic tree plot marked with site fixation. The function does
 #'   not behave like generic \code{\link{plot}} function.
 #' @importFrom tidytree groupOTU
-#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 scale_color_manual guides guide_legend
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -585,10 +585,89 @@ plot.fixationSites <- function(x,
     #         return(res)
     #     })
     # }
-    p <- ggtree(
-        groupOTU(tree, grp, group_name = "Groups"),
-        aes(color = Groups)
-    )
+    clusterPaths <- list()
+    rootNode <- getMRCA(tree, tree[["tip.label"]])
+    for (cluster in names(grp)) {
+        tips <- grp[[cluster]]
+        ancestral <- getMRCA(tree, tips)
+        if (is.null(ancestral)) {
+            np <- nodepath(tree, rootNode, tips)
+            clusterPaths[[cluster]] <- np[1:(length(np) - 1)]
+        } else {
+            clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+        }
+    }
+    clusterInfo <- lapply(names(grp), function(g) {
+        data.frame(row.names = grp[[g]],
+                   "cluster" = rep(g, length(grp[[g]])))
+    })
+    clusterInfo <- do.call(rbind, clusterInfo)
+
+    transMut <- list()
+    for (sp in x) {
+        site <- attr(sp, "site")
+        for (mp in sp) {
+            for (i in seq_along(mp)[-1]) {
+                prevTips <- mp[[i - 1]]
+                currTips <- mp[[i]]
+                prevAA <- attr(prevTips, "AA")
+                currAA <- attr(currTips, "AA")
+                mutation <- paste0(prevAA, site, currAA)
+                # prevCluster <- unique(clusterInfo[as.character(prevTips), ])
+                # names(prevCluster) <- prevCluster
+                # # Choose the most recent cluster to stay un-mutated
+                # prev <- names(which.max(lapply(prevCluster, function(cluster) {
+                #     length(clusterPaths[[cluster]])
+                # })))
+                currCluster <- unique(clusterInfo[as.character(currTips), ])
+                names(currCluster) <- currCluster
+                # Choose the most ancient cluster which first receive the
+                # mutation
+                curr <- names(which.min(lapply(currCluster, function(cluster) {
+                    length(clusterPaths[[cluster]])
+                })))
+                # Find the transition node
+                # trans <- paste(prev, curr, sep = "-")
+                currPath <- clusterPaths[[curr]]
+                trans <- as.character(currPath[length(currPath)])
+                if (trans %in% names(transMut)) {
+                    transMut[[trans]] <- c(transMut[[trans]], mutation)
+                } else {
+                    transMut[[trans]] <- mutation
+                }
+            }
+        }
+    }
+    transMut <- lapply(transMut, unique)
+    d <- as_tibble(t(vapply(
+        X = names(transMut),
+        FUN = function(trans) {
+            mutation <- paste(transMut[[trans]], collapse = ", ")
+            res <- c(trans, mutation)
+            names(res) <- c("node", "SNPs")
+            return(res)
+        },
+        FUN.VALUE = character(2)
+    )))
+    d[["node"]] <- as.integer(d[["node"]])
+    y <- full_join(as_tibble(tree), d, by = "node")
+    tree <- as.treedata(y)
+
+    p <- ggtree(groupOTU(tree, grp, group_name = "Groups"),
+                aes(color = Groups)) +
+        geom_label_repel(
+            aes(x = branch, label = SNPs),
+            fill = "lightgreen",
+            color = "black",
+            min.segment.length = 0,
+            na.rm = TRUE
+        ) +
+        guides(
+            color = guide_legend(
+                override.aes = list(size = 3),
+            )
+        )+
+        theme(legend.position = "left")
     if (!is.null(color)) {
         names(color) <- names(grp)
         colors["0"] <- "#000000"

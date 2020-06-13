@@ -12,8 +12,8 @@
 \item{y}{For a \code{\link{fixationSites}} object, it is whether to plot
 recurring fixation mutation only. The default is FALSE.}
 
-\item{color}{The color for the clusters. The default uses ggplot2's color
-schem.e}
+\item{color}{The color list for the clusters. The default uses ggplot2's
+color scheme.}
 
 \item{...}{Other arguments.}
 }
