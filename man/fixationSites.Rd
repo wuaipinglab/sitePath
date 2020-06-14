@@ -77,3 +77,6 @@ data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 fixationSites(lineagePath(tree))
 }
+\seealso{
+\code{\link{as.data.frame.fixationSites}}
+}

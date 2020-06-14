@@ -245,38 +245,16 @@ print.sitewiseClusters <- function(x, ...) {
     print(names(x))
 }
 
-#' @rdname plotsitewiseClusters
-#' @title Visualize fixation sites
-#' @description Visualize \code{\link{fixationSites}} object. The tips are
-#'   clustered according to the fixation sites. The transition of fixation sites
-#'   will be plotted as a phylogenetic tree. The length of each branch
-#'   represents the number of fixation mutation between two clusters. The name
-#'   of the tree tips indicate the number of sequences in the cluster.
-#' @param x Could be a \code{\link{fixationSites}} object or a \code{sitePath}
-#'   object.
-#' @param y For a \code{\link{sitewiseClusters}} object, it is whether to show
-#'   the fixation mutation between clusters. For a \code{sitePath} object, it
-#'   can have more than one fixation path. This is to select which path to plot.
-#'   The default is \code{NULL} which will plot all the paths.
-#' @param ... Other arguments.
-#' @return The function only makes plot and returns no value (It behaviors like
-#'   the generic \code{\link{plot}} function).
-#' @importFrom ggtree theme_tree2
+#' @rdname plotFunctions
+#' @importFrom ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
 #' @export
-#' @examples
-#' data(zikv_tree_reduced)
-#' data(zikv_align_reduced)
-#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
-#' paths <- lineagePath(tree)
-#' fixations <- fixationSites(paths)
-#' plot(fixations)
 plot.sitewiseClusters <- function(x,
                                   y = TRUE,
                                   ...) {
     tr <- attr(x, "SNPtracing")
     p <- ggtree(tr) +
-        geom_tiplab(align = TRUE) +
+        geom_tiplab(hjust = 0.3, align = TRUE, offset = 0.5) +
         theme_tree2()
     if (y) {
         p <- p + geom_label_repel(

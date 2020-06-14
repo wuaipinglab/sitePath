@@ -24,6 +24,7 @@
 #' @param ... further arguments passed to or from other methods.
 #' @return \code{fixationSites} returns a list of fixation mutations with names
 #'   of the tips involved.
+#' @seealso \code{\link{as.data.frame.fixationSites}}
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -547,27 +548,23 @@ print.fixationSites <- function(x, ...) {
     }
 }
 
-#' @rdname plotFixation
-#' @title Visualize fixation sites on tree
-#' @description Mark fixation sites on the original phylogenetic tree.
-#' @param x A \code{\link{fixationSites}} object.
-#' @param y For a \code{\link{fixationSites}} object, it is whether to plot
-#'   recurring fixation mutation only. The default is FALSE.
+#' @rdname plotFunctions
 #' @param color The color list for the clusters. The default uses ggplot2's
 #'   color scheme.
-#' @param ... Other arguments.
-#' @return A phylogenetic tree plot marked with site fixation. The function does
-#'   not behave like generic \code{\link{plot}} function.
 #' @importFrom tidytree groupOTU
 #' @importFrom ggplot2 scale_color_manual guides guide_legend
+#' @importFrom ggrepel geom_label_repel
 #' @export
 #' @examples
-#' data(zikv_tree_reduced)
-#' data(zikv_align_reduced)
-#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' data(zikv_tree)
+#' data(zikv_align)
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
+#' plot(paths)
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
+#' x <- sitewiseClusters(fixations)
+#' plot(x)
 plot.fixationSites <- function(x,
                                y = FALSE,
                                color = NULL,
@@ -575,16 +572,6 @@ plot.fixationSites <- function(x,
     tree <- as.phylo.fixationSites(x)
     grp <- sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
     grp <- as.list.sitewiseClusters(grp)
-    # if (y) {
-    #     allMutSites <- tr@data[["SNPs"]]
-    #     duplicatedSites <-
-    #         unique(allMutSites[which(duplicated(allMutSites))])
-    #     edgeSNPs <- lapply(edgeSNPs, function(sites) {
-    #         res <- sites[which(sites %in% duplicatedSites)]
-    #         attributes(res) <- attributes(sites)
-    #         return(res)
-    #     })
-    # }
     clusterPaths <- list()
     rootNode <- getMRCA(tree, tree[["tip.label"]])
     for (cluster in names(grp)) {
@@ -613,21 +600,18 @@ plot.fixationSites <- function(x,
                 prevAA <- attr(prevTips, "AA")
                 currAA <- attr(currTips, "AA")
                 mutation <- paste0(prevAA, site, currAA)
-                # prevCluster <- unique(clusterInfo[as.character(prevTips), ])
-                # names(prevCluster) <- prevCluster
-                # # Choose the most recent cluster to stay un-mutated
-                # prev <- names(which.max(lapply(prevCluster, function(cluster) {
-                #     length(clusterPaths[[cluster]])
-                # })))
-                currCluster <- unique(clusterInfo[as.character(currTips), ])
+                currCluster <-
+                    unique(clusterInfo[as.character(currTips), ])
                 names(currCluster) <- currCluster
                 # Choose the most ancient cluster which first receive the
                 # mutation
-                curr <- names(which.min(lapply(currCluster, function(cluster) {
-                    length(clusterPaths[[cluster]])
-                })))
+                curr <- names(which.min(lapply(
+                    X = currCluster,
+                    FUN = function(cluster) {
+                        length(clusterPaths[[cluster]])
+                    }
+                )))
                 # Find the transition node
-                # trans <- paste(prev, curr, sep = "-")
                 currPath <- clusterPaths[[curr]]
                 trans <- as.character(currPath[length(currPath)])
                 if (trans %in% names(transMut)) {
@@ -650,8 +634,8 @@ plot.fixationSites <- function(x,
         FUN.VALUE = character(2)
     )))
     d[["node"]] <- as.integer(d[["node"]])
-    y <- full_join(as_tibble(tree), d, by = "node")
-    tree <- as.treedata(y)
+    d <- full_join(as_tibble(tree), d, by = "node")
+    tree <- as.treedata(d)
 
     p <- ggtree(groupOTU(tree, grp, group_name = "Groups"),
                 aes(color = Groups)) +
@@ -661,13 +645,12 @@ plot.fixationSites <- function(x,
             color = "black",
             min.segment.length = 0,
             na.rm = TRUE
-        ) +
-        guides(
-            color = guide_legend(
-                override.aes = list(size = 3),
-            )
-        )+
-        theme(legend.position = "left")
+        )
+    if (y) {
+        p <- p +
+            guides(color = guide_legend(override.aes = list(size = 3), )) +
+            theme(legend.position = "left")
+    }
     if (!is.null(color)) {
         names(color) <- names(grp)
         colors["0"] <- "#000000"

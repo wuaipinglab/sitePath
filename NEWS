@@ -2,6 +2,7 @@ CHANGES IN VERSION 1.5.7
 -------------------------
     o Left padding with 0 for the cluster name.
     o Add mutation label when plot 'fixationSites'.
+    o Add 'as.data.frame' function for 'fixationSites'.
 
 CHANGES IN VERSION 1.5.6
 -------------------------

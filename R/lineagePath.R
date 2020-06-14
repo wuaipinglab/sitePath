@@ -91,29 +91,36 @@ print.lineagePath <- function(x, ...) {
     )
 }
 
-#' @rdname plotPath
-#' @title Visualize phylogenetic lineages
-#' @description Visualize \code{\link{lineagePath}} object. A tree diagram will
-#'   be plotted and paths are black solid line while the trimmed nodes and tips
-#'   will use grey dashed line.
-#' @param x Could be a \code{\link{lineagePath}} object or the return from
-#'   \code{\link{sneakPeek}}.
-#' @param y Whether to emphasize the lineage branches by using thicker line.
-#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
-#' @param ... Other arguments.
-#' @return A ggplot object to plot the tree and dash-line the non-lineage
-#'   branches. The function does not behave like generic \code{\link{plot}}
-#'   function.
-#' @importFrom ggtree ggtree aes theme scale_color_manual geom_tiplab
+#' @rdname plotFunctions
+#' @name plotFunctions
+#' @title Visualize the results
+#' @description The plot function to visualize the return of functions in the
+#'   package. Though the function name \code{plot} is used, the plot functions
+#'   here do not behave like the generic \code{\link{plot}} function. The
+#'   underlying function applies \code{\link{ggplot2}}.
+#' @param x Could be a \code{\link{lineagePath}} object,
+#'   \code{\link{fixationSites}} object or \code{\link{sitewiseClusters}}
+#'   object.
+#' @param y For \code{\link{lineagePath}} object, it is whether to emphasize the
+#'   lineage branches by using thicker line. For a \code{\link{fixationSites}}
+#'   object, it is whether to give the legend for each group. For a
+#'   \code{\link{sitewiseClusters}} object, it is whether to show the fixation
+#'   mutation between clusters.
+#' @param ... Other arguments. The \code{showTips} argument has been deprecated.
+#' @return A ggplot object to make the plot. A \code{\link{lineagePath}} object
+#'   will be plotted as a tree diagram will be plotted and paths are black solid
+#'   line while the trimmed nodes and tips will use grey dashed line. A
+#'   \code{\link{fixationSites}} object will be plotted as original phylogenetic
+#'   tree marked with fixation substitutions. A \code{\link{sitewiseClusters}}
+#'   object will be plotted as a \code{phylo} object. The tips are clustered
+#'   according to the fixation sites. The transition of fixation sites will be
+#'   plotted as a phylogenetic tree. The length of each branch represents the
+#'   number of fixation mutation between two clusters. The name of the tree tips
+#'   indicate the number of sequences in the cluster.
+#' @importFrom ggtree ggtree aes theme scale_color_manual
 #' @importFrom ggplot2 ggtitle
 #' @export
-#' @examples
-#' data(zikv_tree)
-#' data(zikv_align)
-#' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' paths <- lineagePath(tree)
-#' plot(paths)
-plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
+plot.lineagePath <- function(x, y = TRUE, ...) {
     tree <- attr(x, "tree")
     nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
     group <- rep(1, times = nNodes)
@@ -133,9 +140,6 @@ plot.lineagePath <- function(x, y = TRUE, showTips = FALSE, ...) {
         scale_color_manual(values = c("black", "grey")) +
         theme(legend.position = "none") +
         ggtitle(attr(x, "similarity"))
-    if (showTips) {
-        p <- p + geom_tiplab()
-    }
     return(p)
 }
 
