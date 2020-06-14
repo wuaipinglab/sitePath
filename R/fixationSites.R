@@ -549,8 +549,8 @@ print.fixationSites <- function(x, ...) {
 }
 
 #' @rdname plotFunctions
-#' @param color The color list for the clusters. The default uses ggplot2's
-#'   color scheme.
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
 #' @importFrom tidytree groupOTU
 #' @importFrom ggplot2 scale_color_manual guides guide_legend
 #' @importFrom ggrepel geom_label_repel
@@ -566,8 +566,7 @@ print.fixationSites <- function(x, ...) {
 #' x <- sitewiseClusters(fixations)
 #' plot(x)
 plot.fixationSites <- function(x,
-                               y = FALSE,
-                               color = NULL,
+                               y = TRUE,
                                ...) {
     tree <- as.phylo.fixationSites(x)
     grp <- sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
@@ -626,8 +625,20 @@ plot.fixationSites <- function(x,
     d <- as_tibble(t(vapply(
         X = names(transMut),
         FUN = function(trans) {
-            mutation <- paste(transMut[[trans]], collapse = ", ")
-            res <- c(trans, mutation)
+            snp <- transMut[[trans]]
+            res <- character()
+            snpNum <- length(snp)
+            for (i in seq_len(snpNum)) {
+                res <- paste0(res, snp[i])
+                if (i < snpNum) {
+                    if (i %% 4 == 0) {
+                        res <- paste0(res, ",\n")
+                    } else {
+                        res <- paste0(res, ", ")
+                    }
+                }
+            }
+            res <- c(trans, res)
             names(res) <- c("node", "SNPs")
             return(res)
         },
@@ -637,6 +648,10 @@ plot.fixationSites <- function(x,
     d <- full_join(as_tibble(tree), d, by = "node")
     tree <- as.treedata(d)
 
+    groupColors <- colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
+    names(groupColors) <- names(grp)
+    groupColors["0"] <- "black"
+
     p <- ggtree(groupOTU(tree, grp, group_name = "Groups"),
                 aes(color = Groups)) +
         geom_label_repel(
@@ -645,17 +660,14 @@ plot.fixationSites <- function(x,
             color = "black",
             min.segment.length = 0,
             na.rm = TRUE
-        )
+        ) +
+        scale_color_manual(values = groupColors)
     if (y) {
         p <- p +
             guides(color = guide_legend(override.aes = list(size = 3), )) +
             theme(legend.position = "left")
-    }
-    if (!is.null(color)) {
-        names(color) <- names(grp)
-        colors["0"] <- "#000000"
-        p <- p + scale_color_manual(values = as.list(color))
-
+    } else {
+        p <- p + theme(legend.position = "none")
     }
     return(p)
 }

@@ -254,7 +254,7 @@ plot.sitewiseClusters <- function(x,
                                   ...) {
     tr <- attr(x, "SNPtracing")
     p <- ggtree(tr) +
-        geom_tiplab(hjust = 0.3, align = TRUE, offset = 0.5) +
+        geom_tiplab(hjust = 0.5, align = TRUE, offset = 0.5) +
         theme_tree2()
     if (y) {
         p <- p + geom_label_repel(

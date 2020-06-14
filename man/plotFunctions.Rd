@@ -8,7 +8,7 @@
 \alias{plot.sitewiseClusters}
 \title{Visualize the results}
 \usage{
-\method{plot}{fixationSites}(x, y = FALSE, color = NULL, ...)
+\method{plot}{fixationSites}(x, y = TRUE, ...)
 
 \method{plot}{lineagePath}(x, y = TRUE, ...)
 
@@ -24,9 +24,6 @@ lineage branches by using thicker line. For a \code{\link{fixationSites}}
 object, it is whether to give the legend for each group. For a
 \code{\link{sitewiseClusters}} object, it is whether to show the fixation
 mutation between clusters.}
-
-\item{color}{The color list for the clusters. The default uses ggplot2's
-color scheme.}
 
 \item{...}{Other arguments. The \code{showTips} argument has been deprecated.}
 }

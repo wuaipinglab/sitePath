@@ -68,7 +68,7 @@ as.data.frame.fixationSites <- function(x,
                     currAA <- attr(currTips, "AA")
                     mutation <- paste0(prevAA, site, currAA)
                     prevCluster <-
-                        unique(clusterInfo[as.character(prevTips),])
+                        unique(clusterInfo[as.character(prevTips), ])
                     names(prevCluster) <- prevCluster
                     # Choose the most recent cluster to stay un-mutated
                     prev <- names(which.max(lapply(
@@ -78,7 +78,7 @@ as.data.frame.fixationSites <- function(x,
                         }
                     )))
                     currCluster <-
-                        unique(clusterInfo[as.character(currTips),])
+                        unique(clusterInfo[as.character(currTips), ])
                     names(currCluster) <- currCluster
                     # Choose the most ancient cluster which first receive the
                     # mutation
@@ -98,15 +98,14 @@ as.data.frame.fixationSites <- function(x,
             }
         }
         transMut <- lapply(transMut, unique)
-        res <-
-            lapply(strsplit(names(transMut), '-'), function(i) {
-                n <- paste(i, collapse = '-')
-                data.frame(
-                    "mutation" = transMut[[n]],
-                    "from" = rep(i[1], length(transMut[[n]])),
-                    "to" = rep(i[2], length(transMut[[n]]))
-                )
-            })
+        res <- lapply(strsplit(names(transMut), '-'), function(i) {
+            n <- paste(i, collapse = '-')
+            data.frame(
+                "mutation" = transMut[[n]],
+                "from" = rep(i[1], length(transMut[[n]])),
+                "to" = rep(i[2], length(transMut[[n]]))
+            )
+        })
         res <- do.call(rbind, res)
     }
     return(res)

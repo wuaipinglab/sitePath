@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.5.8
+-------------------------
+    o Wrap mutations text in 'plot.fixationSites'.
+    o Remove 'color' argument for 'plot.fixationSites' as the number of groups
+      is usually unknown.
+
 CHANGES IN VERSION 1.5.7
 -------------------------
     o Left padding with 0 for the cluster name.
