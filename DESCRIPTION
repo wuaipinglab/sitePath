@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Detection of site fixation in molecular evolution
-Version: 1.5.9
+Version: 1.5.10
 Author: Chengyang Ji, Aiping Wu
 Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
 Description: The package does hierarchical search for fixation events given
@@ -37,4 +37,4 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 URL: https://github.com/wuaipinglab/sitePath
 BugReports: https://github.com/wuaipinglab/sitePath/issues
-biocViews: Alignment, MultipleSequenceAlignment, Software
+biocViews: Alignment, MultipleSequenceAlignment, Phylogenetics, SNP, Software

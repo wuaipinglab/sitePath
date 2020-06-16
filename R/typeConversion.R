@@ -47,7 +47,7 @@ as.data.frame.fixationSites <- function(x,
             if (is.null(ancestral)) {
                 np <- nodepath(tree, rootNode, tips)
                 clusterPaths[[cluster]] <-
-                    np[1:(length(np) - 1)]
+                    np[seq_len(length(np) - 1)]
             } else {
                 clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
             }

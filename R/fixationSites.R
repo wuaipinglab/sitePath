@@ -578,7 +578,7 @@ plot.fixationSites <- function(x,
         ancestral <- getMRCA(tree, tips)
         if (is.null(ancestral)) {
             np <- nodepath(tree, rootNode, tips)
-            clusterPaths[[cluster]] <- np[1:(length(np) - 1)]
+            clusterPaths[[cluster]] <- np[seq_len(length(np) - 1)]
         } else {
             clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
         }
