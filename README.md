@@ -119,17 +119,16 @@ threshold.*
 sneakPeek(tree, makePlot = FALSE)
 ```
 
-    ##    similarity pathNum
-    ## 1  0.30000000       1
-    ## 2  0.26777778       1
-    ## 3  0.23555556       1
-    ## 4  0.20333333       1
-    ## 5  0.17111111       1
-    ## 6  0.13888889       2
-    ## 7  0.10666667       3
-    ## 8  0.07444444       3
-    ## 9  0.04222222       3
-    ## 10 0.01000000      12
+    ##   similarity pathNum
+    ## 1      0.050       3
+    ## 2      0.045       3
+    ## 3      0.040       4
+    ## 4      0.035       5
+    ## 5      0.030       5
+    ## 6      0.025       5
+    ## 7      0.020       7
+    ## 8      0.015       9
+    ## 9      0.010      12
 
 ### 3.2 Choose a threshold
 
@@ -149,9 +148,9 @@ Now you’re ready to find fixation events.
 ### 4.1 Fixation mutations
 
 The hierarchical search with resampling method is done by
-`multiFixationSites` function. The function outputs a list of mutations
-with the sequence names involved before and after the fixation. The
-hiearchy search without resampling is `fixationSites`.
+`fixationSites` function. The function outputs a list of mutations with
+the sequence names involved before and after the fixation. The hiearchy
+search without resampling is `fixationSites`.
 
 ``` r
 fixations <- fixationSites(paths)
@@ -178,11 +177,9 @@ print(fixations)
 extractSite(fixations, 139)
 ```
 
-    ## Site 139 may experience fixation on 3 path(s):
+    ## Site 139 may experience fixation on 1 path(s):
     ## 
-    ## S139N (119->85) 
-    ## S139N (119->136) 
-    ## S139N (119->129) 
+    ## S139N (119->243) 
     ## 
     ## In the bracket are the number of tips involved before and after the fixation
 

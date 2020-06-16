@@ -4,8 +4,7 @@
 #' @description The result of \code{\link{fixationSites}} contains all the
 #'   possible sites with fixation mutation. The function \code{extractTips}
 #'   retrieves the name of the tips involved in the fixation.
-#' @param x A \code{fixationSites} or a \code{multiFixationSites} or a
-#'   \code{sitePath} object.
+#' @param x A \code{fixationSites} or a \code{sitePath} object.
 #' @param site A site predicted to experience fixation.
 #' @param select For a site, there theoretically might be more than one fixation
 #'   on different lineages. You may use this argument to extract for a specific

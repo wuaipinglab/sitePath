@@ -98,7 +98,7 @@ plotSingleSite.lineagePath <- function(x,
 #' @rdname plotSingleSite
 #' @description Visualize the \code{sitePath} object which can be extracted by
 #'   using \code{\link{extractSite}} on the return of
-#'   \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
+#'   \code{\link{fixationSites}}.
 #' @param y For a \code{sitePath} object, it can have more than one fixation
 #'   path. This is to select which path to plot. The default is \code{NULL}
 #'   which will plot all the paths. It is the same as \code{select} in
@@ -173,9 +173,8 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
 }
 
 #' @rdname plotSingleSite
-#' @description For \code{\link{fixationSites}} and
-#'   \code{\link{multiFixationSites}}, it will color the ancestral tips in red,
-#'   descendant tips in blue and excluded tips in grey.
+#' @description For \code{\link{fixationSites}}, it will color the ancestral
+#'   tips in red, descendant tips in blue and excluded tips in grey.
 #' @param select Select which fixation path in to plot. The default is NULL
 #'   which will plot all the fixations.
 #' @export

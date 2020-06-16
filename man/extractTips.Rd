@@ -21,8 +21,7 @@
 \method{extractSite}{multiFixationSites}(x, site, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} or a \code{multiFixationSites} or a
-\code{sitePath} object.}
+\item{x}{A \code{fixationSites} or a \code{sitePath} object.}
 
 \item{site}{A site predicted to experience fixation.}
 

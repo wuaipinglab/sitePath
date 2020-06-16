@@ -50,11 +50,10 @@ For \code{lineagePath}, the tree will be colored according to
 
 Visualize the \code{sitePath} object which can be extracted by
   using \code{\link{extractSite}} on the return of
-  \code{\link{fixationSites}} and \code{\link{multiFixationSites}}.
+  \code{\link{fixationSites}}.
 
-For \code{\link{fixationSites}} and
-  \code{\link{multiFixationSites}}, it will color the ancestral tips in red,
-  descendant tips in blue and excluded tips in grey.
+For \code{\link{fixationSites}}, it will color the ancestral
+  tips in red, descendant tips in blue and excluded tips in grey.
 }
 \examples{
 data(zikv_tree)

@@ -96,7 +96,7 @@ Now you're ready to find fixation events.
 
 ### 4.1 Fixation mutations
 
-The hierarchical search with resampling method is done by `multiFixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation. The hiearchy search without resampling is `fixationSites`.
+The hierarchical search with resampling method is done by `fixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation. The hiearchy search without resampling is `fixationSites`.
 
 ```{r fixationSites}
 fixations <- fixationSites(paths)
