@@ -88,7 +88,7 @@ difficult.
 
 Most multiple sequence alignment format can be parsed by
 [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html).
-`sitePath` has a wrapper functin for parsing and adding the sequence
+`sitePath` has a wrapper function for parsing and adding the sequence
 alignment
 
 ``` r
@@ -103,7 +103,7 @@ tree <- addMSA(tree, alignment_file, "fasta")
 The names in tree and aligment must be matched. The fundamental approach
 in identifying phylogenetic lineages is trimming tree leaves/tips to
 expose the major branches. Before finding putative phylogenetic
-lineages, there involves a few more steps to evalute the impact of
+lineages, there involves a few more steps to evaluate the impact of
 threshold on result.
 
 ### 3.1 The impact of threshold on resolving lineages
@@ -134,7 +134,7 @@ sneakPeek(tree, makePlot = FALSE)
 
 Use the function `lineagePath` to get a S3 sitePath class object\[1\]
 for downstream analysis. The choice of the threshold really depends. You
-can use the result from `sneakPeak` as a reference for threhold
+can use the result from `sneakPeak` as a reference for threshold
 choosing. The result can be visualized by `plot` function.
 
 ``` r
@@ -149,7 +149,7 @@ Now you’re ready to find fixation events.
 
 The hierarchical search with resampling method is done by
 `fixationSites` function. The function outputs a list of mutations with
-the sequence names involved before and after the fixation. The hiearchy
+the sequence names involved before and after the fixation. The hierarchy
 search without resampling is `fixationSites`.
 
 ``` r
