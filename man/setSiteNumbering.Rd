@@ -2,17 +2,17 @@
 % Please edit documentation in R/siteNumbering.R
 \name{setSiteNumbering}
 \alias{setSiteNumbering}
-\alias{setSiteNumbering.phylo}
+\alias{setSiteNumbering.phyMSAmatched}
 \alias{setSiteNumbering.lineagePath}
 \title{Set site numbering to the reference sequence}
 \usage{
-\method{setSiteNumbering}{phylo}(x, reference = NULL, gapChar = "-", ...)
+\method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", ...)
 
 \method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", ...)
 }
 \arguments{
-\item{x}{The object to set site numbering. It could be a \code{phylo} object
-after \code{\link{addMSA}} or a \code{lineagePath} object.}
+\item{x}{The object to set site numbering. It could be a
+\code{\link{phyMSAmatched}} or a \code{lineagePath} object.}
 
 \item{reference}{Name of reference for site numbering. The name has to be one
 of the sequences' name. The default uses the intrinsic alignment numbering}
@@ -23,8 +23,7 @@ gapChar for the reference sequence.}
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A \code{phylo} object with site numbering mapped to reference
-  sequence
+The input \code{x} with numbering mapped to \code{reference}.
 }
 \description{
 A reference sequence can be used to define a global site

@@ -2,9 +2,8 @@
 #' @name treemer
 #' @title Topology-dependent tree trimming
 #' @description \code{similarityMatrix} calculates similarity between aligned
-#'   sequences The similarity matrix can be used in \code{\link{groupTips}} or
-#'   \code{\link{lineagePath}}
-#' @param tree The return from \code{\link{addMSA}} function
+#'   sequences. The similarity matrix can be used in \code{\link{groupTips}}.
+#' @param tree The return from \code{\link{addMSA}} function.
 #' @return \code{similarityMatrix} returns a diagonal matrix of similarity
 #'   between sequences
 #' @export
@@ -14,13 +13,10 @@
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' simMatrix <- similarityMatrix(tree)
 similarityMatrix <- function(tree) {
-    if (!inherits(tree, "phylo")) {
-        stop("\"tree\" is not class phylo")
-    } else if (is.null(attr(tree, "align"))) {
-        stop("No alignment found in \"tree\"")
-    }
-    sim <- getSimilarityMatrix(attr(tree, "align"))
-    dimnames(sim) <- list(tree$tip.label, tree$tip.label)
+    x <- .phyMSAmatch(tree)
+    sim <- getSimilarityMatrix(attr(x, "align"))
+    tree <- attr(x, "tree")
+    dimnames(sim) <- list(tree[["tip.label"]], tree[["tip.label"]])
     return(sim)
 }
 
@@ -38,9 +34,9 @@ similarityMatrix <- function(tree) {
 #'   sequences will be used.
 #' @param simMatrix A diagonal matrix of similarities for each pair of
 #'   sequences.
-#' @param forbidTrivial Does not allow trivial trimming
-#' @param tipnames If return as tipnames
-#' @return \code{groupTips} returns grouping of tips
+#' @param forbidTrivial Does not allow trivial trimming.
+#' @param tipnames If return tips as integer or tip names.
+#' @return \code{groupTips} returns grouping of tips.
 #' @export
 #' @importFrom ape nodepath
 #' @importFrom stats sd
@@ -51,44 +47,43 @@ groupTips <- function(tree,
                       simMatrix = NULL,
                       forbidTrivial = TRUE,
                       tipnames = TRUE) {
+    x <- .phyMSAmatch(tree)
+    tree <- attr(x, "tree")
+    # Set 'simMatrix'
+    colMatch <- match(tree[["tip.label"]], colnames(simMatrix))
+    rowMatch <- match(tree[["tip.label"]], rownames(simMatrix))
     if (is.null(simMatrix)) {
-        simMatrix <- similarityMatrix(tree)
+        simMatrix <- matrix(NA,
+                            ncol = length(tree[["tip.label"]]),
+                            nrow = length(tree[["tip.label"]]))
     } else {
-        colMatch <- match(tree$tip.label, colnames(simMatrix))
-        rowMatch <- match(tree$tip.label, rownames(simMatrix))
-        if (is.null(simMatrix)) {
-            simMatrix <- matrix(NA,
-                                ncol = length(tree$tip.label),
-                                nrow = length(tree$tip.label))
-        } else {
-            simMatrix <- simMatrix[rowMatch, colMatch]
-        }
+        simMatrix <- simMatrix[rowMatch, colMatch]
     }
+    # Set default 'similarity'
     if (is.null(similarity)) {
         simDist <- simMatrix[upper.tri(simMatrix)]
         similarity <- mean(simDist) - sd(simDist)
     }
-    align <- attr(tree, "align")
-    if (is.null(align)) {
-        stop("No alignment found in \"tree\"")
-    }
+    # Use treemer
     grouping <- runTreemer(
         tipPaths = nodepath(tree),
-        alignedSeqs = align,
+        alignedSeqs = attr(x, "align"),
         simMatrixInput = simMatrix,
         similarity = similarity,
         getTips = TRUE
     )
+    # If the result is trivial
     if (length(grouping) == 1 && forbidTrivial) {
         warning(
-            "\"similarity\" ",
+            "The input \"similarity\" ",
             similarity,
             " is too low of a cutoff resulting in trivial trimming"
         )
     }
+    # Return with tip names or not
     if (tipnames) {
         return(lapply(grouping, function(g) {
-            tree$tip.label[g]
+            tree[["tip.label"]][g]
         }))
     } else {
         return(grouping)

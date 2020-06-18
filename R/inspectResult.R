@@ -72,15 +72,12 @@ extractSite <- function(x, site, ...)
 
 .actualExtractSite <- function(x, site) {
     site <- .checkSite(site)
-    paths <- attr(x, "paths")
-    tree <- attr(paths, "tree")
     tryCatch(
         expr = sp <- x[[as.character(site)]],
         error = function(e) {
             stop("\"site\": ", site, " is not found in \"x\".")
         }
     )
-    attr(sp, "tree") <- tree
     return(sp)
 }
 

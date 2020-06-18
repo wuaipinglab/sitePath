@@ -14,15 +14,10 @@
 )
 }
 \arguments{
-\item{paths}{a \code{lineagePath} object returned from
-\code{\link{lineagePath}} function or a \code{phylo} object after
-\code{\link{addMSA}}}
+\item{paths}{A \code{lineagePath} object returned from
+\code{\link{lineagePath}} function.}
 
-\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree
-tips involved before/after mutation. Otherwise the mutation will not be
-counted into the return. If more than one number is given, the ancestral
-takes the first and descendant takes the second as the minimum. If only
-given one number, it's the minimum for both ancestral and descendant.}
+\item{minEffectiveSize}{The minimum number of tips in a group.}
 
 \item{searchDepth}{The function uses heuristic search but the termination of
 the search cannot be intrinsically decided. \code{searchDepth} is needed to
@@ -35,8 +30,7 @@ point, or by comparing the two.}
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-\code{fixationSites} returns a list of fixation mutations with names
-  of the tips involved.
+A \code{fixationSites} object.
 }
 \description{
 After finding the \code{\link{lineagePath}} of a phylogenetic

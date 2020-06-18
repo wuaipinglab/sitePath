@@ -17,7 +17,7 @@ groupTips(
 )
 }
 \arguments{
-\item{tree}{The return from \code{\link{addMSA}} function}
+\item{tree}{The return from \code{\link{addMSA}} function.}
 
 \item{similarity}{Similarity threshold for tree trimming in \code{groupTips}.
 If not provided, the mean similarity substract standard deviation of all
@@ -26,20 +26,19 @@ sequences will be used.}
 \item{simMatrix}{A diagonal matrix of similarities for each pair of
 sequences.}
 
-\item{forbidTrivial}{Does not allow trivial trimming}
+\item{forbidTrivial}{Does not allow trivial trimming.}
 
-\item{tipnames}{If return as tipnames}
+\item{tipnames}{If return tips as integer or tip names.}
 }
 \value{
 \code{similarityMatrix} returns a diagonal matrix of similarity
   between sequences
 
-\code{groupTips} returns grouping of tips
+\code{groupTips} returns grouping of tips.
 }
 \description{
 \code{similarityMatrix} calculates similarity between aligned
-  sequences The similarity matrix can be used in \code{\link{groupTips}} or
-  \code{\link{lineagePath}}
+  sequences. The similarity matrix can be used in \code{\link{groupTips}}.
 
 \code{groupTips} uses sequence similarity to group tree tips.
   Members in a group are always constrained to share the same ancestral node.

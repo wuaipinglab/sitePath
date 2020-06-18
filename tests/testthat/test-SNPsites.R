@@ -6,7 +6,7 @@ test_that("Restrication applied in SNPsites", {
     tree <- addMSA(tree = zikv_tree_reduced,
                    alignment = zikv_align_reduced)
 
-    nTips <- length(tree$tip.label)
+    nTips <- length(as.phylo(tree)$tip.label)
     minT <- floor(nTips / 10)
     maxT <- ceiling(nTips / 2)
     for (n in seq(minT, maxT, 20)) {

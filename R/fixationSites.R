@@ -7,14 +7,9 @@
 #'   relatively common in RNA virus. There is chance that some site be fixed in
 #'   one lineage but does not show fixation because of different sequence
 #'   context.
-#' @param paths a \code{lineagePath} object returned from
-#'   \code{\link{lineagePath}} function or a \code{phylo} object after
-#'   \code{\link{addMSA}}
-#' @param minEffectiveSize A vector of two integers to specifiy minimum tree
-#'   tips involved before/after mutation. Otherwise the mutation will not be
-#'   counted into the return. If more than one number is given, the ancestral
-#'   takes the first and descendant takes the second as the minimum. If only
-#'   given one number, it's the minimum for both ancestral and descendant.
+#' @param paths A \code{lineagePath} object returned from
+#'   \code{\link{lineagePath}} function.
+#' @param minEffectiveSize The minimum number of tips in a group.
 #' @param searchDepth The function uses heuristic search but the termination of
 #'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
 #'   tell the search when to stop.
@@ -22,8 +17,7 @@
 #'   entropy minimization and can be achieved by adding or removing fixation
 #'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
-#' @return \code{fixationSites} returns a list of fixation mutations with names
-#'   of the tips involved.
+#' @return A \code{fixationSites} object.
 #' @seealso \code{\link{as.data.frame.fixationSites}}
 #' @export
 #' @examples
@@ -36,11 +30,9 @@ fixationSites.lineagePath <- function(paths,
                                       searchDepth = 1,
                                       method = c("compare", "insert", "delete"),
                                       ...) {
+    paths <- .phyMSAmatch(paths)
     tree <- attr(paths, "tree")
-    nTips <- length(tree[["tip.label"]])
     align <- attr(paths, "align")
-    # Generate the site mapping from reference
-    reference <- attr(paths, "reference")
     # Decide which miniminzing strategy
     minimizeEntropy <- switch(
         match.arg(method),
@@ -48,42 +40,48 @@ fixationSites.lineagePath <- function(paths,
         "insert" = minEntropyByInserting,
         "delete" = minEntropyByDeleting
     )
-    # Get the 'minEffectiveSize' for each fixation
+    # Set the 'minEffectiveSize'
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- nTips / length(unique(unlist(paths)))
+        minEffectiveSize <-
+            length(tree[["tip.label"]]) / length(unique(unlist(paths)))
     } else if (!is.numeric(minEffectiveSize)) {
         stop("\"minEffectiveSize\" only accepts numeric")
     }
     minEffectiveSize <- ceiling(minEffectiveSize)
-    # Get the 'searchDepth' for heuristic search
+    # Set the 'searchDepth' for heuristic search
     if (searchDepth < 1) {
         stop("\"searchDepth\" should be at least 1")
     } else {
         searchDepth <- ceiling(searchDepth)
     }
+    # Get the divergent nodes
     divNodes <- divergentNode(paths)
+    # The tips and matching
     nodeAlign <- .tipSeqsAlongPathNodes(
         paths = paths,
         divNodes = divNodes,
         tree = tree,
         align = align
     )
+    # Find fixation sites
     res <- .findFixationSite(
         paths = paths,
         tree = tree,
         align = align,
         nodeAlign = nodeAlign,
         divNodes = divNodes,
-        reference = reference,
+        reference = attr(paths, "msaNumbering"),
         minimizeEntropy = minimizeEntropy,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
     )
-    groupingByPath <- .transitionClusters(res, paths, tree)
+    # Cluster tips according to fixation sites
+    clustersByPath <- .transitionClusters(res, paths, tree)
+    # Merge fixation sites on different paths if applicable
     res <- .combineFixations(res, tree, align)
+    # Set 'paths' and 'clustersByPath' attributes
     attr(res, "paths") <- paths
-    attr(res, "reference") <- reference
-    attr(res, "clustersByPath") <- groupingByPath
+    attr(res, "clustersByPath") <- clustersByPath
     class(res) <- "fixationSites"
     return(res)
 }
@@ -148,6 +146,8 @@ fixationSites.lineagePath <- function(paths,
                               minimizeEntropy,
                               minEffectiveSize,
                               searchDepth) {
+    # Get the MSA numbering
+    reference <- attr(paths, "msaNumbering")
     # Exclude the invariant sites
     loci <- which(vapply(
         X = seq_along(reference),
@@ -322,6 +322,10 @@ fixationSites.lineagePath <- function(paths,
         }
         return(res)
     })
+    return(.mergeClusters(groupByPath))
+}
+
+.mergeClusters <- function(groupByPath) {
     # Find the divergent point and remove the overlapped part
     grouping <- list(groupByPath[[1]])
 
@@ -492,41 +496,6 @@ print.sitePath <- function(x, ...) {
         "involved before and after the fixation\n")
 }
 
-fixationSites.phylo <- function(paths, ...) {
-    align <- attr(paths, "align")
-    # Generate the site mapping from reference
-    reference <- attr(paths, "reference")
-    # Exclude the invariant sites
-    loci <- which(vapply(
-        X = seq_along(reference),
-        FUN = function(s) {
-            s <- reference[s]
-            length(unique(substr(align, s, s))) > 1
-        },
-        FUN.VALUE = logical(1)
-    ))
-    res <- fixationSitesSearch(nodepath(paths), align, loci)
-    res <- res[which(lengths(res) != 1)]
-    return(res)
-}
-
-treemerBySite <- function(x, ...) {
-    align <- attr(x, "align")
-    # Generate the site mapping from reference
-    reference <- attr(x, "reference")
-    # Exclude the invariant sites
-    loci <- which(vapply(
-        X = seq_along(reference),
-        FUN = function(s) {
-            s <- reference[s]
-            length(unique(substr(align, s, s))) > 1
-        },
-        FUN.VALUE = logical(1)
-    ))
-    res <- runTreemerBySite(nodepath(x), align, loci)
-    return(res)
-}
-
 #' @export
 fixationSites <- function(paths, ...)
     UseMethod("fixationSites")
@@ -538,7 +507,7 @@ print.fixationSites <- function(x, ...) {
         cat("No multi-fixation found\n")
     } else {
         cat(paste(names(x), collapse = " "), "\n")
-        refSeqName <- attr(attr(x, "reference"), "refSeqName")
+        refSeqName <- attr(x, "reference")
         if (is.null(refSeqName)) {
             cat("No reference sequence specified.",
                 "Using alignment numbering\n")
@@ -648,7 +617,8 @@ plot.fixationSites <- function(x,
     d <- full_join(as_tibble(tree), d, by = "node")
     tree <- as.treedata(d)
 
-    groupColors <- colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
+    groupColors <-
+        colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
     names(groupColors) <- names(grp)
     groupColors["0"] <- "black"
 

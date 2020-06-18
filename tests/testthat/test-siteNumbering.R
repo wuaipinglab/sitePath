@@ -13,8 +13,8 @@ test_that("setSiteNumbering works", {
                          toupper(zikv_align[["seq"]][[which(zikv_align[["nam"]] == tip)]]))
         paths <- lineagePath(tree)
         paths <- setSiteNumbering(paths, tip, "C")
-        reference <- attr(paths, "reference")
-        refSeqName <- attr(reference, "refSeqName")
+        reference <- attr(paths, "msaNumbering")
+        refSeqName <- attr(paths, "reference")
         expect_equal(tip, refSeqName)
         ungappedRefSeq <- gsub("C", "", refSeq)
         aaEqual <- all(sapply(seq_along(reference), function(n) {
@@ -25,8 +25,8 @@ test_that("setSiteNumbering works", {
         expect_true(aaEqual)
 
         tree <- setSiteNumbering(tree, tip, "G")
-        reference <- attr(tree, "reference")
-        refSeqName <- attr(reference, "refSeqName")
+        reference <- attr(tree, "msaNumbering")
+        refSeqName <- attr(tree, "reference")
         expect_equal(tip, refSeqName)
         ungappedRefSeq <- gsub("G", "", refSeq)
         aaEqual <- all(sapply(seq_along(reference), function(n) {

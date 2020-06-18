@@ -116,7 +116,19 @@ as.data.frame.fixationSites <- function(x,
 ape::as.phylo
 
 #' @export
+as.phylo.phyMSAmatched <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
 as.phylo.lineagePath <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.sitePath <- function(x, ...) {
     res <- attr(x, "tree")
     return(res)
 }
@@ -124,7 +136,7 @@ as.phylo.lineagePath <- function(x, ...) {
 #' @export
 as.phylo.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
-    res <- as.phylo.lineagePath(paths)
+    res <- attr(paths, "tree")
     return(res)
 }
 

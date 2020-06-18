@@ -22,12 +22,16 @@
 #' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' lineagePath(tree)
-lineagePath.phylo <- function(tree,
-                              similarity = NULL,
-                              simMatrix = NULL,
-                              forbidTrivial = TRUE,
-                              ...) {
+lineagePath.phyMSAmatched <- function(tree,
+                                      similarity = NULL,
+                                      simMatrix = NULL,
+                                      forbidTrivial = TRUE,
+                                      ...) {
+    x <- .phyMSAmatch(tree)
+    tree <- attr(x, "tree")
+    # Find total number of tree tips
     nTips <- length(tree[["tip.label"]])
+    # Set 'minSNP' with 'nTips' and 'similarity'
     if (is.null(similarity)) {
         minSNP <- nTips * 0.05
         similarity <- 0.05
@@ -44,17 +48,15 @@ lineagePath.phylo <- function(tree,
             "And better not be equal to 1."
         )
     }
-    align <- attr(tree, "align")
-    attr(tree, "align") <- NULL
-    if (is.null(align)) {
-        stop("No alignment found in \"tree\"")
-    }
+    align <- attr(x, "align")
+    # Get all lineages using the terminal node found by SNP
     paths <- mergePaths(lapply(
         X = majorSNPtips(align, minSNP),
         FUN = function(tips) {
             nodepath(tree, from = nTips + 1, to = getMRCA(tree, tips))
         }
     ))
+    # The reminder of using major SNP to find lineages
     if (length(paths) == 0 && forbidTrivial) {
         warning(
             "\"lineagePath\" now uses 'major SNP' to find lineages ",
@@ -66,10 +68,9 @@ lineagePath.phylo <- function(tree,
             "hence no lineage path found."
         )
     }
-    attr(paths, "reference") <- attr(tree, "reference")
-    attr(tree, "reference") <- NULL
-    attr(paths, "tree") <- tree
-    attr(paths, "align") <- align
+    # Transfer attributes
+    paths <- .phyMSAtransfer(paths, x)
+    # Set attributes 'similarity' and 'rootNode'
     attr(paths, "similarity") <- similarity
     attr(paths, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
     class(paths) <- "lineagePath"
@@ -122,16 +123,20 @@ print.lineagePath <- function(x, ...) {
 #' @export
 plot.lineagePath <- function(x, y = TRUE, ...) {
     tree <- attr(x, "tree")
+    # Get number of ancestral nodes plus tip nodes
     nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
+    # Set lineage nodes and non-lineage nodes as separate group
     group <- rep(1, times = nNodes)
     group[unique(unlist(x))] <- 0
     group <- factor(group)
+    # Set line size
     if (y) {
         size <- rep(0.5, times = nNodes)
         size[unique(unlist(x))] <- 1
     } else {
         size <- NULL
     }
+    # Tree plot
     p <- ggtree(tree, aes(
         color = group,
         linetype = group,
@@ -173,30 +178,35 @@ sneakPeek <- function(tree,
                       maxPath = NULL,
                       minPath = 1,
                       makePlot = FALSE) {
+    x <- .phyMSAmatch(tree)
+    tree <- attr(x, "tree")
+    # Check 'maxPath'
     if (is.null(maxPath)) {
         maxPath <- length(tree[["tip.label"]]) / 20
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
+    # Check 'minPath'
     if (minPath >= maxPath) {
         stop("Invalid \"minPath\": greater than \"maxPath\"")
     } else if (minPath < 0) {
         stop("Invalid \"minPath\": less than zero")
     }
+    # Try every 'similarity'
     similarity <- numeric()
     pathNum <- integer()
     allPaths <- list()
     for (s in seq(from = 0.05,
                   to = 0.01,
                   length.out = step)) {
-        paths <- lineagePath(tree,
+        paths <- lineagePath(x,
                              similarity = s,
                              forbidTrivial = FALSE)
         if (length(paths) > maxPath) {
+            # Terminate when hit 'maxPath'
             break
         } else if (length(paths) <= minPath) {
-            similarity <- c(similarity, s)
-            pathNum <- c(pathNum, length(paths))
+            # Go to next 'similarity' when less than 'minPath'
             next
         }
         similarity <- c(similarity, s)
@@ -206,6 +216,7 @@ sneakPeek <- function(tree,
     res <- data.frame(similarity, pathNum)
     attr(res, "allPaths") <- allPaths
     class(res) <- c(class(res), "sneakPeekedPaths")
+    # Combine all plots of the lineages
     if (makePlot) {
         g <- lapply(allPaths, plot, y = FALSE)
         grid.arrange(arrangeGrob(grobs = g))

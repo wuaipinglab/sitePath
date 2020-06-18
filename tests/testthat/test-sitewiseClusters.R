@@ -5,7 +5,7 @@ test_that("The output is valid phylo", {
     data(h3n2_align_reduced)
     tree <- addMSA(tree = h3n2_tree_reduced,
                    alignment = h3n2_align_reduced)
-    nTips <- length(tree$tip.label)
+    nTips <- length(as.phylo(tree)$tip.label)
     paths <- lineagePath(tree)
     mutations <- fixationSites(paths)
     x <- sitewiseClusters(mutations)

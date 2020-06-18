@@ -2,12 +2,12 @@
 % Please edit documentation in R/lineagePath.R
 \name{lineagePath}
 \alias{lineagePath}
-\alias{lineagePath.phylo}
+\alias{lineagePath.phyMSAmatched}
 \alias{sneakPeek}
 \alias{lineagePath.sneakPeekedPaths}
 \title{Resolving lineage paths using SNP}
 \usage{
-\method{lineagePath}{phylo}(
+\method{lineagePath}{phyMSAmatched}(
   tree,
   similarity = NULL,
   simMatrix = NULL,

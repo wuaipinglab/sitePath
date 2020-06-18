@@ -7,12 +7,13 @@
 SNPsites(tree, minSNP = NULL)
 }
 \arguments{
-\item{tree}{The return from \code{\link{addMSA}} function.}
+\item{tree}{A \code{\link{phyMSAmatched}} object.}
 
-\item{minSNP}{Minimum number of amino acid variation to be a SNP.}
+\item{minSNP}{Minimum number of a mutation to be a SNP. The default is 10th
+of the total tree tips.}
 }
 \value{
-A \code{SNPsites} object
+A \code{SNPsites} object.
 }
 \description{
 Single nucleotide polymorphism (SNP) in the whole package refers

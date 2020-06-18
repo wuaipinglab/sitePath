@@ -35,7 +35,7 @@ plotSingleSite.lineagePath <- function(x,
     tree <- ladderize(tree, right = FALSE)
     align <- attr(x, "align")
     align <- strsplit(tolower(align), "")
-    reference <- attr(x, "reference")
+    reference <- attr(x, "msaNumbering")
     tryCatch(
         expr = site <- match.arg(as.character(site), seq_along(reference)),
         error = function(e) {

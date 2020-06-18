@@ -4,9 +4,10 @@ test_that("SNP-dependent trimming", {
     data(zikv_align)
     data(zikv_tree)
     tree <- addMSA(zikv_tree, alignment = zikv_align)
-    nTips <- length(tree[["tip.label"]])
+    nTips <- length(as.phylo(tree)[["tip.label"]])
+    expect_identical(as.phylo(tree), zikv_tree)
     align <- attr(tree, "align")
-    reference <- attr(tree, "reference")
+    reference <- attr(tree, "msaNumbering")
     similarity <- nTips * 0.1
     paths <- lineagePath(
         tree = tree,
@@ -25,7 +26,7 @@ test_that("SNP-dependent trimming", {
     majorSNPsites <- list()
     for (site in loci) {
         for (p in paths) {
-            seqs <- align[sitePath:::.childrenTips(tree, p[length(p)])]
+            seqs <- align[sitePath:::.childrenTips(as.phylo(tree), p[length(p)])]
             siteSummary <- sitePath:::tableAA(seqs, site - 1)
             siteChar <- names(siteSummary)[which(siteSummary == length(seqs))]
             if (length(siteSummary) != 0) {
