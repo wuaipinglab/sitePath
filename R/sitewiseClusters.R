@@ -178,21 +178,12 @@ sitewiseClusters.fixationSites <- function(x,
             tipClusters <- c(tipClusters, list(currentTips))
         }
     }
-    # Left padding with 0 for cluster ID
-    groupID <- as.character(seq_along(tipClusters))
-    idLen <- nchar(groupID)
-    padding <- vapply(
-        X = max(idLen) - idLen,
-        FUN = function(n) {
-            paste0(rep("0", n), collapse = "")
-        },
+    names(tipClusters) <- vapply(
+        X = tipClusters,
+        FUN = attr,
+        which = "clsName",
         FUN.VALUE = character(1)
     )
-    names(tipClusters) <- paste0("c",
-                                 paste0(padding, groupID),
-                                 " [",
-                                 lengths(tipClusters),
-                                 "]")
     SNPtracing <- list(
         "edge" = cbind(parentNodes, childrenNodes),
         "edge.length" = lengths(edgeSNPs),
@@ -254,7 +245,9 @@ plot.sitewiseClusters <- function(x,
                                   ...) {
     tr <- attr(x, "SNPtracing")
     p <- ggtree(tr) +
-        geom_tiplab(hjust = 0.5, align = TRUE, offset = 0.5) +
+        geom_tiplab(hjust = 0.5,
+                    align = TRUE,
+                    offset = 0.5) +
         theme_tree2()
     if (y) {
         p <- p + geom_label_repel(

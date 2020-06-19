@@ -57,20 +57,13 @@ fixationSites.lineagePath <- function(paths,
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching
-    nodeAlign <- .tipSeqsAlongPathNodes(
-        paths = paths,
-        divNodes = divNodes,
-        tree = tree,
-        align = align
-    )
+    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
+                                        divNodes = divNodes)
     # Find fixation sites
     res <- .findFixationSite(
         paths = paths,
-        tree = tree,
-        align = align,
         nodeAlign = nodeAlign,
         divNodes = divNodes,
-        reference = attr(paths, "msaNumbering"),
         minimizeEntropy = minimizeEntropy,
         minEffectiveSize = minEffectiveSize,
         searchDepth = searchDepth
@@ -102,7 +95,9 @@ fixationSites.lineagePath <- function(paths,
     return(getChildren(tree[["edge"]], node))
 }
 
-.tipSeqsAlongPathNodes <- function(paths, divNodes, tree, align) {
+.tipSeqsAlongPathNodes <- function(paths, divNodes) {
+    tree <- attr(paths, "tree")
+    align <- attr(paths, "align")
     allNodes <- unlist(paths)
     terminalNodes <- vapply(
         X = paths,
@@ -138,16 +133,14 @@ fixationSites.lineagePath <- function(paths,
 }
 
 .findFixationSite <- function(paths,
-                              tree,
-                              align,
                               nodeAlign,
                               divNodes,
-                              reference,
                               minimizeEntropy,
                               minEffectiveSize,
                               searchDepth) {
     # Get the MSA numbering
     reference <- attr(paths, "msaNumbering")
+    align <- attr(paths, "align")
     # Exclude the invariant sites
     loci <- which(vapply(
         X = seq_along(reference),
@@ -226,7 +219,7 @@ fixationSites.lineagePath <- function(paths,
                     attr(seg, "path") <- path
                     res[[site]][[targetIndex]] <- seg
                     attr(res[[site]], "site") <- i
-                    attr(res[[site]], "tree") <- tree
+                    attr(res[[site]], "tree") <- attr(paths, "tree")
                     class(res[[site]]) <- "sitePath"
                 }
             }
@@ -328,12 +321,18 @@ fixationSites.lineagePath <- function(paths,
 .mergeClusters <- function(groupByPath) {
     # Find the divergent point and remove the overlapped part
     grouping <- list(groupByPath[[1]])
-
+    # 'grouping' stores all the non-overlapped parts which means all the
+    # clusters are unique
     for (gpIndex in seq_along(groupByPath)[-1]) {
+        # 'gp' is the complete path with overlapped parts
         gp <- groupByPath[[gpIndex]]
+        # The index of 'grouping' which to merge with 'gp'
         toMergeIndex <- NULL
+        # The index of 'gp' where the divergent point is
         divergedIndex <- 0L
-        # Loop through to find the most related group
+        # Loop through 'grouping' to find the most related group (because all
+        # the clusters are unique, the first cluster in 'gp' cannot be found is
+        # the divergent point)
         for (i in seq_along(grouping)) {
             allTips <- unlist(grouping[[i]])
             for (j in seq_along(gp)[-1]) {
@@ -351,13 +350,14 @@ fixationSites.lineagePath <- function(paths,
         # Find the tips before diverged
         sharedTips <- gp[[divergedIndex - 1]]
         refSites <- attr(sharedTips, "site")
-        # The non-shared part
+        # The non-shared part of the 'sharedTips' ('allTips' are from the
+        # divergent point in 'grouping')
         divergedTips <- setdiff(sharedTips, allTips)
         attr(divergedTips, "site") <- refSites
         # Drop the overlapped part
         grouping[[gpIndex]] <-
             c(list(divergedTips), gp[divergedIndex:length(gp)])
-        # Find the most related group
+        # Find the most related group in 'grouping'
         toMerge <- grouping[[toMergeIndex]]
         # To determine where to add the new (truncated) group
         for (i in seq_along(toMerge)) {
@@ -385,6 +385,43 @@ fixationSites.lineagePath <- function(paths,
                                               list(divergedTips),
                                               toMerge[i:length(toMerge)])
                 break
+            }
+        }
+    }
+    return(.assignClusterNames(grouping))
+}
+
+.assignClusterNames <- function(grouping) {
+    # The starting major numbers of all 'gp' in 'grouping'
+    startingMajors <- rep(NA_integer_, length(grouping))
+    startingMajors[1] <- 1L
+    # The maximum minor number for each major number (so can be continued on a
+    # new 'gp')
+    maxMinors <- 0L
+    # Iterate 'grouping' to assign cluster number
+    for (i in seq_along(grouping)) {
+        # Get the starting major number
+        currMajor <- startingMajors[i]
+        # Increase the maximum minor number for 'currMajor'
+        maxMinors[currMajor] <- maxMinors[currMajor] + 1L
+        # Initiate mini number
+        currMini <- 1L
+        for (j in seq_along(grouping[[i]])) {
+            attr(grouping[[i]][[j]], "clsName") <- paste(currMajor,
+                                                         maxMinors[currMajor],
+                                                         currMini,
+                                                         sep = ".")
+            currMini <- currMini + 1
+            toMerge <- attr(grouping[[i]][[j]], "toMerge")
+            if (!is.null(toMerge)) {
+                # Create a new major number when encounter a divergent point
+                currMajor <- currMajor + 1L
+                # Assign the starting major number for the 'gp' toMerge
+                startingMajors[toMerge] <- currMajor
+                # Initiate minor number for the new major number
+                maxMinors[currMajor] <- 1L
+                # Reset mini number
+                currMini <- 1L
             }
         }
     }
@@ -569,7 +606,7 @@ plot.fixationSites <- function(x,
                 currAA <- attr(currTips, "AA")
                 mutation <- paste0(prevAA, site, currAA)
                 currCluster <-
-                    unique(clusterInfo[as.character(currTips), ])
+                    unique(clusterInfo[as.character(currTips),])
                 names(currCluster) <- currCluster
                 # Choose the most ancient cluster which first receive the
                 # mutation
@@ -634,7 +671,7 @@ plot.fixationSites <- function(x,
         scale_color_manual(values = groupColors)
     if (y) {
         p <- p +
-            guides(color = guide_legend(override.aes = list(size = 3), )) +
+            guides(color = guide_legend(override.aes = list(size = 3))) +
             theme(legend.position = "left")
     } else {
         p <- p + theme(legend.position = "none")
