@@ -24,8 +24,8 @@ as.data.frame.fixationSites <- function(x,
                                         ...) {
     tree <- as.phylo.fixationSites(x)
     grp <-
-        sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
-    grp <- as.list.sitewiseClusters(grp)
+        fixationPath.fixationSites(x, minEffectiveSize = 0)
+    grp <- as.list.fixationPath(grp)
     if (tipname) {
         res <- lapply(names(grp), function(n) {
             tips <- grp[[n]]
@@ -68,7 +68,7 @@ as.data.frame.fixationSites <- function(x,
                     currAA <- attr(currTips, "AA")
                     mutation <- paste0(prevAA, site, currAA)
                     prevCluster <-
-                        unique(clusterInfo[as.character(prevTips),])
+                        unique(clusterInfo[as.character(prevTips), ])
                     names(prevCluster) <- prevCluster
                     # Choose the most recent cluster to stay un-mutated
                     prev <- names(which.max(lapply(
@@ -78,7 +78,7 @@ as.data.frame.fixationSites <- function(x,
                         }
                     )))
                     currCluster <-
-                        unique(clusterInfo[as.character(currTips),])
+                        unique(clusterInfo[as.character(currTips), ])
                     names(currCluster) <- currCluster
                     # Choose the most ancient cluster which first receive the
                     # mutation
@@ -119,8 +119,8 @@ tidytree::as.treedata
 as.treedata.fixationSites <- function(tree, ...) {
     x <- tree
     tree <- as.phylo.fixationSites(x)
-    grp <- sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
-    grp <- as.list.sitewiseClusters(grp)
+    grp <- fixationPath.fixationSites(x, minEffectiveSize = 0)
+    grp <- as.list.fixationPath(grp)
     clusterPaths <- list()
     rootNode <- getMRCA(tree, tree[["tip.label"]])
     for (cluster in names(grp)) {
@@ -150,7 +150,7 @@ as.treedata.fixationSites <- function(tree, ...) {
                 currAA <- attr(currTips, "AA")
                 mutation <- paste0(prevAA, site, currAA)
                 currCluster <-
-                    unique(clusterInfo[as.character(currTips),])
+                    unique(clusterInfo[as.character(currTips), ])
                 names(currCluster) <- currCluster
                 # Choose the most ancient cluster which first receive the
                 # mutation
@@ -243,7 +243,7 @@ as.phylo.fixationSites <- function(x, ...) {
 }
 
 #' @export
-as.list.sitewiseClusters <- function(x, ...) {
+as.list.fixationPath <- function(x, ...) {
     groupName <- names(x)
     attributes(x) <- NULL
     res <- lapply(x, function(tips) {

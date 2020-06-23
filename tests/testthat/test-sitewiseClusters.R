@@ -1,4 +1,4 @@
-context("test-sitewiseClusters")
+context("test-fixationPath")
 
 test_that("The output is valid phylo", {
     data(h3n2_tree_reduced)
@@ -8,7 +8,7 @@ test_that("The output is valid phylo", {
     nTips <- length(as.phylo(tree)$tip.label)
     paths <- lineagePath(tree)
     mutations <- fixationSites(paths)
-    x <- sitewiseClusters(mutations)
+    x <- fixationPath(mutations)
     tr <- attr(x, "SNPtracing")@phylo
     checkOutput <- capture.output(ape::checkValidPhylo(tr))
     expect_false(any(grepl("FATAL", checkOutput)))

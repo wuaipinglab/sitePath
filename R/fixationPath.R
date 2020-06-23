@@ -1,5 +1,5 @@
-#' @rdname sitewiseClusters
-#' @name sitewiseClusters
+#' @rdname fixationPath
+#' @name fixationPath
 #' @title Accumulation of fixed mutation as a tree
 #' @description The tips are clustered according to the fixation sites. The
 #'   transition of fixation sites will be plotted as a phylogenetic tree. The
@@ -9,7 +9,7 @@
 #' @param x The return from \code{\link{fixationSites}} function.
 #' @param minEffectiveSize The minimum size for a tip cluster.
 #' @param ... Further arguments passed to or from other methods.
-#' @return An \code{sitewiseClusters} object
+#' @return An \code{fixationPath} object
 #' @importFrom stats na.omit
 #' @importFrom tidytree as_tibble full_join as.treedata
 #' @export
@@ -19,10 +19,10 @@
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' paths <- lineagePath(tree)
 #' mutations <- fixationSites(paths)
-#' sitewiseClusters(mutations)
-sitewiseClusters.fixationSites <- function(x,
-                                           minEffectiveSize = NULL,
-                                           ...) {
+#' fixationPath(mutations)
+fixationPath.fixationSites <- function(x,
+                                       minEffectiveSize = NULL,
+                                       ...) {
     grouping <- attr(x, "clustersByPath")
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <-
@@ -222,17 +222,17 @@ sitewiseClusters.fixationSites <- function(x,
     SNPtracing <- as_tibble(SNPtracing)
     SNPtracing <- full_join(SNPtracing, d, by = "node")
     attr(tipClusters, "SNPtracing") <- as.treedata(SNPtracing)
-    class(tipClusters) <- "sitewiseClusters"
+    class(tipClusters) <- "fixationPath"
     return(tipClusters)
 }
 
 #' @export
-sitewiseClusters <- function(x, ...) {
-    UseMethod("sitewiseClusters")
+fixationPath <- function(x, ...) {
+    UseMethod("fixationPath")
 }
 
 #' @export
-print.sitewiseClusters <- function(x, ...) {
+print.fixationPath <- function(x, ...) {
     print(names(x))
 }
 
@@ -240,9 +240,9 @@ print.sitewiseClusters <- function(x, ...) {
 #' @importFrom ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
 #' @export
-plot.sitewiseClusters <- function(x,
-                                  y = TRUE,
-                                  ...) {
+plot.fixationPath <- function(x,
+                              y = TRUE,
+                              ...) {
     tr <- attr(x, "SNPtracing")
     p <- ggtree(tr) +
         geom_tiplab(hjust = 0.5,

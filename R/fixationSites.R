@@ -70,11 +70,13 @@ fixationSites.lineagePath <- function(paths,
     )
     # Cluster tips according to fixation sites
     clustersByPath <- .transitionClusters(res, paths, tree)
+    clustersByPath <- .mergeClusters(clustersByPath)
     # Merge fixation sites on different paths if applicable
     res <- .combineFixations(res, tree, align)
     # Set 'paths' and 'clustersByPath' attributes
     attr(res, "paths") <- paths
-    attr(res, "clustersByPath") <- clustersByPath
+    attr(res, "clustersByPath") <-
+        .assignClusterNames(clustersByPath)
     class(res) <- "fixationSites"
     return(res)
 }
@@ -315,7 +317,7 @@ fixationSites.lineagePath <- function(paths,
         }
         return(res)
     })
-    return(.mergeClusters(groupByPath))
+    return(groupByPath)
 }
 
 .mergeClusters <- function(groupByPath) {
@@ -388,7 +390,7 @@ fixationSites.lineagePath <- function(paths,
             }
         }
     }
-    return(.assignClusterNames(grouping))
+    return(grouping)
 }
 
 .assignClusterNames <- function(grouping) {
@@ -569,7 +571,7 @@ print.fixationSites <- function(x, ...) {
 #' plot(paths)
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
-#' x <- sitewiseClusters(fixations)
+#' x <- fixationPath(fixations)
 #' plot(x)
 plot.fixationSites <- function(x,
                                y = TRUE,

@@ -180,10 +180,10 @@ setSiteNumbering.fixationSites <- function(x,
     return(x)
 }
 
-setSiteNumbering.sitewiseClusters <- function(x,
-                                              reference = NULL,
-                                              gapChar = '-',
-                                              ...) {
+setSiteNumbering.fixationPath <- function(x,
+                                          reference = NULL,
+                                          gapChar = '-',
+                                          ...) {
     site2newRef <- cds2genome
     attr(x, "SNPtracing")@data[["SNPs"]] <- vapply(
         X = strsplit(attr(x, "SNPtracing")@data[["SNPs"]], ", "),

@@ -123,10 +123,10 @@ To have an overall view of the transition of fixation mutation, use `plot` on an
 plot(fixations)
 ```
 
-To have a simplified view of mutation accumulations. It might help to use `sitewiseClusters` function and visualize it.
+To have a simplified view of mutation accumulations. It might help to use `fixationPath` function and visualize it.
 
 ```{r}
-x <- sitewiseClusters(fixations)
+x <- fixationPath(fixations)
 plot(x)
 ```
 
