@@ -3,6 +3,7 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
+\alias{as.treedata}
 \alias{as.phylo}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -12,5 +13,7 @@ below to see their documentation.
 
 \describe{
   \item{ape}{\code{\link[ape]{as.phylo}}}
+
+  \item{tidytree}{\code{\link[tidytree]{as.treedata}}}
 }}
 

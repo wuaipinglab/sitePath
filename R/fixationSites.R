@@ -574,93 +574,14 @@ print.fixationSites <- function(x, ...) {
 plot.fixationSites <- function(x,
                                y = TRUE,
                                ...) {
-    tree <- as.phylo.fixationSites(x)
-    grp <- sitewiseClusters.fixationSites(x, minEffectiveSize = 0)
-    grp <- as.list.sitewiseClusters(grp)
-    clusterPaths <- list()
-    rootNode <- getMRCA(tree, tree[["tip.label"]])
-    for (cluster in names(grp)) {
-        tips <- grp[[cluster]]
-        ancestral <- getMRCA(tree, tips)
-        if (is.null(ancestral)) {
-            np <- nodepath(tree, rootNode, tips)
-            clusterPaths[[cluster]] <- np[seq_len(length(np) - 1)]
-        } else {
-            clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
-        }
-    }
-    clusterInfo <- lapply(names(grp), function(g) {
-        data.frame(row.names = grp[[g]],
-                   "cluster" = rep(g, length(grp[[g]])))
-    })
-    clusterInfo <- do.call(rbind, clusterInfo)
-
-    transMut <- list()
-    for (sp in x) {
-        site <- attr(sp, "site")
-        for (mp in sp) {
-            for (i in seq_along(mp)[-1]) {
-                prevTips <- mp[[i - 1]]
-                currTips <- mp[[i]]
-                prevAA <- attr(prevTips, "AA")
-                currAA <- attr(currTips, "AA")
-                mutation <- paste0(prevAA, site, currAA)
-                currCluster <-
-                    unique(clusterInfo[as.character(currTips),])
-                names(currCluster) <- currCluster
-                # Choose the most ancient cluster which first receive the
-                # mutation
-                curr <- names(which.min(lapply(
-                    X = currCluster,
-                    FUN = function(cluster) {
-                        length(clusterPaths[[cluster]])
-                    }
-                )))
-                # Find the transition node
-                currPath <- clusterPaths[[curr]]
-                trans <- as.character(currPath[length(currPath)])
-                if (trans %in% names(transMut)) {
-                    transMut[[trans]] <- c(transMut[[trans]], mutation)
-                } else {
-                    transMut[[trans]] <- mutation
-                }
-            }
-        }
-    }
-    transMut <- lapply(transMut, unique)
-    d <- as_tibble(t(vapply(
-        X = names(transMut),
-        FUN = function(trans) {
-            snp <- transMut[[trans]]
-            res <- character()
-            snpNum <- length(snp)
-            for (i in seq_len(snpNum)) {
-                res <- paste0(res, snp[i])
-                if (i < snpNum) {
-                    if (i %% 4 == 0) {
-                        res <- paste0(res, ",\n")
-                    } else {
-                        res <- paste0(res, ", ")
-                    }
-                }
-            }
-            res <- c(trans, res)
-            names(res) <- c("node", "SNPs")
-            return(res)
-        },
-        FUN.VALUE = character(2)
-    )))
-    d[["node"]] <- as.integer(d[["node"]])
-    d <- full_join(as_tibble(tree), d, by = "node")
-    tree <- as.treedata(d)
-
+    tree <- as.treedata.fixationSites(x)
+    grp <- levels(attr(tree@phylo, "Groups"))
     groupColors <-
         colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
     names(groupColors) <- names(grp)
-    groupColors["0"] <- "black"
+    # groupColors["0"] <- "black"
 
-    p <- ggtree(groupOTU(tree, grp, group_name = "Groups"),
-                aes(color = Groups)) +
+    p <- ggtree(tree, aes(color = Groups)) +
         geom_label_repel(
             aes(x = branch, label = SNPs),
             fill = "lightgreen",
