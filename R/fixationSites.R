@@ -158,8 +158,7 @@ fixationSites.lineagePath <- function(paths,
     # Iterate each path
     rootNode <- attr(paths, "rootNode")
     if (!rootNode %in% names(nodeAlign)) {
-        paths <- lapply(paths, function(p)
-            p[-1])
+        paths <- lapply(paths, "[", -1)
     }
     for (path in paths) {
         # Iterate every loci (variant sites)
@@ -322,21 +321,25 @@ fixationSites.lineagePath <- function(paths,
 
 .mergeClusters <- function(groupByPath) {
     # Find the divergent point and remove the overlapped part
-    grouping <- list(groupByPath[[1]])
-    # 'grouping' stores all the non-overlapped parts which means all the
-    # clusters are unique
+    res <- list(groupByPath[[1]])
+    # 'res' stores all the non-overlapped parts which means all the clusters are
+    # unique
     for (gpIndex in seq_along(groupByPath)[-1]) {
         # 'gp' is the complete path with overlapped parts
         gp <- groupByPath[[gpIndex]]
-        # The index of 'grouping' which to merge with 'gp'
+        # The index of 'res' which to merge with 'gp'
         toMergeIndex <- NULL
-        # The index of 'gp' where the divergent point is
+        # The index of 'gp' where the divergent point is. Each truncated 'gp' in
+        # 'res' will have one but only the deepest will be used
         divergedIndex <- 0L
-        # Loop through 'grouping' to find the most related group (because all
-        # the clusters are unique, the first cluster in 'gp' cannot be found is
-        # the divergent point)
-        for (i in seq_along(grouping)) {
-            allTips <- unlist(grouping[[i]])
+        # Loop through 'res' to find the most related group (because all the
+        # clusters are unique, the first cluster in 'gp' cannot be found is the
+        # divergent point)
+        for (i in seq_along(res)) {
+            # All existing tips in the other 'gp' in 'groupByPath' to see if
+            # overlapped with tips in the 'gp' to be merged
+            allTips <- unlist(groupByPath[[i]])
+            # The first cluster in 'gp' to have no overlap (divergent point)
             for (j in seq_along(gp)[-1]) {
                 if (all(!gp[[j]] %in% allTips)) {
                     m <- i
@@ -344,6 +347,7 @@ fixationSites.lineagePath <- function(paths,
                     break
                 }
             }
+            # The deepest divergent point
             if (d > divergedIndex) {
                 toMergeIndex <- m
                 divergedIndex <- d
@@ -353,44 +357,58 @@ fixationSites.lineagePath <- function(paths,
         sharedTips <- gp[[divergedIndex - 1]]
         refSites <- attr(sharedTips, "site")
         # The non-shared part of the 'sharedTips' ('allTips' are from the
-        # divergent point in 'grouping')
+        # divergent point in 'res')
         divergedTips <- setdiff(sharedTips, allTips)
+        # In case the 'sharedTips' do not have non-shared part
+        if (length(divergedTips) == 0) {
+            divergedTips <- gp[[divergedIndex]]
+            divergedIndex <- divergedIndex + 1
+        }
         attr(divergedTips, "site") <- refSites
-        # Drop the overlapped part
-        grouping[[gpIndex]] <-
+        # Add the truncated 'gp' (no overlap) to 'res'
+        res[[gpIndex]] <-
             c(list(divergedTips), gp[divergedIndex:length(gp)])
-        # Find the most related group in 'grouping'
-        toMerge <- grouping[[toMergeIndex]]
-        # To determine where to add the new (truncated) group
+        # Find the most related group of 'gp' in 'res'
+        toMerge <- res[[toMergeIndex]]
+        # To determine where to add the new group (truncated 'gp')
         for (i in seq_along(toMerge)) {
             gpTips <- unlist(gp)
             if (all(!toMerge[[i]] %in% gpTips)) {
                 # Find the tips before diverged
                 sharedTips <- toMerge[[i - 1]]
+                # Store the fixation site info for 'sharedTips'
                 sites <- attr(sharedTips, "site")
-                # The non-shared part
+                # The non-shared part of 'sharedTips'
                 divergedTips <- setdiff(sharedTips, gpTips)
                 attr(divergedTips, "site") <- sites
-                # The shared part
+                # The shared part of 'sharedTips'
                 sharedTips <- setdiff(sharedTips, divergedTips)
+                if (length(divergedTips) == 0) {
+                    divergedTips <- list()
+                } else {
+                    divergedTips <- list(divergedTips)
+                }
+                # Give back the fixation site info to 'sharedTips'
                 attr(sharedTips, "site") <- sites
                 attr(sharedTips, "toMerge") <- gpIndex
                 attr(sharedTips, "toMergeRefSites") <- refSites
-                # Reform
+                sharedTips <- list(sharedTips)
+                # Reform because the previous two are taken by 'sharedTips' and
+                # 'divergedTips'
                 if (i == 2) {
                     preTips <- list()
                 } else {
                     preTips <- toMerge[seq_len(i - 2)]
                 }
-                grouping[[toMergeIndex]] <- c(preTips,
-                                              list(sharedTips),
-                                              list(divergedTips),
-                                              toMerge[i:length(toMerge)])
+                res[[toMergeIndex]] <- c(preTips,
+                                         sharedTips,
+                                         divergedTips,
+                                         toMerge[i:length(toMerge)])
                 break
             }
         }
     }
-    return(grouping)
+    return(res)
 }
 
 .assignClusterNames <- function(grouping) {
@@ -578,10 +596,11 @@ plot.fixationSites <- function(x,
                                ...) {
     tree <- as.treedata.fixationSites(x)
     grp <- levels(attr(tree@phylo, "Groups"))
+    grp <- grp[which(grp != "0")]
     groupColors <-
         colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
     names(groupColors) <- names(grp)
-    # groupColors["0"] <- "black"
+    groupColors["0"] <- "black"
 
     p <- ggtree(tree, aes(color = Groups)) +
         geom_label_repel(
