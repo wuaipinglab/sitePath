@@ -100,12 +100,10 @@ print.lineagePath <- function(x, ...) {
 #'   here do not behave like the generic \code{\link{plot}} function. The
 #'   underlying function applies \code{\link{ggplot2}}.
 #' @param x Could be a \code{\link{lineagePath}} object,
-#'   \code{\link{fixationSites}} object or \code{\link{fixationPath}}
-#'   object.
+#'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
 #' @param y For \code{\link{lineagePath}} object, it is whether to emphasize the
 #'   lineage branches by using thicker line. For a \code{\link{fixationSites}}
-#'   object, it is whether to give the legend for each group. For a
-#'   \code{\link{fixationPath}} object, it is whether to show the fixation
+#'   or a \code{\link{fixationPath}} object, it is whether to show the fixation
 #'   mutation between clusters.
 #' @param ... Other arguments. The \code{showTips} argument has been deprecated.
 #' @return A ggplot object to make the plot. A \code{\link{lineagePath}} object
@@ -118,8 +116,8 @@ print.lineagePath <- function(x, ...) {
 #'   plotted as a phylogenetic tree. The length of each branch represents the
 #'   number of fixation mutation between two clusters. The name of the tree tips
 #'   indicate the number of sequences in the cluster.
-#' @importFrom ggtree ggtree aes theme scale_color_manual
-#' @importFrom ggplot2 ggtitle
+#' @importFrom ggtree ggtree aes theme
+#' @importFrom ggplot2 ggtitle scale_color_manual
 #' @export
 plot.lineagePath <- function(x, y = TRUE, ...) {
     tree <- attr(x, "tree")

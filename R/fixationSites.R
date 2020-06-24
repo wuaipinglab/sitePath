@@ -603,20 +603,17 @@ plot.fixationSites <- function(x,
     groupColors["0"] <- "black"
 
     p <- ggtree(tree, aes(color = Groups)) +
-        geom_label_repel(
+        scale_color_manual(values = groupColors) +
+        guides(color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left")
+    if (y) {
+        p <- p + geom_label_repel(
             aes(x = branch, label = SNPs),
             fill = "lightgreen",
             color = "black",
             min.segment.length = 0,
             na.rm = TRUE
-        ) +
-        scale_color_manual(values = groupColors)
-    if (y) {
-        p <- p +
-            guides(color = guide_legend(override.aes = list(size = 3))) +
-            theme(legend.position = "left")
-    } else {
-        p <- p + theme(legend.position = "none")
+        )
     }
     return(p)
 }

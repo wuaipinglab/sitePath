@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.5.16
+-------------------------
+    o Allow turning off mutation label for 'plot.fixationSites' while
+      legend of cluster name becomes compulsory.
+    o Import 'scale_color_manual' from 'ggplot2'.
+    o Update vignette.
+
 CHANGES IN VERSION 1.5.15
 -------------------------
     o Bug fix: NA in cluster name.
