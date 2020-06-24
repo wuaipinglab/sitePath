@@ -1,5 +1,5 @@
 ---
-title: "A basic workflow for sitePath"
+title: "An introduction to sitePath"
 author: "Chengyang Ji"
 package: sitePath
 output: 
@@ -8,7 +8,7 @@ output:
 abstract: >
     Detection of site fixation in molecular evolution.
 vignette: >
-  %\VignetteIndexEntry{A basic workflow for sitePath}
+  %\VignetteIndexEntry{An introduction to sitePath}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,7 +28,7 @@ The `sitePath` package does hierarchical search for fixation events given multip
 2. Resolve phylogenetic lineages
 3. Hierarchical search for lineage-dependent fixation events
 
-# Import tree and sequence alignment
+# Import data
 
 There're various R packages for parsing phylogenetic tree and multiple sequence alignment files. For now, `sitepath` accepts `phylo` object and `alignment` object. Functions from `ggtree` and `seqinr` are able to handle most file formats.
 
@@ -40,12 +40,13 @@ The S3 phylo class is a common data structure for phylogenetic analysis in R. Th
 ```{r import_tree, message=FALSE}
 library(ape)
 
-tree <- read.tree(system.file("extdata", "ZIKV.newick", package = "sitePath"))
+tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
+tree <- read.tree(tree_file)
 ```
 
 It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.
 
-## Parse and add sequence alignment
+## Parse and match sequence alignment
 
 Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper function for parsing and adding the sequence alignment.
 
@@ -56,7 +57,7 @@ alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 tree <- addMSA(tree, alignment_file, "fasta")
 ```
 
-# Resolve phylogenetic lineages
+# Phylogenetic lineages
 
 The names in tree and aligment must be matched. We use a **tip-to-root** algorithm to trim tree leaves/tips to expose the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evalute the impact of threshold on result.
 
@@ -70,7 +71,7 @@ preassessment <- sneakPeek(tree, makePlot = TRUE)
 
 ## Choose a threshold by yourself
 
-Use the function `lineagePath` to get a S3 sitePath class object^[The S3 sitePath object contains the nodes to represent phylogenetic lineages] for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here the default value is used.
+Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here the default value is used.
 
 ```{r get_lineagePath}
 paths <- lineagePath(tree)
@@ -80,23 +81,23 @@ paths
 You can visualize the result.
 
 ```{r plot_paths}
-plot(paths, no.margin = TRUE)
+plot(paths)
 ```
 
-# Hierarchical search for fixation events
+# Fixation sites
 
 Now you're ready to find fixation events.
 
 ## Fixation mutations
 
-The hierarchical search is done by `fixationSites` function. The function outputs a list of mutations with the sequence names involved before and after the fixation.
+The hierarchical search is done by `fixationSites` function. The function detects the site with fixation mutation.
 
 ```{r find_fixations}
 fixations <- fixationSites(paths)
 fixations
 ```
 
-If you want to retrieve the tip names involved in the fixation of a site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
+If you want to retrieve the result of a single site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
 
 ```{r get_sitePath}
 sp <- extractSite(fixations, 139)
@@ -129,7 +130,6 @@ To have a simplified view of mutation accumulations. It might help to use `fixat
 x <- fixationPath(fixations)
 plot(x)
 ```
-
 
 # Additional functions
 

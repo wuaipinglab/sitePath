@@ -599,7 +599,7 @@ plot.fixationSites <- function(x,
     grp <- grp[which(grp != "0")]
     groupColors <-
         colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
-    names(groupColors) <- names(grp)
+    names(groupColors) <- grp
     groupColors["0"] <- "black"
 
     p <- ggtree(tree, aes(color = Groups)) +
