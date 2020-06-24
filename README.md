@@ -1,7 +1,7 @@
 # sitePath: an R package for detection of site fixation in molecular evolution
 
 A more detailed tutorial can be found
-[here](https://bioconductor.org/packages/devel/bioc/vignettes/sitePath/inst/doc/sitePathTutorial.html).
+[here](https://wuaipinglab.github.io/sitePath/).
 
 ## 1\. Installation
 

@@ -116,8 +116,8 @@ print.lineagePath <- function(x, ...) {
 #'   plotted as a phylogenetic tree. The length of each branch represents the
 #'   number of fixation mutation between two clusters. The name of the tree tips
 #'   indicate the number of sequences in the cluster.
-#' @importFrom ggtree ggtree aes theme
-#' @importFrom ggplot2 ggtitle scale_color_manual
+#' @importFrom ggtree ggtree
+#' @importFrom ggplot2 aes theme ggtitle scale_color_manual
 #' @export
 plot.lineagePath <- function(x, y = TRUE, ...) {
     tree <- attr(x, "tree")
