@@ -122,7 +122,7 @@
     </div>
 
     <div class="ref-description">
-    <p>After finding the <code><a href='lineagePath.html'>lineagePath</a></code> of a phylogenetic
+    <p>After finding the <code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code> of a phylogenetic
   tree, <code>fixationSites</code> uses the result to find those sites that show
   fixation on some, if not all, of the lineages. Parallel evolution is
   relatively common in RNA virus. There is chance that some site be fixed in
@@ -131,12 +131,12 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for lineagePath</span>
-<span class='fu'>fixationSites</span>(
-  <span class='no'>paths</span>,
-  <span class='kw'>minEffectiveSize</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>searchDepth</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span>),
-  <span class='no'>...</span>
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(
+  <span class='kw'>paths</span>,
+  minEffectiveSize = <span class='kw'>NULL</span>,
+  searchDepth = <span class='fl'>1</span>,
+  method = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span>),
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -145,7 +145,7 @@
     <tr>
       <th>paths</th>
       <td><p>A <code>lineagePath</code> object returned from
-<code><a href='lineagePath.html'>lineagePath</a></code> function.</p></td>
+<code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code> function.</p></td>
     </tr>
     <tr>
       <th>minEffectiveSize</th>
@@ -174,13 +174,13 @@ point, or by comparing the two.</p></td>
     <p>A <code>fixationSites</code> object.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='as.data.frame.html'>as.data.frame.fixationSites</a></code></p></div>
+    <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/sitePath/man/as.data.frame.html'>as.data.frame.fixationSites</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_tree_reduced</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_align_reduced</span>)
-<span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span>(<span class='no'>zikv_tree_reduced</span>, <span class='kw'>alignment</span> <span class='kw'>=</span> <span class='no'>zikv_align_reduced</span>)
-<span class='fu'>fixationSites</span>(<span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='no'>tree</span>))</div><div class='output co'>#&gt; Result for 3 paths:
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>))</div><div class='output co'>#&gt; Result for 3 paths:
 #&gt; 
 #&gt; 123 196 763 988 1949 784 139 894 2074 2634 3045 
 #&gt; No reference sequence specified. Using alignment numbering</div></pre>
@@ -199,7 +199,7 @@ point, or by comparing the two.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

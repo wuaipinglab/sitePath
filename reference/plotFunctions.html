@@ -122,32 +122,32 @@
     <div class="ref-description">
     <p>The plot function to visualize the return of functions in the
   package. Though the function name <code>plot</code> is used, the plot functions
-  here do not behave like the generic <code><a href='https://rdrr.io/r/base/plot.html'>plot</a></code> function. The
+  here do not behave like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function. The
   underlying function applies <code>ggplot2</code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for fixationPath</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for fixationSites</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for lineagePath</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>Could be a <code><a href='lineagePath.html'>lineagePath</a></code> object,
-<code><a href='fixationSites.html'>fixationSites</a></code> object or <code><a href='fixationPath.html'>fixationPath</a></code> object.</p></td>
+      <td><p>Could be a <code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code> object,
+<code><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></code> object or <code><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></code> object.</p></td>
     </tr>
     <tr>
       <th>y</th>
-      <td><p>For <code><a href='lineagePath.html'>lineagePath</a></code> object, it is whether to emphasize the
-lineage branches by using thicker line. For a <code><a href='fixationSites.html'>fixationSites</a></code>
-or a <code><a href='fixationPath.html'>fixationPath</a></code> object, it is whether to show the fixation
+      <td><p>For <code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code> object, it is whether to emphasize the
+lineage branches by using thicker line. For a <code><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></code>
+or a <code><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></code> object, it is whether to show the fixation
 mutation between clusters.</p></td>
     </tr>
     <tr>
@@ -158,11 +158,11 @@ mutation between clusters.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot object to make the plot. A <code><a href='lineagePath.html'>lineagePath</a></code> object
+    <p>A ggplot object to make the plot. A <code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code> object
   will be plotted as a tree diagram will be plotted and paths are black solid
   line while the trimmed nodes and tips will use grey dashed line. A
-  <code><a href='fixationSites.html'>fixationSites</a></code> object will be plotted as original phylogenetic
-  tree marked with fixation substitutions. A <code><a href='fixationPath.html'>fixationPath</a></code>
+  <code><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></code> object will be plotted as original phylogenetic
+  tree marked with fixation substitutions. A <code><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></code>
   object will be plotted as a <code>phylo</code> object. The tips are clustered
   according to the fixation sites. The transition of fixation sites will be
   plotted as a phylogenetic tree. The length of each branch represents the
@@ -170,13 +170,13 @@ mutation between clusters.</p></td>
   indicate the number of sequences in the cluster.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_tree</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_align</span>)
-<span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span>(<span class='no'>zikv_tree</span>, <span class='kw'>alignment</span> <span class='kw'>=</span> <span class='no'>zikv_align</span>)
-<span class='no'>paths</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='no'>tree</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>paths</span>)</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>fixations</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='no'>paths</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>fixations</span>)</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span>(<span class='no'>fixations</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>)</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
+<span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>paths</span>)</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>fixations</span>)</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></span>(<span class='kw'>fixations</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>)</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -192,7 +192,7 @@ mutation between clusters.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

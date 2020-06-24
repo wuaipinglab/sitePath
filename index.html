@@ -75,56 +75,64 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#sitepath-an-r-package-for-detection-of-site-fixation-in-molecular-evolution" class="anchor"></a>sitePath: an R package for detection of site fixation in molecular evolution</h1></div>
 <p>A more detailed tutorial can be found <a href="https://wuaipinglab.github.io/sitePath/">here</a>.</p>
-<div id="installation" class="section level2">
+<div id="1-installation" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>1. Installation</h2>
+<a href="#1-installation" class="anchor"></a>1. Installation</h2>
 <p><a href="https://cran.r-project.org/">R programming language</a> &gt;= 3.6.0 is required to use <code>sitePath</code>.</p>
-<div id="install-from-bioconductor" class="section level4">
+<div id="11-install-from-bioconductor" class="section level4">
 <h4 class="hasAnchor">
-<a href="#install-from-bioconductor" class="anchor"></a>1.1. Install from Bioconductor</h4>
+<a href="#11-install-from-bioconductor" class="anchor"></a>1.1. Install from Bioconductor</h4>
 <p>The stable release is avaiable on <a href="https://bioconductor.org/packages/release/bioc/html/sitePath.html">Bioconductor</a>.</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"BiocManager"</span>, <span class="kw">quietly</span> <span class="kw">=</span> <span class="fl">TRUE</span>))
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"BiocManager"</span>, quietly = <span class="fl">TRUE</span>))
     <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"BiocManager"</span>)
 
-<span class="kw pkg">BiocManager</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">"sitePath"</span>)</pre></div>
+<span class="kw">BiocManager</span>::<span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">"sitePath"</span>)
+</pre></div>
 </div>
-<div id="install-from-github" class="section level3">
+<div id="12-install-from-github" class="section level3">
 <h3 class="hasAnchor">
-<a href="#install-from-github" class="anchor"></a>1.2. Install from GitHub</h3>
+<a href="#12-install-from-github" class="anchor"></a>1.2. Install from GitHub</h3>
 <p>The package is in the experimental stage but gives the newest feature:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"wuaipinglab/sitePath"</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)
+<span class="kw">devtools</span>::<span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"wuaipinglab/sitePath"</span>)
+</pre></div>
 </div>
 </div>
-<div id="a-quickstart" class="section level2">
+<div id="2-a-quickstart" class="section level2">
 <h2 class="hasAnchor">
-<a href="#a-quickstart" class="anchor"></a>2. A QuickStart</h2>
-<div id="import-data" class="section level3">
+<a href="#2-a-quickstart" class="anchor"></a>2. A QuickStart</h2>
+<div id="21-import-data" class="section level3">
 <h3 class="hasAnchor">
-<a href="#import-data" class="anchor"></a>2.1. Import data</h3>
+<a href="#21-import-data" class="anchor"></a>2.1. Import data</h3>
 <p>Both the phylogenetic tree and the matching multiple sequence alignment are required.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ape</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sitePath</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ape-package.ird.fr">ape</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/wuaipinglab/sitePath">sitePath</a></span>)
 
 <span class="co"># The file names of your tree and multiple sequence alignment</span>
-<span class="no">tree_file</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"sitePath"</span>)
-<span class="no">alignment_file</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"sitePath"</span>)
+<span class="kw">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package = <span class="st">"sitePath"</span>)
+<span class="kw">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package = <span class="st">"sitePath"</span>)
 
-<span class="no">tree</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span>(<span class="no">tree_file</span>)
-<span class="no">tree</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/addMSA.html">addMSA</a></span>(<span class="no">tree</span>, <span class="no">alignment_file</span>, <span class="st">"fasta"</span>)</pre></div>
+<span class="kw">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span>(<span class="kw">tree_file</span>)
+<span class="kw">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phyMSAmatched.html">addMSA</a></span>(<span class="kw">tree</span>, <span class="kw">alignment_file</span>, <span class="st">"fasta"</span>)
+</pre></div>
 </div>
-<div id="detect-fixation-sites" class="section level3">
+<div id="22-detect-fixation-sites" class="section level3">
 <h3 class="hasAnchor">
-<a href="#detect-fixation-sites" class="anchor"></a>2.2. Detect fixation sites</h3>
+<a href="#22-detect-fixation-sites" class="anchor"></a>2.2. Detect fixation sites</h3>
 <p>Use the <code>lineagePath</code> function to resolve major lineages (the choice of threshold really depends). Then use the <code>fixationSites</code> function to detect fixation sites.</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="no">paths</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/lineagePath.html">lineagePath</a></span>(<span class="no">tree</span>, <span class="fl">0.05</span>)
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="kw">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lineagePath.html">lineagePath</a></span>(<span class="kw">tree</span>, <span class="fl">0.05</span>)
 
-<span class="no">fixations</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/fixationSites.html">fixationSites</a></span>(<span class="no">paths</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">fixations</span>)</pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co">## Result for 3 paths:</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">## </span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 </span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">## No reference sequence specified. Using alignment numbering</span></a></code></pre></div>
+<span class="kw">fixations</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fixationSites.html">fixationSites</a></span>(<span class="kw">paths</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">fixations</span>)
+</pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## Result for 3 paths:</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">## </span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 </span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">## No reference sequence specified. Using alignment numbering</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -166,7 +174,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

@@ -125,10 +125,10 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
-<span class='fu'>setSiteNumbering</span>(<span class='no'>x</span>, <span class='kw'>reference</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>gapChar</span> <span class='kw'>=</span> <span class='st'>"-"</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/setSiteNumbering.html'>setSiteNumbering</a></span>(<span class='kw'>x</span>, reference = <span class='kw'>NULL</span>, gapChar = <span class='st'>"-"</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for lineagePath</span>
-<span class='fu'>setSiteNumbering</span>(<span class='no'>x</span>, <span class='kw'>reference</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>gapChar</span> <span class='kw'>=</span> <span class='st'>"-"</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/setSiteNumbering.html'>setSiteNumbering</a></span>(<span class='kw'>x</span>, reference = <span class='kw'>NULL</span>, gapChar = <span class='st'>"-"</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -136,7 +136,7 @@
     <tr>
       <th>x</th>
       <td><p>The object to set site numbering. It could be a
-<code><a href='addMSA.html'>phyMSAmatched</a></code> or a <code>lineagePath</code> object.</p></td>
+<code><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>phyMSAmatched</a></code> or a <code>lineagePath</code> object.</p></td>
     </tr>
     <tr>
       <th>reference</th>
@@ -159,10 +159,10 @@ gapChar for the reference sequence.</p></td>
     <p>The input <code>x</code> with numbering mapped to <code>reference</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_tree</span>)
-<span class='no'>msaPath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>'sitePath'</span>)
-<span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span>(<span class='no'>zikv_tree</span>, <span class='kw'>msaPath</span> <span class='kw'>=</span> <span class='no'>msaPath</span>, <span class='kw'>msaFormat</span> <span class='kw'>=</span> <span class='st'>'fasta'</span>)
-<span class='fu'>setSiteNumbering</span>(<span class='no'>tree</span>)</div><div class='output co'>#&gt; This is a 'phyMSAmatched' object.</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
+<span class='kw'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package = <span class='st'>'sitePath'</span>)
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, msaPath = <span class='kw'>msaPath</span>, msaFormat = <span class='st'>'fasta'</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/setSiteNumbering.html'>setSiteNumbering</a></span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; This is a 'phyMSAmatched' object.</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -178,7 +178,7 @@ gapChar for the reference sequence.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

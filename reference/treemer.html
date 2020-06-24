@@ -127,7 +127,7 @@ groupTips uses sequence similarity to group tree tips.
 
     <div class="ref-description">
     <p><code>similarityMatrix</code> calculates similarity between aligned
-  sequences. The similarity matrix can be used in <code>groupTips</code>.</p>
+  sequences. The similarity matrix can be used in <code><a href='https://rdrr.io/pkg/sitePath/man/treemer.html'>groupTips</a></code>.</p>
 <p><code>groupTips</code> uses sequence similarity to group tree tips.
   Members in a group are always constrained to share the same ancestral node.
   Similarity between two tips is derived from their multiple sequence
@@ -138,14 +138,14 @@ groupTips uses sequence similarity to group tree tips.
   divergent if the similarity is lower than the threshold.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>similarityMatrix</span>(<span class='no'>tree</span>)
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/treemer.html'>similarityMatrix</a></span>(<span class='kw'>tree</span>)
 
-<span class='fu'>groupTips</span>(
-  <span class='no'>tree</span>,
-  <span class='kw'>similarity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>simMatrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>forbidTrivial</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>tipnames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/treemer.html'>groupTips</a></span>(
+  <span class='kw'>tree</span>,
+  similarity = <span class='kw'>NULL</span>,
+  simMatrix = <span class='kw'>NULL</span>,
+  forbidTrivial = <span class='fl'>TRUE</span>,
+  tipnames = <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -153,7 +153,7 @@ groupTips uses sequence similarity to group tree tips.
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>tree</th>
-      <td><p>The return from <code><a href='addMSA.html'>addMSA</a></code> function.</p></td>
+      <td><p>The return from <code><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></code> function.</p></td>
     </tr>
     <tr>
       <th>similarity</th>
@@ -185,9 +185,9 @@ sequences.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_tree'</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_align'</span>)
-<span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span>(<span class='no'>zikv_tree</span>, <span class='kw'>alignment</span> <span class='kw'>=</span> <span class='no'>zikv_align</span>)
-<span class='no'>simMatrix</span> <span class='kw'>&lt;-</span> <span class='fu'>similarityMatrix</span>(<span class='no'>tree</span>)
-<span class='fu'>groupTips</span>(<span class='no'>tree</span>, <span class='fl'>0.996</span>, <span class='no'>simMatrix</span>)</div><div class='output co'>#&gt; $`3`
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
+<span class='kw'>simMatrix</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/treemer.html'>similarityMatrix</a></span>(<span class='kw'>tree</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/treemer.html'>groupTips</a></span>(<span class='kw'>tree</span>, <span class='fl'>0.996</span>, <span class='kw'>simMatrix</span>)</div><div class='output co'>#&gt; $`3`
 #&gt; [1] "ARU07183"
 #&gt; 
 #&gt; $`7`
@@ -394,7 +394,7 @@ sequences.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

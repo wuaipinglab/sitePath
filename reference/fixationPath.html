@@ -129,14 +129,14 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for fixationSites</span>
-<span class='fu'>fixationPath</span>(<span class='no'>x</span>, <span class='kw'>minEffectiveSize</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></span>(<span class='kw'>x</span>, minEffectiveSize = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>The return from <code><a href='fixationSites.html'>fixationSites</a></code> function.</p></td>
+      <td><p>The return from <code><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></code> function.</p></td>
     </tr>
     <tr>
       <th>minEffectiveSize</th>
@@ -153,12 +153,12 @@
     <p>An <code>fixationPath</code> object</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_tree_reduced</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>zikv_align_reduced</span>)
-<span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span>(<span class='no'>zikv_tree_reduced</span>, <span class='kw'>alignment</span> <span class='kw'>=</span> <span class='no'>zikv_align_reduced</span>)
-<span class='no'>paths</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='no'>tree</span>)
-<span class='no'>mutations</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='no'>paths</span>)
-<span class='fu'>fixationPath</span>(<span class='no'>mutations</span>)</div><div class='output co'>#&gt; [1] "1.1.2" "2.1.1" "2.2.2" "2.2.4"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
+<span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
+<span class='kw'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationPath.html'>fixationPath</a></span>(<span class='kw'>mutations</span>)</div><div class='output co'>#&gt; [1] "1.1.2" "2.1.1" "2.2.2" "2.2.4"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -174,7 +174,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>
