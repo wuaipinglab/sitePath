@@ -252,6 +252,9 @@ fixationSites.lineagePath <- function(paths,
                 }
             }
         }
+        if (length(group) == 0) {
+            return(group)
+        }
         # Group tips according to fixation points
         res <- group[[1]]
         for (p in group[-1]) {
@@ -316,6 +319,7 @@ fixationSites.lineagePath <- function(paths,
         }
         return(res)
     })
+    groupByPath <- groupByPath[which(lengths(groupByPath) != 0)]
     return(groupByPath)
 }
 
@@ -341,7 +345,7 @@ fixationSites.lineagePath <- function(paths,
             allTips <- unlist(groupByPath[[i]])
             # The first cluster in 'gp' to have no overlap (divergent point)
             for (j in seq_along(gp)[-1]) {
-                if (all(!gp[[j]] %in% allTips)) {
+                if (any(!gp[[j]] %in% allTips)) {
                     m <- i
                     d <- j
                     break
@@ -353,57 +357,62 @@ fixationSites.lineagePath <- function(paths,
                 divergedIndex <- d
             }
         }
-        # Find the tips before diverged
-        sharedTips <- gp[[divergedIndex - 1]]
-        refSites <- attr(sharedTips, "site")
-        # The non-shared part of the 'sharedTips' ('allTips' are from the
-        # divergent point in 'res')
-        divergedTips <- setdiff(sharedTips, allTips)
-        # In case the 'sharedTips' do not have non-shared part
-        if (length(divergedTips) == 0) {
-            divergedTips <- gp[[divergedIndex]]
-            divergedIndex <- divergedIndex + 1
-        }
+        # Find the tips when diverged
+        divergedTips <- gp[[divergedIndex]]
+        refSites <- attr(divergedTips, "site")
+        # The non-shared part of the 'divergedTips' ('allTips' are from the
+        # divergent point in 'res'). This part will not be empty
+        divergedTips <- setdiff(divergedTips, allTips)
         attr(divergedTips, "site") <- refSites
         # Add the truncated 'gp' (no overlap) to 'res'
-        res[[gpIndex]] <-
-            c(list(divergedTips), gp[divergedIndex:length(gp)])
+        if (divergedIndex == length(gp)) {
+            # No more trailing tips besides the non-shared part
+            res[[gpIndex]] <- list(divergedTips)
+        } else {
+            # Non-shared part plus the trailing part
+            res[[gpIndex]] <- c(list(divergedTips),
+                                gp[(divergedIndex + 1):length(gp)])
+        }
         # Find the most related group of 'gp' in 'res'
         toMerge <- res[[toMergeIndex]]
         # To determine where to add the new group (truncated 'gp')
+        gpTips <- unlist(gp)
         for (i in seq_along(toMerge)) {
-            gpTips <- unlist(gp)
-            if (all(!toMerge[[i]] %in% gpTips)) {
-                # Find the tips before diverged
-                sharedTips <- toMerge[[i - 1]]
-                # Store the fixation site info for 'sharedTips'
-                sites <- attr(sharedTips, "site")
-                # The non-shared part of 'sharedTips'
-                divergedTips <- setdiff(sharedTips, gpTips)
+            # The divergent point of the most related group
+            if (any(!toMerge[[i]] %in% gpTips)) {
+                # Store the fixation site info for the tips to be split
+                sites <- attr(toMerge[[i]], "site")
+                # The non-shared part
+                divergedTips <- setdiff(toMerge[[i]], gpTips)
                 attr(divergedTips, "site") <- sites
-                # The shared part of 'sharedTips'
-                sharedTips <- setdiff(sharedTips, divergedTips)
-                if (length(divergedTips) == 0) {
-                    divergedTips <- list()
+                # The shared part
+                sharedTips <- setdiff(toMerge[[i]], divergedTips)
+                if (length(sharedTips) == 0) {
+                    # There is at least one group of tips before divergence
+                    attr(toMerge[[i - 1]], "toMerge") <- gpIndex
+                    attr(toMerge[[i - 1]], "toMergeRefSites") <- refSites
+                    sharedTips <- list()
                 } else {
+                    # Give back the fixation site info to the shared part
+                    attr(sharedTips, "site") <- sites
+                    attr(sharedTips, "toMerge") <- gpIndex
+                    attr(sharedTips, "toMergeRefSites") <- refSites
+                    sharedTips <- list(sharedTips)
+                }
+                # The divergent part
+                if (i == length(toMerge)) {
+                    # No more trailing tips besides the non-shared part
                     divergedTips <- list(divergedTips)
-                }
-                # Give back the fixation site info to 'sharedTips'
-                attr(sharedTips, "site") <- sites
-                attr(sharedTips, "toMerge") <- gpIndex
-                attr(sharedTips, "toMergeRefSites") <- refSites
-                sharedTips <- list(sharedTips)
-                # Reform because the previous two are taken by 'sharedTips' and
-                # 'divergedTips'
-                if (i == 2) {
-                    preTips <- list()
                 } else {
-                    preTips <- toMerge[seq_len(i - 2)]
+                    # Non-shared part plus the trailing part
+                    divergedTips <- c(list(divergedTips),
+                                      toMerge[(i + 1):length(toMerge)])
                 }
-                res[[toMergeIndex]] <- c(preTips,
+                # Reform the most related group because the divergent tips might
+                # be split
+                res[[toMergeIndex]] <- c(toMerge[seq_len(i - 1)],
                                          sharedTips,
-                                         divergedTips,
-                                         toMerge[i:length(toMerge)])
+                                         divergedTips)
                 break
             }
         }
