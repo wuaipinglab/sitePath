@@ -344,7 +344,7 @@ fixationSites.lineagePath <- function(paths,
             # overlapped with tips in the 'gp' to be merged
             allTips <- unlist(groupByPath[[i]])
             # The first cluster in 'gp' to have no overlap (divergent point)
-            for (j in seq_along(gp)[-1]) {
+            for (j in seq_along(gp)) {
                 if (any(!gp[[j]] %in% allTips)) {
                     m <- i
                     d <- j
