@@ -25,8 +25,7 @@ BiocManager::install("sitePath")
 The package is in the experimental stage but gives the newest feature:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("wuaipinglab/sitePath")
+BiocManager::install("wuaipinglab/sitePath")
 ```
 
 ## 2\. A QuickStart
