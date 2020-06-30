@@ -141,7 +141,9 @@
       <th>tree</th>
       <td><p>A <code><a href='https://rdrr.io/pkg/ape/man/read.tree.html'>phylo</a></code> object. This commonly can be from tree
 parsing function in <code><a href='https://rdrr.io/pkg/ape/man/ape-package.html'>ape</a></code> or <code>ggtree</code>. All the
-<code>tip.label</code> should be found in the sequence alignment.</p></td>
+<code>tip.label</code> should be found in the sequence alignment. The tree is
+supposed to fully resolved (bifurcated) and will be resolved by
+<code><a href='https://rdrr.io/pkg/ape/man/multi2di.html'>multi2di</a></code> if <code><a href='https://rdrr.io/pkg/ape/man/is.binary.tree.html'>is.binary</a></code> gives <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>msaPath</th>
