@@ -10,7 +10,9 @@
 #'   function will use the sequence in the alignment file.
 #' @param tree A \code{\link{phylo}} object. This commonly can be from tree
 #'   parsing function in \code{\link{ape}} or \code{\link{ggtree}}. All the
-#'   \code{tip.label} should be found in the sequence alignment.
+#'   \code{tip.label} should be found in the sequence alignment. The tree is
+#'   supposed to fully resolved (bifurcated) and will be resolved by
+#'   \code{\link{multi2di}} if \code{\link{is.binary}} gives \code{FALSE}.
 #' @param msaPath The file path to the multiple sequence alignment file
 #' @param msaFormat The format of the multiple sequence alignment file
 #' @param alignment An \code{alignment} object. This commonly can be from
@@ -18,7 +20,7 @@
 #'   names in the alignment should include all \code{tip.label} in the tree
 #' @return Since 1.5.12, the function returns a \code{phyMSAmatched} object to
 #'   avoid S3 methods used on \code{phylo} (better encapsulation).
-#' @importFrom ape as.phylo
+#' @importFrom ape as.phylo multi2di is.binary
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
@@ -42,11 +44,16 @@ addMSA <- function(tree,
     } else if (!is(alignment, "alignment")) {
         stop("\"alignment\" is not class alignment.")
     }
-    # Set'alignment' attribute
+    # Set 'alignment' attribute
     align <- toupper(alignment[["seq"]])
     names(align) <- alignment[["nam"]]
     attr(res, "align") <- align
     # Set 'tree' attribute
+    if (!is.binary(tree)) {
+        tree <- multi2di(tree, random = FALSE)
+        message("The \"tree\" object is not bifurcated ",
+                "and resolved by \"multi2di\" function.")
+    }
     attr(res, "tree") <- tree
     # Use the numbering of MSA as the default site numbering
     res <- .checkReference(res, NULL, NULL)

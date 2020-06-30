@@ -10,7 +10,9 @@ addMSA(tree, msaPath = "", msaFormat = "", alignment = NULL)
 \arguments{
 \item{tree}{A \code{\link{phylo}} object. This commonly can be from tree
 parsing function in \code{\link{ape}} or \code{\link{ggtree}}. All the
-\code{tip.label} should be found in the sequence alignment.}
+\code{tip.label} should be found in the sequence alignment. The tree is
+supposed to fully resolved (bifurcated) and will be resolved by
+\code{\link{multi2di}} if \code{\link{is.binary}} gives \code{FALSE}.}
 
 \item{msaPath}{The file path to the multiple sequence alignment file}
 
