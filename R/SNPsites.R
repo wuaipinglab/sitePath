@@ -40,28 +40,23 @@ SNPsites <- function(tree, minSNP = NULL) {
         FUN.VALUE = character(1)
     )
     # Find SNP for each tree tip by comparing with the consensus sequence
-    allSNP <- lapply(names(align), function(ac) {
-        res <- as.data.frame(t(vapply(
-            X = seq_along(majorSNP),
-            FUN = function(site) {
-                s <- msaNumbering[site]
-                snp <- substr(align[[ac]], s, s)
-                if (snp != majorSNP[[site]] && snp != '-') {
-                    return(c(site, snp))
-                } else {
-                    return(c(site, NA_character_))
-                }
-            },
-            FUN.VALUE = c(integer(1), character(1))
-        )))
-        res <- res[complete.cases(res), ]
-        colnames(res) <- c("Pos", "SNP")
-        res[["Pos"]] <- as.integer(res[["Pos"]])
-        res[["Accession"]] <- rep(ac, nrow(res))
+    align <- strsplit(x = align, split = "")
+    allSNP <- lapply(seq_along(majorSNP), function(site) {
+        snp <- vapply(
+            X = align,
+            FUN = "[[",
+            i = msaNumbering[site],
+            FUN.VALUE = character(1)
+        )
+        snp <- snp[which(snp != majorSNP[[site]] & snp != '-')]
+        res <- data.frame(
+            "Accession" = names(snp),
+            "Pos" = rep(site, length(snp)),
+            "SNP" = snp
+        )
         return(res)
     })
     allSNP <- do.call(rbind, allSNP)
-    allSNP <- allSNP[, c(3, 1, 2)]
     # Calculate the frequency of each mutation/SNP
     snpSummary <- as.data.frame(table(allSNP[["Pos"]],
                                       allSNP[["SNP"]]))
@@ -74,7 +69,7 @@ SNPsites <- function(tree, minSNP = NULL) {
     )
     # Filter out low frequency mutation/SNP
     allSNP <- allSNP[which(allSNP[, "Freq"] >= minSNP),
-                     c(3, 1, 2, 4)]
+                     c("Accession", "Pos", "SNP")]
     rownames(allSNP) <- NULL
     # Extract all the qualified sites as 'res' to be compatible with the return
     # of previous version
@@ -129,11 +124,9 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     )
     names(snpColors) <- toupper(names(snpColors))
     # Use 'ggplot' to make SNP plot as dots
-    snpPlot <- ggplot(allSNP, aes(
-        x = Pos,
-        y = Accession,
-        fill = SNP
-    )) +
+    snpPlot <- ggplot(allSNP, aes(x = Pos,
+                                  y = Accession,
+                                  fill = SNP)) +
         geom_point(
             shape = 23,
             size = 1,

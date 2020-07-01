@@ -6,7 +6,7 @@
 #' @param row.names NULL or a character vector giving the row names for the data
 #'   frame. Missing values are not allowed.
 #' @param optional Unimplemented.
-#' @param tipname Logical: if the return give fixation mutations betweem tip
+#' @param tipname Logical: if the return give fixation mutations between tip
 #'   groups or tip names within a group. The default is \code{FALSE}.
 #' @param ... Other arguments.
 #' @return A \code{\link{data.frame}} object.
@@ -36,7 +36,6 @@ as.data.frame.fixationSites <- function(x,
             )
         })
         res <- do.call(rbind, res)
-
     } else {
         clusterPaths <- list()
         rootNode <- getMRCA(tree, tree[["tip.label"]])
@@ -108,6 +107,15 @@ as.data.frame.fixationSites <- function(x,
         })
         res <- do.call(rbind, res)
     }
+    return(res)
+}
+
+#' @export
+as.data.frame.SNPsites <- function(x,
+                                   row.names = NULL,
+                                   optional = FALSE,
+                                   ...) {
+    res <- attr(x, "allSNP")
     return(res)
 }
 
@@ -198,18 +206,6 @@ as.treedata.fixationSites <- function(tree, ...) {
     d <- full_join(as_tibble(tree), d, by = "node")
     tree <- as.treedata(d)
     tree <- groupOTU(tree, grp, group_name = "Groups")
-    # Change group '0' to its ancestral node's group
-    # edge <- tree@phylo[["edge"]]
-    # grpNames <- attr(tree@phylo, "Groups")
-    # groupZero <- which(grpNames == 0)
-    # attr(tree@phylo, "Groups")[groupZero] <-
-    #     levels(grpNames)[vapply(
-    #         X = groupZero,
-    #         FUN = function(i) {
-    #             grpNames[which(edge[, 2] == i)]
-    #         },
-    #         FUN.VALUE = integer(1)
-    #     )]
     return(tree)
 }
 
