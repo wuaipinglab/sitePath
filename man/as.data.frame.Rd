@@ -14,7 +14,7 @@ frame. Missing values are not allowed.}
 
 \item{optional}{Unimplemented.}
 
-\item{tipname}{Logical: if the return give fixation mutations betweem tip
+\item{tipname}{Logical: if the return give fixation mutations between tip
 groups or tip names within a group. The default is \code{FALSE}.}
 
 \item{...}{Other arguments.}
