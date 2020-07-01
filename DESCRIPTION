@@ -1,9 +1,9 @@
 Package: sitePath
 Type: Package
 Title: Detection of site fixation in molecular evolution
-Version: 1.5.18
-Author: Chengyang Ji, Aiping Wu
-Maintainer: Chengyang Ji <chengyang.ji12@alumni.xjtlu.edu.cn>
+Version: 1.5.19
+Authors@R: c(person("Chengyang", "Ji", email = "chengyang.ji12@alumni.xjtlu.edu.cn", role = c("aut", "cre", "cph"), comment = c(ORCID = "00000-0001-9258-5453")),
+             person("Aiping", "Wu", email = "wap@ism.cams.cn", role = c("ths")))
 Description: The package does hierarchical search for fixation events given
     multiple sequence alignment and phylogenetic tree. These fixation events
     can be specific to a phylogenetic lineages or shared by multiple lineages.
@@ -35,6 +35,6 @@ LinkingTo: Rcpp
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr
-URL: https://github.com/wuaipinglab/sitePath
+URL: https://wuaipinglab.github.io/sitePath/
 BugReports: https://github.com/wuaipinglab/sitePath/issues
 biocViews: Alignment, MultipleSequenceAlignment, Phylogenetics, SNP, Software
