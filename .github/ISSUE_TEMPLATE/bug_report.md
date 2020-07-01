@@ -8,27 +8,21 @@ assignees: ''
 ---
 
 **Describe the bug**
+
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior:
-1. Use the `saveRDS` function to save the R object causing the bug.
-2. Upload the RDS file.
-For example:
-```r
-paths <- lineagePath(tree)
-fixations <- fixationSites(paths) # Error occurs
 
-saveRDS("paths.rds", paths) # Upload "paths.rds"
-```
+The tree and sequence alignment file are needed in most cases to reproduce the bug, you can either:
+
+1. Use upload the tree and sequence alignment file.
+2. Or the `saveRDS` function to save the R object causing the bug and upload the RDS file.
+3. If the file(s) exceeds the size limit, email those file(s) to chengyang.ji12@alumni.xjtlu.edu.cn.
 
 **Screenshots**
+
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Version info:**
 
-**Additional context**
-Add any other context about the problem here.
+Run `sessionInfo()` in the R console and paste the output below.

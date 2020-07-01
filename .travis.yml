@@ -1,9 +1,0 @@
-language: r
-r:
-  - bioc-devel
-
-cache: packages
-bioc_required: true
-
-os:
-  - linux
