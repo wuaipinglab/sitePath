@@ -332,8 +332,6 @@ fixationSites.lineagePath <- function(paths,
         # 'gp' is the complete path with overlapped parts
         gp <- groupByPath[[gpIndex]]
         # Reset the variables to NULL for in case of no overlap
-        m <- NULL
-        d <- NULL
         t <- integer()
         # The index of 'res' which to merge with 'gp'
         toMergeIndex <- NULL
@@ -353,19 +351,18 @@ fixationSites.lineagePath <- function(paths,
             # The first cluster in 'gp' to have no overlap (divergent point)
             for (j in seq_along(gp)) {
                 if (any(!gp[[j]] %in% allTips)) {
-                    m <- i
-                    d <- j
                     t <- intersect(gp[[j]], allTips)
+                    # The deepest and most divergent point, safeguard the 'gp'
+                    # has overlap with the truncated 'gp' to merge with in 'res'
+                    if (j >= divergedIndex &&
+                        length(t) >= length(sharedAtDiv) &&
+                        any(unlist(gp) %in% unlist(res[[i]]))) {
+                        toMergeIndex <- i
+                        divergedIndex <- j
+                        sharedAtDiv <- t
+                    }
                     break
                 }
-            }
-            # The deepest and most divergent point
-            if (d >= divergedIndex &&
-                length(t) >= length(sharedAtDiv) &&
-                all(t) %in% unlist(res[[m]])) {
-                toMergeIndex <- m
-                divergedIndex <- d
-                sharedAtDiv <- t
             }
         }
         # Find the tips when diverged
@@ -389,13 +386,14 @@ fixationSites.lineagePath <- function(paths,
         # To determine where to add the new group (truncated 'gp')
         gpTips <- unlist(gp)
         for (i in seq_along(toMerge)) {
-            # The divergent point of the most related group
+            # The divergent point of the most related group in 'res', which
+            # might already be different from the original 'gp'
             if (any(!toMerge[[i]] %in% gpTips)) {
-                # Store the fixation site info for the tips to be split
-                sites <- attr(toMerge[[i]], "site")
                 # The non-shared part
                 divergedTips <- setdiff(toMerge[[i]], gpTips)
-                attr(divergedTips, "site") <- sites
+                # Give back the attributes, including fixation site and possible
+                # merging info
+                attributes(divergedTips) <- attributes(toMerge[[i]])
                 # The shared part
                 sharedTips <- setdiff(toMerge[[i]], divergedTips)
                 if (length(sharedTips) == 0) {
@@ -405,8 +403,10 @@ fixationSites.lineagePath <- function(paths,
                         refSites
                     sharedTips <- list()
                 } else {
-                    # Give back the fixation site info to the shared part
-                    attr(sharedTips, "site") <- sites
+                    # When 'sharedTips' is not empty, the fixation site should
+                    # be the only info to give back to
+                    attr(sharedTips, "site") <-
+                        attr(toMerge[[i]], "site")
                     attr(sharedTips, "toMerge") <- gpIndex
                     attr(sharedTips, "toMergeRefSites") <- refSites
                     sharedTips <- list(sharedTips)
