@@ -341,22 +341,27 @@ fixationSites.lineagePath <- function(paths,
         # The number of shared tips at divergent point will be used to decide if
         # the two clusters are completely diverged or not
         sharedAtDiv <- integer()
-        # Loop through 'res' to find the most related group (because all the
-        # clusters are unique, the first cluster in 'gp' cannot be found is the
-        # divergent point)
+        # Loop through 'res' to find the most related group
         for (i in seq_along(res)) {
             # All existing tips in the other 'gp' in 'groupByPath' to see if
             # overlapped with tips in the 'gp' to be merged
             allTips <- unlist(groupByPath[[i]])
-            # The first cluster in 'gp' to have no overlap (divergent point)
+            # Because all the tip groups are unique in 'res', the first cluster
+            # in 'gp' containing tips that cannot be found is the divergent
+            # point
             for (j in seq_along(gp)) {
-                if (any(!gp[[j]] %in% allTips)) {
+                # Once a potential divergent point having being found, safeguard
+                # the truncated 'gp' (in 'res') to merge with have actual
+                # overlap with the 'gp'
+                if (any(!gp[[j]] %in% allTips) &&
+                    any(unlist(gp) %in% unlist(res[[i]]))) {
                     t <- intersect(gp[[j]], allTips)
-                    # The deepest and most divergent point, safeguard the 'gp'
-                    # has overlap with the truncated 'gp' to merge with in 'res'
-                    if (j >= divergedIndex &&
-                        length(t) >= length(sharedAtDiv) &&
-                        any(unlist(gp) %in% unlist(res[[i]]))) {
+                    # The deepest and most divergent point, which is decided by
+                    # the index. When the index is the same as the previous one,
+                    # chose the one with more shared tips
+                    if (j > divergedIndex ||
+                        (j == divergedIndex &&
+                         length(t) >= length(sharedAtDiv))) {
                         toMergeIndex <- i
                         divergedIndex <- j
                         sharedAtDiv <- t
