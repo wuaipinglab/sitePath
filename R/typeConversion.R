@@ -209,6 +209,12 @@ as.treedata.fixationSites <- function(tree, ...) {
     return(tree)
 }
 
+#' @export
+as.treedata.fixationPath <- function(tree, ...) {
+    res <- attr(tree, "SNPtracing")
+    return(res)
+}
+
 #' @importFrom ape as.phylo
 #' @export
 ape::as.phylo
