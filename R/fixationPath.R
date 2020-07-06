@@ -67,11 +67,10 @@ fixationPath.fixationSites <- function(x,
         refSites <- attr(currentTips, "site")
         # Find where to merge and parent node, update reference site maybe
         for (i in seq_along(tipClusters)) {
-            toMerge <- tipClusters[[i]]
-            toMergeIndex <- attr(toMerge, "toMerge")
-            if (!is.null(toMergeIndex) &&
-                toMergeIndex == gpIndex) {
-                refSites <- attr(toMerge, "toMergeRefSites")
+            toMerge <- attr(tipClusters[[i]], "toMerge")
+            if (!is.null(toMerge) &&
+                gpIndex %in% as.integer(names(toMerge))) {
+                refSites <- toMerge[[as.character(gpIndex)]]
                 parentNode <-
                     parentNodes[which(childrenNodes == i)]
                 break
