@@ -51,8 +51,10 @@ addMSA <- function(tree,
     # Set 'tree' attribute
     if (!is.binary(tree)) {
         tree <- multi2di(tree, random = FALSE)
-        message("The \"tree\" object is not bifurcated ",
-                "and resolved by \"multi2di\" function.")
+        message(
+            "The \"tree\" object is not bifurcated ",
+            "and resolved by \"multi2di\" function."
+        )
     }
     attr(res, "tree") <- tree
     # Use the numbering of MSA as the default site numbering
@@ -168,19 +170,22 @@ setSiteNumbering.fixationSites <- function(x,
     }
     for (gpIndex in seq_along(attr(x, "clustersByPath"))) {
         for (i in seq_along(attr(x, "clustersByPath")[[gpIndex]])) {
-            oldSiteName <- names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]],
-                                      "site"))
-            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]],
-                       "site")) <- site2newRef[oldSiteName]
-            toMergeRefSites <-
-                attr(attr(x, "clustersByPath")[[gpIndex]][[i]],
-                     "toMergeRefSites")
-            if (!is.null(toMergeRefSites)) {
-                oldSiteName <- names(toMergeRefSites)
-                names(attr(
-                    attr(x, "clustersByPath")[[gpIndex]][[i]],
-                    "toMergeRefSites"
-                )) <- site2newRef[oldSiteName]
+            oldSiteName <-
+                names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site"))
+            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site")) <-
+                site2newRef[oldSiteName]
+            toMerge <-
+                attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "toMerge")
+            if (!is.null(toMerge)) {
+                attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "toMerge") <-
+                    lapply(
+                        X = toMerge,
+                        FUN = function(sites) {
+                            oldSiteName <- names(sites)
+                            names(sites) <- site2newRef[oldSiteName]
+                            return(sites)
+                        }
+                    )
             }
         }
     }
