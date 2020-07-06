@@ -465,16 +465,22 @@ fixationSites.lineagePath <- function(paths,
             currMini <- currMini + 1
             toMerge <- attr(grouping[[i]][[j]], "toMerge")
             if (!is.null(toMerge)) {
-                # Create a new major number when encounter a divergent point
-                currMajor <- currMajor + 1L
+                if (identical(attr(grouping[[i]][[j]], "site"),
+                              attr(grouping[[i]][[j + 1]], "site"))) {
+                    nextMajor <- currMajor + 1
+                } else {
+                    # Create a new major number when encounter a divergent point
+                    currMajor <- currMajor + 1L
+                    # Reset mini number
+                    currMini <- 1L
+                    nextMajor <- currMajor
+                }
                 # Assign the starting major number for the 'gp' to be merged
                 toMergeIndex <- as.integer(names(toMerge))
                 startingMajors[toMergeIndex] <-
-                    rep(currMajor, length(toMergeIndex))
+                    rep(nextMajor, length(toMergeIndex))
                 # Initiate minor number for the new major number
-                maxMinors[currMajor] <- 1L
-                # Reset mini number
-                currMini <- 1L
+                maxMinors[nextMajor] <- 1L
             }
         }
     }
