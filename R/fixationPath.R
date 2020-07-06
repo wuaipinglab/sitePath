@@ -28,7 +28,7 @@ fixationPath.fixationSites <- function(x,
         minEffectiveSize <-
             mean(lengths(unlist(grouping, recursive = FALSE)))
     }
-    # Filter out small sized cluster except the divegent points
+    # Filter out small sized cluster except the divergent points
     grouping <- lapply(grouping, function(g) {
         g[which(vapply(
             X = g,
