@@ -9,6 +9,9 @@ test_that("Constrains in fixationSites work", {
     nTips <- length(tipNames)
     paths <- lineagePath(tree)
     mutations <- fixationSites(paths)
+    expect_false(any(duplicated(unlist(
+        attr(mutations, "clustersByPath")
+    ))))
     minEffectiveSize <- nTips / length(unique(unlist(paths)))
     for (sp in mutations) {
         site <- attr(sp, "site")
