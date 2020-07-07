@@ -373,9 +373,9 @@ fixationSites.lineagePath <- function(paths,
         # Find the tips when diverged
         divergedTips <- gp[[divergedIndex]]
         refSites <- attr(divergedTips, "site")
-        # The non-shared part of the 'divergedTips' ('allTips' are from the
-        # divergent point in 'res'). This part will not be empty
-        divergedTips <- setdiff(divergedTips, allTips)
+        # The non-shared part of the 'divergedTips'. This part will not be empty
+        divergedTips <- setdiff(divergedTips,
+                                unlist(groupByPath[[toMergeIndex]]))
         attr(divergedTips, "site") <- refSites
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
