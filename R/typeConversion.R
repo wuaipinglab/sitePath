@@ -23,8 +23,7 @@ as.data.frame.fixationSites <- function(x,
                                         tipname = FALSE,
                                         ...) {
     tree <- as.phylo.fixationSites(x)
-    grp <-
-        fixationPath.fixationSites(x, minEffectiveSize = 0)
+    grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
     grp <- as.list.fixationPath(grp)
     if (tipname) {
         res <- lapply(names(grp), function(n) {
@@ -108,6 +107,70 @@ as.data.frame.fixationSites <- function(x,
         res <- do.call(rbind, res)
     }
     return(res)
+}
+
+.mutationTable <- function(x, tree, grp) {
+    # Extract the node path for each tip cluster
+    clusterPaths <- list()
+    rootNode <- getMRCA(tree, tree[["tip.label"]])
+    for (cluster in names(grp)) {
+        tips <- grp[[cluster]]
+        ancestral <- getMRCA(tree, tips)
+        if (is.null(ancestral)) {
+            np <- nodepath(tree, rootNode, tips)
+            clusterPaths[[cluster]] <-
+                np[seq_len(length(np) - 1)]
+        } else {
+            clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+        }
+    }
+    # The cluster each tip belongs to
+    clusterInfo <- lapply(names(grp), function(g) {
+        data.frame(row.names = grp[[g]],
+                   "cluster" = rep(g, length(grp[[g]])))
+    })
+    clusterInfo <- do.call(rbind, clusterInfo)
+    # The mutation between adjacent clusters
+    transMut <- list()
+    for (sp in x) {
+        site <- attr(sp, "site")
+        for (mp in sp) {
+            for (i in seq_along(mp)[-1]) {
+                prevTips <- mp[[i - 1]]
+                currTips <- mp[[i]]
+                mutation <- paste0(attr(prevTips, "AA"),
+                                   site,
+                                   attr(currTips, "AA"))
+                prevCluster <-
+                    unique(clusterInfo[as.character(prevTips), ])
+                names(prevCluster) <- prevCluster
+                # Choose the most recent cluster to stay un-mutated
+                prev <- names(which.max(lapply(
+                    X = prevCluster,
+                    FUN = function(cluster) {
+                        length(clusterPaths[[cluster]])
+                    }
+                )))
+                currCluster <-
+                    unique(clusterInfo[as.character(currTips), ])
+                names(currCluster) <- currCluster
+                # Choose the most ancient cluster which first receive the
+                # mutation
+                curr <- names(which.min(lapply(
+                    X = currCluster,
+                    FUN = function(cluster) {
+                        length(clusterPaths[[cluster]])
+                    }
+                )))
+                trans <- paste(prev, curr, sep = "-")
+                if (trans %in% names(transMut)) {
+                    transMut[[trans]] <- c(transMut[[trans]], mutation)
+                } else {
+                    transMut[[trans]] <- mutation
+                }
+            }
+        }
+    }
 }
 
 #' @export
