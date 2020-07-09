@@ -36,103 +36,40 @@ as.data.frame.fixationSites <- function(x,
         })
         res <- do.call(rbind, res)
     } else {
-        clusterPaths <- list()
-        rootNode <- getMRCA(tree, tree[["tip.label"]])
-
-        for (cluster in names(grp)) {
-            tips <- grp[[cluster]]
-            ancestral <- getMRCA(tree, tips)
-            if (is.null(ancestral)) {
-                np <- nodepath(tree, rootNode, tips)
-                clusterPaths[[cluster]] <-
-                    np[seq_len(length(np) - 1)]
-            } else {
-                clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
-            }
-        }
-        clusterInfo <- lapply(names(grp), function(g) {
-            data.frame(row.names = grp[[g]],
-                       "cluster" = rep(g, length(grp[[g]])))
-        })
-        clusterInfo <- do.call(rbind, clusterInfo)
-        transMut <- list()
-        for (sp in x) {
-            site <- attr(sp, "site")
-            for (mp in sp) {
-                for (i in seq_along(mp)[-1]) {
-                    prevTips <- mp[[i - 1]]
-                    currTips <- mp[[i]]
-                    prevAA <- attr(prevTips, "AA")
-                    currAA <- attr(currTips, "AA")
-                    mutation <- paste0(prevAA, site, currAA)
-                    prevCluster <-
-                        unique(clusterInfo[as.character(prevTips), ])
-                    names(prevCluster) <- prevCluster
-                    # Choose the most recent cluster to stay un-mutated
-                    prev <- names(which.max(lapply(
-                        X = prevCluster,
-                        FUN = function(cluster) {
-                            length(clusterPaths[[cluster]])
-                        }
-                    )))
-                    currCluster <-
-                        unique(clusterInfo[as.character(currTips), ])
-                    names(currCluster) <- currCluster
-                    # Choose the most ancient cluster which first receive the
-                    # mutation
-                    curr <- names(which.min(lapply(
-                        X = currCluster,
-                        FUN = function(cluster) {
-                            length(clusterPaths[[cluster]])
-                        }
-                    )))
-                    trans <- paste(prev, curr, sep = "-")
-                    if (trans %in% names(transMut)) {
-                        transMut[[trans]] <- c(transMut[[trans]], mutation)
-                    } else {
-                        transMut[[trans]] <- mutation
-                    }
-                }
-            }
-        }
-        transMut <- lapply(transMut, unique)
-        res <- lapply(strsplit(names(transMut), '-'), function(i) {
-            n <- paste(i, collapse = '-')
-            data.frame(
-                "mutation" = transMut[[n]],
-                "from" = rep(i[1], length(transMut[[n]])),
-                "to" = rep(i[2], length(transMut[[n]]))
-            )
-        })
-        res <- do.call(rbind, res)
+        res <- .mutationTable(x, tree, grp)
+        res <- res[, c("mutation", "from", "to")]
     }
     return(res)
 }
 
-.mutationTable <- function(x, tree, grp) {
+.mutationTable <- function(fixations, tree, grp) {
+    # The cluster each tip belongs to
+    clusterInfo <- character()
     # Extract the node path for each tip cluster
     clusterPaths <- list()
     rootNode <- getMRCA(tree, tree[["tip.label"]])
+    # Iterate the cluster and grow the two above
     for (cluster in names(grp)) {
         tips <- grp[[cluster]]
+        # The cluster named by the tips
+        clsNames <- rep(cluster, length(tips))
+        names(clsNames) <- as.character(tips)
+        clusterInfo <- c(clusterInfo, clsNames)
+        # The node path towards the cluster
         ancestral <- getMRCA(tree, tips)
         if (is.null(ancestral)) {
             np <- nodepath(tree, rootNode, tips)
-            clusterPaths[[cluster]] <-
-                np[seq_len(length(np) - 1)]
+            clusterPaths[[cluster]] <- np[seq_len(length(np) - 1)]
         } else {
             clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
         }
     }
-    # The cluster each tip belongs to
-    clusterInfo <- lapply(names(grp), function(g) {
-        data.frame(row.names = grp[[g]],
-                   "cluster" = rep(g, length(grp[[g]])))
-    })
-    clusterInfo <- do.call(rbind, clusterInfo)
-    # The mutation between adjacent clusters
-    transMut <- list()
-    for (sp in x) {
+    # Info for the transition mutation
+    prevCls <- character()
+    currCls <- character()
+    mutName <- character()
+    transNode <- integer()
+    for (sp in fixations) {
         site <- attr(sp, "site")
         for (mp in sp) {
             for (i in seq_along(mp)[-1]) {
@@ -141,36 +78,44 @@ as.data.frame.fixationSites <- function(x,
                 mutation <- paste0(attr(prevTips, "AA"),
                                    site,
                                    attr(currTips, "AA"))
-                prevCluster <-
-                    unique(clusterInfo[as.character(prevTips), ])
-                names(prevCluster) <- prevCluster
+                prev <- unique(clusterInfo[as.character(prevTips)])
+                names(prev) <- prev
                 # Choose the most recent cluster to stay un-mutated
                 prev <- names(which.max(lapply(
-                    X = prevCluster,
+                    X = prev,
                     FUN = function(cluster) {
                         length(clusterPaths[[cluster]])
                     }
                 )))
-                currCluster <-
-                    unique(clusterInfo[as.character(currTips), ])
-                names(currCluster) <- currCluster
+                curr <- unique(clusterInfo[as.character(currTips)])
+                names(curr) <- curr
                 # Choose the most ancient cluster which first receive the
                 # mutation
                 curr <- names(which.min(lapply(
-                    X = currCluster,
+                    X = curr,
                     FUN = function(cluster) {
                         length(clusterPaths[[cluster]])
                     }
                 )))
-                trans <- paste(prev, curr, sep = "-")
-                if (trans %in% names(transMut)) {
-                    transMut[[trans]] <- c(transMut[[trans]], mutation)
-                } else {
-                    transMut[[trans]] <- mutation
-                }
+                # Find the transition node
+                currPath <- clusterPaths[[curr]]
+                trans <- currPath[length(currPath)]
+                # Add the new transition mutation
+                prevCls <- c(prevCls, prev)
+                currCls <- c(currCls, curr)
+                mutName <- c(mutName, mutation)
+                transNode <- c(transNode, trans)
             }
         }
     }
+    # The mutation between adjacent clusters
+    res <- data.frame(
+        "mutation" = mutName,
+        "from" = prevCls,
+        "to" = currCls,
+        "node" = transNode
+    )
+    return(res)
 }
 
 #' @export
