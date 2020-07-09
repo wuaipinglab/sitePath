@@ -141,31 +141,7 @@ as.treedata.fixationSites <- function(tree, ...) {
     transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
                        FUN = "[[",
                        i = "mutation")
-    d <- as_tibble(t(vapply(
-        X = names(transMut),
-        FUN = function(trans) {
-            snp <- transMut[[trans]]
-            res <- character()
-            snpNum <- length(snp)
-            for (i in seq_len(snpNum)) {
-                res <- paste0(res, snp[i])
-                if (i < snpNum) {
-                    if (i %% 4 == 0) {
-                        res <- paste0(res, ",\n")
-                    } else {
-                        res <- paste0(res, ", ")
-                    }
-                }
-            }
-            res <- c(trans, res)
-            names(res) <- c("node", "SNPs")
-            return(res)
-        },
-        FUN.VALUE = character(2)
-    )))
-    d[["node"]] <- as.integer(d[["node"]])
-    d <- full_join(as_tibble(tree), d, by = "node")
-    tree <- as.treedata(d)
+    tree <- .annotateSNPonTree(tree, transMut)
     tree <- groupOTU(tree, grp, group_name = "Groups")
     return(tree)
 }
