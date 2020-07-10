@@ -27,30 +27,7 @@ parallelSites <- function(x,
     }
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
-    # Find SNP for each tree tip by comparing with the consensus sequence
-    if (is.null(refSeqName)) {
-        referenceSeq <- .consensusSeq(align, msaNumbering)
-        align <- strsplit(x = align, split = "")
-    } else {
-        align <- strsplit(x = align, split = "")
-        referenceSeq <- align[[refSeqName]]
-    }
-    allSNP <- lapply(seq_along(referenceSeq), function(site) {
-        snp <- vapply(
-            X = align,
-            FUN = "[[",
-            i = msaNumbering[site],
-            FUN.VALUE = character(1)
-        )
-        snp <- snp[which(snp != referenceSeq[[site]] & snp != '-')]
-        res <- data.frame(
-            "Accession" = names(snp),
-            "Pos" = rep(site, length(snp)),
-            "SNP" = snp
-        )
-        return(res)
-    })
-    allSNP <- do.call(rbind, allSNP)
+    allSNP <- .findSNPsites(align, msaNumbering, refSeqName)
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching sequence
@@ -93,20 +70,6 @@ parallelSites <- function(x,
     # Transfer attributes
     res <- .phyMSAtransfer(res, x)
     class(res) <- "parallelSites"
-    return(res)
-}
-
-.consensusSeq <- function(align, msaNumbering) {
-    # Find the major SNP of each site as the consensus sequence
-    res <- vapply(
-        X = msaNumbering,
-        FUN = function(s) {
-            aaSummary <- tableAA(align, s - 1)
-            # The amino acid/nucleotide having the most appearance
-            names(aaSummary)[which.max(aaSummary)]
-        },
-        FUN.VALUE = character(1)
-    )
     return(res)
 }
 

@@ -24,39 +24,7 @@ SNPsites <- function(tree, minSNP = NULL) {
     }
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
-    # Find the major SNP of each site as the consensus sequence
-    majorSNP <- vapply(
-        X = msaNumbering,
-        FUN = function(s) {
-            aaSummary <- tableAA(align, s - 1)
-            # Gap cannot be the major SNP
-            gapIndex <- which(names(aaSummary) == '-')
-            if (length(gapIndex) != 0) {
-                aaSummary <- aaSummary[-gapIndex]
-            }
-            # The amino acid/nucleotide having the most appearance
-            names(aaSummary)[which.max(aaSummary)]
-        },
-        FUN.VALUE = character(1)
-    )
-    # Find SNP for each tree tip by comparing with the consensus sequence
-    align <- strsplit(x = align, split = "")
-    allSNP <- lapply(seq_along(majorSNP), function(site) {
-        snp <- vapply(
-            X = align,
-            FUN = "[[",
-            i = msaNumbering[site],
-            FUN.VALUE = character(1)
-        )
-        snp <- snp[which(snp != majorSNP[[site]] & snp != '-')]
-        res <- data.frame(
-            "Accession" = names(snp),
-            "Pos" = rep(site, length(snp)),
-            "SNP" = snp
-        )
-        return(res)
-    })
-    allSNP <- do.call(rbind, allSNP)
+    allSNP <- .findSNPsites(align, msaNumbering, NULL)
     # Calculate the frequency of each mutation/SNP
     snpSummary <- as.data.frame(table(allSNP[["Pos"]],
                                       allSNP[["SNP"]]))
@@ -93,6 +61,43 @@ print.SNPsites <- function(x, ...) {
     attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
     attr(receive, "reference") <- attr(give, "reference")
     return(receive)
+}
+
+.findSNPsites <- function(align, msaNumbering, refSeqName) {
+    # Find SNP for each tree tip by comparing with the consensus sequence
+    if (is.null(refSeqName)) {
+        # Find the major SNP of each site as the consensus sequence
+        referenceSeq <- vapply(
+            X = msaNumbering,
+            FUN = function(s) {
+                aaSummary <- tableAA(align, s - 1)
+                # The amino acid/nucleotide having the most appearance
+                names(aaSummary)[which.max(aaSummary)]
+            },
+            FUN.VALUE = character(1)
+        )
+        align <- strsplit(x = align, split = "")
+    } else {
+        align <- strsplit(x = align, split = "")
+        referenceSeq <- align[[refSeqName]]
+    }
+    allSNP <- lapply(seq_along(referenceSeq), function(site) {
+        snp <- vapply(
+            X = align,
+            FUN = "[[",
+            i = msaNumbering[site],
+            FUN.VALUE = character(1)
+        )
+        snp <- snp[which(snp != referenceSeq[[site]] & snp != '-')]
+        res <- data.frame(
+            "Accession" = names(snp),
+            "Pos" = rep(site, length(snp)),
+            "SNP" = snp
+        )
+        return(res)
+    })
+    allSNP <- do.call(rbind, allSNP)
+    return(allSNP)
 }
 
 #' @rdname plotMutSites
