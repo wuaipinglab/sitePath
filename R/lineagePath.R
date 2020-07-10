@@ -93,7 +93,6 @@ print.lineagePath <- function(x, ...) {
 }
 
 #' @rdname plotFunctions
-#' @name plotFunctions
 #' @title Visualize the results
 #' @description The plot function to visualize the return of functions in the
 #'   package. Though the function name \code{plot} is used, the plot functions

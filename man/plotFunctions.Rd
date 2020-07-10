@@ -4,7 +4,6 @@
 \name{plot.fixationPath}
 \alias{plot.fixationPath}
 \alias{plot.fixationSites}
-\alias{plotFunctions}
 \alias{plot.lineagePath}
 \title{Visualize the results}
 \usage{

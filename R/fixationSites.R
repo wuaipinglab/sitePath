@@ -373,9 +373,9 @@ fixationSites.lineagePath <- function(paths,
         # Find the tips when diverged
         divergedTips <- gp[[divergedIndex]]
         refSites <- attr(divergedTips, "site")
-        # The non-shared part of the 'divergedTips' ('allTips' are from the
-        # divergent point in 'res'). This part will not be empty
-        divergedTips <- setdiff(divergedTips, allTips)
+        # The non-shared part of the 'divergedTips'. This part will not be empty
+        divergedTips <- setdiff(divergedTips,
+                                unlist(groupByPath[[toMergeIndex]]))
         attr(divergedTips, "site") <- refSites
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
@@ -388,7 +388,9 @@ fixationSites.lineagePath <- function(paths,
         }
         # Find the most related group of 'gp' in 'res'
         toMerge <- res[[toMergeIndex]]
-        # To determine where to add the new group (truncated 'gp')
+        # To determine where to add the new group (truncated 'gp'). This wasn't
+        # done above just in case the merged part might not be the same for the
+        # two paths
         gpTips <- unlist(gp)
         for (i in seq_along(toMerge)) {
             # The divergent point of the most related group in 'res', which
@@ -401,19 +403,22 @@ fixationSites.lineagePath <- function(paths,
                 attributes(divergedTips) <- attributes(toMerge[[i]])
                 # The shared part
                 sharedTips <- setdiff(toMerge[[i]], divergedTips)
+                toMergeRefSites <- list()
+                toMergeRefSites[[as.character(gpIndex)]] <- refSites
                 if (length(sharedTips) == 0) {
                     # There is at least one group of tips before divergence
-                    attr(toMerge[[i - 1]], "toMerge") <- gpIndex
-                    attr(toMerge[[i - 1]], "toMergeRefSites") <-
-                        refSites
+                    attr(toMerge[[i - 1]], "toMerge") <-
+                        c(toMergeRefSites,
+                          attr(toMerge[[i - 1]], "toMerge"))
                     sharedTips <- list()
                 } else {
                     # When 'sharedTips' is not empty, the fixation site should
                     # be the only info to give back to
                     attr(sharedTips, "site") <-
                         attr(toMerge[[i]], "site")
-                    attr(sharedTips, "toMerge") <- gpIndex
-                    attr(sharedTips, "toMergeRefSites") <- refSites
+                    attr(sharedTips, "toMerge") <-
+                        c(toMergeRefSites,
+                          attr(sharedTips, "toMerge"))
                     sharedTips <- list(sharedTips)
                 }
                 # The divergent part
@@ -460,14 +465,22 @@ fixationSites.lineagePath <- function(paths,
             currMini <- currMini + 1
             toMerge <- attr(grouping[[i]][[j]], "toMerge")
             if (!is.null(toMerge)) {
-                # Create a new major number when encounter a divergent point
-                currMajor <- currMajor + 1L
-                # Assign the starting major number for the 'gp' toMerge
-                startingMajors[toMerge] <- currMajor
+                if (identical(attr(grouping[[i]][[j]], "site"),
+                              attr(grouping[[i]][[j + 1]], "site"))) {
+                    nextMajor <- currMajor + 1
+                } else {
+                    # Create a new major number when encounter a divergent point
+                    currMajor <- currMajor + 1L
+                    # Reset mini number
+                    currMini <- 1L
+                    nextMajor <- currMajor
+                }
+                # Assign the starting major number for the 'gp' to be merged
+                toMergeIndex <- as.integer(names(toMerge))
+                startingMajors[toMergeIndex] <-
+                    rep(nextMajor, length(toMergeIndex))
                 # Initiate minor number for the new major number
-                maxMinors[currMajor] <- 1L
-                # Reset mini number
-                currMini <- 1L
+                maxMinors[nextMajor] <- 1L
             }
         }
     }

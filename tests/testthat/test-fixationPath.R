@@ -8,6 +8,9 @@ test_that("The output is valid phylo", {
     nTips <- length(as.phylo(tree)$tip.label)
     paths <- lineagePath(tree)
     mutations <- fixationSites(paths)
+    expect_false(any(duplicated(unlist(
+        attr(mutations, "clustersByPath")
+    ))))
     x <- fixationPath(mutations)
     tr <- attr(x, "SNPtracing")@phylo
     checkOutput <- capture.output(ape::checkValidPhylo(tr))

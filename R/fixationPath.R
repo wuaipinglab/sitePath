@@ -28,7 +28,7 @@ fixationPath.fixationSites <- function(x,
         minEffectiveSize <-
             mean(lengths(unlist(grouping, recursive = FALSE)))
     }
-    # Filter out small sized cluster except the divegent points
+    # Filter out small sized cluster except the divergent points
     grouping <- lapply(grouping, function(g) {
         g[which(vapply(
             X = g,
@@ -67,11 +67,10 @@ fixationPath.fixationSites <- function(x,
         refSites <- attr(currentTips, "site")
         # Find where to merge and parent node, update reference site maybe
         for (i in seq_along(tipClusters)) {
-            toMerge <- tipClusters[[i]]
-            toMergeIndex <- attr(toMerge, "toMerge")
-            if (!is.null(toMergeIndex) &&
-                toMergeIndex == gpIndex) {
-                refSites <- attr(toMerge, "toMergeRefSites")
+            toMerge <- attr(tipClusters[[i]], "toMerge")
+            if (!is.null(toMerge) &&
+                gpIndex %in% as.integer(names(toMerge))) {
+                refSites <- toMerge[[as.character(gpIndex)]]
                 parentNode <-
                     parentNodes[which(childrenNodes == i)]
                 break
@@ -191,10 +190,18 @@ fixationPath.fixationSites <- function(x,
         "tip.label" = names(tipClusters)
     )
     class(SNPtracing) <- "phylo"
+    names(edgeSNPs) <- SNPtracing[["edge"]][seq_along(edgeSNPs), 2]
+    attr(tipClusters, "SNPtracing") <-
+        .annotateSNPonTree(SNPtracing, edgeSNPs)
+    class(tipClusters) <- "fixationPath"
+    return(tipClusters)
+}
+
+.annotateSNPonTree <- function(tree, branchSNPs) {
     d <- as_tibble(t(vapply(
-        X = seq_along(edgeSNPs),
+        X = names(branchSNPs),
         FUN = function(n) {
-            snp <- edgeSNPs[[n]]
+            snp <- branchSNPs[[n]]
             if (length(snp) == 0) {
                 res <- NA_character_
             } else {
@@ -211,19 +218,16 @@ fixationPath.fixationSites <- function(x,
                     }
                 }
             }
-            res <- c(res, SNPtracing[["edge"]][n, 2])
-            # res <- c(res, attr(snp, "edge")[2])
+            res <- c(res, n)
             names(res) <- c("SNPs", "node")
             return(res)
         },
         FUN.VALUE = c(character(1), integer(1))
     )))
     d[["node"]] <- as.integer(d[["node"]])
-    SNPtracing <- as_tibble(SNPtracing)
-    SNPtracing <- full_join(SNPtracing, d, by = "node")
-    attr(tipClusters, "SNPtracing") <- as.treedata(SNPtracing)
-    class(tipClusters) <- "fixationPath"
-    return(tipClusters)
+    tree <- as_tibble(tree)
+    tree <- full_join(tree, d, by = "node")
+    return(as.treedata(tree))
 }
 
 #' @export
