@@ -127,6 +127,15 @@ as.data.frame.SNPsites <- function(x,
     return(res)
 }
 
+#' @export
+as.data.frame.parallelSites <- function(x,
+                                        row.names = NULL,
+                                        optional = FALSE,
+                                        ...) {
+    res <- attr(x, "allSNP")
+    return(res)
+}
+
 #' @importFrom tidytree as.treedata
 #' @export
 tidytree::as.treedata
