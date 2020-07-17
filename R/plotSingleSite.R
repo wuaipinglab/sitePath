@@ -32,7 +32,6 @@ plotSingleSite.lineagePath <- function(x,
                                        ...) {
     site <- .checkSite(site)
     tree <- attr(x, "tree")
-    tree <- ladderize(tree, right = FALSE)
     align <- attr(x, "align")
     align <- strsplit(tolower(align), "")
     reference <- attr(x, "msaNumbering")
@@ -42,44 +41,38 @@ plotSingleSite.lineagePath <- function(x,
             stop("\"site\": ", site, " is not within the length of reference")
         }
     )
-    siteComp <- vapply(align,
-                       FUN = "[[",
-                       FUN.VALUE = character(1),
-                       reference[site])
-    nEdges <- length(tree$edge.length)
-    color <- rep("#000000", nEdges)
-    rootNode <- getMRCA(tree, tree$tip.label)
+    siteComp <- vapply(
+        X = align,
+        FUN = "[[",
+        FUN.VALUE = character(1),
+        i = reference[site]
+    )
     group <- list()
     for (i in seq_along(siteComp)) {
         group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
     }
-    AAnames <- AA_FULL_NAMES[names(group)]
-    names(group) <- AA_COLORS[AAnames]
-    for (g in names(group)) {
-        tip2colorEdge(color, g, tree$edge, group[[g]], rootNode)
-    }
-    width <- rep(1, nEdges)
+    names(group) <- AA_FULL_NAMES[names(group)]
+    groupColors <- AA_COLORS
+    tree <- groupOTU(tree, group)
+    # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
-        targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
-        color[targetEdges] <- "#000000"
-        width[targetEdges] <- 2
+        pathLabel <- ".Lineage"
+        # Color the path node black
+        levels(attr(tree, "group")) <-
+            c(levels(attr(tree, "group")), pathLabel)
+        attr(tree, "group")[unique(unlist(paths))] <- pathLabel
+        lineageColor <- "black"
+        names(lineageColor) <- pathLabel
+        groupColors <- c(groupColors, lineageColor)
     }
-    show.tip.label <- showTips
-    plot.phylo(
-        tree,
-        show.tip.label = show.tip.label,
-        edge.color = color,
-        edge.width = width,
-        main = site,
-        ...
-    )
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = unique(AAnames),
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    p <- ggtree(tree, aes(color = group)) +
+        scale_color_manual(values = groupColors) +
+        guides(color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left")
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
 }
 
 .checkSite <- function(site) {
