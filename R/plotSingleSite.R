@@ -105,15 +105,6 @@ plotSingleSite.lineagePath <- function(x,
 #' plot(sp)
 plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
-    # Prepare tree for plotting
-    tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
-    plotName <- character(0)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(0.5, nEdges)
-    AAnames <- character(0)
     if (is.null(y)) {
         sitePaths <- x[]
     } else {
@@ -127,42 +118,44 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
             }
         )
     }
+    subtitle <- character()
+    group <- list()
     for (sp in sitePaths) {
-        aaName <- character(0)
-        for (tips in rev(sp)) {
+        aaName <- character()
+        for (tips in sp) {
             aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
-            aaName <- c(aa, aaName)
-            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
-            color[targetEdges] <- AA_COLORS[aa]
-            lty[targetEdges] <- 1
-            width[targetEdges] <- 2
+            aaName <- c(aaName, aa)
+            group[[aa]] <- c(group[[aa]], tips)
         }
-        AAnames <- c(AAnames, aaName)
-        plotName <-
-            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+        subtitle <-
+            c(subtitle, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
-    show.tip.label <- showTips
-    plot.phylo(
-        tree,
-        show.tip.label = show.tip.label,
-        edge.color = color,
-        edge.lty = lty,
-        edge.width = width,
-        ...
-    )
+    groupColors <- AA_COLORS
+    excludedTips <- setdiff(seq_along(tree[["tip.label"]]),
+                            unlist(group, use.names = FALSE))
+    if (length(excludedTips) != 0) {
+        excludedLabel <- ".excluded"
+        group[[excludedLabel]] <- excludedTips
+        excludedColor <- "#d3d3d3"
+        names(excludedColor) <- excludedLabel
+        groupColors <- c(groupColors, excludedColor)
+    }
+    groupColors[["0"]] <- "#d3d3d3"
+    tree <- groupOTU(tree, group)
     sepChar <- "\n"
-    if (sum(nchar(plotName) <= 18)) {
+    if (sum(nchar(subtitle) <= 18)) {
         sepChar <- ", "
     }
-    title(main = attr(x, "site"),
-          sub = paste(plotName, collapse = sepChar))
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = AA_SHORT_NAMES[unique(AAnames)],
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    subtitle <- paste(subtitle, collapse = sepChar)
+    p <- ggtree(tree, aes(color = group)) +
+        scale_color_manual(values = groupColors) +
+        guides(color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(label = attr(x, "site"), subtitle = subtitle)
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
 }
 
 #' @rdname plotSingleSite
