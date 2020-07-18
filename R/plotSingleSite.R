@@ -13,8 +13,8 @@
 #' @param showPath If plot the lineage result from lineagePath.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Arguments in \code{plot.phylo} functions and other arguments.
-#' @return The function only makes plot and returns no value (It behaviors like
-#'   the generic \code{\link{plot}} function).
+#' @return A ggplot object to make the plot. It does not behavior like the
+#'   generic \code{\link{plot}} function.
 #' @seealso \code{\link{plot.sitePath}}
 #' @importFrom graphics plot legend
 #' @importFrom ape ladderize getMRCA plot.phylo
@@ -32,7 +32,6 @@ plotSingleSite.lineagePath <- function(x,
                                        ...) {
     site <- .checkSite(site)
     tree <- attr(x, "tree")
-    tree <- ladderize(tree, right = FALSE)
     align <- attr(x, "align")
     align <- strsplit(tolower(align), "")
     reference <- attr(x, "msaNumbering")
@@ -42,44 +41,39 @@ plotSingleSite.lineagePath <- function(x,
             stop("\"site\": ", site, " is not within the length of reference")
         }
     )
-    siteComp <- vapply(align,
-                       FUN = "[[",
-                       FUN.VALUE = character(1),
-                       reference[site])
-    nEdges <- length(tree$edge.length)
-    color <- rep("#000000", nEdges)
-    rootNode <- getMRCA(tree, tree$tip.label)
+    siteComp <- vapply(
+        X = align,
+        FUN = "[[",
+        FUN.VALUE = character(1),
+        i = reference[site]
+    )
     group <- list()
     for (i in seq_along(siteComp)) {
         group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
     }
-    AAnames <- AA_FULL_NAMES[names(group)]
-    names(group) <- AA_COLORS[AAnames]
-    for (g in names(group)) {
-        tip2colorEdge(color, g, tree$edge, group[[g]], rootNode)
-    }
-    width <- rep(1, nEdges)
+    names(group) <- AA_FULL_NAMES[names(group)]
+    groupColors <- AA_COLORS
+    tree <- groupOTU(tree, group)
+    # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
-        targetEdges <- which(tree$edge[, 2] %in% unique(unlist(x)))
-        color[targetEdges] <- "#000000"
-        width[targetEdges] <- 2
+        pathLabel <- ".lineage"
+        # Color the path node black
+        levels(attr(tree, "group")) <-
+            c(levels(attr(tree, "group")), pathLabel)
+        attr(tree, "group")[unique(unlist(paths))] <- pathLabel
+        lineageColor <- "black"
+        names(lineageColor) <- pathLabel
+        groupColors <- c(groupColors, lineageColor)
     }
-    show.tip.label <- showTips
-    plot.phylo(
-        tree,
-        show.tip.label = show.tip.label,
-        edge.color = color,
-        edge.width = width,
-        main = site,
-        ...
-    )
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = unique(AAnames),
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    p <- ggtree(tree, aes(color = group)) +
+        scale_color_manual(values = groupColors) +
+        guides(color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(site)
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
 }
 
 .checkSite <- function(site) {
@@ -112,64 +106,52 @@ plotSingleSite.lineagePath <- function(x,
 #' plot(sp)
 plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
     tree <- attr(x, "tree")
-    # Prepare tree for plotting
-    tree <- ladderize(tree, right = FALSE)
-    rootNode <- getMRCA(tree, tree$tip.label)
-    plotName <- character(0)
-    nEdges <- length(tree$edge.length)
-    color <- rep("#d3d3d3", nEdges)
-    lty <- rep(2, nEdges)
-    width <- rep(0.5, nEdges)
-    AAnames <- character(0)
     if (is.null(y)) {
         sitePaths <- x[]
     } else {
-        tryCatch(
-            expr = sitePaths <- x[y],
-            error = function(e) {
-                stop("There are ",
-                     length(x),
-                     " in \"x\". ",
-                     "The selection \"y\" is out of bounds.")
-            }
-        )
-    }
-    for (sp in sitePaths) {
-        aaName <- character(0)
-        for (tips in rev(sp)) {
-            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
-            aaName <- c(aa, aaName)
-            targetEdges <- tip2Edge(tree$edge, tips, rootNode)
-            color[targetEdges] <- AA_COLORS[aa]
-            lty[targetEdges] <- 1
-            width[targetEdges] <- 2
+        if (length(x) < y) {
+            stop("There are ",
+                 length(x),
+                 "lineages with fixation mutation. ",
+                 "The selection \"y\" is out of bounds.")
         }
-        AAnames <- c(AAnames, aaName)
-        plotName <-
-            c(plotName, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+        sitePaths <- x[y]
     }
-    show.tip.label <- showTips
-    plot.phylo(
-        tree,
-        show.tip.label = show.tip.label,
-        edge.color = color,
-        edge.lty = lty,
-        edge.width = width,
-        ...
-    )
+    subtitle <- character()
+    group <- list()
+    for (sp in sitePaths) {
+        aaName <- character()
+        for (tips in sp) {
+            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
+            aaName <- c(aaName, aa)
+            group[[aa]] <- c(group[[aa]], tips)
+        }
+        subtitle <-
+            c(subtitle, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+    }
+    groupColors <- AA_COLORS
+    tree <- groupOTU(tree, group)
+    excludedLabel <- ".excluded"
+    groupColors[[excludedLabel]] <- "#dcdcdc"
+    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
+        excludedLabel
+    linetype <- as.integer(attr(tree, "group") == excludedLabel)
+    linetype <- factor(linetype)
     sepChar <- "\n"
-    if (sum(nchar(plotName) <= 18)) {
+    if (sum(nchar(subtitle) <= 18)) {
         sepChar <- ", "
     }
-    title(main = attr(x, "site"),
-          sub = paste(plotName, collapse = sepChar))
-    legend(
-        "topleft",
-        title = "Amino acid",
-        legend = AA_SHORT_NAMES[unique(AAnames)],
-        fill = AA_COLORS[unique(AAnames)],
-        box.lty = 0
-    )
+    subtitle <- paste(subtitle, collapse = sepChar)
+    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
+        scale_color_manual(values = groupColors) +
+        guides(linetype = FALSE,
+               color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(label = attr(x, "site"), subtitle = subtitle)
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
 }
 
 #' @rdname plotSingleSite

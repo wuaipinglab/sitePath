@@ -40,8 +40,8 @@ which will plot all the paths. It is the same as \code{select} in
 which will plot all the fixations.}
 }
 \value{
-The function only makes plot and returns no value (It behaviors like
-  the generic \code{\link{plot}} function).
+A ggplot object to make the plot. It does not behavior like the
+  generic \code{\link{plot}} function.
 }
 \description{
 For \code{lineagePath}, the tree will be colored according to

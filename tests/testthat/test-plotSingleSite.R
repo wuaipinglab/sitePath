@@ -1,0 +1,16 @@
+context("test-plotSingleSite")
+
+test_that("Warnings in plotSingleSite works", {
+    data(zikv_align)
+    data(zikv_tree)
+    tree <- addMSA(zikv_tree, alignment = zikv_align)
+    paths <- lineagePath(tree)
+    expect_error(plotSingleSite(paths, 0))
+    mutations <- fixationSites(paths)
+    expect_error(extractSite(mutations, 0))
+    expect_error(plotSingleSite(mutations, 0))
+    sp <- extractSite(mutations, 139)
+    nSP <- length(sp)
+    expect_error(extractTips(sp, nSP + 1))
+    expect_error(plot(sp, nSP + 1))
+})
