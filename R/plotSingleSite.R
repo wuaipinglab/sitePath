@@ -13,8 +13,8 @@
 #' @param showPath If plot the lineage result from lineagePath.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Arguments in \code{plot.phylo} functions and other arguments.
-#' @return The function only makes plot and returns no value (It behaviors like
-#'   the generic \code{\link{plot}} function).
+#' @return A ggplot object to make the plot. It does not behavior like the
+#'   generic \code{\link{plot}} function.
 #' @seealso \code{\link{plot.sitePath}}
 #' @importFrom graphics plot legend
 #' @importFrom ape ladderize getMRCA plot.phylo
