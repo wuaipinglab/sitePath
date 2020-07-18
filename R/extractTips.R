@@ -27,6 +27,37 @@ extractTips.fixationSites <- function(x,
     return(.actualExtractTips(sp, select))
 }
 
+.actualExtractTips <- function(sp, select) {
+    tree <- attr(sp, "tree")
+    if (select <= 0 || as.integer(select) != select) {
+        stop("Please enter a single positive integer for \"select\"")
+    }
+    tryCatch(
+        expr = sp <- sp[[select]],
+        error = function(e) {
+            if (length(select))
+                stop(
+                    "The site: ",
+                    attr(sp, "site"),
+                    " has ",
+                    length(sp),
+                    " fixation(s). Please choose a number from 1 to ",
+                    length(sp),
+                    " for \"select\"."
+                )
+        }
+    )
+    res <- list()
+    for (i in sp) {
+        aa <- attr(i, "AA")
+        attributes(aa) <- NULL
+        i <- tree$tip.label[i]
+        attr(i, "AA") <- aa
+        res <- c(res, list(i))
+    }
+    return(res)
+}
+
 #' @rdname extractTips
 #' @export
 extractTips.multiFixationSites <- function(x,
@@ -59,17 +90,6 @@ extractSite.fixationSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))
 }
 
-#' @rdname extractTips
-#' @name extractSite
-#' @export
-extractSite.multiFixationSites <- function(x, site, ...) {
-    return(.actualExtractSite(x, site))
-}
-
-#' @export
-extractSite <- function(x, site, ...)
-    UseMethod("extractSite")
-
 .actualExtractSite <- function(x, site) {
     site <- .checkSite(site)
     tryCatch(
@@ -81,34 +101,13 @@ extractSite <- function(x, site, ...)
     return(sp)
 }
 
-.actualExtractTips <- function(sp, select) {
-    tree <- attr(sp, "tree")
-    if (select <= 0 || as.integer(select) != select) {
-        stop("Please enter a single positive integer for \"select\"")
-    }
-    tryCatch(
-        expr = sp <- sp[[select]],
-        error = function(e) {
-            cat(e, "\n")
-            if (length(select))
-                stop(
-                    "The site: ",
-                    attr(sp, "site"),
-                    " has ",
-                    length(sp),
-                    " fixation(s). Please choose a number from 1 to ",
-                    length(sp),
-                    " for \"select\"."
-                )
-        }
-    )
-    res <- list()
-    for (i in sp) {
-        aa <- attr(i, "AA")
-        attributes(aa) <- NULL
-        i <- tree$tip.label[i]
-        attr(i, "AA") <- aa
-        res <- c(res, list(i))
-    }
-    return(res)
+#' @rdname extractTips
+#' @name extractSite
+#' @export
+extractSite.multiFixationSites <- function(x, site, ...) {
+    return(.actualExtractSite(x, site))
 }
+
+#' @export
+extractSite <- function(x, site, ...)
+    UseMethod("extractSite")
