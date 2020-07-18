@@ -89,7 +89,6 @@ extractSite <- function(x, site, ...)
     tryCatch(
         expr = sp <- sp[[select]],
         error = function(e) {
-            cat(e, "\n")
             if (length(select))
                 stop(
                     "The site: ",
