@@ -189,8 +189,8 @@ which will plot all the fixations.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The function only makes plot and returns no value (It behaviors like
-  the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function).</p>
+    <p>A ggplot object to make the plot. It does not behavior like the
+  generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/sitePath/man/plotSingleSite.html'>plot.sitePath</a></code></p>
@@ -203,7 +203,7 @@ which will plot all the fixations.</p></td>
 <span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
 <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/plotSingleSite.html'>plotSingleSite</a></span>(<span class='kw'>paths</span>, <span class='fl'>139</span>)</div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
 <span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/plotSingleSite.html'>plotSingleSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/plotSingleSite.html'>plotSingleSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)</div><div class='img'><img src='plotSingleSite-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
