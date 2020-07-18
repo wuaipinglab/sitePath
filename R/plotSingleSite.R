@@ -56,7 +56,7 @@ plotSingleSite.lineagePath <- function(x,
     tree <- groupOTU(tree, group)
     # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
-        pathLabel <- ".Lineage"
+        pathLabel <- ".lineage"
         # Color the path node black
         levels(attr(tree, "group")) <-
             c(levels(attr(tree, "group")), pathLabel)
@@ -68,7 +68,8 @@ plotSingleSite.lineagePath <- function(x,
     p <- ggtree(tree, aes(color = group)) +
         scale_color_manual(values = groupColors) +
         guides(color = guide_legend(override.aes = list(size = 3))) +
-        theme(legend.position = "left")
+        theme(legend.position = "left") +
+        ggtitle(site)
     if (showTips) {
         p <- p + geom_tiplab()
     }
@@ -108,15 +109,13 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
     if (is.null(y)) {
         sitePaths <- x[]
     } else {
-        tryCatch(
-            expr = sitePaths <- x[y],
-            error = function(e) {
-                stop("There are ",
-                     length(x),
-                     " in \"x\". ",
-                     "The selection \"y\" is out of bounds.")
-            }
-        )
+        if (length(x) < y) {
+            stop("There are ",
+                 length(x),
+                 "lineages with fixation mutation. ",
+                 "The selection \"y\" is out of bounds.")
+        }
+        sitePaths <- x[y]
     }
     subtitle <- character()
     group <- list()
@@ -131,25 +130,22 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
             c(subtitle, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
     groupColors <- AA_COLORS
-    excludedTips <- setdiff(seq_along(tree[["tip.label"]]),
-                            unlist(group, use.names = FALSE))
-    if (length(excludedTips) != 0) {
-        excludedLabel <- ".excluded"
-        group[[excludedLabel]] <- excludedTips
-        excludedColor <- "#d3d3d3"
-        names(excludedColor) <- excludedLabel
-        groupColors <- c(groupColors, excludedColor)
-    }
-    groupColors[["0"]] <- "#d3d3d3"
     tree <- groupOTU(tree, group)
+    excludedLabel <- ".excluded"
+    groupColors[[excludedLabel]] <- "#dcdcdc"
+    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
+        excludedLabel
+    linetype <- as.integer(attr(tree, "group") == excludedLabel)
+    linetype <- factor(linetype)
     sepChar <- "\n"
     if (sum(nchar(subtitle) <= 18)) {
         sepChar <- ", "
     }
     subtitle <- paste(subtitle, collapse = sepChar)
-    p <- ggtree(tree, aes(color = group)) +
+    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
         scale_color_manual(values = groupColors) +
-        guides(color = guide_legend(override.aes = list(size = 3))) +
+        guides(linetype = FALSE,
+               color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(label = attr(x, "site"), subtitle = subtitle)
     if (showTips) {
