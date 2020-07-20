@@ -169,34 +169,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tip2colorEdge
-Rcpp::CharacterVector tip2colorEdge(Rcpp::CharacterVector& colorEdge, const std::string& color, const Rcpp::IntegerMatrix& treeEdge, const Rcpp::IntegerVector& tips, const int rootNode);
-RcppExport SEXP _sitePath_tip2colorEdge(SEXP colorEdgeSEXP, SEXP colorSEXP, SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector& >::type colorEdge(colorEdgeSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type color(colorSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix& >::type treeEdge(treeEdgeSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type tips(tipsSEXP);
-    Rcpp::traits::input_parameter< const int >::type rootNode(rootNodeSEXP);
-    rcpp_result_gen = Rcpp::wrap(tip2colorEdge(colorEdge, color, treeEdge, tips, rootNode));
-    return rcpp_result_gen;
-END_RCPP
-}
-// tip2Edge
-Rcpp::IntegerVector tip2Edge(const Rcpp::IntegerMatrix& treeEdge, const Rcpp::IntegerVector& tips, const int rootNode);
-RcppExport SEXP _sitePath_tip2Edge(SEXP treeEdgeSEXP, SEXP tipsSEXP, SEXP rootNodeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix& >::type treeEdge(treeEdgeSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type tips(tipsSEXP);
-    Rcpp::traits::input_parameter< const int >::type rootNode(rootNodeSEXP);
-    rcpp_result_gen = Rcpp::wrap(tip2Edge(treeEdge, tips, rootNode));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
@@ -212,8 +184,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_minEntropyByDeleting", (DL_FUNC) &_sitePath_minEntropyByDeleting, 3},
     {"_sitePath_minEntropyByComparing", (DL_FUNC) &_sitePath_minEntropyByComparing, 3},
     {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 5},
-    {"_sitePath_tip2colorEdge", (DL_FUNC) &_sitePath_tip2colorEdge, 5},
-    {"_sitePath_tip2Edge", (DL_FUNC) &_sitePath_tip2Edge, 3},
     {NULL, NULL, 0}
 };
 
