@@ -53,11 +53,3 @@ summarizeAA <- function(allMutations, allSampledTips, originalNodeTips, setTxtPr
     .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb)
 }
 
-tip2colorEdge <- function(colorEdge, color, treeEdge, tips, rootNode) {
-    .Call('_sitePath_tip2colorEdge', PACKAGE = 'sitePath', colorEdge, color, treeEdge, tips, rootNode)
-}
-
-tip2Edge <- function(treeEdge, tips, rootNode) {
-    .Call('_sitePath_tip2Edge', PACKAGE = 'sitePath', treeEdge, tips, rootNode)
-}
-
