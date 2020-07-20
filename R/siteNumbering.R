@@ -111,7 +111,7 @@ addMSA <- function(tree,
 
 #' @export
 print.phyMSAmatched <- function(x, ...) {
-    cat(x)
+    cat(x, "\n")
 }
 
 #' @rdname setSiteNumbering
