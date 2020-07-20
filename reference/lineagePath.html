@@ -85,7 +85,7 @@ When used on the return of sneakPeek, a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.20</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.21</span>
       </span>
     </div>
 
@@ -137,7 +137,7 @@ When used on the return of sneakPeek, a
   least percentage of 'major SNP') as a threshold against number of output
   lineagePath. This plot is intended to give user a rought view about how
   many lineages they could expect from the 'similarity' threshold in the
-  function <code><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></code>. The number of lineagePath is preferably
+  function <code>lineagePath</code>. The number of lineagePath is preferably
   not be too many or too few. The result excludes where the number of
   lineagePath is greater than number of tips divided by 20 or user-defined
   maxPath. The zero lineagePath result will also be excluded.</p>
@@ -147,7 +147,7 @@ When used on the return of sneakPeek, a
     </div>
 
     <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(
+<span class='fu'>lineagePath</span>(
   <span class='kw'>tree</span>,
   similarity = <span class='kw'>NULL</span>,
   simMatrix = <span class='kw'>NULL</span>,
@@ -155,17 +155,17 @@ When used on the return of sneakPeek, a
   <span class='kw'>...</span>
 )
 
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>sneakPeek</a></span>(<span class='kw'>tree</span>, step = <span class='fl'>9</span>, maxPath = <span class='kw'>NULL</span>, minPath = <span class='fl'>1</span>, makePlot = <span class='fl'>FALSE</span>)
+<span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>9</span>, maxPath = <span class='kw'>NULL</span>, minPath = <span class='fl'>1</span>, makePlot = <span class='fl'>FALSE</span>)
 
 <span class='co'># S3 method for sneakPeekedPaths</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>, <span class='kw'>similarity</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>lineagePath</span>(<span class='kw'>tree</span>, <span class='kw'>similarity</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>tree</th>
-      <td><p>The return from <code><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></code> or <code>sneakPeek</code>
+      <td><p>The return from <code><a href='phyMSAmatched.html'>addMSA</a></code> or <code>sneakPeek</code>
 function.</p></td>
     </tr>
     <tr>
@@ -221,12 +221,12 @@ see the impact of threshold on path number. The default is 1.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_tree'</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_align'</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; 3 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>sneakPeek</a></span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)</div><div class='output co'>#&gt;   similarity pathNum
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
+<span class='fu'>lineagePath</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; 3 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)</div><div class='output co'>#&gt;   similarity pathNum
 #&gt; 1       0.05       3
 #&gt; 2       0.03       5
-#&gt; 3       0.01      12</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>sneakPeek</a></span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>x</span>, similarity = <span class='fl'>0.05</span>)</div><div class='output co'>#&gt; $`0.05`
+#&gt; 3       0.01      12</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
+<span class='fu'>lineagePath</span>(<span class='kw'>x</span>, similarity = <span class='fl'>0.05</span>)</div><div class='output co'>#&gt; $`0.05`
 #&gt; 3 lineage paths using 5% as "major SNP" threshold 
 #&gt; </div></pre>
   </div>

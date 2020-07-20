@@ -76,7 +76,7 @@ The function extractSite can be used to extract the
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.20</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.21</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@ The function extractSite can be used to extract the
     </div>
 
     <div class="ref-description">
-    <p>The result of <code><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></code> contains all the
+    <p>The result of <code><a href='fixationSites.html'>fixationSites</a></code> contains all the
   possible sites with fixation mutation. The function <code>extractTips</code>
   retrieves the name of the tips involved in the fixation.</p>
 <p>The function <code>extractSite</code> can be used to extract the
@@ -129,19 +129,19 @@ The function extractSite can be used to extract the
     </div>
 
     <pre class="usage"><span class='co'># S3 method for fixationSites</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractTips</a></span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for multiFixationSites</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractTips</a></span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for sitePath</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractTips</a></span>(<span class='kw'>x</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for fixationSites</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractSite</a></span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)
+<span class='fu'>extractSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for multiFixationSites</span>
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractSite</a></span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>extractSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,9 +175,9 @@ fixation of a site. The default is the first fixation of the site.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/addMSA.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
-<span class='kw'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/fixationSites.html'>fixationSites</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>))
-<span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractTips</a></span>(<span class='kw'>mutations</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; [[1]]
+<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
+<span class='kw'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>))
+<span class='fu'>extractTips</span>(<span class='kw'>mutations</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; [[1]]
 #&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
 #&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
 #&gt; [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
@@ -200,7 +200,7 @@ fixation of a site. The default is the first fixation of the site.</p></td>
 #&gt; [67] "AQZ41952" "AQZ41955" "ARI68105" "ASU55505" "AQM74762" "AUD54964"
 #&gt; attr(,"AA")
 #&gt; [1] "N"
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/sitePath/man/extractTips.html'>extractSite</a></span>(<span class='kw'>mutations</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; Site 139 may experience fixation on 1 path(s):
+#&gt; </div><div class='input'><span class='fu'>extractSite</span>(<span class='kw'>mutations</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; Site 139 may experience fixation on 1 path(s):
 #&gt; 
 #&gt; S139N (20-&gt;72) 
 #&gt; 
