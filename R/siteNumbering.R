@@ -62,11 +62,6 @@ addMSA <- function(tree,
     return(res)
 }
 
-#' @export
-print.phyMSAmatched <- function(x, ...) {
-    cat(x)
-}
-
 .checkReference <- function(x, reference, gapChar) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
@@ -112,6 +107,11 @@ print.phyMSAmatched <- function(x, ...) {
     # Update 'align' attribute as matched with tree tips
     attr(x, "align") <- align[m]
     return(x)
+}
+
+#' @export
+print.phyMSAmatched <- function(x, ...) {
+    cat(x)
 }
 
 #' @rdname setSiteNumbering

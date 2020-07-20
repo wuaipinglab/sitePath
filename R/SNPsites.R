@@ -49,20 +49,6 @@ SNPsites <- function(tree, minSNP = NULL) {
     return(res)
 }
 
-#' @export
-print.SNPsites <- function(x, ...) {
-    x <- as.integer(x)
-    print(x)
-}
-
-.phyMSAtransfer <- function(receive, give) {
-    attr(receive, "align") <- attr(give, "align")
-    attr(receive, "tree") <- attr(give, "tree")
-    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
-    attr(receive, "reference") <- attr(give, "reference")
-    return(receive)
-}
-
 .findSNPsites <- function(align, msaNumbering, refSeqName) {
     # Find SNP for each tree tip by comparing with the consensus sequence
     if (is.null(refSeqName)) {
@@ -98,6 +84,20 @@ print.SNPsites <- function(x, ...) {
     })
     allSNP <- do.call(rbind, allSNP)
     return(allSNP)
+}
+
+.phyMSAtransfer <- function(receive, give) {
+    attr(receive, "align") <- attr(give, "align")
+    attr(receive, "tree") <- attr(give, "tree")
+    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
+    attr(receive, "reference") <- attr(give, "reference")
+    return(receive)
+}
+
+#' @export
+print.SNPsites <- function(x, ...) {
+    x <- as.integer(x)
+    print(x)
 }
 
 #' @rdname plotMutSites
