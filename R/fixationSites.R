@@ -228,7 +228,7 @@ fixationSites.lineagePath <- function(paths,
 
 .transitionClusters <- function(fixations, paths, tree) {
     # Find the clustering for each lineage path
-    groupByPath <- lapply(paths, function(p) {
+    res <- lapply(paths, function(p) {
         terminalTips <- .childrenTips(tree, p[length(p)])
         # Group fixation results by path rather than site
         group <- list()
@@ -316,8 +316,8 @@ fixationSites.lineagePath <- function(paths,
         }
         return(res)
     })
-    groupByPath <- groupByPath[which(lengths(groupByPath) != 0)]
-    return(groupByPath)
+    res <- res[which(lengths(res) != 0)]
+    return(res)
 }
 
 .mergeClusters <- function(groupByPath) {
