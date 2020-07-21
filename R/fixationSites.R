@@ -320,14 +320,14 @@ fixationSites.lineagePath <- function(paths,
     return(res)
 }
 
-.mergeClusters <- function(groupByPath) {
+.mergeClusters <- function(clustersByPath) {
     # Find the divergent point and remove the overlapped part
-    res <- list(groupByPath[[1]])
+    res <- list(clustersByPath[[1]])
     # 'res' stores all the non-overlapped parts which means all the clusters are
     # unique
-    for (gpIndex in seq_along(groupByPath)[-1]) {
+    for (gpIndex in seq_along(clustersByPath)[-1]) {
         # 'gp' is the complete path with overlapped parts
-        gp <- groupByPath[[gpIndex]]
+        gp <- clustersByPath[[gpIndex]]
         # Reset the variables to NULL for in case of no overlap
         t <- integer()
         # The index of 'res' which to merge with 'gp'
@@ -340,9 +340,9 @@ fixationSites.lineagePath <- function(paths,
         sharedAtDiv <- integer()
         # Loop through 'res' to find the most related group
         for (i in seq_along(res)) {
-            # All existing tips in the other 'gp' in 'groupByPath' to see if
-            # overlapped with tips in the 'gp' to be merged
-            allTips <- unlist(groupByPath[[i]])
+            # All existing tips in another 'gp' to see if overlapped with tips
+            # in the 'gp' to be merged
+            allTips <- unlist(clustersByPath[[i]])
             # Because all the tip groups are unique in 'res', the first cluster
             # in 'gp' containing tips that cannot be found is the divergent
             # point
@@ -372,7 +372,7 @@ fixationSites.lineagePath <- function(paths,
         refSites <- attr(divergedTips, "site")
         # The non-shared part of the 'divergedTips'. This part will not be empty
         divergedTips <- setdiff(divergedTips,
-                                unlist(groupByPath[[toMergeIndex]]))
+                                unlist(clustersByPath[[toMergeIndex]]))
         attr(divergedTips, "site") <- refSites
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
