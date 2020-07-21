@@ -33,13 +33,6 @@ fixationSites.lineagePath <- function(paths,
     paths <- .phyMSAmatch(paths)
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
-    # Decide which miniminzing strategy
-    minimizeEntropy <- switch(
-        match.arg(method),
-        "compare" = minEntropyByComparing,
-        "insert" = minEntropyByInserting,
-        "delete" = minEntropyByDeleting
-    )
     # Set the 'minEffectiveSize'
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <-
@@ -54,19 +47,12 @@ fixationSites.lineagePath <- function(paths,
     } else {
         searchDepth <- ceiling(searchDepth)
     }
-    # Get the divergent nodes
-    divNodes <- divergentNode(paths)
-    # The tips and matching
-    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
-                                        divNodes = divNodes)
     # Find fixation sites
     res <- .findFixationSite(
         paths = paths,
-        nodeAlign = nodeAlign,
-        divNodes = divNodes,
-        minimizeEntropy = minimizeEntropy,
         minEffectiveSize = minEffectiveSize,
-        searchDepth = searchDepth
+        searchDepth = searchDepth,
+        method = method
     )
     # Cluster tips according to fixation sites
     clustersByPath <- .transitionClusters(res, paths, tree)
@@ -81,65 +67,22 @@ fixationSites.lineagePath <- function(paths,
     return(res)
 }
 
-.childrenTips <- function(tree, node) {
-    maxTip <- length(tree[["tip.label"]])
-    children <- integer(0)
-    getChildren <- function(edges, parent) {
-        children <<- c(children, parent[which(parent <= maxTip)])
-        i <- which(edges[, 1] %in% parent)
-        if (length(i) == 0L) {
-            return(children)
-        } else {
-            parent <- edges[i, 2]
-            return(getChildren(edges, parent))
-        }
-    }
-    return(getChildren(tree[["edge"]], node))
-}
-
-.tipSeqsAlongPathNodes <- function(paths, divNodes) {
-    tree <- attr(paths, "tree")
-    align <- attr(paths, "align")
-    allNodes <- unlist(paths)
-    terminalNodes <- vapply(
-        X = paths,
-        FUN = function(p) {
-            p[length(p)]
-        },
-        FUN.VALUE = integer(1)
-    )
-    # Get all the nodes that are not at divergent point
-    nodes <- setdiff(allNodes, divNodes)
-    # Get the sequence of the children tips that are descendant of
-    # the nodes. Assign the tip index to the sequences for
-    # retrieving the tip name
-    nodeAlign <- lapply(nodes, function(n) {
-        isTerminal <- FALSE
-        if (n %in% terminalNodes) {
-            childrenNode <- n
-            isTerminal <- TRUE
-        } else {
-            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
-            # Keep the node that is not on the path.
-            childrenNode <- setdiff(childrenNode, allNodes)
-        }
-        tips <- .childrenTips(tree, childrenNode)
-        res <- align[tips]
-        attr(res, "isTerminal") <- isTerminal
-        names(res) <- tips
-        return(res)
-    })
-    # Assign the node names to the 'nodeAlign' list
-    names(nodeAlign) <- nodes
-    return(nodeAlign)
-}
-
 .findFixationSite <- function(paths,
-                              nodeAlign,
-                              divNodes,
-                              minimizeEntropy,
                               minEffectiveSize,
-                              searchDepth) {
+                              searchDepth,
+                              method) {
+    # Get the divergent nodes
+    divNodes <- divergentNode(paths)
+    # The tips and matching
+    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
+                                        divNodes = divNodes)
+    # Decide which minimizing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
     # Get the MSA numbering
     reference <- attr(paths, "msaNumbering")
     align <- attr(paths, "align")
@@ -155,11 +98,13 @@ fixationSites.lineagePath <- function(paths,
     # The variable to store the result from entropy minimization for
     # each path with those purely fixed excluded.
     res <- list()
-    # Iterate each path
+    # In case root node does not have any tips (because itself is a divergent
+    # node)
     rootNode <- attr(paths, "rootNode")
     if (!rootNode %in% names(nodeAlign)) {
         paths <- lapply(paths, "[", -1)
     }
+    # Iterate each path
     for (path in paths) {
         # Iterate every loci (variant sites)
         for (i in loci) {
@@ -217,7 +162,6 @@ fixationSites.lineagePath <- function(paths,
                                        searchDepth)
                 if (length(seg) >= 2) {
                     targetIndex <- length(res[[site]]) + 1
-                    attr(seg, "path") <- path
                     res[[site]][[targetIndex]] <- seg
                     attr(res[[site]], "site") <- i
                     attr(res[[site]], "tree") <- attr(paths, "tree")
@@ -227,6 +171,59 @@ fixationSites.lineagePath <- function(paths,
         }
     }
     return(res)
+}
+
+.tipSeqsAlongPathNodes <- function(paths, divNodes) {
+    tree <- attr(paths, "tree")
+    align <- attr(paths, "align")
+    allNodes <- unlist(paths)
+    terminalNodes <- vapply(
+        X = paths,
+        FUN = function(p) {
+            p[length(p)]
+        },
+        FUN.VALUE = integer(1)
+    )
+    # Get all the nodes that are not at divergent point
+    nodes <- setdiff(allNodes, divNodes)
+    # Get the sequence of the children tips that are descendant of
+    # the nodes. Assign the tip index to the sequences for
+    # retrieving the tip name
+    nodeAlign <- lapply(nodes, function(n) {
+        isTerminal <- FALSE
+        if (n %in% terminalNodes) {
+            childrenNode <- n
+            isTerminal <- TRUE
+        } else {
+            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
+            # Keep the node that is not on the path.
+            childrenNode <- setdiff(childrenNode, allNodes)
+        }
+        tips <- .childrenTips(tree, childrenNode)
+        res <- align[tips]
+        attr(res, "isTerminal") <- isTerminal
+        names(res) <- tips
+        return(res)
+    })
+    # Assign the node names to the 'nodeAlign' list
+    names(nodeAlign) <- nodes
+    return(nodeAlign)
+}
+
+.childrenTips <- function(tree, node) {
+    maxTip <- length(tree[["tip.label"]])
+    children <- integer()
+    getChildren <- function(edges, parent) {
+        children <<- c(children, parent[which(parent <= maxTip)])
+        i <- which(edges[, 1] %in% parent)
+        if (length(i) == 0L) {
+            return(children)
+        } else {
+            parent <- edges[i, 2]
+            return(getChildren(edges, parent))
+        }
+    }
+    return(getChildren(tree[["edge"]], node))
 }
 
 .transitionClusters <- function(fixations, paths, tree) {
