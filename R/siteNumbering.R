@@ -1,3 +1,31 @@
+#' @rdname setSiteNumbering
+#' @name setSiteNumbering
+#' @title Set site numbering to the reference sequence
+#' @description A reference sequence can be used to define a global site
+#'   numbering scheme for multiple sequence alignment. The gap in the reference
+#'   will be skipped so the site ignored in numbering.
+#' @param x The object to set site numbering. It could be a
+#'   \code{\link{phyMSAmatched}} or a \code{lineagePath} object.
+#' @param reference Name of reference for site numbering. The name has to be one
+#'   of the sequences' name. The default uses the intrinsic alignment numbering
+#' @param gapChar The character to indicate gap. The numbering will skip the
+#'   gapChar for the reference sequence.
+#' @param ... further arguments passed to or from other methods.
+#' @return The input \code{x} with numbering mapped to \code{reference}.
+#' @export
+#' @examples
+#' data(zikv_tree)
+#' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
+#' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
+#' setSiteNumbering(tree)
+setSiteNumbering.phyMSAmatched <- function(x,
+                                           reference = NULL,
+                                           gapChar = "-",
+                                           ...) {
+    res <- .checkReference(x, reference, gapChar)
+    return(res)
+}
+
 .checkReference <- function(x, reference, gapChar) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
@@ -43,34 +71,6 @@
     # Update 'align' attribute as matched with tree tips
     attr(x, "align") <- align[m]
     return(x)
-}
-
-#' @rdname setSiteNumbering
-#' @name setSiteNumbering
-#' @title Set site numbering to the reference sequence
-#' @description A reference sequence can be used to define a global site
-#'   numbering scheme for multiple sequence alignment. The gap in the reference
-#'   will be skipped so the site ignored in numbering.
-#' @param x The object to set site numbering. It could be a
-#'   \code{\link{phyMSAmatched}} or a \code{lineagePath} object.
-#' @param reference Name of reference for site numbering. The name has to be one
-#'   of the sequences' name. The default uses the intrinsic alignment numbering
-#' @param gapChar The character to indicate gap. The numbering will skip the
-#'   gapChar for the reference sequence.
-#' @param ... further arguments passed to or from other methods.
-#' @return The input \code{x} with numbering mapped to \code{reference}.
-#' @export
-#' @examples
-#' data(zikv_tree)
-#' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
-#' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
-#' setSiteNumbering(tree)
-setSiteNumbering.phyMSAmatched <- function(x,
-                                           reference = NULL,
-                                           gapChar = "-",
-                                           ...) {
-    res <- .checkReference(x, reference, gapChar)
-    return(res)
 }
 
 #' @rdname setSiteNumbering

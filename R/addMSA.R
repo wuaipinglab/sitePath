@@ -58,7 +58,7 @@ addMSA <- function(tree,
     }
     attr(res, "tree") <- tree
     # Use the numbering of MSA as the default site numbering
-    res <- .checkReference(res, NULL, NULL)
+    res <- setSiteNumbering.phyMSAmatched(res, NULL, NULL)
     return(res)
 }
 
