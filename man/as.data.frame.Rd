@@ -4,7 +4,7 @@
 \alias{as.data.frame.fixationSites}
 \title{Convert results to Data Frame}
 \usage{
-\method{as.data.frame}{fixationSites}(x, row.names = NULL, optional = FALSE, tipname = FALSE, ...)
+\method{as.data.frame}{fixationSites}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{\link{fixationSites}} object.}
@@ -13,9 +13,6 @@
 frame. Missing values are not allowed.}
 
 \item{optional}{Unimplemented.}
-
-\item{tipname}{Logical: if the return give fixation mutations between tip
-groups or tip names within a group. The default is \code{FALSE}.}
 
 \item{...}{Other arguments.}
 }
