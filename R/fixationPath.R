@@ -193,6 +193,7 @@ fixationPath.fixationSites <- function(x,
     names(edgeSNPs) <- SNPtracing[["edge"]][seq_along(edgeSNPs), 2]
     attr(tipClusters, "SNPtracing") <-
         .annotateSNPonTree(SNPtracing, edgeSNPs)
+    attr(tipClusters, "tree") <- as.phylo.fixationSites(x)
     class(tipClusters) <- "fixationPath"
     return(tipClusters)
 }

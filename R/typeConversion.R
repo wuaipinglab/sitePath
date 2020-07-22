@@ -21,7 +21,7 @@ as.data.frame.fixationSites <- function(x,
                                         ...) {
     tree <- as.phylo.fixationSites(x)
     grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
-    grp <- as.list.fixationPath(grp)
+    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
     res <- .mutationTable(x, tree, grp)
     res <- res[, c("mutation", "from", "to")]
     return(res)
@@ -130,7 +130,7 @@ as.treedata.fixationSites <- function(tree, ...) {
     x <- tree
     tree <- as.phylo.fixationSites(x)
     grp <- fixationPath.fixationSites(x, minEffectiveSize = 0)
-    grp <- as.list.fixationPath(grp)
+    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
     mutTable <- .mutationTable(x, tree, grp)
     transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
                        FUN = "[[",
@@ -172,30 +172,5 @@ as.phylo.sitePath <- function(x, ...) {
 as.phylo.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
     res <- attr(paths, "tree")
-    return(res)
-}
-
-#' @export
-as.list.fixationSites <- function(x, tipnames = TRUE, ...) {
-    grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
-    res <- as.list.fixationPath(grp)
-    if (tipnames) {
-        tree <- as.phylo.fixationSites(x)
-        res <- lapply(res, function(tips) {
-            tree[["tip.label"]][tips]
-        })
-    }
-    return(res)
-}
-
-#' @export
-as.list.fixationPath <- function(x, ...) {
-    groupName <- names(x)
-    attributes(x) <- NULL
-    res <- lapply(x, function(tips) {
-        attributes(tips) <- NULL
-        return(tips)
-    })
-    names(res) <- groupName
     return(res)
 }
