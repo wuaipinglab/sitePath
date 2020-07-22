@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Detection of site fixation in molecular evolution
-Version: 1.5.21
+Version: 1.5.22
 Authors@R: c(person("Chengyang", "Ji",
                     email = "chengyang.ji12@alumni.xjtlu.edu.cn",
                     role = c("aut", "cre", "cph"),
