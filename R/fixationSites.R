@@ -70,7 +70,7 @@ fixationSites.lineagePath <- function(paths,
 .findFixationSite <- function(paths,
                               minEffectiveSize,
                               searchDepth,
-                              method) {
+                              method = c("compare", "insert", "delete")) {
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching
