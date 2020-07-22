@@ -6,8 +6,6 @@
 #' @param row.names NULL or a character vector giving the row names for the data
 #'   frame. Missing values are not allowed.
 #' @param optional Unimplemented.
-#' @param tipname Logical: if the return give fixation mutations between tip
-#'   groups or tip names within a group. The default is \code{FALSE}.
 #' @param ... Other arguments.
 #' @return A \code{\link{data.frame}} object.
 #' @export
@@ -20,25 +18,12 @@
 as.data.frame.fixationSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
-                                        tipname = FALSE,
                                         ...) {
     tree <- as.phylo.fixationSites(x)
     grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
     grp <- as.list.fixationPath(grp)
-    if (tipname) {
-        res <- lapply(names(grp), function(n) {
-            tips <- grp[[n]]
-            data.frame(
-                row.names = as.character(tips),
-                "tipname" = tree[["tip.label"]][tips],
-                "group" = rep(n, length(tips))
-            )
-        })
-        res <- do.call(rbind, res)
-    } else {
-        res <- .mutationTable(x, tree, grp)
-        res <- res[, c("mutation", "from", "to")]
-    }
+    res <- .mutationTable(x, tree, grp)
+    res <- res[, c("mutation", "from", "to")]
     return(res)
 }
 
@@ -187,6 +172,19 @@ as.phylo.sitePath <- function(x, ...) {
 as.phylo.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
     res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
+as.list.fixationSites <- function(x, tipnames = TRUE, ...) {
+    grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
+    res <- as.list.fixationPath(grp)
+    if (tipnames) {
+        tree <- as.phylo.fixationSites(x)
+        res <- lapply(res, function(tips) {
+            tree[["tip.label"]][tips]
+        })
+    }
     return(res)
 }
 
