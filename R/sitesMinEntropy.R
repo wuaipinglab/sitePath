@@ -46,20 +46,17 @@ sitesMinEntropy.lineagePath <- function(x,
     ))
     # In case root node does not have any tips (because itself is a divergent
     # node)
-    if (!attr(paths, "rootNode") %in% names(nodeAlign)) {
-        paths <- lapply(paths, function(p) {
-            as.character(setdiff(p[-1], divNodes))
-        })
-    } else {
-        paths <- lapply(paths, function(p) {
-            as.character(setdiff(p, divNodes))
-        })
+    excludedNodes <- divNodes
+    rootNode <- attr(paths, "rootNode")
+    if (!rootNode %in% names(nodeAlign)) {
+        excludedNodes <- c(rootNode, excludedNodes)
     }
     # Turn the site number into index for C++ code
     siteIndices <- reference[loci] - 1
     names(siteIndices) <- as.character(loci)
     # Group the result by path for all loci
     res <- lapply(paths, function(path) {
+        path <- as.character(setdiff(path, excludedNodes))
         # Entropy minimization result for every locus
         lapply(
             X = siteIndices,
