@@ -117,7 +117,7 @@ as.data.frame.parallelSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    res <- attr(x, "allSNP")
+    res <- attr(x, "allParallel")
     return(res)
 }
 
