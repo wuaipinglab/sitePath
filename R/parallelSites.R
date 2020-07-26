@@ -26,11 +26,21 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     # Collect the sporadic and fixation mutation on each lineage
     sporadicParallel <- list()
     fixationParallel <- list()
-    # Iterate entropy minimization result for each lineage
+    # The site with mutation on each lineage
+    sporadicParallelSites <- list()
+    fixationParallelSites <- list()
+    # Iterate entropy minimization result for each lineage. This part is to
+    # remove the duplicate mutations on the overlapped part of the lineages
     for (segs in x) {
         # To collect mutation on the current lineage
         sporadicMut <- list()
         fixationMut <- list()
+        # To collect all sites with mutation on the current lineage
+        sporadicMutSites <- character()
+        fixationMutSites <- character()
+        # The existing mutation tip/node of the previous lineages
+        existingSporadic <- unlist(lapply(sporadicParallel, names))
+        existingFixation <- unlist(lapply(fixationParallel, names))
         # The site have mutated on at least two lineages
         for (siteName in hasParallelMut) {
             # Convert the site to index of multiple sequence alignment
@@ -57,13 +67,25 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                         return(mutName)
                     }
                 )
-                # Add the mutation info to all mutation collection of the
+                # Add the mutation info to sporadic mutation collection of the
+                # lineage if the the tip is not found in the previous lineages
+                mut <- mut[setdiff(names(mut), existingSporadic)]
+                # Add the mutation info to sporadic mutation collection of the
                 # lineage
-                sporadicMut <- c(sporadicMut, mut)
+                for (mutNode in names(mut)) {
+                    mutName <- list(mut[[mutNode]])
+                    if (mutNode %in% names(sporadicMut)) {
+                        sporadicMut[[mutNode]] <- c(sporadicMut[[mutNode]],
+                                                    mutName)
+                    } else {
+                        sporadicMut[[mutNode]] <- mutName
+                    }
+                    sporadicMutSites <- c(sporadicMutSites,
+                                          siteName)
+                }
             }
             # Collect all fixation mutations if any for the site
             if (length(seg) >= 2) {
-                mut <- list()
                 # Compare the fixed AA/nucleotide between two adjacent groups
                 for (i in seq_along(seg)[-1]) {
                     prevTips <- seg[[i - 1]]
@@ -81,14 +103,31 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                     tips <- names(which(currTipsAA == currAA))
                     # Add the tip name
                     attr(mutName, "tips") <- tips
-                    mut[[mutNode]] <- mutName
+                    # Add the mutation info to fixation mutation collection of
+                    # the lineage if the the same group of tips is not found in
+                    # the previous lineages
+                    if (!mutNode %in% existingFixation) {
+                        mutName <- list(mutName)
+                        if (mutNode %in% names(fixationMut)) {
+                            fixationMut[[mutNode]] <- c(fixationMut[[mutNode]],
+                                                        mutName)
+                        } else {
+                            fixationMut[[mutNode]] <- mutName
+                        }
+                        fixationMutSites <- c(fixationMutSites,
+                                              siteName)
+                    }
                 }
-                fixationMut <- c(fixationMut, mut)
             }
         }
         sporadicParallel <- c(sporadicParallel, list(sporadicMut))
         fixationParallel <- c(fixationParallel, list(fixationMut))
+        sporadicParallelSites <- c(sporadicParallelSites,
+                                   list(unique(sporadicMutSites)))
+        fixationParallelSites <- c(fixationParallelSites,
+                                   list(unique(fixationMutSites)))
     }
+    return(fixationParallelSites)
     # allParallel <- data.frame(
     #     "Accession" = character(),
     #     "Pos" = integer(),
