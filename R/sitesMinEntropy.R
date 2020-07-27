@@ -1,3 +1,26 @@
+#' @rdname sitesMinEntropy
+#' @name sitesMinEntropy
+#' @title Fixation sites prediction
+#' @description After finding the \code{\link{lineagePath}} of a phylogenetic
+#'   tree, \code{sitesMinEntropy} perform entropy minimization on every site of
+#'   the sequence to group the tips according to amino acid/nucleotide.
+#' @param x A \code{lineagePath} object returned from \code{\link{lineagePath}}
+#'   function.
+#' @param minEffectiveSize The minimum number of tips in a group.
+#' @param searchDepth The function uses heuristic search but the termination of
+#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
+#'   tell the search when to stop.
+#' @param method The strategy for predicting the fixation. The basic approach is
+#'   entropy minimization and can be achieved by adding or removing fixation
+#'   point, or by comparing the two.
+#' @param ... further arguments passed to or from other methods.
+#' @return A \code{sitesMinEntropy} object.
+#' @export
+#' @examples
+#' data(zikv_tree_reduced)
+#' data(zikv_align_reduced)
+#' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
+#' sitesMinEntropy(lineagePath(tree))
 #' @export
 sitesMinEntropy.lineagePath <- function(x,
                                         minEffectiveSize = NULL,
