@@ -103,6 +103,25 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
         sporadicParallel <- c(sporadicParallel, list(sporadicMut))
         fixationParallel <- c(fixationParallel, list(fixationMut))
     }
+    res <- integer()
+    pathsNum <- length(paths)
+    # Compare fixation result on each pair of lineages
+    for (i in seq_len(pathsNum)[-pathsNum]) {
+        sporadicRef <- sporadicParallel[[i]]
+        fixationRef <- fixationParallel[[i]]
+        for (j in seq(i + 1, pathsNum)) {
+            # Both lineage should each have their own unique sporadic mutations
+            sporadicMut <- sporadicParallel[[j]]
+            res <- c(res, as.integer(
+                .parallelSitesOnTwoPaths(sporadicRef, sporadicMut)
+            ))
+            # Both lineage should each have their own unique fixation mutations
+            fixationMut <- fixationParallel[[j]]
+            # res <- c(res, as.integer(
+            #     .parallelSitesOnTwoPaths(fixationRef, fixationMut)
+            # ))
+        }
+    }
     # allParallel <- data.frame(
     #     "Accession" = character(),
     #     "Pos" = integer(),
@@ -112,9 +131,35 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     # )
     # res <- sort(unique(allParallel[["Pos"]]))
     # attr(res, "allParallel") <- allParallel
-    # attr(res, "paths") <- paths
-    # class(res) <- "parallelSites"
-    # return(res)
+    attr(res, "paths") <- paths
+    class(res) <- "parallelSites"
+    return(res)
+}
+
+.parallelSitesOnTwoPaths <- function(mutatNodes, otherNodes) {
+    res <- NULL
+    mutatDiff <- setdiff(names(mutatNodes), names(otherNodes))
+    otherDiff <- setdiff(names(otherNodes), names(mutatNodes))
+    if (length(mutatDiff) != 0 && length(otherDiff) != 0) {
+        mutatDiff <- mutatNodes[mutatDiff]
+        otherDiff <- otherNodes[otherDiff]
+        mutatSites <- .extractUniqueSites(mutatDiff)
+        otherSites <- .extractUniqueSites(otherDiff)
+        res <- intersect(mutatSites, otherSites)
+    }
+    return(res)
+}
+
+.extractUniqueSites <- function(nodeGrouped) {
+    res <- unique(unlist(lapply(nodeGrouped, function(node) {
+        vapply(
+            X = node,
+            FUN = "[",
+            i = 2,
+            FUN.VALUE = character(1)
+        )
+    })))
+    return(res)
 }
 
 #' @export
