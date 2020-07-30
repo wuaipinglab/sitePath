@@ -147,11 +147,37 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
         otherSites <- .groupMutationsBySites(otherNodes, otherDiff)
         candidateSites <- intersect(names(mutatSites),
                                     names(otherSites))
-        # for (site in candidateSites) {
-        #     mutat <- mutatNodes[[site]]
-        #     other <- otherNodes[[site]]
-        # }
-        res <- candidateSites
+        # Check if the candidate sites are qualified because the uniqueness
+        # judged by ancestral node could be incorrect if entropy minimization
+        # result is off on the two lineages
+        res <- character()
+        for (site in candidateSites) {
+            # All candidate groups of tip(s) on the two lineages for the site
+            mutat <- mutatSites[[site]]
+            other <- otherSites[[site]]
+            # Assume all tip groups in one set has actual parallel site
+            mutatQualifed <- rep(TRUE, length(mutat))
+            # Iterate one set of groups and compare with the other group set
+            for (i in seq_along(mutat)) {
+                mTips <- mutat[[i]]
+                for (j in seq_along(other)) {
+                    oTips <- other[[j]]
+                    if (length(intersect(mTips, oTips)) != 0) {
+                        # Disqualify the group if it has overlap with the group
+                        # in another set
+                        mutatQualifed[i] <- FALSE
+                        # The group with overlap in another set is dropped
+                        other <- other[-j]
+                        # There is no point looking at the rest
+                        break
+                    }
+                }
+            }
+            # The site is qualified only when both sets pass the check
+            if (any(mutatQualifed) && length(other) != 0) {
+                res <- c(res, site)
+            }
+        }
     }
     return(res)
 }
