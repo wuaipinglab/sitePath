@@ -141,24 +141,28 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     mutatDiff <- setdiff(names(mutatNodes), names(otherNodes))
     otherDiff <- setdiff(names(otherNodes), names(mutatNodes))
     if (length(mutatDiff) != 0 && length(otherDiff) != 0) {
-        mutatDiff <- mutatNodes[mutatDiff]
-        otherDiff <- otherNodes[otherDiff]
-        mutatSites <- .extractUniqueSites(mutatDiff)
-        otherSites <- .extractUniqueSites(otherDiff)
-        res <- intersect(mutatSites, otherSites)
+        mutatSites <- .groupMutationsBySites(mutatNodes, mutatDiff)
+        otherSites <- .groupMutationsBySites(otherNodes, otherDiff)
+        candidateSites <- intersect(names(mutatSites),
+                                    names(otherSites))
+        # for (site in candidateSites) {
+        #     mutat <- mutatNodes[[site]]
+        #     other <- otherNodes[[site]]
+        # }
+        res <- candidateSites
     }
     return(res)
 }
 
-.extractUniqueSites <- function(nodeGrouped) {
-    res <- unique(unlist(lapply(nodeGrouped, function(node) {
-        vapply(
-            X = node,
-            FUN = "[",
-            i = 2,
-            FUN.VALUE = character(1)
-        )
-    })))
+.groupMutationsBySites <- function(nodeGrouped, siteNames) {
+    nodeGrouped <- nodeGrouped[siteNames]
+    res <- list()
+    for (node in nodeGrouped) {
+        for (mut in node) {
+            site <- mut[2]
+            res[[site]] <- c(res[[site]], list(mut))
+        }
+    }
     return(res)
 }
 
