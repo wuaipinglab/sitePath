@@ -52,21 +52,23 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                     X = which(tipsAA != fixedAA & tipsAA != '-'),
                     FUN = function(i) {
                         # Return the mutation info
-                        mutName <- c(fixedAA, siteName, tipsAA[[i]])
+                        mutTips <- names(tipsAA[i])
                         # Add the tip name
-                        attr(mutName, "tips") <- names(tipsAA[i])
-                        return(mutName)
+                        attr(mutTips, "mutName") <- c(fixedAA,
+                                                      siteName,
+                                                      tipsAA[[i]])
+                        return(mutTips)
                     }
                 )
                 # Add the mutation info to sporadic mutation collection of the
                 # lineage
                 for (mutNode in names(mut)) {
-                    mutName <- list(mut[[mutNode]])
+                    mutTips <- list(mut[[mutNode]])
                     if (mutNode %in% names(sporadicMut)) {
                         sporadicMut[[mutNode]] <- c(sporadicMut[[mutNode]],
-                                                    mutName)
+                                                    mutTips)
                     } else {
-                        sporadicMut[[mutNode]] <- mutName
+                        sporadicMut[[mutNode]] <- mutTips
                     }
                 }
             }
@@ -86,16 +88,16 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                                          stop = site)
                     # Find the tips actually have the same AA/nucleotide as the
                     # fixed one
-                    tips <- names(which(currTipsAA == currAA))
+                    mutTips <- names(which(currTipsAA == currAA))
                     # Add the tip name
-                    attr(mutName, "tips") <- tips
+                    attr(mutTips, "mutName") <- mutName
                     # Add the mutation info to fixation mutation collection
-                    mutName <- list(mutName)
+                    mutTips <- list(mutTips)
                     if (mutNode %in% names(fixationMut)) {
                         fixationMut[[mutNode]] <- c(fixationMut[[mutNode]],
-                                                    mutName)
+                                                    mutTips)
                     } else {
-                        fixationMut[[mutNode]] <- mutName
+                        fixationMut[[mutNode]] <- mutTips
                     }
                 }
             }
@@ -159,7 +161,7 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     res <- list()
     for (node in nodeGrouped) {
         for (mut in node) {
-            site <- mut[2]
+            site <- attr(mut, "mutName")[2]
             res[[site]] <- c(res[[site]], list(mut))
         }
     }
