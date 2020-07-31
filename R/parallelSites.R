@@ -57,6 +57,7 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                         attr(mutTips, "mutName") <- c(fixedAA,
                                                       siteName,
                                                       tipsAA[[i]])
+                        attr(mutTips, "fixed") <- FALSE
                         return(mutTips)
                     }
                 )
@@ -86,6 +87,7 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                     mutTips <- names(align[currTips])
                     # Add the tip name
                     attr(mutTips, "mutName") <- mutName
+                    attr(mutTips, "fixed") <- TRUE
                     # Add the mutation info to fixation mutation collection
                     mutTips <- list(mutTips)
                     if (mutNode %in% names(fixationMut)) {
@@ -100,43 +102,45 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
         sporadicParallel <- c(sporadicParallel, list(sporadicMut))
         fixationParallel <- c(fixationParallel, list(fixationMut))
     }
-    res <- integer()
+    sporadic <- list()
+    fixation <- list()
+    mixed <- list()
     pathsNum <- length(paths)
     # Compare fixation result on each pair of lineages
     for (i in seq_len(pathsNum)[-pathsNum]) {
         sporadicRef <- sporadicParallel[[i]]
         fixationRef <- fixationParallel[[i]]
+        mixedRef <- c(sporadicRef, fixationRef)
         for (j in seq(i + 1, pathsNum)) {
             # Both lineage should each have their own unique sporadic mutations
             sporadicMut <- sporadicParallel[[j]]
-            res <- c(res, as.integer(
-                .parallelSitesOnTwoPaths(sporadicRef, sporadicMut)
-            ))
+            # sporadic <- .collectParallelSites(sporadicRef,
+            #                                   sporadicMut,
+            #                                   sporadic)
             # Both lineage should each have their own unique fixation mutations
             fixationMut <- fixationParallel[[j]]
-            # res <- c(res, as.integer(
-            #     .parallelSitesOnTwoPaths(fixationRef, fixationMut)
-            # ))
+            fixation <- .collectParallelSites(fixationRef,
+                                              fixationMut,
+                                              fixation)
+            # To deal with a rare scenario when a fixation mutation and
+            # non-fixation mutation are in parallel
+            mixedMut <- c(sporadicMut, fixationMut)
+            mixed <- .collectParallelSites(mixedRef,
+                                           mixedMut,
+                                           mixed)
         }
     }
-    # allParallel <- data.frame(
-    #     "Accession" = character(),
-    #     "Pos" = integer(),
-    #     "From" = character(),
-    #     "To" = character(),
-    #     "Fixed" = logical()
-    # )
-    # res <- sort(unique(allParallel[["Pos"]]))
-    # attr(res, "allParallel") <- allParallel
+    res <- mixed
     attr(res, "paths") <- paths
     class(res) <- "parallelSites"
     return(res)
 }
 
-.parallelSitesOnTwoPaths <- function(mutatNodes, otherNodes) {
-    res <- NULL
+.collectParallelSites <- function(mutatNodes, otherNodes, res) {
+    # Use the ancestral node to to remove overlapped part
     mutatDiff <- setdiff(names(mutatNodes), names(otherNodes))
     otherDiff <- setdiff(names(otherNodes), names(mutatNodes))
+    # There has to have non-overlap part for both lineage
     if (length(mutatDiff) != 0 && length(otherDiff) != 0) {
         mutatSites <- .groupMutationsBySites(mutatNodes, mutatDiff)
         otherSites <- .groupMutationsBySites(otherNodes, otherDiff)
@@ -145,7 +149,6 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
         # Check if the candidate sites are qualified because the uniqueness
         # judged by ancestral node could be incorrect if entropy minimization
         # result is off on the two lineages
-        res <- character()
         for (site in candidateSites) {
             # All candidate groups of tip(s) on the two lineages for the site
             mutat <- mutatSites[[site]]
@@ -170,7 +173,10 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
             }
             # The site is qualified only when both sets pass the check
             if (any(mutatQualifed) && length(other) != 0) {
-                res <- c(res, site)
+                existingNodes <- names(res[[site]])
+                res[[site]] <- c(res[[site]],
+                                 mutat[which(!names(mutat) %in% existingNodes)],
+                                 other[which(!names(other) %in% existingNodes)])
             }
         }
     }
@@ -180,10 +186,12 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
 .groupMutationsBySites <- function(nodeGrouped, siteNames) {
     nodeGrouped <- nodeGrouped[siteNames]
     res <- list()
-    for (node in nodeGrouped) {
-        for (mut in node) {
+    for (node in names(nodeGrouped)) {
+        for (mut in nodeGrouped[[node]]) {
             site <- attr(mut, "mutName")[2]
-            res[[site]] <- c(res[[site]], list(mut))
+            mut <- list(mut)
+            names(mut) <- node
+            res[[site]] <- c(res[[site]], mut)
         }
     }
     return(res)
