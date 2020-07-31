@@ -82,13 +82,8 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                     currAA <- attr(currTips, "AA")
                     mutNode <- attr(currTips, "node")
                     mutName <- c(prevAA, siteName, currAA)
-                    # The real AA/nucleotide of each tip named with tip name
-                    currTipsAA <- substr(x = align[currTips],
-                                         start = site,
-                                         stop = site)
-                    # Find the tips actually have the same AA/nucleotide as the
-                    # fixed one
-                    mutTips <- names(which(currTipsAA == currAA))
+                    # Get the tip names
+                    mutTips <- names(align[currTips])
                     # Add the tip name
                     attr(mutTips, "mutName") <- mutName
                     # Add the mutation info to fixation mutation collection
