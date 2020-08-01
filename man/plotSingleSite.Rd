@@ -3,12 +3,15 @@
 \name{plotSingleSite}
 \alias{plotSingleSite}
 \alias{plotSingleSite.lineagePath}
+\alias{plotSingleSite.parallelSites}
 \alias{plot.sitePath}
 \alias{plotSingleSite.fixationSites}
 \alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
 \method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE, showTips = FALSE, ...)
+
+\method{plotSingleSite}{parallelSites}(x, site, showPath = FALSE, ...)
 
 \method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 
@@ -47,6 +50,9 @@ A ggplot object to make the plot. It does not behavior like the
 For \code{lineagePath}, the tree will be colored according to
   the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
+
+For \code{parallelSites}, the tree will be colored according to
+  the amino acid of the site if the mutation is not fixed.
 
 Visualize the \code{sitePath} object which can be extracted by
   using \code{\link{extractSite}} on the return of

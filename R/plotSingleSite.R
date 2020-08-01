@@ -90,6 +90,85 @@ plotSingleSite.lineagePath <- function(x,
 }
 
 #' @rdname plotSingleSite
+#' @description For \code{parallelSites}, the tree will be colored according to
+#'   the amino acid of the site if the mutation is not fixed.
+#' @importFrom ggtree geom_tippoint
+#' @export
+plotSingleSite.parallelSites <- function(x,
+                                         site,
+                                         showPath = FALSE,
+                                         ...) {
+    site <- .checkSite(site)
+    paths <- attr(x, "paths")
+    align <- attr(paths, "align")
+    tree <- attr(paths, "tree")
+    align <- strsplit(tolower(align), "")
+    reference <- attr(paths, "msaNumbering")
+    siteComp <- vapply(
+        X = align,
+        FUN = "[[",
+        FUN.VALUE = character(1),
+        i = reference[site]
+    )
+    tryCatch(
+        expr = site <- match.arg(as.character(site), choices = names(x)),
+        error = function(e) {
+            stop("\"site\": ", site, " is not a mutation of fixation")
+        }
+    )
+    group <- list()
+    for (i in seq_along(siteComp)) {
+        group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
+    }
+    names(group) <- AA_FULL_NAMES[names(group)]
+    groupColors <- AA_COLORS
+    tree <- groupOTU(tree, group)
+    pathLabel <- ".lineage"
+    # Color the path node black
+    levels(attr(tree, "group")) <-
+        c(levels(attr(tree, "group")), pathLabel)
+    attr(tree, "group")[unique(unlist(paths))] <- pathLabel
+    lineageColor <- "black"
+    names(lineageColor) <- pathLabel
+    groupColors <- c(groupColors, lineageColor)
+
+    tipNames <- tree[["tip.label"]]
+    nNodes <- length(tipNames) + tree[["Nnode"]]
+    parallelMut <- x[[site]]
+    fixationMut <- character()
+    sporadicTip <- rep(FALSE, nNodes)
+    for (node in names(parallelMut)) {
+        tips <- parallelMut[[node]]
+        if (attr(tips, "fixed")) {
+            fixationMut[node] <- paste0(attr(tips, "mutName"), collapse = "")
+        } else {
+            sporadicTip[which(tipNames == node)] <- TRUE
+        }
+    }
+    if (length(fixationMut) != 0) {
+        tree <- .annotateSNPonTree(tree, fixationMut)
+        p <- ggtree(tree, aes(color = group)) +
+            geom_label_repel(
+                aes(x = branch, label = SNPs),
+                fill = 'lightgreen',
+                color = "black",
+                min.segment.length = 0,
+                na.rm = TRUE
+            )
+    } else {
+        p <- ggtree(tree, aes(color = group))
+    }
+    if (any(sporadicTip)) {
+        p <- p + geom_tippoint(mapping = aes(subset = sporadicTip))
+    }
+    p <- p + scale_color_manual(values = groupColors) +
+        guides(color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(site)
+    return(p)
+}
+
+#' @rdname plotSingleSite
 #' @description Visualize the \code{sitePath} object which can be extracted by
 #'   using \code{\link{extractSite}} on the return of
 #'   \code{\link{fixationSites}}.
@@ -110,10 +189,12 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
         sitePaths <- x[]
     } else {
         if (length(x) < y) {
-            stop("There are ",
-                 length(x),
-                 "lineages with fixation mutation. ",
-                 "The selection \"y\" is out of bounds.")
+            stop(
+                "There are ",
+                length(x),
+                "lineages with fixation mutation. ",
+                "The selection \"y\" is out of bounds."
+            )
         }
         sitePaths <- x[y]
     }
