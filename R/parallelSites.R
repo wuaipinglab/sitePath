@@ -204,5 +204,19 @@ parallelSites <- function(x, ...) {
 
 #' @export
 print.parallelSites <- function(x, ...) {
-    cat("This is a 'parallelSites' object.\n")
+    cat("This is a 'parallelSites' object.\n\nResult for",
+        length(attr(x, "paths")),
+        "paths:\n\n")
+    if (length(x) == 0) {
+        cat("No parallel site found\n")
+    } else {
+        cat(paste(names(x), collapse = " "), "\n")
+        refSeqName <- attr(x, "reference")
+        if (is.null(refSeqName)) {
+            cat("No reference sequence specified.",
+                "Using alignment numbering\n")
+        } else {
+            cat("Reference sequence: ", refSeqName, "\n", sep = "")
+        }
+    }
 }
