@@ -35,12 +35,6 @@ plotSingleSite.lineagePath <- function(x,
     align <- attr(x, "align")
     align <- strsplit(tolower(align), "")
     reference <- attr(x, "msaNumbering")
-    tryCatch(
-        expr = site <- match.arg(as.character(site), seq_along(reference)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not within the length of reference")
-        }
-    )
     siteComp <- vapply(
         X = align,
         FUN = "[[",
@@ -82,11 +76,15 @@ plotSingleSite.lineagePath <- function(x,
         stop("Please enter positive integer value for \"site\"")
     }
     if (length(site) != 1) {
-        warning("\"site\" has more than one element, only the first ",
-                site[1],
-                " will be used.")
+        site <- site[1]
+        warning(
+            "\"site\" has more than one element, ",
+            "only the first element (",
+            site,
+            ") will be used."
+        )
     }
-    return(site[1])
+    return(site)
 }
 
 #' @rdname plotSingleSite
@@ -98,43 +96,11 @@ plotSingleSite.parallelSites <- function(x,
                                          site,
                                          showPath = FALSE,
                                          ...) {
-    site <- .checkSite(site)
     paths <- attr(x, "paths")
-    align <- attr(paths, "align")
     tree <- attr(paths, "tree")
-    align <- strsplit(tolower(align), "")
-    reference <- attr(paths, "msaNumbering")
-    siteComp <- vapply(
-        X = align,
-        FUN = "[[",
-        FUN.VALUE = character(1),
-        i = reference[site]
-    )
-    tryCatch(
-        expr = site <- match.arg(as.character(site), choices = names(x)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not a mutation of fixation")
-        }
-    )
-    group <- list()
-    for (i in seq_along(siteComp)) {
-        group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
-    }
-    names(group) <- AA_FULL_NAMES[names(group)]
-    groupColors <- AA_COLORS
-    tree <- groupOTU(tree, group)
-    pathLabel <- ".lineage"
-    # Color the path node black
-    levels(attr(tree, "group")) <-
-        c(levels(attr(tree, "group")), pathLabel)
-    attr(tree, "group")[unique(unlist(paths))] <- pathLabel
-    lineageColor <- "black"
-    names(lineageColor) <- pathLabel
-    groupColors <- c(groupColors, lineageColor)
-
     tipNames <- tree[["tip.label"]]
     nNodes <- length(tipNames) + tree[["Nnode"]]
-    parallelMut <- x[[site]]
+    parallelMut <- .actualExtractSite(x, site)
     fixationMut <- character()
     sporadicTip <- rep(FALSE, nNodes)
     for (node in names(parallelMut)) {
@@ -146,8 +112,13 @@ plotSingleSite.parallelSites <- function(x,
         }
     }
     if (length(fixationMut) != 0) {
-        tree <- .annotateSNPonTree(tree, fixationMut)
-        p <- ggtree(tree, aes(color = group)) +
+        attr(paths, "tree") <- .annotateSNPonTree(tree, fixationMut)
+        p <- plotSingleSite.lineagePath(
+            x = paths,
+            site = site,
+            showPath = showPath,
+            showTips = FALSE
+        ) +
             geom_label_repel(
                 aes(x = branch, label = SNPs),
                 fill = 'lightgreen',
@@ -156,15 +127,16 @@ plotSingleSite.parallelSites <- function(x,
                 na.rm = TRUE
             )
     } else {
-        p <- ggtree(tree, aes(color = group))
+        p <- plotSingleSite.lineagePath(
+            x = paths,
+            site = site,
+            showPath = showPath,
+            showTips = FALSE
+        )
     }
     if (any(sporadicTip)) {
         p <- p + geom_tippoint(mapping = aes(subset = sporadicTip))
     }
-    p <- p + scale_color_manual(values = groupColors) +
-        guides(color = guide_legend(override.aes = list(size = 3))) +
-        theme(legend.position = "left") +
-        ggtitle(site)
     return(p)
 }
 
@@ -207,8 +179,8 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
             aaName <- c(aaName, aa)
             group[[aa]] <- c(group[[aa]], tips)
         }
-        subtitle <-
-            c(subtitle, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+        subtitle <- c(subtitle,
+                      paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
     groupColors <- AA_COLORS
     tree <- groupOTU(tree, group)
@@ -248,13 +220,7 @@ plotSingleSite.fixationSites <- function(x,
                                          select = NULL,
                                          ...) {
     site <- .checkSite(site)
-    tryCatch(
-        expr = site <- match.arg(as.character(site), choices = names(x)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not a mutation of fixation")
-        }
-    )
-    plot.sitePath(x = x[[site]], y = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
 #' @rdname plotSingleSite
@@ -264,13 +230,7 @@ plotSingleSite.multiFixationSites <- function(x,
                                               select = NULL,
                                               ...) {
     site <- .checkSite(site)
-    tryCatch(
-        expr = site <- match.arg(as.character(site), choices = names(x)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not a mutation of fixation")
-        }
-    )
-    plot.sitePath(x = x[[site]], y = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
 #' @export
