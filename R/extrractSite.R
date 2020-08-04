@@ -22,19 +22,38 @@ extractSite.fixationSites <- function(x, site, ...) {
 
 .actualExtractSite <- function(x, site) {
     site <- .checkSite(site)
-    tryCatch(
-        expr = sp <- x[[as.character(site)]],
-        error = function(e) {
-            stop("\"site\": ", site, " is not found in \"x\".")
-        }
-    )
+    sp <- x[[as.character(site)]]
+    if (is.null(sp)) {
+        stop("\"site\": ", site, " is not found in \"x\".")
+    }
     return(sp)
 }
 
+.checkSite <- function(site) {
+    if (!is.numeric(site) ||
+        any(site <= 0) || as.integer(site) != site) {
+        stop("Please enter positive integer value for \"site\"")
+    }
+    if (length(site) != 1) {
+        site <- site[1]
+        warning(
+            "\"site\" has more than one element, ",
+            "only the first element (",
+            site,
+            ") will be used."
+        )
+    }
+    return(site)
+}
+
 #' @rdname extractSite
-#' @name extractSite
 #' @export
 extractSite.multiFixationSites <- function(x, site, ...) {
+    return(.actualExtractSite(x, site))
+}
+
+#' @export
+extractSite.parallelSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))
 }
 

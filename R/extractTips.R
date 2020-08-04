@@ -22,35 +22,37 @@ extractTips.fixationSites <- function(x,
                                       site,
                                       select = 1,
                                       ...) {
-    sp <- extractSite(x, site)
-    return(.actualExtractTips(sp, select))
+    sp <- extractSite.fixationSites(x, site)
+    return(extractTips.sitePath(sp, select))
 }
 
-.actualExtractTips <- function(sp, select) {
-    tree <- attr(sp, "tree")
+#' @rdname extractTips
+#' @export
+extractTips.sitePath <- function(x, select = 1, ...) {
+    tree <- attr(x, "tree")
     if (select <= 0 || as.integer(select) != select) {
         stop("Please enter a single positive integer for \"select\"")
     }
     tryCatch(
-        expr = sp <- sp[[select]],
+        expr = x <- x[[select]],
         error = function(e) {
             if (length(select))
                 stop(
                     "The site: ",
-                    attr(sp, "site"),
+                    attr(x, "site"),
                     " has ",
-                    length(sp),
+                    length(x),
                     " fixation(s). Please choose a number from 1 to ",
-                    length(sp),
+                    length(x),
                     " for \"select\"."
                 )
         }
     )
     res <- list()
-    for (i in sp) {
+    for (i in x) {
         aa <- attr(i, "AA")
         attributes(aa) <- NULL
-        i <- tree$tip.label[i]
+        i <- tree[["tip.label"]][i]
         attr(i, "AA") <- aa
         res <- c(res, list(i))
     }
@@ -63,14 +65,8 @@ extractTips.multiFixationSites <- function(x,
                                            site,
                                            select = 1,
                                            ...) {
-    sp <- extractSite(x, site)
-    return(.actualExtractTips(sp, select))
-}
-
-#' @rdname extractTips
-#' @export
-extractTips.sitePath <- function(x, select = 1, ...) {
-    return(.actualExtractTips(x, select))
+    sp <- extractSite.multiFixationSites(x, site)
+    return(extractTips.sitePath(sp, select))
 }
 
 #' @rdname extractTips

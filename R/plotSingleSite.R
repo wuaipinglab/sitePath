@@ -57,23 +57,6 @@ plotSingleSite.lineagePath <- function(x,
     return(p)
 }
 
-.checkSite <- function(site) {
-    if (!is.numeric(site) ||
-        any(site <= 0) || as.integer(site) != site) {
-        stop("Please enter positive integer value for \"site\"")
-    }
-    if (length(site) != 1) {
-        site <- site[1]
-        warning(
-            "\"site\" has more than one element, ",
-            "only the first element (",
-            site,
-            ") will be used."
-        )
-    }
-    return(site)
-}
-
 #' @rdname plotSingleSite
 #' @description For \code{parallelSites}, the tree will be colored according to
 #'   the amino acid of the site if the mutation is not fixed.
@@ -87,7 +70,7 @@ plotSingleSite.parallelSites <- function(x,
     tree <- attr(paths, "tree")
     tipNames <- tree[["tip.label"]]
     nNodes <- length(tipNames) + tree[["Nnode"]]
-    parallelMut <- .actualExtractSite(x, site)
+    parallelMut <- extractSite.parallelSites(x, site)
     fixationMut <- character()
     sporadicTip <- rep(FALSE, nNodes)
     for (node in names(parallelMut)) {
@@ -206,7 +189,6 @@ plotSingleSite.fixationSites <- function(x,
                                          site,
                                          select = NULL,
                                          ...) {
-    site <- .checkSite(site)
     plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
@@ -216,7 +198,6 @@ plotSingleSite.multiFixationSites <- function(x,
                                               site,
                                               select = NULL,
                                               ...) {
-    site <- .checkSite(site)
     plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
