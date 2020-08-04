@@ -5,13 +5,16 @@
 \alias{extractTips.fixationSites}
 \alias{extractTips.multiFixationSites}
 \alias{extractTips.sitePath}
-\title{Extract info for fixation of a single site}
+\alias{extractTips.lineagePath}
+\title{Extract grouped tips for a single site}
 \usage{
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
 \method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
 
 \method{extractTips}{sitePath}(x, select = 1, ...)
+
+\method{extractTips}{lineagePath}(x, site, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{sitePath} object.}
@@ -25,13 +28,16 @@ fixation of a site. The default is the first fixation of the site.}
 \item{...}{Other arguments}
 }
 \value{
-The function \code{extractTips} returns the name of the tips involved
-  in the fixation.
+Tree tips grouped as \code{\link{list}}
 }
 \description{
 The result of \code{\link{fixationSites}} contains all the
   possible sites with fixation mutation. The function \code{extractTips}
   retrieves the name of the tips involved in the fixation.
+
+For \code{\link{lineagePath}}, the function \code{extractTips}
+  groups all the tree tips according to the amino acid/nucleotide of the
+  \code{site}.
 }
 \examples{
 data(zikv_tree_reduced)

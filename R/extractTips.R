@@ -1,6 +1,6 @@
 #' @rdname extractTips
 #' @name extractTips
-#' @title Extract info for fixation of a single site
+#' @title Extract grouped tips for a single site
 #' @description The result of \code{\link{fixationSites}} contains all the
 #'   possible sites with fixation mutation. The function \code{extractTips}
 #'   retrieves the name of the tips involved in the fixation.
@@ -10,8 +10,7 @@
 #'   on different lineages. You may use this argument to extract for a specific
 #'   fixation of a site. The default is the first fixation of the site.
 #' @param ... Other arguments
-#' @return The function \code{extractTips} returns the name of the tips involved
-#'   in the fixation.
+#' @return Tree tips grouped as \code{\link{list}}
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -72,6 +71,27 @@ extractTips.multiFixationSites <- function(x,
 #' @export
 extractTips.sitePath <- function(x, select = 1, ...) {
     return(.actualExtractTips(x, select))
+}
+
+#' @rdname extractTips
+#' @description For \code{\link{lineagePath}}, the function \code{extractTips}
+#'   groups all the tree tips according to the amino acid/nucleotide of the
+#'   \code{site}.
+#' @export
+extractTips.lineagePath <- function(x, site, ...) {
+    site <- .checkSite(site)
+    align <- attr(x, "align")
+    align <- strsplit(tolower(align), "")
+    reference <- attr(x, "msaNumbering")
+    # Get the site index of the alignment
+    site <- reference[site]
+    # Group the tree tips by amino acid/nucleotide of the site
+    group <- list()
+    for (tipName in names(align)) {
+        siteChar <- align[[tipName]][site]
+        group[[siteChar]] <- c(group[[siteChar]], tipName)
+    }
+    return(group)
 }
 
 #' @export

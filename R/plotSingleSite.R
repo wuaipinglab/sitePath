@@ -30,23 +30,10 @@ plotSingleSite.lineagePath <- function(x,
                                        showPath = FALSE,
                                        showTips = FALSE,
                                        ...) {
-    site <- .checkSite(site)
-    tree <- attr(x, "tree")
-    align <- attr(x, "align")
-    align <- strsplit(tolower(align), "")
-    reference <- attr(x, "msaNumbering")
-    siteComp <- vapply(
-        X = align,
-        FUN = "[[",
-        FUN.VALUE = character(1),
-        i = reference[site]
-    )
-    group <- list()
-    for (i in seq_along(siteComp)) {
-        group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
-    }
+    group <- extractTips.lineagePath(x, site)
     names(group) <- AA_FULL_NAMES[names(group)]
     groupColors <- AA_COLORS
+    tree <- attr(x, "tree")
     tree <- groupOTU(tree, group)
     # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
