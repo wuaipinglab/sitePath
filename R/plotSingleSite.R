@@ -70,7 +70,7 @@ plotSingleSite.parallelSites <- function(x,
     tree <- attr(paths, "tree")
     tipNames <- tree[["tip.label"]]
     nNodes <- length(tipNames) + tree[["Nnode"]]
-    parallelMut <- extractSite.parallelSites(x, site)
+    parallelMut <- extractTips.parallelSites(x, site)
     fixationMut <- character()
     sporadicTip <- rep(FALSE, nNodes)
     for (node in names(parallelMut)) {

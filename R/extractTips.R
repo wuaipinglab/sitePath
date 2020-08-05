@@ -90,6 +90,27 @@ extractTips.lineagePath <- function(x, site, ...) {
     return(group)
 }
 
+#' @rdname extractTips
+#' @description For \code{\link{lineagePath}}, the function \code{extractTips}
+#'   retrieve all the tips with parallel mutation.
+#' @export
+extractTips.parallelSites <- function(x,
+                                      site,
+                                      select = c(1, 2, 3, 4),
+                                      ...) {
+
+    parallelMut <- .actualExtractSite(x, site)
+    res <- list()
+    for (mut in parallelMut) {
+        for (node in names(mut)) {
+            if (!node %in% names(res)) {
+                res[[node]] <- mut[[node]]
+            }
+        }
+    }
+    return(res)
+}
+
 #' @export
 extractTips <- function(x, ...)
     UseMethod("extractTips")

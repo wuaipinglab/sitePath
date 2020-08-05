@@ -23,9 +23,12 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     if (length(hasParallelMut) == 0) {
         stop("There doesn't seem to have any mutation in parallel lineages")
     }
+    # To collect the result by site
+    res <- list()
     # Collect the sporadic and fixation mutation on each lineage
     sporadicParallel <- list()
     fixationParallel <- list()
+    mixedParallel <- list()
     # Iterate entropy minimization result for each lineage. This part is to
     # remove the duplicate mutations on the overlapped part of the lineages
     for (segs in x) {
@@ -99,47 +102,31 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
                 }
             }
         }
+        mixedRef <- c(sporadicMut, fixationMut)
+        # Compare mutation result on each pair of lineages
+        for (mixedMut in mixedParallel) {
+            res <- .collectParallelSites(mixedRef, mixedMut, res)
+        }
+        # Add the mutation result to the collection
+        mixedParallel <- c(mixedParallel, list(mixedRef))
         sporadicParallel <- c(sporadicParallel, list(sporadicMut))
         fixationParallel <- c(fixationParallel, list(fixationMut))
     }
-    sporadic <- list()
-    fixation <- list()
-    mixed <- list()
-    pathsNum <- length(paths)
-    # Compare fixation result on each pair of lineages
-    for (i in seq_len(pathsNum)[-pathsNum]) {
-        sporadicRef <- sporadicParallel[[i]]
-        fixationRef <- fixationParallel[[i]]
-        mixedRef <- c(sporadicRef, fixationRef)
-        for (j in seq(i + 1, pathsNum)) {
-            # Both lineage should each have their own unique sporadic mutations
-            sporadicMut <- sporadicParallel[[j]]
-            # sporadic <- .collectParallelSites(sporadicRef,
-            #                                   sporadicMut,
-            #                                   sporadic)
-            # Both lineage should each have their own unique fixation mutations
-            fixationMut <- fixationParallel[[j]]
-            fixation <- .collectParallelSites(fixationRef,
-                                              fixationMut,
-                                              fixation)
-            # To deal with a rare scenario when a fixation mutation and
-            # non-fixation mutation are in parallel
-            mixedMut <- c(sporadicMut, fixationMut)
-            mixed <- .collectParallelSites(mixedRef,
-                                           mixedMut,
-                                           mixed)
-        }
-    }
-    res <- mixed
     attr(res, "paths") <- paths
     class(res) <- "parallelSites"
     return(res)
 }
 
 .collectParallelSites <- function(mutatNodes, otherNodes, res) {
+    allMutatNodes <- names(mutatNodes)
+    allOtherNodes <- names(otherNodes)
+    mutatSitesFull <- .groupMutationsBySites(mutatNodes,
+                                             allMutatNodes)
+    otherSitesFull <- .groupMutationsBySites(otherNodes,
+                                             allOtherNodes)
     # Use the ancestral node to to remove overlapped part
-    mutatDiff <- setdiff(names(mutatNodes), names(otherNodes))
-    otherDiff <- setdiff(names(otherNodes), names(mutatNodes))
+    mutatDiff <- setdiff(allMutatNodes, allOtherNodes)
+    otherDiff <- setdiff(allOtherNodes, allMutatNodes)
     # There has to have non-overlap part for both lineage
     if (length(mutatDiff) != 0 && length(otherDiff) != 0) {
         mutatSites <- .groupMutationsBySites(mutatNodes, mutatDiff)
@@ -173,18 +160,22 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
             }
             # The site is qualified only when both sets pass the check
             if (any(mutatQualifed) && length(other) != 0) {
-                existingNodes <- names(res[[site]])
-                res[[site]] <- c(res[[site]],
-                                 mutat[which(!names(mutat) %in% existingNodes)],
-                                 other[which(!names(other) %in% existingNodes)])
+                toAddMutat <- mutatSitesFull[[site]]
+                toAddOther <- otherSitesFull[[site]]
+                for (node in names(toAddOther)) {
+                    if (!node %in% names(toAddMutat)) {
+                        toAddMutat[[node]] <- toAddOther[[node]]
+                    }
+                }
+                res[[site]] <- c(res[[site]], list(toAddMutat))
             }
         }
     }
     return(res)
 }
 
-.groupMutationsBySites <- function(nodeGrouped, siteNames) {
-    nodeGrouped <- nodeGrouped[siteNames]
+.groupMutationsBySites <- function(nodeGrouped, nodeNames) {
+    nodeGrouped <- nodeGrouped[nodeNames]
     res <- list()
     for (node in names(nodeGrouped)) {
         for (mut in nodeGrouped[[node]]) {

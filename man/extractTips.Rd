@@ -3,18 +3,21 @@
 \name{extractTips}
 \alias{extractTips}
 \alias{extractTips.fixationSites}
-\alias{extractTips.multiFixationSites}
 \alias{extractTips.sitePath}
+\alias{extractTips.multiFixationSites}
 \alias{extractTips.lineagePath}
+\alias{extractTips.parallelSites}
 \title{Extract grouped tips for a single site}
 \usage{
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
-\method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
-
 \method{extractTips}{sitePath}(x, select = 1, ...)
 
+\method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
+
 \method{extractTips}{lineagePath}(x, site, ...)
+
+\method{extractTips}{parallelSites}(x, site, select = c(1, 2, 3, 4), ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{sitePath} object.}
@@ -38,6 +41,9 @@ The result of \code{\link{fixationSites}} contains all the
 For \code{\link{lineagePath}}, the function \code{extractTips}
   groups all the tree tips according to the amino acid/nucleotide of the
   \code{site}.
+
+For \code{\link{lineagePath}}, the function \code{extractTips}
+  retrieve all the tips with parallel mutation.
 }
 \examples{
 data(zikv_tree_reduced)
