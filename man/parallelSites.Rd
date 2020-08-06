@@ -5,12 +5,25 @@
 \alias{parallelSites.sitesMinEntropy}
 \title{Mutation in multiple lineages}
 \usage{
-\method{parallelSites}{sitesMinEntropy}(x, minSNP, ...)
+\method{parallelSites}{sitesMinEntropy}(
+  x,
+  minEffectiveSize = NULL,
+  method = c("all", "exact", "pre", "post"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{\link{sitesMinEntropy}} object.}
 
-\item{minSNP}{Minimum number of tips to have mutations on a lineage.}
+\item{minEffectiveSize}{The minimum number of mutations to be qualified as
+parallel on at least two lineages. The default is 1.}
+
+\item{method}{The strategy for finding parallel site. The default is to
+consider any mutation regardless of the amino acid/nucleotide before and
+after mutation; Or the exact same mutation; Or the mutation having amino
+acid/nucleotide before or after mutation.}
+
+\item{...}{Other arguments.}
 }
 \value{
 A \code{sitesMinEntropy} object

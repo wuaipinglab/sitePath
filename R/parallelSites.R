@@ -3,7 +3,13 @@
 #' @title Mutation in multiple lineages
 #' @description A site may have mutated on parallel lineages.
 #' @param x A \code{\link{sitesMinEntropy}} object.
-#' @param minSNP Minimum number of tips to have mutations on a lineage.
+#' @param minEffectiveSize The minimum number of mutations to be qualified as
+#'   parallel on at least two lineages. The default is 1.
+#' @param method The strategy for finding parallel site. The default is to
+#'   consider any mutation regardless of the amino acid/nucleotide before and
+#'   after mutation; Or the exact same mutation; Or the mutation having amino
+#'   acid/nucleotide before or after mutation.
+#' @param ... Other arguments.
 #' @return A \code{sitesMinEntropy} object
 #' @export
 #' @examples
@@ -13,7 +19,11 @@
 #' paths <- lineagePath(tree)
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
-parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
+parallelSites.sitesMinEntropy <- function(x,
+                                          minEffectiveSize = NULL,
+                                          method = c("all", "exact",
+                                                     "pre", "post"),
+                                          ...) {
     paths <- attr(x, "paths")
     align <- attr(paths, "align")
     reference <- attr(paths, "msaNumbering")
@@ -23,6 +33,35 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     if (length(hasParallelMut) == 0) {
         stop("There doesn't seem to have any mutation in parallel lineages")
     }
+    # Set the 'minEffectiveSize'
+    if (is.null(minEffectiveSize)) {
+        minEffectiveSize <- 1
+    } else if (!is.numeric(minEffectiveSize)) {
+        stop("\"minEffectiveSize\" only accepts numeric")
+    }
+    minEffectiveSize <- ceiling(minEffectiveSize)
+    # The function to the corresponding method
+    checkParallelity <- switch(
+        match.arg(method),
+        "all" = function(mut) {
+            return(mut)
+        },
+        "exact" = function(mut) {
+            nodes <- names(mut)
+            nodes[duplicated(nodes)]
+            return(mut)
+        },
+        "pre" = function(mut) {
+            nodes <- names(mut)
+            nodes[duplicated(nodes)]
+            return(mut)
+        },
+        "post" = function(mut) {
+            nodes <- names(mut)
+            nodes[duplicated(nodes)]
+            return(mut)
+        }
+    )
     # To collect the result by site
     res <- list()
     # Collect the sporadic and fixation mutation on each lineage
@@ -105,7 +144,10 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
         mixedRef <- c(sporadicMut, fixationMut)
         # Compare mutation result on each pair of lineages
         for (mixedMut in mixedParallel) {
-            res <- .collectParallelSites(mixedRef, mixedMut, res)
+            res <- .collectParallelSites(mixedRef,
+                                         mixedMut,
+                                         res,
+                                         checkParallelity)
         }
         # Add the mutation result to the collection
         mixedParallel <- c(mixedParallel, list(mixedRef))
@@ -117,7 +159,10 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
     return(res)
 }
 
-.collectParallelSites <- function(mutatNodes, otherNodes, res) {
+.collectParallelSites <- function(mutatNodes,
+                                  otherNodes,
+                                  res,
+                                  checkParallelity) {
     allMutatNodes <- names(mutatNodes)
     allOtherNodes <- names(otherNodes)
     mutatSitesFull <- .groupMutationsBySites(mutatNodes,
@@ -210,4 +255,6 @@ print.parallelSites <- function(x, ...) {
 
 #' @export
 print.sitePara <- function(x, ...) {
+    class(x) <- NULL
+    print(x)
 }

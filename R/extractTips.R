@@ -94,7 +94,7 @@ extractTips.lineagePath <- function(x, site, ...) {
 #' @description For \code{\link{parallelSites}} and \code{sitePara} object, the
 #'   function \code{extractTips} retrieve all the tips with parallel mutation.
 #' @export
-extractTips.sitePara <- function(x, select = c(1, 2, 3, 4), ...) {
+extractTips.sitePara <- function(x, ...) {
     # The duplicated nodes should be removed because they are not truly parallel
     toRemoveNodes <- unique(unlist(lapply(
         X = x,
@@ -118,12 +118,9 @@ extractTips.sitePara <- function(x, select = c(1, 2, 3, 4), ...) {
 
 #' @rdname extractTips
 #' @export
-extractTips.parallelSites <- function(x,
-                                      site,
-                                      select = c(1, 2, 3, 4),
-                                      ...) {
+extractTips.parallelSites <- function(x, site, ...) {
     parallelMut <- extractSite.parallelSites(x, site)
-    return(extractTips.sitePara(parallelMut, select))
+    return(extractTips.sitePara(parallelMut))
 }
 
 #' @export

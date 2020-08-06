@@ -18,9 +18,9 @@
 
 \method{extractTips}{lineagePath}(x, site, ...)
 
-\method{extractTips}{sitePara}(x, select = c(1, 2, 3, 4), ...)
+\method{extractTips}{sitePara}(x, ...)
 
-\method{extractTips}{parallelSites}(x, site, select = c(1, 2, 3, 4), ...)
+\method{extractTips}{parallelSites}(x, site, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{sitePath} object.}
