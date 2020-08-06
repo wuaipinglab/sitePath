@@ -160,14 +160,10 @@ parallelSites.sitesMinEntropy <- function(x, minSNP, ...) {
             }
             # The site is qualified only when both sets pass the check
             if (any(mutatQualifed) && length(other) != 0) {
-                toAddMutat <- mutatSitesFull[[site]]
-                toAddOther <- otherSitesFull[[site]]
-                for (node in names(toAddOther)) {
-                    if (!node %in% names(toAddMutat)) {
-                        toAddMutat[[node]] <- toAddOther[[node]]
-                    }
-                }
-                res[[site]] <- c(res[[site]], list(toAddMutat))
+                toAdd <- c(mutatSitesFull[[site]],
+                           otherSitesFull[[site]])
+                res[[site]] <- c(res[[site]], list(toAdd))
+                class(res[[site]]) <- "sitePara"
             }
         }
     }
@@ -210,4 +206,8 @@ print.parallelSites <- function(x, ...) {
             cat("Reference sequence: ", refSeqName, "\n", sep = "")
         }
     }
+}
+
+#' @export
+print.sitePara <- function(x, ...) {
 }

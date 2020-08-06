@@ -1,9 +1,9 @@
 #' @rdname extractTips
 #' @name extractTips
 #' @title Extract grouped tips for a single site
-#' @description The result of \code{\link{fixationSites}} contains all the
-#'   possible sites with fixation mutation. The function \code{extractTips}
-#'   retrieves the name of the tips involved in the fixation.
+#' @description The result of \code{\link{fixationSites}} and \code{sitePath}
+#'   contains all the possible sites with fixation mutation. The function
+#'   \code{extractTips} retrieves the name of the tips involved in the fixation.
 #' @param x A \code{fixationSites} or a \code{sitePath} object.
 #' @param site A site predicted to experience fixation.
 #' @param select For a site, there theoretically might be more than one fixation
@@ -18,16 +18,6 @@
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
-extractTips.fixationSites <- function(x,
-                                      site,
-                                      select = 1,
-                                      ...) {
-    sp <- extractSite.fixationSites(x, site)
-    return(extractTips.sitePath(sp, select))
-}
-
-#' @rdname extractTips
-#' @export
 extractTips.sitePath <- function(x, select = 1, ...) {
     tree <- attr(x, "tree")
     if (select <= 0 || as.integer(select) != select) {
@@ -57,6 +47,16 @@ extractTips.sitePath <- function(x, select = 1, ...) {
         res <- c(res, list(i))
     }
     return(res)
+}
+
+#' @rdname extractTips
+#' @export
+extractTips.fixationSites <- function(x,
+                                      site,
+                                      select = 1,
+                                      ...) {
+    sp <- extractSite.fixationSites(x, site)
+    return(extractTips.sitePath(sp, select))
 }
 
 #' @rdname extractTips
@@ -91,24 +91,39 @@ extractTips.lineagePath <- function(x, site, ...) {
 }
 
 #' @rdname extractTips
-#' @description For \code{\link{lineagePath}}, the function \code{extractTips}
-#'   retrieve all the tips with parallel mutation.
+#' @description For \code{\link{parallelSites}} and \code{sitePara} object, the
+#'   function \code{extractTips} retrieve all the tips with parallel mutation.
 #' @export
-extractTips.parallelSites <- function(x,
-                                      site,
-                                      select = c(1, 2, 3, 4),
-                                      ...) {
-
-    parallelMut <- .actualExtractSite(x, site)
+extractTips.sitePara <- function(x, select = c(1, 2, 3, 4), ...) {
+    # The duplicated nodes should be removed because they are not truly parallel
+    toRemoveNodes <- unique(unlist(lapply(
+        X = x,
+        FUN = function(mut) {
+            nodes <- names(mut)
+            nodes[duplicated(nodes)]
+        }
+    )))
+    # The parallel nodes in one pair of paths might be duplicated for the other
+    # pair. And they should be remove too
     res <- list()
-    for (mut in parallelMut) {
+    for (mut in x) {
         for (node in names(mut)) {
-            if (!node %in% names(res)) {
+            if (!node %in% toRemoveNodes) {
                 res[[node]] <- mut[[node]]
             }
         }
     }
     return(res)
+}
+
+#' @rdname extractTips
+#' @export
+extractTips.parallelSites <- function(x,
+                                      site,
+                                      select = c(1, 2, 3, 4),
+                                      ...) {
+    parallelMut <- extractSite.parallelSites(x, site)
+    return(extractTips.sitePara(parallelMut, select))
 }
 
 #' @export
