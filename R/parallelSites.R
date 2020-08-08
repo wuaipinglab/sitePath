@@ -190,18 +190,14 @@ parallelSites.sitesMinEntropy <- function(x,
                          mutatFix,
                          otherFix,
                          minEffectiveSize) {
-            # Collect the names of parallel mutations on the two lineages
-            mutatNames <- lapply(mutat, attr, "mutName")
-            otherNames <- lapply(other, attr, "mutname")
-            # Summarize the amino acid/nucleotide before the mutation on the two
+            # The qualified amino acid/nucleotide before the mutation on the two
             # lineages
-            mutatPre <- vapply(
-                X = mutatNames,
-                FUN = "[",
-                FUN.VALUE = character(1),
-                i = 1
+            qualifedAA <- intersect(
+                .qualifiedMutAA(mutat, mutatFix, 1, minEffectiveSize),
+                .qualifiedMutAA(other, otherFix, 1, minEffectiveSize)
             )
-            res <- character()
+            res <- c(.selectMutByAA(mutat, 1, qualifedAA),
+                     .selectMutByAA(other, 1, qualifedAA))
             return(res)
         },
         "post" = function(mutat,
@@ -209,10 +205,14 @@ parallelSites.sitesMinEntropy <- function(x,
                           mutatFix,
                           otherFix,
                           minEffectiveSize) {
-            # Collect the names of parallel mutations on the two lineages
-            mutatNames <- lapply(mutat, attr, "mutName")
-            otherNames <- lapply(other, attr, "mutname")
-            res <- character()
+            # The qualified amino acid/nucleotide before the mutation on the two
+            # lineages
+            qualifedAA <- intersect(
+                .qualifiedMutAA(mutat, mutatFix, 3, minEffectiveSize),
+                .qualifiedMutAA(other, otherFix, 3, minEffectiveSize)
+            )
+            res <- c(.selectMutByAA(mutat, 3, qualifedAA),
+                     .selectMutByAA(other, 3, qualifedAA))
             return(res)
         }
     )
@@ -229,13 +229,37 @@ parallelSites.sitesMinEntropy <- function(x,
     )
 }
 
-.summarizeMutAA <- function(mutatNames, i, minEffectiveSize) {
+.qualifiedMutAA <- function(mutat, mutatFix, i, minEffectiveSize) {
     mutAAsummary <- table(vapply(
-        X = mutatNames,
-        FUN = "[",
-        FUN.VALUE = character(1),
-        i = i
+        X = mutat,
+        FUN = function(mut) {
+            attr(mut, "mutName")[i]
+        },
+        FUN.VALUE = character(1)
     ))
+    fixedMutAA <- vapply(
+        X = mutatFix,
+        FUN = function(mut) {
+            attr(mut, "mutName")[i]
+        },
+        FUN.VALUE = character(1)
+    )
+    c(fixedMutAA, names(which(mutAAsummary >= minEffectiveSize)))
+}
+
+.selectMutByAA <- function(mutat, i, qualifiedAA) {
+    res <- vapply(
+        X = mutat,
+        FUN = function(mut) {
+            mutName <- attr(mut, "mutName")
+            if (mutName[i] %in% qualifiedAA) {
+                return(paste0(mutName, collapse = ""))
+            }
+            return(NA_character_)
+        },
+        FUN.VALUE = character(1)
+    )
+    res[which(!is.na(res))]
 }
 
 .collectParallelSites <- function(mutatNodes,
