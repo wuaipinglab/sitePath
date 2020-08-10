@@ -264,6 +264,7 @@ parallelSites.sitesMinEntropy <- function(x,
                     # pair of lineages
                     res[[site]] <- c(res[[site]], list(toAdd))
                     # Re-assign or assign the class
+                    attr(res[[site]], "site") <- site
                     class(res[[site]]) <- "sitePara"
                 }
             }
@@ -312,6 +313,28 @@ print.parallelSites <- function(x, ...) {
 
 #' @export
 print.sitePara <- function(x, ...) {
-    class(x) <- NULL
-    print(x)
+    cat(
+        "This is a 'sitePara' object.\n\nSite",
+        attr(x, "site"),
+        "may have parallel mutation on",
+        length(x),
+        "pair of paths:\n\n"
+    )
+    mutSummary <- table(vapply(
+        X = extractTips.sitePara(x),
+        FUN = function(mutTips) {
+            attr(mutTips, "mutName")[4]
+        },
+        FUN.VALUE = character(1)
+    ))
+    mutInfo <- character()
+    for (mutName in names(mutSummary)) {
+        mutInfo <-
+            c(mutInfo, paste0(mutName, "(", mutSummary[[mutName]], ")"))
+    }
+    cat(
+        paste0(mutInfo, collapse = ", "),
+        "\n\nIn the bracket are the number of tips",
+        "involved in the mutation\n"
+    )
 }
