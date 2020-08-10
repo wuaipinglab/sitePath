@@ -34,14 +34,14 @@ plotSingleSite.lineagePath <- function(x,
     names(group) <- AA_FULL_NAMES[names(group)]
     groupColors <- AA_COLORS
     tree <- attr(x, "tree")
-    tree <- groupOTU(tree, group)
+    group <- groupOTU(as_tibble(tree), group)
+    group <- group[["group"]]
     # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
         pathLabel <- ".lineage"
         # Color the path node black
-        levels(attr(tree, "group")) <-
-            c(levels(attr(tree, "group")), pathLabel)
-        attr(tree, "group")[unique(unlist(paths))] <- pathLabel
+        levels(group) <- c(levels(group), pathLabel)
+        group[unique(unlist(paths))] <- pathLabel
         lineageColor <- "black"
         names(lineageColor) <- pathLabel
         groupColors <- c(groupColors, lineageColor)
