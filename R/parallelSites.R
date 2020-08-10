@@ -73,12 +73,14 @@ parallelSites.sitesMinEntropy <- function(x,
                 mut <- lapply(
                     X = which(tipsAA != fixedAA & tipsAA != '-'),
                     FUN = function(i) {
-                        # Return the mutation info
+                        # The tip name to return
                         mutTips <- names(tipsAA[i])
+                        # The mutation info used later
+                        mutName <- c(fixedAA, siteName, tipsAA[[i]])
+                        mutName <- c(mutName,
+                                     paste0(mutName, collapse = ""))
                         # Add the tip name
-                        attr(mutTips, "mutName") <- c(fixedAA,
-                                                      siteName,
-                                                      tipsAA[[i]])
+                        attr(mutTips, "mutName") <- mutName
                         attr(mutTips, "fixed") <- FALSE
                         return(mutTips)
                     }
@@ -104,7 +106,10 @@ parallelSites.sitesMinEntropy <- function(x,
                     prevAA <- attr(prevTips, "AA")
                     currAA <- attr(currTips, "AA")
                     mutNode <- attr(currTips, "node")
+                    # The mutation info used later
                     mutName <- c(prevAA, siteName, currAA)
+                    mutName <- c(mutName,
+                                 paste0(mutName, collapse = ""))
                     # Get the tip names
                     mutTips <- names(align[currTips])
                     # Add the tip name
@@ -223,7 +228,7 @@ parallelSites.sitesMinEntropy <- function(x,
     vapply(
         X = mutat,
         FUN = function(mut) {
-            paste0(attr(mut, "mutName"), collapse = "")
+            attr(mut, "mutName")[4]
         },
         FUN.VALUE = character(1)
     )
@@ -327,12 +332,10 @@ parallelSites.sitesMinEntropy <- function(x,
                 if (length(qualifiedMut) > 0) {
                     toAdd <- c(
                         Filter(function(mut) {
-                            paste0(attr(mut, "mutName"),
-                                   collapse = "") %in% qualifiedMut
+                            attr(mut, "mutName")[4] %in% qualifiedMut
                         }, mutatSitesFull[[site]]),
                         Filter(function(mut) {
-                            paste0(attr(mut, "mutName"),
-                                   collapse = "") %in% qualifiedMut
+                            attr(mut, "mutName")[4] %in% qualifiedMut
                         }, otherSitesFull[[site]])
                     )
                     res[[site]] <- c(res[[site]], list(toAdd))

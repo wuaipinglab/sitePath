@@ -76,7 +76,7 @@ plotSingleSite.parallelSites <- function(x,
     for (node in names(parallelMut)) {
         tips <- parallelMut[[node]]
         if (attr(tips, "fixed")) {
-            fixationMut[node] <- paste0(attr(tips, "mutName"), collapse = "")
+            fixationMut[node] <- attr(tips, "mutName")[4]
         } else {
             sporadicTip[which(tipNames == node)] <- TRUE
         }
