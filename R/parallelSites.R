@@ -40,8 +40,14 @@ parallelSites.sitesMinEntropy <- function(x,
         stop("\"minEffectiveSize\" only accepts numeric")
     }
     minEffectiveSize <- ceiling(minEffectiveSize)
-    # The function to the corresponding method
-    mutSelectFunc <- .parallelMutSelectFunc(method)
+    # The index of 'mutName' attribute to be used for applying constrains
+    mutNameIndex <- switch(
+        match.arg(method),
+        "all" = 2,
+        "exact" = 4,
+        "pre" = 1,
+        "post" = 3
+    )
     # To collect the result by site
     res <- list()
     # Collect the sporadic and fixation mutation on each lineage
@@ -132,7 +138,7 @@ parallelSites.sitesMinEntropy <- function(x,
             res <- .collectParallelSites(mixedRef,
                                          mixedMut,
                                          res,
-                                         mutSelectFunc,
+                                         mutNameIndex,
                                          minEffectiveSize)
         }
         # Add the mutation result to the collection
@@ -145,120 +151,34 @@ parallelSites.sitesMinEntropy <- function(x,
     return(res)
 }
 
-.parallelMutSelectFunc <- function(method = c("all", "exact",
-                                              "pre", "post")) {
-    resFunc <- switch(
-        match.arg(method),
-        "all" = function(mutat,
-                         other,
-                         mutatFix,
-                         otherFix,
-                         minEffectiveSize) {
-            res <- character()
-            # The name of the fixation mutation
-            mutatFixMut <- .getMutationNames(mutatFix)
-            otherFixMut <- .getMutationNames(otherFix)
-            # Apply the 'minEffectiveSize' constrain to see if any mutation
-            # still qualified on the two lineages
-            if ((length(mutat) >= minEffectiveSize ||
-                 length(mutatFixMut) > 0) &&
-                (length(other) >= minEffectiveSize ||
-                 length(otherFixMut) > 0)) {
-                # Collect the names of all true parallel mutations
-                mutNames <- .getMutationNames(c(mutat, other))
-                res <- unique(mutNames)
-            }
-            return(res)
-        },
-        "exact" = function(mutat,
-                           other,
-                           mutatFix,
-                           otherFix,
-                           minEffectiveSize) {
-            # The name of the fixation mutation
-            mutatFixMut <- .getMutationNames(mutatFix)
-            otherFixMut <- .getMutationNames(otherFix)
-            # Summarize the names of parallel mutations on the two lineages
-            mutatSummary <- table(.getMutationNames(mutat))
-            mutatMutNames <- c(mutatFixMut,
-                               names(which(mutatSummary >= minEffectiveSize)))
-            otherSummary <- table(.getMutationNames(other))
-            otherMutNames <- c(otherFixMut,
-                               names(which(otherSummary >= minEffectiveSize)))
-            # Apply the 'minEffectiveSize' constrain: a mutation has to be
-            # qualified on both lineages
-            res <- intersect(mutatMutNames, otherMutNames)
-            return(res)
-        },
-        "pre" = function(mutat,
-                         other,
-                         mutatFix,
-                         otherFix,
-                         minEffectiveSize) {
-            # The qualified amino acid/nucleotide before the mutation on the two
-            # lineages
-            qualifedAA <- intersect(
-                .qualifiedMutAA(mutat, mutatFix, 1, minEffectiveSize),
-                .qualifiedMutAA(other, otherFix, 1, minEffectiveSize)
-            )
-            res <- c(.selectMutByAA(mutat, 1, qualifedAA),
-                     .selectMutByAA(other, 1, qualifedAA))
-            return(res)
-        },
-        "post" = function(mutat,
-                          other,
-                          mutatFix,
-                          otherFix,
-                          minEffectiveSize) {
-            # The qualified amino acid/nucleotide before the mutation on the two
-            # lineages
-            qualifedAA <- intersect(
-                .qualifiedMutAA(mutat, mutatFix, 3, minEffectiveSize),
-                .qualifiedMutAA(other, otherFix, 3, minEffectiveSize)
-            )
-            res <- c(.selectMutByAA(mutat, 3, qualifedAA),
-                     .selectMutByAA(other, 3, qualifedAA))
-            return(res)
+.qualifiedMutAA <- function(mutat, i, minEffectiveSize) {
+    # Fixation mutation will ignore 'minEffectiveSize' constrain
+    fixationMutAA <- character()
+    sporadicMutAA <- character()
+    for (mutTips in mutat) {
+        # Get the indexed 'mutName' for deciding parallelity
+        mutAA <- attr(mutTips, "mutName")[i]
+        if (attr(mutTips, "fixed")) {
+            fixationMutAA <- c(fixationMutAA, mutAA)
+        } else {
+            sporadicMutAA <- c(sporadicMutAA, mutAA)
         }
-    )
-    return(resFunc)
-}
-
-.getMutationNames <- function(mutat) {
-    vapply(
-        X = mutat,
-        FUN = function(mut) {
-            attr(mut, "mutName")[4]
-        },
-        FUN.VALUE = character(1)
-    )
-}
-
-.qualifiedMutAA <- function(mutat, mutatFix, i, minEffectiveSize) {
-    mutAAsummary <- table(vapply(
-        X = mutat,
-        FUN = function(mut) {
-            attr(mut, "mutName")[i]
-        },
-        FUN.VALUE = character(1)
-    ))
-    fixedMutAA <- vapply(
-        X = mutatFix,
-        FUN = function(mut) {
-            attr(mut, "mutName")[i]
-        },
-        FUN.VALUE = character(1)
-    )
-    c(fixedMutAA, names(which(mutAAsummary >= minEffectiveSize)))
+    }
+    # Summarize the number of each amino acid/nucleotide of each sporadic
+    # mutation
+    c(fixationMutAA, names(which(
+        table(sporadicMutAA) >= minEffectiveSize
+    )))
 }
 
 .selectMutByAA <- function(mutat, i, qualifiedAA) {
+    # Select the mutation name according to the result of qualification
     res <- vapply(
         X = mutat,
         FUN = function(mut) {
             mutName <- attr(mut, "mutName")
             if (mutName[i] %in% qualifiedAA) {
-                return(paste0(mutName, collapse = ""))
+                return(mutName[4])
             }
             return(NA_character_)
         },
@@ -270,7 +190,7 @@ parallelSites.sitesMinEntropy <- function(x,
 .collectParallelSites <- function(mutatNodes,
                                   otherNodes,
                                   res,
-                                  mutSelectFunc,
+                                  mutNameIndex,
                                   minEffectiveSize) {
     allMutatNodes <- names(mutatNodes)
     allOtherNodes <- names(otherNodes)
@@ -317,19 +237,21 @@ parallelSites.sitesMinEntropy <- function(x,
                 # Apply the constrains to get the mutations that meet the
                 # constrain of "minEffectiveSize" and filtering "method"
                 mutat <- mutat[which(mutatQualifed)]
-                # Fixation mutation will ignore 'minEffectiveSize' constrain
-                mutatFix <- Filter(function(mut) {
-                    attr(mut, "fixed")
-                }, mutat)
-                otherFix <- Filter(function(mut) {
-                    attr(mut, "fixed")
-                }, other)
-                qualifiedMut <- mutSelectFunc(mutat,
-                                              other,
-                                              mutatFix,
-                                              otherFix,
-                                              minEffectiveSize)
+                # The qualified 'mutName' (indexed according to the constrain
+                # mode) on the two lineages
+                qualifedAA <- intersect(
+                    .qualifiedMutAA(mutat, mutNameIndex, minEffectiveSize),
+                    .qualifiedMutAA(other, mutNameIndex, minEffectiveSize)
+                )
+                # Collect all mutation names that qualify the constrain
+                qualifiedMut <- c(
+                    .selectMutByAA(mutat, mutNameIndex, qualifedAA),
+                    .selectMutByAA(other, mutNameIndex, qualifedAA)
+                )
                 if (length(qualifiedMut) > 0) {
+                    # Only the tips with qualified mutation will be added to the
+                    # result. The result still keeps the mutation separate of
+                    # the two lineages
                     toAdd <- c(
                         Filter(function(mut) {
                             attr(mut, "mutName")[4] %in% qualifiedMut
@@ -338,7 +260,10 @@ parallelSites.sitesMinEntropy <- function(x,
                             attr(mut, "mutName")[4] %in% qualifiedMut
                         }, otherSitesFull[[site]])
                     )
+                    # The result of a site will contain qualified tips on the
+                    # pair of lineages
                     res[[site]] <- c(res[[site]], list(toAdd))
+                    # Re-assign or assign the class
                     class(res[[site]]) <- "sitePara"
                 }
             }
