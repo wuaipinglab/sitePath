@@ -80,7 +80,14 @@ extractTips.lineagePath <- function(x, site, ...) {
     align <- strsplit(tolower(align), "")
     reference <- attr(x, "msaNumbering")
     # Get the site index of the alignment
-    site <- reference[site]
+    tryCatch(
+        expr = site <- reference[[site]],
+        error = function(e) {
+            stop("The site: ",
+                 attr(x, "site"),
+                 "is not within the length of sequence alignment.")
+        }
+    )
     # Group the tree tips by amino acid/nucleotide of the site
     group <- list()
     for (tipName in names(align)) {
