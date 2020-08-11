@@ -1,6 +1,6 @@
 context("test-parallelSites")
 
-test_minEffectiveSize <- function(tips, minEffectiveSize) {
+test_minEffectiveSize <- function(tips, minSNP) {
     tipNum <- length(unlist(tips))
     isFixed <- vapply(
         X = tips,
@@ -8,14 +8,12 @@ test_minEffectiveSize <- function(tips, minEffectiveSize) {
         FUN.VALUE = logical(1),
         which = "fixed"
     )
-    # This check could be improved because the 'minEffectiveSize' constrain
+    # This check could be improved because the 'minSNP' constrain
     # applies on the two lineage separately
-    expect_true(
-        tipNum >= minEffectiveSize * 2  ||
-            sum(isFixed) >= 2 ||
-            tipNum >= minEffectiveSize &&
-            any(isFixed)
-    )
+    expect_true(tipNum >= minSNP * 2  ||
+                    sum(isFixed) >= 2 ||
+                    tipNum >= minSNP &&
+                    any(isFixed))
 }
 
 test_that("Constrains in parallelSites works", {
@@ -26,13 +24,13 @@ test_that("Constrains in parallelSites works", {
     paths <- lineagePath(tree)
     x <- sitesMinEntropy(paths)
     for (s in c(1, 5, 15)) {
-        mutations <- parallelSites(x, minEffectiveSize = s, method = "all")
+        mutations <- parallelSites(x, minSNP = s, mutMode = "all")
         for (sp in mutations) {
             mutTips <- extractTips(sp)
             test_minEffectiveSize(mutTips, s)
         }
         mutations <-
-            parallelSites(x, minEffectiveSize = s, method = "exact")
+            parallelSites(x, minSNP = s, mutMode = "exact")
         for (sp in mutations) {
             mutTips <- extractTips(sp)
             mutModeTips <- list()
@@ -46,7 +44,7 @@ test_that("Constrains in parallelSites works", {
             }
         }
         mutations <-
-            parallelSites(x, minEffectiveSize = s, method = "pre")
+            parallelSites(x, minSNP = s, mutMode = "pre")
         for (sp in mutations) {
             mutTips <- extractTips(sp)
             for (tips in mutTips) {
@@ -59,7 +57,7 @@ test_that("Constrains in parallelSites works", {
             }
         }
         mutations <-
-            parallelSites(x, minEffectiveSize = s, method = "post")
+            parallelSites(x, minSNP = s, mutMode = "post")
         for (sp in mutations) {
             mutTips <- extractTips(sp)
             for (tips in mutTips) {

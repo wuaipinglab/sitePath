@@ -3,9 +3,9 @@
 #' @title Mutation in multiple lineages
 #' @description A site may have mutated on parallel lineages.
 #' @param x A \code{\link{sitesMinEntropy}} object.
-#' @param minEffectiveSize The minimum number of mutations to be qualified as
-#'   parallel on at least two lineages. The default is 1.
-#' @param method The strategy for finding parallel site. The default is to
+#' @param minSNP The minimum number of mutations to be qualified as parallel on
+#'   at least two lineages. The default is 1.
+#' @param mutMode The strategy for finding parallel site. The default is to
 #'   consider any mutation regardless of the amino acid/nucleotide before and
 #'   after mutation; Or the exact same mutation; Or the mutation having amino
 #'   acid/nucleotide before or after mutation.
@@ -20,9 +20,9 @@
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
 parallelSites.sitesMinEntropy <- function(x,
-                                          minEffectiveSize = NULL,
-                                          method = c("all", "exact",
-                                                     "pre", "post"),
+                                          minSNP = NULL,
+                                          mutMode = c("all", "exact",
+                                                      "pre", "post"),
                                           ...) {
     paths <- attr(x, "paths")
     align <- attr(paths, "align")
@@ -33,16 +33,16 @@ parallelSites.sitesMinEntropy <- function(x,
     if (length(hasParallelMut) == 0) {
         stop("There doesn't seem to have any mutation in parallel lineages")
     }
-    # Set the 'minEffectiveSize'
-    if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- 1
-    } else if (!is.numeric(minEffectiveSize)) {
-        stop("\"minEffectiveSize\" only accepts numeric")
+    # Set the 'minSNP' constrain
+    if (is.null(minSNP)) {
+        minSNP <- 1
+    } else if (!is.numeric(minSNP)) {
+        stop("\"minSNP\" only accepts numeric")
     }
-    minEffectiveSize <- ceiling(minEffectiveSize)
+    minSNP <- ceiling(minSNP)
     # The index of 'mutName' attribute to be used for applying constrains
     mutNameIndex <- switch(
-        match.arg(method),
+        match.arg(mutMode),
         "all" = 2,
         "exact" = 4,
         "pre" = 1,
@@ -139,7 +139,7 @@ parallelSites.sitesMinEntropy <- function(x,
                                          mixedMut,
                                          res,
                                          mutNameIndex,
-                                         minEffectiveSize)
+                                         minSNP)
         }
         # Add the mutation result to the collection
         mixedParallel <- c(mixedParallel, list(mixedRef))
@@ -152,8 +152,8 @@ parallelSites.sitesMinEntropy <- function(x,
     return(res)
 }
 
-.qualifiedMutAA <- function(mutat, i, minEffectiveSize) {
-    # Fixation mutation will ignore 'minEffectiveSize' constrain
+.qualifiedMutAA <- function(mutat, i, minSNP) {
+    # Fixation mutation will ignore 'minSNP' constrain
     fixationMutAA <- character()
     sporadicMutAA <- character()
     for (mutTips in mutat) {
@@ -167,9 +167,7 @@ parallelSites.sitesMinEntropy <- function(x,
     }
     # Summarize the number of each amino acid/nucleotide of each sporadic
     # mutation
-    c(fixationMutAA, names(which(
-        table(sporadicMutAA) >= minEffectiveSize
-    )))
+    c(fixationMutAA, names(which(table(sporadicMutAA) >= minSNP)))
 }
 
 .selectMutByAA <- function(mutat, i, qualifiedAA) {
@@ -192,7 +190,7 @@ parallelSites.sitesMinEntropy <- function(x,
                                   otherNodes,
                                   res,
                                   mutNameIndex,
-                                  minEffectiveSize) {
+                                  minSNP) {
     allMutatNodes <- names(mutatNodes)
     allOtherNodes <- names(otherNodes)
     mutatSitesFull <- .groupMutationsBySites(mutatNodes,
@@ -236,13 +234,13 @@ parallelSites.sitesMinEntropy <- function(x,
             # The site is qualified only when both sets pass the check
             if (any(mutatQualifed) && length(other) != 0) {
                 # Apply the constrains to get the mutations that meet the
-                # constrain of "minEffectiveSize" and filtering "method"
+                # constrain of "minSNP" and filtering "mutMode"
                 mutat <- mutat[which(mutatQualifed)]
                 # The qualified 'mutName' (indexed according to the constrain
                 # mode) on the two lineages
                 qualifedAA <- intersect(
-                    .qualifiedMutAA(mutat, mutNameIndex, minEffectiveSize),
-                    .qualifiedMutAA(other, mutNameIndex, minEffectiveSize)
+                    .qualifiedMutAA(mutat, mutNameIndex, minSNP),
+                    .qualifiedMutAA(other, mutNameIndex, minSNP)
                 )
                 # Collect all mutation names that qualify the constrain
                 qualifiedMut <- c(
