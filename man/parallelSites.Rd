@@ -3,9 +3,17 @@
 \name{parallelSites}
 \alias{parallelSites}
 \alias{parallelSites.sitesMinEntropy}
+\alias{parallelSites.lineagePath}
 \title{Mutation in multiple lineages}
 \usage{
 \method{parallelSites}{sitesMinEntropy}(
+  x,
+  minSNP = NULL,
+  mutMode = c("all", "exact", "pre", "post"),
+  ...
+)
+
+\method{parallelSites}{lineagePath}(
   x,
   minSNP = NULL,
   mutMode = c("all", "exact", "pre", "post"),

@@ -233,6 +233,112 @@ multiFixationSites.lineagePath <- function(paths,
     return(sampledPaths)
 }
 
+.findFixationSite <- function(paths,
+                              minEffectiveSize,
+                              searchDepth,
+                              method = c("compare", "insert", "delete")) {
+    # Get the divergent nodes
+    divNodes <- divergentNode(paths)
+    # The tips and matching
+    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
+                                        divNodes = divNodes)
+    # Decide which minimizing strategy
+    minimizeEntropy <- switch(
+        match.arg(method),
+        "compare" = minEntropyByComparing,
+        "insert" = minEntropyByInserting,
+        "delete" = minEntropyByDeleting
+    )
+    # Get the MSA numbering
+    reference <- attr(paths, "msaNumbering")
+    align <- attr(paths, "align")
+    # Exclude the invariant sites
+    loci <- which(vapply(
+        X = seq_along(reference),
+        FUN = function(s) {
+            s <- reference[s]
+            length(unique(substr(align, s, s))) > 1
+        },
+        FUN.VALUE = logical(1)
+    ))
+    # The variable to store the result from entropy minimization for
+    # each path with those purely fixed excluded.
+    res <- list()
+    # In case root node does not have any tips (because itself is a divergent
+    # node)
+    rootNode <- attr(paths, "rootNode")
+    if (!rootNode %in% names(nodeAlign)) {
+        paths <- lapply(paths, "[", -1)
+    }
+    # Iterate each path
+    for (path in paths) {
+        # Iterate every loci (variant sites)
+        for (i in loci) {
+            site <- as.character(i)
+            # The index to use for cpp code
+            s <- reference[i] - 1
+            # Assign a variable to store the tip names and their info on
+            # amino acids. They are the potential fixation segment
+            nodeTips <- integer()
+            previousAA <- NULL
+            currentAA <- NULL
+            previousNode <- NULL
+            # The input for entropy minimization calculation
+            nodeSummaries <- list()
+            # Divergent nodes are not included anywhere in the result
+            for (node in as.character(setdiff(path, divNodes))) {
+                # Get the related descendant tips and related sequences
+                nodeTips <- as.integer(names(nodeAlign[[node]]))
+                # Frequency of the amino acids at the site
+                aaSummary <- tableAA(nodeAlign[[node]], s)
+                # Assoicate the amino acid frequence with the tip names
+                attr(nodeTips, "aaSummary") <- aaSummary
+                # Decide the current fixed amino acid
+                if (length(aaSummary) == 1) {
+                    currentAA <- names(aaSummary)
+                } else {
+                    currentAA <- NULL
+                }
+                # Attach the node to the preivous node if they're
+                # both purely fixed and have the same AA fixed.
+                if (!is.null(previousAA) &&
+                    !is.null(currentAA) &&
+                    previousAA == currentAA) {
+                    node <- previousNode
+                    # Combine the tips in the previous node
+                    nodeTips <- c(nodeSummaries[[node]], nodeTips)
+                    # Add up the amino acid frequency
+                    attr(nodeTips, "aaSummary") <-
+                        attr(nodeSummaries[[node]], "aaSummary") +
+                        aaSummary
+                    # Oddly, R uses the name of the first variable when
+                    # adding two numeric vectors. So there is no need for
+                    # names (AA) assignment
+                }
+                # Assign or re-assign the nodeTips with 'aaSummary'
+                # to the 'nodeSummaries'
+                nodeSummaries[[node]] <- nodeTips
+                previousAA <- currentAA
+                previousNode <- node
+            }
+            # Skip to the next locus if AA is fixed along the whole path
+            if (length(nodeSummaries) >= 2) {
+                seg <- minimizeEntropy(nodeSummaries,
+                                       minEffectiveSize,
+                                       searchDepth)
+                if (length(seg) >= 2) {
+                    targetIndex <- length(res[[site]]) + 1
+                    res[[site]][[targetIndex]] <- seg
+                    attr(res[[site]], "site") <- i
+                    attr(res[[site]], "tree") <- attr(paths, "tree")
+                    class(res[[site]]) <- "sitePath"
+                }
+            }
+        }
+    }
+    return(res)
+}
+
 .sampleSummarize <- function(allMutations, nodeAlign, tree) {
     allSampledTips <- lapply(allMutations, function(m) {
         sampledPaths <- attr(m, "paths")

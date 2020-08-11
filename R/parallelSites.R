@@ -286,6 +286,20 @@ parallelSites.sitesMinEntropy <- function(x,
     res[which(!is.na(res))]
 }
 
+#' @rdname parallelSites
+#' @export
+parallelSites.lineagePath <- function(x,
+                                      minSNP = NULL,
+                                      mutMode = c("all", "exact",
+                                                  "pre", "post"),
+                                      ...) {
+    minEntropy <- sitesMinEntropy.lineagePath(x, ...)
+    res <- parallelSites.sitesMinEntropy(x = minEntropy,
+                                         minSNP = minSNP,
+                                         mutMode = mutMode)
+    return(res)
+}
+
 #' @export
 parallelSites <- function(x, ...) {
     UseMethod("parallelSites")

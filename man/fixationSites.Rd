@@ -3,6 +3,7 @@
 \name{fixationSites}
 \alias{fixationSites}
 \alias{fixationSites.lineagePath}
+\alias{fixationSites.sitesMinEntropy}
 \title{Fixation sites prediction}
 \usage{
 \method{fixationSites}{lineagePath}(
@@ -12,6 +13,8 @@
   method = c("compare", "insert", "delete"),
   ...
 )
+
+\method{fixationSites}{sitesMinEntropy}(paths, ...)
 }
 \arguments{
 \item{paths}{A \code{lineagePath} object returned from
