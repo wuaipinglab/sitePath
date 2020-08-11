@@ -43,6 +43,8 @@
 <meta property="og:description" content="For lineagePath, the tree will be colored according to
   the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
+For parallelSites, the tree will be colored according to
+  the amino acid of the site if the mutation is not fixed.
 Visualize the sitePath object which can be extracted by
   using extractSite on the return of
   fixationSites.
@@ -127,8 +129,10 @@ For fixationSites, it will color the ancestral
     <p>For <code>lineagePath</code>, the tree will be colored according to
   the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.</p>
+<p>For <code>parallelSites</code>, the tree will be colored according to
+  the amino acid of the site if the mutation is not fixed.</p>
 <p>Visualize the <code>sitePath</code> object which can be extracted by
-  using <code><a href='extractTips.html'>extractSite</a></code> on the return of
+  using <code><a href='extractSite.html'>extractSite</a></code> on the return of
   <code><a href='fixationSites.html'>fixationSites</a></code>.</p>
 <p>For <code><a href='fixationSites.html'>fixationSites</a></code>, it will color the ancestral
   tips in red, descendant tips in blue and excluded tips in grey.</p>
@@ -136,6 +140,9 @@ For fixationSites, it will color the ancestral
 
     <pre class="usage"><span class='co'># S3 method for lineagePath</span>
 <span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>FALSE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for parallelSites</span>
+<span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for sitePath</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='kw'>NULL</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
@@ -194,15 +201,19 @@ which will plot all the fixations.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>plot.sitePath</code></p>
-<p><code>plotSingleSite</code>, <code><a href='extractTips.html'>extractSite</a></code></p></div>
+<p><code>plotSingleSite</code>, <code><a href='extractSite.html'>extractSite</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
 <span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
-<span class='fu'>plotSingleSite</span>(<span class='kw'>paths</span>, <span class='fl'>139</span>)</div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
-<span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractTips.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
+<span class='fu'>plotSingleSite</span>(<span class='kw'>paths</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `filter()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'>This warning is displayed once every 8 hours.</span>
+#&gt; <span class='warning'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span></div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
+<span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>plotSingleSite</span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)</div><div class='img'><img src='plotSingleSite-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
