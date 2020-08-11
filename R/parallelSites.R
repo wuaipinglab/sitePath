@@ -147,6 +147,7 @@ parallelSites.sitesMinEntropy <- function(x,
         fixationParallel <- c(fixationParallel, list(fixationMut))
     }
     attr(res, "paths") <- paths
+    attr(res, "clustersByPath") <- attr(x, "clustersByPath")
     class(res) <- "parallelSites"
     return(res)
 }

@@ -117,7 +117,45 @@ as.data.frame.parallelSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    res <- attr(x, "allParallel")
+    tree <- as.phylo.lineagePath(attr(x, "paths"))
+    tipNames <- tree[["tip.label"]]
+    clustersByPath <- attr(x, "clustersByPath")
+    clusterInfo <- character()
+    for (gp in clustersByPath) {
+        for (tips in gp) {
+            # The cluster named by the tips
+            clsNames <- rep(attr(tips, "clsName"), length(tips))
+            names(clsNames) <- as.character(tipNames[tips])
+            clusterInfo <- c(clusterInfo, clsNames)
+        }
+    }
+    # Info for the parallel mutation
+    accession <- character()
+    clsName <- character()
+    mutSite <- integer()
+    mutFrom <- character()
+    mutTo <- character()
+    isFixed <- logical()
+    for (sp in x) {
+        tips <- extractTips.sitePara(sp)
+        for (t in tips) {
+            accession <- c(accession, t)
+            clsName <- c(clsName, clusterInfo[t])
+            mutName <- attr(t, "mutName")
+            mutSite <- c(mutSite, rep(mutName[2], length(t)))
+            mutFrom <- c(mutFrom, rep(mutName[1], length(t)))
+            mutTo <- c(mutTo, rep(mutName[3], length(t)))
+            isFixed <- c(isFixed, rep(attr(t, "fixed"), length(t)))
+        }
+    }
+    res <- data.frame(
+        "Accession" = accession,
+        "group" = clsName,
+        "site" = mutSite,
+        "mutFrom" = mutFrom,
+        "mutTo" = mutTo,
+        "fixation" = isFixed
+    )
     return(res)
 }
 
