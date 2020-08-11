@@ -123,8 +123,16 @@
     <pre class="usage"><span class='co'># S3 method for sitesMinEntropy</span>
 <span class='fu'>parallelSites</span>(
   <span class='kw'>x</span>,
-  minEffectiveSize = <span class='kw'>NULL</span>,
-  method = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"exact"</span>, <span class='st'>"pre"</span>, <span class='st'>"post"</span>),
+  minSNP = <span class='kw'>NULL</span>,
+  mutMode = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"exact"</span>, <span class='st'>"pre"</span>, <span class='st'>"post"</span>),
+  <span class='kw'>...</span>
+)
+
+<span class='co'># S3 method for lineagePath</span>
+<span class='fu'>parallelSites</span>(
+  <span class='kw'>x</span>,
+  minSNP = <span class='kw'>NULL</span>,
+  mutMode = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"exact"</span>, <span class='st'>"pre"</span>, <span class='st'>"post"</span>),
   <span class='kw'>...</span>
 )</pre>
 
@@ -136,12 +144,12 @@
       <td><p>A <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code> object.</p></td>
     </tr>
     <tr>
-      <th>minEffectiveSize</th>
-      <td><p>The minimum number of mutations to be qualified as
-parallel on at least two lineages. The default is 1.</p></td>
+      <th>minSNP</th>
+      <td><p>The minimum number of mutations to be qualified as parallel on
+at least two lineages. The default is 1.</p></td>
     </tr>
     <tr>
-      <th>method</th>
+      <th>mutMode</th>
       <td><p>The strategy for finding parallel site. The default is to
 consider any mutation regardless of the amino acid/nucleotide before and
 after mutation; Or the exact same mutation; Or the mutation having amino
