@@ -595,7 +595,9 @@ fixationSites <- function(paths, ...)
 
 #' @export
 print.fixationSites <- function(x, ...) {
-    cat("Result for", length(attr(x, "paths")), "paths:\n\n")
+    cat("This is a 'fixationSites' object.\n\nResult for",
+        length(attr(x, "paths")),
+        "paths:\n\n")
     if (length(x) == 0) {
         cat("No multi-fixation found\n")
     } else {

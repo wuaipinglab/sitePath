@@ -2,48 +2,51 @@
 % Please edit documentation in R/extractTips.R
 \name{extractTips}
 \alias{extractTips}
+\alias{extractTips.sitePath}
 \alias{extractTips.fixationSites}
 \alias{extractTips.multiFixationSites}
-\alias{extractTips.sitePath}
-\alias{extractSite}
-\alias{extractSite.fixationSites}
-\alias{extractSite.multiFixationSites}
-\title{Extract info for fixation of a single site}
+\alias{extractTips.lineagePath}
+\alias{extractTips.sitePara}
+\alias{extractTips.parallelSites}
+\title{Extract grouped tips for a single site}
 \usage{
+\method{extractTips}{sitePath}(x, select = 1, ...)
+
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
 \method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
 
-\method{extractTips}{sitePath}(x, select = 1, ...)
+\method{extractTips}{lineagePath}(x, site, ...)
 
-\method{extractSite}{fixationSites}(x, site, ...)
+\method{extractTips}{sitePara}(x, ...)
 
-\method{extractSite}{multiFixationSites}(x, site, ...)
+\method{extractTips}{parallelSites}(x, site, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{sitePath} object.}
-
-\item{site}{A site predicted to experience fixation.}
 
 \item{select}{For a site, there theoretically might be more than one fixation
 on different lineages. You may use this argument to extract for a specific
 fixation of a site. The default is the first fixation of the site.}
 
 \item{...}{Other arguments}
+
+\item{site}{A site predicted to experience fixation.}
 }
 \value{
-The function \code{extractTips} returns the name of the tips involved
-  in the fixation.
-
-The function \code{extractSite} returns a \code{sitePath} object
+Tree tips grouped as \code{\link{list}}
 }
 \description{
-The result of \code{\link{fixationSites}} contains all the
-  possible sites with fixation mutation. The function \code{extractTips}
-  retrieves the name of the tips involved in the fixation.
+The result of \code{\link{fixationSites}} and \code{sitePath}
+  contains all the possible sites with fixation mutation. The function
+  \code{extractTips} retrieves the name of the tips involved in the fixation.
 
-The function \code{extractSite} can be used to extract the
-  fixation info of a single site.
+For \code{\link{lineagePath}}, the function \code{extractTips}
+  groups all the tree tips according to the amino acid/nucleotide of the
+  \code{site}.
+
+For \code{\link{parallelSites}} and \code{sitePara} object, the
+  function \code{extractTips} retrieve all the tips with parallel mutation.
 }
 \examples{
 data(zikv_tree_reduced)
@@ -51,5 +54,4 @@ data(zikv_align_reduced)
 tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 mutations <- fixationSites(lineagePath(tree))
 extractTips(mutations, 139)
-extractSite(mutations, 139)
 }

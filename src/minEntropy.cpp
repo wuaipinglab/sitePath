@@ -34,6 +34,12 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
     Rcpp::CharacterVector ancestralNodes = nodeSummaries.names();
     // Index of the ancestral node of the group
     segIndex aNodeIndex = 0;
+    // To find the segmentation index of current group, there is a need to look
+    // back at the last segmentation index that separate two groups with
+    // different dominant AA
+    unsigned int indexShift = 1;
+    // Ancestral node of the group
+    std::string aNode = Rcpp::as<std::string>(ancestralNodes.at(0));
     for (
             segment::const_iterator final_itr = final.begin();
             final_itr != final.end(); ++final_itr
@@ -68,17 +74,21 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
                 combNode[node_itr->first] += node_itr->second;
             }
             combTips.insert(combTips.end(), tips.begin(), tips.end());
+            indexShift++;
         } else {
             // Add the previous combination as a new segment
             Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
             combined.attr("aaSummary") = Rcpp::wrap(combNode);
             combined.attr("AA") = prevFixedAA;
-            combined.attr("node") = Rcpp::as<std::string>(ancestralNodes.at(aNodeIndex));
+            combined.attr("node") = aNode;
             res.push_back(combined);
             // Initiate a new segment to be combined
             combTips = tips;
             combNode = node;
-            aNodeIndex = *final_itr - 1;
+            // Find the segmentation index for the next group
+            aNodeIndex = (final_itr == final.begin()) ? 0 : *(final_itr - indexShift);
+            aNode = Rcpp::as<std::string>(ancestralNodes.at(aNodeIndex));
+            indexShift = 1;
         }
         // Update the starting segment point for the next segment
         start = *final_itr;
@@ -89,9 +99,12 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
     Rcpp::IntegerVector combined = Rcpp::wrap(combTips);
     combined.attr("aaSummary") = Rcpp::wrap(combNode);
     combined.attr("AA") = prevFixedAA;
-    combined.attr("node") = Rcpp::as<std::string>(ancestralNodes.at(aNodeIndex));
+    combined.attr("node") = aNode;
     res.push_back(combined);
     // The first combination of segments is actually empty
     res.erase(res.begin());
-    return Rcpp::wrap(res);
+    Rcpp::ListOf<Rcpp::IntegerVector> res2 = Rcpp::wrap(res);
+    res2.attr("final") = Rcpp::wrap(final);
+    res2.attr("nodeSummaries") = nodeSummaries.names();
+    return res2;
 }

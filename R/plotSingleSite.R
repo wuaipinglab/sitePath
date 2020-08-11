@@ -30,37 +30,18 @@ plotSingleSite.lineagePath <- function(x,
                                        showPath = FALSE,
                                        showTips = FALSE,
                                        ...) {
-    site <- .checkSite(site)
-    tree <- attr(x, "tree")
-    align <- attr(x, "align")
-    align <- strsplit(tolower(align), "")
-    reference <- attr(x, "msaNumbering")
-    tryCatch(
-        expr = site <- match.arg(as.character(site), seq_along(reference)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not within the length of reference")
-        }
-    )
-    siteComp <- vapply(
-        X = align,
-        FUN = "[[",
-        FUN.VALUE = character(1),
-        i = reference[site]
-    )
-    group <- list()
-    for (i in seq_along(siteComp)) {
-        group[[siteComp[[i]]]] <- c(group[[siteComp[[i]]]], i)
-    }
+    group <- extractTips.lineagePath(x, site)
     names(group) <- AA_FULL_NAMES[names(group)]
     groupColors <- AA_COLORS
-    tree <- groupOTU(tree, group)
+    tree <- attr(x, "tree")
+    group <- groupOTU(as_tibble(tree), group)
+    group <- group[["group"]]
     # Set lineage nodes and non-lineage nodes as separate group
     if (showPath) {
         pathLabel <- ".lineage"
         # Color the path node black
-        levels(attr(tree, "group")) <-
-            c(levels(attr(tree, "group")), pathLabel)
-        attr(tree, "group")[unique(unlist(paths))] <- pathLabel
+        levels(group) <- c(levels(group), pathLabel)
+        group[unique(unlist(paths))] <- pathLabel
         lineageColor <- "black"
         names(lineageColor) <- pathLabel
         groupColors <- c(groupColors, lineageColor)
@@ -76,17 +57,57 @@ plotSingleSite.lineagePath <- function(x,
     return(p)
 }
 
-.checkSite <- function(site) {
-    if (!is.numeric(site) ||
-        any(site <= 0) || as.integer(site) != site) {
-        stop("Please enter positive integer value for \"site\"")
+#' @rdname plotSingleSite
+#' @description For \code{parallelSites}, the tree will be colored according to
+#'   the amino acid of the site if the mutation is not fixed.
+#' @importFrom ggtree geom_tippoint
+#' @export
+plotSingleSite.parallelSites <- function(x,
+                                         site,
+                                         showPath = FALSE,
+                                         ...) {
+    paths <- attr(x, "paths")
+    tree <- attr(paths, "tree")
+    tipNames <- tree[["tip.label"]]
+    nNodes <- length(tipNames) + tree[["Nnode"]]
+    parallelMut <- extractTips.parallelSites(x, site)
+    fixationMut <- character()
+    sporadicTip <- rep(FALSE, nNodes)
+    for (node in names(parallelMut)) {
+        tips <- parallelMut[[node]]
+        if (attr(tips, "fixed")) {
+            fixationMut[node] <- attr(tips, "mutName")[4]
+        } else {
+            sporadicTip[which(tipNames == node)] <- TRUE
+        }
     }
-    if (length(site) != 1) {
-        warning("\"site\" has more than one element, only the first ",
-                site[1],
-                " will be used.")
+    if (length(fixationMut) != 0) {
+        attr(paths, "tree") <- .annotateSNPonTree(tree, fixationMut)
+        p <- plotSingleSite.lineagePath(
+            x = paths,
+            site = site,
+            showPath = showPath,
+            showTips = FALSE
+        ) +
+            geom_label_repel(
+                aes(x = branch, label = SNPs),
+                fill = 'lightgreen',
+                color = "black",
+                min.segment.length = 0,
+                na.rm = TRUE
+            )
+    } else {
+        p <- plotSingleSite.lineagePath(
+            x = paths,
+            site = site,
+            showPath = showPath,
+            showTips = FALSE
+        )
     }
-    return(site[1])
+    if (any(sporadicTip)) {
+        p <- p + geom_tippoint(mapping = aes(subset = sporadicTip))
+    }
+    return(p)
 }
 
 #' @rdname plotSingleSite
@@ -110,10 +131,12 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
         sitePaths <- x[]
     } else {
         if (length(x) < y) {
-            stop("There are ",
-                 length(x),
-                 "lineages with fixation mutation. ",
-                 "The selection \"y\" is out of bounds.")
+            stop(
+                "There are ",
+                length(x),
+                "lineages with fixation mutation. ",
+                "The selection \"y\" is out of bounds."
+            )
         }
         sitePaths <- x[y]
     }
@@ -126,8 +149,8 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
             aaName <- c(aaName, aa)
             group[[aa]] <- c(group[[aa]], tips)
         }
-        subtitle <-
-            c(subtitle, paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+        subtitle <- c(subtitle,
+                      paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
     }
     groupColors <- AA_COLORS
     tree <- groupOTU(tree, group)
@@ -166,14 +189,7 @@ plotSingleSite.fixationSites <- function(x,
                                          site,
                                          select = NULL,
                                          ...) {
-    site <- .checkSite(site)
-    tryCatch(
-        expr = site <- match.arg(as.character(site), choices = names(x)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not a mutation of fixation")
-        }
-    )
-    plot.sitePath(x = x[[site]], y = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
 #' @rdname plotSingleSite
@@ -182,14 +198,7 @@ plotSingleSite.multiFixationSites <- function(x,
                                               site,
                                               select = NULL,
                                               ...) {
-    site <- .checkSite(site)
-    tryCatch(
-        expr = site <- match.arg(as.character(site), choices = names(x)),
-        error = function(e) {
-            stop("\"site\": ", site, " is not a mutation of fixation")
-        }
-    )
-    plot.sitePath(x = x[[site]], y = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
 #' @export
