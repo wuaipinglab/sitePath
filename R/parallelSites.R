@@ -152,40 +152,6 @@ parallelSites.sitesMinEntropy <- function(x,
     return(res)
 }
 
-.qualifiedMutAA <- function(mutat, i, minSNP) {
-    # Fixation mutation will ignore 'minSNP' constrain
-    fixationMutAA <- character()
-    sporadicMutAA <- character()
-    for (mutTips in mutat) {
-        # Get the indexed 'mutName' for deciding parallelity
-        mutAA <- attr(mutTips, "mutName")[i]
-        if (attr(mutTips, "fixed")) {
-            fixationMutAA <- c(fixationMutAA, mutAA)
-        } else {
-            sporadicMutAA <- c(sporadicMutAA, mutAA)
-        }
-    }
-    # Summarize the number of each amino acid/nucleotide of each sporadic
-    # mutation
-    c(fixationMutAA, names(which(table(sporadicMutAA) >= minSNP)))
-}
-
-.selectMutByAA <- function(mutat, i, qualifiedAA) {
-    # Select the mutation name according to the result of qualification
-    res <- vapply(
-        X = mutat,
-        FUN = function(mut) {
-            mutName <- attr(mut, "mutName")
-            if (mutName[i] %in% qualifiedAA) {
-                return(mutName[4])
-            }
-            return(NA_character_)
-        },
-        FUN.VALUE = character(1)
-    )
-    res[which(!is.na(res))]
-}
-
 .collectParallelSites <- function(mutatNodes,
                                   otherNodes,
                                   res,
@@ -284,6 +250,40 @@ parallelSites.sitesMinEntropy <- function(x,
         }
     }
     return(res)
+}
+
+.qualifiedMutAA <- function(mutat, i, minSNP) {
+    # Fixation mutation will ignore 'minSNP' constrain
+    fixationMutAA <- character()
+    sporadicMutAA <- character()
+    for (mutTips in mutat) {
+        # Get the indexed 'mutName' for deciding parallelity
+        mutAA <- attr(mutTips, "mutName")[i]
+        if (attr(mutTips, "fixed")) {
+            fixationMutAA <- c(fixationMutAA, mutAA)
+        } else {
+            sporadicMutAA <- c(sporadicMutAA, mutAA)
+        }
+    }
+    # Summarize the number of each amino acid/nucleotide of each sporadic
+    # mutation
+    c(fixationMutAA, names(which(table(sporadicMutAA) >= minSNP)))
+}
+
+.selectMutByAA <- function(mutat, i, qualifiedAA) {
+    # Select the mutation name according to the result of qualification
+    res <- vapply(
+        X = mutat,
+        FUN = function(mut) {
+            mutName <- attr(mut, "mutName")
+            if (mutName[i] %in% qualifiedAA) {
+                return(mutName[4])
+            }
+            return(NA_character_)
+        },
+        FUN.VALUE = character(1)
+    )
+    res[which(!is.na(res))]
 }
 
 #' @export
