@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.22</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.23</span>
       </span>
     </div>
 
@@ -93,7 +93,10 @@
 </pre></div>
 <p>The installation from <a href="https://github.com/wuaipinglab/sitePath/">GitHub</a> is in experimental stage but gives the newest feature:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw">BiocManager</span>::<span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">"wuaipinglab/sitePath"</span>)
+<span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"remotes"</span>, quietly = <span class="fl">TRUE</span>))
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
+
+<span class="kw">remotes</span>::<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"wuaipinglab/sitePath"</span>)
 </pre></div>
 </div>
 <div id="quickstart" class="section level2">
@@ -118,10 +121,12 @@
 <span class="kw">fixations</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fixationSites.html">fixationSites</a></span>(<span class="kw">paths</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">fixations</span>)
 </pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## Result for 3 paths:</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## This is a 'fixationSites' object.</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">## </span></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="co">## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 </span></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="co">## No reference sequence specified. Using alignment numbering</span></span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">## Result for 3 paths:</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">## </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">## No reference sequence specified. Using alignment numbering</span></span></code></pre></div>
 </div>
 </div>
   </div>
