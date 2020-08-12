@@ -24,7 +24,10 @@ BiocManager::install("sitePath")
 
 The installation from [GitHub](https://github.com/wuaipinglab/sitePath/) is in experimental stage but gives the newest feature:
 ```r
-BiocManager::install("wuaipinglab/sitePath")
+if (!requireNamespace("remotes", quietly = TRUE))
+    install.packages("remotes")
+
+remotes::install_github("wuaipinglab/sitePath")
 ```
 
 ## QuickStart

@@ -26,7 +26,10 @@ The installation from [GitHub](https://github.com/wuaipinglab/sitePath/)
 is in experimental stage but gives the newest feature:
 
 ``` r
-BiocManager::install("wuaipinglab/sitePath")
+if (!requireNamespace("remotes", quietly = TRUE))
+    install.packages("remotes")
+
+remotes::install_github("wuaipinglab/sitePath")
 ```
 
 ## QuickStart
@@ -57,6 +60,8 @@ fixations <- fixationSites(paths)
 print(fixations)
 ```
 
+    ## This is a 'fixationSites' object.
+    ## 
     ## Result for 3 paths:
     ## 
     ## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 
