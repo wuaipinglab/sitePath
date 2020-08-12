@@ -98,6 +98,24 @@ groupTips.phyMSAmatched <- function(tree,
 
 #' @rdname groupTips
 #' @export
+groupTips.sitesMinEntropy <- function(tree, tipnames = TRUE, ...) {
+    clustersByPath <- attr(x, "clustersByPath")
+    tree <- as.phylo.sitesMinEntropy(x)
+    tipLabels <- tree[["tip.label"]]
+    if (!tipnames) {
+        tipLabels <- seq_along(tipLabels)
+    }
+    res <- list()
+    for (gp in clustersByPath) {
+        for (tips in gp) {
+            res[[attr(tips, "clsName")]] <- tipLabels[as.integer(tips)]
+        }
+    }
+    return(res)
+}
+
+#' @rdname groupTips
+#' @export
 groupTips.fixationSites <- function(tree, tipnames = TRUE, ...) {
     grp <- fixationPath.fixationSites(tree, minEffectiveSize = 0)
     res <- groupTips.fixationPath(grp, tipnames = tipnames)

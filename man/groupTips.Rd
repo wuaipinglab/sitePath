@@ -3,6 +3,7 @@
 \name{groupTips}
 \alias{groupTips}
 \alias{groupTips.phyMSAmatched}
+\alias{groupTips.sitesMinEntropy}
 \alias{groupTips.fixationSites}
 \alias{groupTips.fixationPath}
 \title{The grouping of tree tips}
@@ -15,6 +16,8 @@
   tipnames = TRUE,
   ...
 )
+
+\method{groupTips}{sitesMinEntropy}(tree, tipnames = TRUE, ...)
 
 \method{groupTips}{fixationSites}(tree, tipnames = TRUE, ...)
 

@@ -2,9 +2,12 @@
 % Please edit documentation in R/fixationPath.R
 \name{fixationPath}
 \alias{fixationPath}
+\alias{fixationPath.sitesMinEntropy}
 \alias{fixationPath.fixationSites}
 \title{Accumulation of fixed mutation as a tree}
 \usage{
+\method{fixationPath}{sitesMinEntropy}(x, minEffectiveSize = NULL, ...)
+
 \method{fixationPath}{fixationSites}(x, minEffectiveSize = NULL, ...)
 }
 \arguments{

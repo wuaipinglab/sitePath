@@ -20,9 +20,15 @@
 #' paths <- lineagePath(tree)
 #' mutations <- fixationSites(paths)
 #' fixationPath(mutations)
-fixationPath.fixationSites <- function(x,
-                                       minEffectiveSize = NULL,
-                                       ...) {
+fixationPath.sitesMinEntropy <- function(x,
+                                         minEffectiveSize = NULL,
+                                         ...) {
+    tree <- as.phylo.sitesMinEntropy(x)
+    res <- .findFixationPath(x, minEffectiveSize, tree)
+    return(res)
+}
+
+.findFixationPath <- function(x, minEffectiveSize, tree) {
     grouping <- attr(x, "clustersByPath")
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <-
@@ -193,7 +199,7 @@ fixationPath.fixationSites <- function(x,
     names(edgeSNPs) <- SNPtracing[["edge"]][seq_along(edgeSNPs), 2]
     attr(tipClusters, "SNPtracing") <-
         .annotateSNPonTree(SNPtracing, edgeSNPs)
-    attr(tipClusters, "tree") <- as.phylo.fixationSites(x)
+    attr(tipClusters, "tree") <- tree
     class(tipClusters) <- "fixationPath"
     return(tipClusters)
 }
@@ -229,6 +235,16 @@ fixationPath.fixationSites <- function(x,
     tree <- as_tibble(tree)
     tree <- full_join(tree, d, by = "node")
     return(as.treedata(tree))
+}
+
+#' @rdname fixationPath
+#' @export
+fixationPath.fixationSites <- function(x,
+                                       minEffectiveSize = NULL,
+                                       ...) {
+    tree <- as.phylo.fixationSites(x)
+    res <- .findFixationPath(x, minEffectiveSize, tree)
+    return(res)
 }
 
 #' @export

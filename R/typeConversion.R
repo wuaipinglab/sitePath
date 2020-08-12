@@ -207,6 +207,13 @@ as.phylo.sitePath <- function(x, ...) {
 }
 
 #' @export
+as.phylo.sitesMinEntropy <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
 as.phylo.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
     res <- attr(paths, "tree")
