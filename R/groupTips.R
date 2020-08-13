@@ -108,6 +108,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
 #' @rdname groupTips
 #' @export
 groupTips.sitesMinEntropy <- function(tree, tipnames = TRUE, ...) {
+    x <- tree
     clustersByPath <- attr(x, "clustersByPath")
     tree <- as.phylo.sitesMinEntropy(x)
     tipLabels <- tree[["tip.label"]]

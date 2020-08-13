@@ -15,7 +15,7 @@ test_that("The grouped tips include all tree tips", {
         expect_identical(sort(allTips), sort(tipNames))
         # The grouping from the fixation mutation
         minEntropy <- sitesMinEntropy(paths)
-        grouped <- groupTips(paths)
+        grouped <- groupTips(minEntropy)
         allTips <- unlist(grouped)
         names(allTips) <- NULL
         expect_identical(sort(allTips), sort(tipNames))
