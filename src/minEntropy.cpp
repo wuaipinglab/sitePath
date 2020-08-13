@@ -53,7 +53,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> MinEntropy::updatedSegmentation(
             // Summarize the AA within a segment
             Rcpp::IntegerVector summary = nodeTips.attr("aaSummary");
             Rcpp::CharacterVector aa = summary.names();
-            for (unsigned int j = 0; j < aa.size(); ++j) {
+            for (int j = 0; j < aa.size(); ++j) {
                 node[Rcpp::as<std::string>(aa.at(j))] += summary.at(j);
             }
         }

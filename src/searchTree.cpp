@@ -17,7 +17,7 @@ MinEntropy::SearchTree<T>::SearchTree(
         Rcpp::IntegerVector summary = nodeSummaries[i].attr("aaSummary");
         Rcpp::CharacterVector aa = summary.names();
         aaSummary node;
-        for (unsigned int j = 0; j < aa.size(); ++j) {
+        for (int j = 0; j < aa.size(); ++j) {
             node[Rcpp::as<std::string>(aa[j])] = summary[j];
         }
         m_aaSummaries.push_back(node);

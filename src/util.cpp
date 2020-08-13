@@ -1,7 +1,6 @@
 #include <set>
 #include <algorithm>
 #include "treemer.h"
-#include "fixationSite.h"
 #include "minEntropy.h"
 
 // [[Rcpp::export]]
@@ -41,64 +40,6 @@ for (
 }
 
 // [[Rcpp::export]]
-Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > fixationSitesSearch(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::IntegerVector &loci
-) {
-    std::map<int, std::vector< std::vector<int> > > res;
-    for (
-            Rcpp::IntegerVector::const_iterator loci_itr = loci.begin();
-            loci_itr != loci.end(); loci_itr++
-    ) {
-        Treemer::BySite match(tipPaths, alignedSeqs, *loci_itr);
-        using namespace FixationSite;
-        TreeSearch ts(match.finalClusters(), *loci_itr);
-        const sitePath sp = ts.getFinal();
-        for (
-            sitePath::const_iterator sp_itr = sp.begin();
-            sp_itr != sp.end(); sp_itr++
-        ) {
-            std::vector<int> groupedTips;
-            for (
-                    mutPath::const_iterator mp_itr = sp_itr->begin();
-                    mp_itr != sp_itr->end(); mp_itr++
-            ) {
-                std::vector<int> tipNodes = (**mp_itr).getTips();
-                groupedTips.insert(
-                    groupedTips.end(),
-                    tipNodes.begin(),
-                    tipNodes.end()
-                );
-            }
-            res[*loci_itr].push_back(groupedTips);
-        }
-    }
-    return Rcpp::wrap(res);
-}
-
-// [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> runTreemer(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        Rcpp::NumericMatrix &simMatrixInput,
-        const float similarity, const bool getTips
-) {
-    std::map<std::pair<int, int>, float> simMatrix;
-    int nrow = simMatrixInput.nrow(), ncol = simMatrixInput.ncol();
-    for (int i = 0; i < nrow; ++i) {
-        for (int j = 0; j < ncol; ++j) {
-            if (!R_IsNA(simMatrixInput(i, j))) {
-                simMatrix[std::make_pair(i + 1, j + 1)] = simMatrixInput(i, j);
-            }
-        }
-    }
-    Treemer::BySimilarity match(tipPaths, alignedSeqs, similarity, simMatrix);
-    // TODO: Separate the two functionalities
-    return getTips ? Rcpp::wrap(match.getTips()) : Rcpp::wrap(match.getPaths());
-}
-
-// [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
         const Rcpp::CharacterVector &alignedSeqs,
         const int minSNPnum
@@ -107,7 +48,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
 
     std::vector< std::vector<int> > res;
     // Select the major SNPs for each site (aa/nt)
-    for (unsigned int siteIndex = 0; siteIndex < alignedSeqs[0].size(); ++siteIndex) {
+    for (int siteIndex = 0; siteIndex < alignedSeqs[0].size(); ++siteIndex) {
         std::map<char, int> snpSummary;
         for (int i = 0; i < totalTipNum; ++i) {
             snpSummary[alignedSeqs[i][siteIndex]]++;
@@ -138,7 +79,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> mergePaths(
 ) {
     std::vector<Rcpp::IntegerVector> res;
     res.push_back(paths[0]);
-    for (unsigned int i = 1; i < paths.size(); ++i) {
+    for (int i = 1; i < paths.size(); ++i) {
         bool toAddNew = true;
         Rcpp::IntegerVector::const_iterator q, s;
         for (

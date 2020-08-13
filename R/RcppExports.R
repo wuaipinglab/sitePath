@@ -9,14 +9,6 @@ runTreemerBySite <- function(tipPaths, alignedSeqs, loci) {
     .Call('_sitePath_runTreemerBySite', PACKAGE = 'sitePath', tipPaths, alignedSeqs, loci)
 }
 
-fixationSitesSearch <- function(tipPaths, alignedSeqs, loci) {
-    .Call('_sitePath_fixationSitesSearch', PACKAGE = 'sitePath', tipPaths, alignedSeqs, loci)
-}
-
-runTreemer <- function(tipPaths, alignedSeqs, simMatrixInput, similarity, getTips) {
-    .Call('_sitePath_runTreemer', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrixInput, similarity, getTips)
-}
-
 majorSNPtips <- function(alignedSeqs, minSNPnum) {
     .Call('_sitePath_majorSNPtips', PACKAGE = 'sitePath', alignedSeqs, minSNPnum)
 }
