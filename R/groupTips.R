@@ -3,6 +3,7 @@
 #' @description Get similarity between aligned sequences with gap ignored.
 #' @param tree The return from \code{\link{addMSA}} function.
 #' @return A diagonal matrix of similarity between sequences.
+#' @seealso \code{\link{lineagePath}}
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -20,28 +21,21 @@ similarityMatrix <- function(tree) {
 #' @rdname groupTips
 #' @name groupTips
 #' @title The grouping of tree tips
-#' @description \code{groupTips} uses sequence similarity to group tree tips.
-#'   Members in a group are always constrained to share the same ancestral node.
-#'   Similarity between two tips is derived from their multiple sequence
-#'   alignment. The site will not be counted into total length if both are gap.
-#'   Similarity is calculated as number of matched divided by the corrected
-#'   total length. So far the detection of divergence is based on one simple
-#'   rule: the minimal pairwise similarity. The two branches are decided to be
-#'   divergent if the similarity is lower than the threshold.
-#' @param tree The return from \code{\link{addMSA}}, \code{\link{lineagePath}}
-#'   or other functions in the \code{sitePath} package.
-#' @param similarity Similarity threshold for tree trimming in \code{groupTips}.
-#'   If not provided, the mean similarity subtract standard deviation of all
-#'   sequences will be used.
-#' @param simMatrix A diagonal matrix of similarities for each pair of
-#'   sequences.
+#' @description The tips between divergent nodes or fixation mutations on the
+#'   lineages are each gathered as group.
+#' @param tree The return from \code{\link{addMSA}}, \code{\link{lineagePath}},
+#'   \code{\link{sitesMinEntropy}} or other functions.
+#' @param similarity This decides how minor SNPs are to remove. If provided as
+#'   fraction between 0 and 1, then the minimum number of SNP will be total tips
+#'   times \code{similariy}. If provided as integer greater than 1, the minimum
+#'   number will be \code{similariy}. The default \code{similariy} is 0.05 for
+#'   \code{lineagePath}.
+#' @param simMatrix Deprecated and will not have effect.
 #' @param forbidTrivial Does not allow trivial trimming.
 #' @param tipnames If return tips as integer or tip names.
 #' @param ... Other arguments.
 #' @return \code{groupTips} returns grouping of tips.
 #' @export
-#' @importFrom ape nodepath
-#' @importFrom stats sd
 #' @examples
 #' data(zikv_tree)
 #' data(zikv_align)
@@ -53,47 +47,62 @@ groupTips.phyMSAmatched <- function(tree,
                                     forbidTrivial = TRUE,
                                     tipnames = TRUE,
                                     ...) {
-    x <- .phyMSAmatch(tree)
-    tree <- attr(x, "tree")
-    # Set 'simMatrix'
-    colMatch <- match(tree[["tip.label"]], colnames(simMatrix))
-    rowMatch <- match(tree[["tip.label"]], rownames(simMatrix))
-    if (is.null(simMatrix)) {
-        simMatrix <- matrix(NA,
-                            ncol = length(tree[["tip.label"]]),
-                            nrow = length(tree[["tip.label"]]))
-    } else {
-        simMatrix <- simMatrix[rowMatch, colMatch]
-    }
-    # Set default 'similarity'
-    if (is.null(similarity)) {
-        simDist <- simMatrix[upper.tri(simMatrix)]
-        similarity <- mean(simDist) - sd(simDist)
-    }
-    # Use treemer
-    grouping <- runTreemer(
-        tipPaths = nodepath(tree),
-        alignedSeqs = attr(x, "align"),
-        simMatrixInput = simMatrix,
-        similarity = similarity,
-        getTips = TRUE
+    paths <- lineagePath.phyMSAmatched(
+        tree = tree,
+        similarity = simMatrix,
+        simMatrix = simMatrix,
+        forbidTrivial = forbidTrivial,
+        ...
     )
-    # If the result is trivial
-    if (length(grouping) == 1 && forbidTrivial) {
-        warning(
-            "The input \"similarity\" ",
-            similarity,
-            " is too low of a cutoff resulting in trivial trimming"
-        )
+    res <- groupTips.lineagePath(paths, tipnames = tipnames)
+    return(res)
+}
+
+#' @rdname groupTips
+#' @export
+groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
+    paths <- tree
+    tree <- attr(paths, "tree")
+    # Get the divergent nodes
+    divNodes <- divergentNode(paths)
+    # The tips and the corresponding ancestral node
+    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
+                                        divNodes = divNodes)
+    nodeTips <- lapply(nodeAlign, function(i) {
+        as.integer(names(i))
+    })
+    # To group the tips by the node right after the divergent point
+    res <- list()
+    # Iterate through each lineage path
+    for (p in paths) {
+        # Assume the root node as the first ancestral node
+        aNode <- as.character(attr(paths, "rootNode"))
+        tips <- integer()
+        pathLen <- length(p)
+        for (i in seq_len(pathLen)[-pathLen]) {
+            currNode <- p[[i]]
+            nextNode <- p[[i + 1]]
+            # Add the tips of the current node to the group
+            tips <- c(tips, nodeTips[[as.character(currNode)]])
+            # Stop adding the tips to the group and take the group out
+            if (nextNode %in% divNodes) {
+                res[[aNode]] <- tips
+                # The node next to the divergent node is the new ancestral node
+                aNode <- as.character(p[[i + 2]])
+                tips <- integer()
+            }
+        }
+        # Add the tips of the final node to the group and take the final group
+        # out
+        res[[aNode]] <- c(tips,
+                          nodeTips[[as.character(p[[pathLen]])]])
     }
-    # Return with tip names or not
     if (tipnames) {
-        return(lapply(grouping, function(g) {
-            tree[["tip.label"]][g]
-        }))
-    } else {
-        return(grouping)
+        res <- lapply(res, function(tips) {
+            tree[["tip.label"]][tips]
+        })
     }
+    return(res)
 }
 
 #' @rdname groupTips

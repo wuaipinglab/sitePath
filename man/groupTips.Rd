@@ -3,6 +3,7 @@
 \name{groupTips}
 \alias{groupTips}
 \alias{groupTips.phyMSAmatched}
+\alias{groupTips.lineagePath}
 \alias{groupTips.sitesMinEntropy}
 \alias{groupTips.fixationSites}
 \alias{groupTips.fixationPath}
@@ -17,6 +18,8 @@
   ...
 )
 
+\method{groupTips}{lineagePath}(tree, tipnames = TRUE, ...)
+
 \method{groupTips}{sitesMinEntropy}(tree, tipnames = TRUE, ...)
 
 \method{groupTips}{fixationSites}(tree, tipnames = TRUE, ...)
@@ -24,15 +27,16 @@
 \method{groupTips}{fixationPath}(tree, tipnames = TRUE, ...)
 }
 \arguments{
-\item{tree}{The return from \code{\link{addMSA}}, \code{\link{lineagePath}}
-or other functions in the \code{sitePath} package.}
+\item{tree}{The return from \code{\link{addMSA}}, \code{\link{lineagePath}},
+\code{\link{sitesMinEntropy}} or other functions.}
 
-\item{similarity}{Similarity threshold for tree trimming in \code{groupTips}.
-If not provided, the mean similarity subtract standard deviation of all
-sequences will be used.}
+\item{similarity}{This decides how minor SNPs are to remove. If provided as
+fraction between 0 and 1, then the minimum number of SNP will be total tips
+times \code{similariy}. If provided as integer greater than 1, the minimum
+number will be \code{similariy}. The default \code{similariy} is 0.05 for
+\code{lineagePath}.}
 
-\item{simMatrix}{A diagonal matrix of similarities for each pair of
-sequences.}
+\item{simMatrix}{Deprecated and will not have effect.}
 
 \item{forbidTrivial}{Does not allow trivial trimming.}
 
@@ -44,14 +48,8 @@ sequences.}
 \code{groupTips} returns grouping of tips.
 }
 \description{
-\code{groupTips} uses sequence similarity to group tree tips.
-  Members in a group are always constrained to share the same ancestral node.
-  Similarity between two tips is derived from their multiple sequence
-  alignment. The site will not be counted into total length if both are gap.
-  Similarity is calculated as number of matched divided by the corrected
-  total length. So far the detection of divergence is based on one simple
-  rule: the minimal pairwise similarity. The two branches are decided to be
-  divergent if the similarity is lower than the threshold.
+The tips between divergent nodes or fixation mutations on the
+  lineages are each gathered as group.
 }
 \examples{
 data(zikv_tree)
