@@ -40,14 +40,8 @@
 
 
 <meta property="og:title" content="The grouping of tree tips — groupTips" />
-<meta property="og:description" content="groupTips uses sequence similarity to group tree tips.
-  Members in a group are always constrained to share the same ancestral node.
-  Similarity between two tips is derived from their multiple sequence
-  alignment. The site will not be counted into total length if both are gap.
-  Similarity is calculated as number of matched divided by the corrected
-  total length. So far the detection of divergence is based on one simple
-  rule: the minimal pairwise similarity. The two branches are decided to be
-  divergent if the similarity is lower than the threshold." />
+<meta property="og:description" content="The tips between divergent nodes or fixation mutations on the
+  lineages are each gathered as group." />
 
 
 
@@ -124,14 +118,8 @@
     </div>
 
     <div class="ref-description">
-    <p><code>groupTips</code> uses sequence similarity to group tree tips.
-  Members in a group are always constrained to share the same ancestral node.
-  Similarity between two tips is derived from their multiple sequence
-  alignment. The site will not be counted into total length if both are gap.
-  Similarity is calculated as number of matched divided by the corrected
-  total length. So far the detection of divergence is based on one simple
-  rule: the minimal pairwise similarity. The two branches are decided to be
-  divergent if the similarity is lower than the threshold.</p>
+    <p>The tips between divergent nodes or fixation mutations on the
+  lineages are each gathered as group.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
@@ -143,6 +131,9 @@
   tipnames = <span class='fl'>TRUE</span>,
   <span class='kw'>...</span>
 )
+
+<span class='co'># S3 method for lineagePath</span>
+<span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for sitesMinEntropy</span>
 <span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
@@ -158,19 +149,20 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>tree</th>
-      <td><p>The return from <code><a href='phyMSAmatched.html'>addMSA</a></code>, <code><a href='lineagePath.html'>lineagePath</a></code>
-or other functions in the <code>sitePath</code> package.</p></td>
+      <td><p>The return from <code><a href='phyMSAmatched.html'>addMSA</a></code>, <code><a href='lineagePath.html'>lineagePath</a></code>,
+<code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code> or other functions.</p></td>
     </tr>
     <tr>
       <th>similarity</th>
-      <td><p>Similarity threshold for tree trimming in <code>groupTips</code>.
-If not provided, the mean similarity subtract standard deviation of all
-sequences will be used.</p></td>
+      <td><p>This decides how minor SNPs are to remove. If provided as
+fraction between 0 and 1, then the minimum number of SNP will be total tips
+times <code>similariy</code>. If provided as integer greater than 1, the minimum
+number will be <code>similariy</code>. The default <code>similariy</code> is 0.05 for
+<code>lineagePath</code>.</p></td>
     </tr>
     <tr>
       <th>simMatrix</th>
-      <td><p>A diagonal matrix of similarities for each pair of
-sequences.</p></td>
+      <td><p>Deprecated and will not have effect.</p></td>
     </tr>
     <tr>
       <th>forbidTrivial</th>
@@ -194,85 +186,79 @@ sequences.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; $`122`
-#&gt; [1] "ANK57896"
+<span class='fu'>groupTips</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; $`363`
+#&gt;   [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
+#&gt;   [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
+#&gt;  [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
+#&gt;  [19] "ATL14618" "AUF35021" "AOL02459" "APG56499" "ASW34302" "APH11552"
+#&gt;  [25] "APH11574" "APH11550" "APH11586" "APH11535" "APH11544" "AWK27349"
+#&gt;  [31] "APH11545" "APH11554" "APH11553" "APH11509" "APH11584" "APH11567"
+#&gt;  [37] "APH11548" "APH11558" "APH11564" "APH11537" "APH11521" "APH11572"
+#&gt;  [43] "APH11575" "APH11555" "APH11577" "APH11525" "APH11568" "APH11561"
+#&gt;  [49] "APH11533" "APH11523" "APH11570" "APH11565" "APH11541" "APH11583"
+#&gt;  [55] "APH11501" "APH11546" "APH11524" "APH11505" "APH11582" "APH11585"
+#&gt;  [61] "APH11542" "APH11557" "APH11563" "APH11504" "APH11587" "APH11579"
+#&gt;  [67] "APH11540" "APH11495" "AOO19565" "APH11511" "APH11547" "APH11569"
+#&gt;  [73] "AVG19202" "APH11530" "APH11580" "APH11500" "APH11502" "APH11539"
+#&gt;  [79] "APH11534" "APH11576" "APH11503" "APH11578" "APH11590" "APH11559"
+#&gt;  [85] "APH11531" "APH11499" "APH11498" "APH11506" "APH11592" "APH11594"
+#&gt;  [91] "APH11532" "APH11593" "APH11507" "APH11497" "APH11517" "APH11527"
+#&gt;  [97] "APH11518" "APH11549" "APH11512" "APH11538" "APH11514" "APH11515"
+#&gt; [103] "APH11551" "APH11571" "APH11581" "APH11566" "APH11529" "APH11508"
+#&gt; [109] "APH11516" "APH11543" "APH11573" "APH11560" "APH11536" "APH11493"
+#&gt; [115] "APH11528" "APH11562" "APH11595" "AVV62004" "BAX00477" "BAV89190"
+#&gt; [121] "AOI20067" "AMM43325" "AMM43326" "ANC90425" "AUI42329" "AUI42330"
+#&gt; [127] "AMR68932" "ANF16414" "AMT75536" "AMV49165" "AMO03410" "ANA12599"
+#&gt; [133] "AMM39806" "AMR39830" "ANO46307" "AVG19275" "ANN44857" "ANO46306"
+#&gt; [139] "ANO46309" "ANO46305" "ANO46303" "ANO46302" "ANO46301" "ARB08102"
+#&gt; [145] "AHZ13508" "ANO46304" "ANO46308" "AMD16557" "AMK49165" "ARB07976"
+#&gt; [151] "APB03018" "AMC13911" "APB03019" "ASU55416" "ANK57897" "AWH65849"
+#&gt; [157] "ASU55417" "ANW07476" "AMZ03556"
 #&gt; 
-#&gt; $`504`
-#&gt;   [1] "APO39243"     "APO39229"     "ARU07183"     "AQZ41956"     "ATG29276"    
-#&gt;   [6] "ANG09399"     "AVZ25033"     "ASL68979"     "ATG29299"     "ASL68978"    
-#&gt;  [11] "AQZ41953"     "AQZ41949"     "ANO46297"     "ANO46298"     "AQX32985"    
-#&gt;  [16] "AQZ41947"     "AQZ41950"     "AQZ41951"     "AQZ41948"     "ATG29267"    
-#&gt;  [21] "AOY08518"     "ARB07962"     "AML81028"     "APY24199"     "ALX35659"    
-#&gt;  [26] "ANQ92019"     "AOX49264"     "AOX49265"     "APY24198"     "APO36913"    
-#&gt;  [31] "AQU12485"     "AMQ48981"     "APH11492"     "AOO54270"     "AND01116"    
-#&gt;  [36] "AMS00611"     "ANF04752"     "AOE22997"     "ASU55411"     "ASU55395"    
-#&gt;  [41] "ASU55396"     "ASU55392"     "AOY08524"     "ASU55394"     "ASU55404"    
-#&gt;  [46] "ASU55423"     "ANB66182"     "ASU55425"     "APQ41782"     "ASU55406"    
-#&gt;  [51] "ASU55398"     "ASU55401"     "ASU55402"     "ASU55407"     "AQX32987"    
-#&gt;  [56] "APB03017"     "ASU55399"     "APQ41783"     "ASU55410"     "ASU55397"    
-#&gt;  [61] "ANS60026"     "ASU55408"     "ASU55413"     "ASU55414"     "ASU55405"    
-#&gt;  [66] "AMZ03557"     "AMM39804"     "ANC90428"     "ASU55421"     "ASU55415"    
-#&gt;  [71] "APQ41786"     "ASU55390"     "AQX32986"     "ASU55422"     "ASU55426"    
-#&gt;  [76] "ASU55412"     "ASU55419"     "ARM59239"     "ANB66183"     "ASU55420"    
-#&gt;  [81] "ASU55418"     "ASU55424"     "APQ41784"     "ASU55391"     "ASU55400"    
-#&gt;  [86] "ASU55409"     "ANB66184"     "ASU55393"     "AMC33116"     "AMQ34003"    
-#&gt;  [91] "AMQ34004"     "ASU55403"     "ARB07967"     "AMK49165"     "ARB07976"    
-#&gt;  [96] "ASU55416"     "ANW07476"     "AMZ03556"     "ASU55417"     "ANK57897"    
-#&gt; [101] "AWH65849"     "AMC13911"     "APB03019"     "APB03018"     "AMD16557"    
-#&gt; [106] "ANO46302"     "ANO46301"     "AVG19275"     "ANN44857"     "ANO46307"    
-#&gt; [111] "BBC70847"     "AUF35022"     "ATL14618"     "AUF35021"     "APO08504"    
-#&gt; [116] "AMX81917"     "AVZ47169"     "AMX81916"     "AMR39834"     "AWH65848"    
-#&gt; [121] "AUI42289"     "AMD61710"     "AOC50652"     "APH11611"     "AMK49492"    
-#&gt; [126] "AMX81915"     "APH11550"     "APH11586"     "APH11535"     "APH11544"    
-#&gt; [131] "APH11584"     "APH11567"     "APH11548"     "APH11572"     "APH11575"    
-#&gt; [136] "APH11568"     "APH11561"     "APH11533"     "APH11523"     "AWK27349"    
-#&gt; [141] "APH11545"     "APH11554"     "APH11558"     "APH11564"     "APH11553"    
-#&gt; [146] "APH11555"     "APH11577"     "APH11525"     "APH11570"     "APH11565"    
-#&gt; [151] "APH11541"     "APH11546"     "APH11582"     "APH11585"     "APH11563"    
-#&gt; [156] "APH11504"     "APH11587"     "APH11499"     "APH11498"     "APH11503"    
-#&gt; [161] "APH11578"     "APH11506"     "APH11507"     "APH11497"     "APH11500"    
-#&gt; [166] "APH11502"     "AVG19202"     "APH11539"     "APH11534"     "APH11592"    
-#&gt; [171] "APH11594"     "APH11518"     "APH11549"     "APH11512"     "APH11514"    
-#&gt; [176] "APH11581"     "APH11508"     "APH11516"     "APH11515"     "APH11538"    
-#&gt; [181] "APH11551"     "APH11571"     "APH11566"     "APH11562"     "APH11595"    
-#&gt; [186] "APH11528"     "APH11560"     "APH11543"     "APH11529"     "APH11573"    
-#&gt; [191] "APH11536"     "APH11493"     "APH11532"     "APH11590"     "APH11559"    
-#&gt; [196] "APH11530"     "APH11517"     "APH11527"     "APH11593"     "APH11531"    
-#&gt; [201] "APH11576"     "APH11580"     "APH11569"     "APH11542"     "APH11579"    
-#&gt; [206] "APH11540"     "APH11557"     "APH11495"     "AOO19565"     "APH11511"    
-#&gt; [211] "APH11547"     "APH11524"     "APH11505"     "APH11501"     "APH11583"    
-#&gt; [216] "APH11537"     "APH11521"     "APH11509"     "APH11574"     "APH11552"    
-#&gt; [221] "AOL02459"     "APG56499"     "ASW34302"     "AVV62004"     "BAX00477"    
-#&gt; [226] "BAV89190"     "AOI20067"     "AMM43325"     "AMR68932"     "AMV49165"    
-#&gt; [231] "AMM39806"     "AMR39830"     "ANF16414"     "AMT75536"     "AMO03410"    
-#&gt; [236] "ANA12599"     "ANC90425"     "AUI42329"     "AUI42330"     "AMM43326"    
-#&gt; [241] "ANO46306"     "ANO46309"     "ANO46305"     "ANO46303"     "ARB08102"    
-#&gt; [246] "AHZ13508"     "ANO46304"     "ANO46308"     "ATB53752"     "AOR82893"    
-#&gt; [251] "ANH10698"     "AOR82892"     "ARU07075"     "AMQ48982"     "AMK49164"    
-#&gt; [256] "APG56457"     "AMB18850"     "YP_009428568" "ART29823"     "AVZ25035"    
-#&gt; [261] "AOY08542"     "ARB07932"     "AOS90223"     "AOS90220"     "APO39232"    
-#&gt; [266] "AOO85388"     "AOO53981"     "AOS90222"     "APO39228"     "AOY08546"    
-#&gt; [271] "AOY08521"     "APO39237"     "APB03020"     "AOY08516"     "APB03021"    
-#&gt; [276] "APO39236"     "AOS90221"     "APO39233"     "ASW34087"     "ART29826"    
-#&gt; [281] "ART29825"     "AOY08523"     "AOS90224"     "BAV82373"     "AOY08525"    
-#&gt; [286] "AOY08535"     "APW84875"     "APW84874"     "ANH22038"     "APW84877"    
-#&gt; [291] "APW84873"     "APW84872"     "AMN14620"     "APW84876"     "AOY08537"    
-#&gt; [296] "ASK51714"     "ARB07953"     "ARU07076"     "ARU07074"     "AMX81919"    
-#&gt; [301] "ANC90426"     "ALU33341"     "ASB32509"     "AMB37295"     "AMA12086"    
-#&gt; [306] "AMA12085"     "AMU04506"     "AMA12087"     "AMA12084"     "AMH87239"    
-#&gt; [311] "AOY08538"     "AOY08517"     "AOY08541"     "AOG18295"     "AMM39805"    
-#&gt; [316] "AMK79468"     "AML82110"     "AMR39831"     "AMX81918"     "ARX97119"    
-#&gt; [321] "APY24200"     "AUI42194"     "AOG18296"     "AOO19564"     "ATG29306"    
-#&gt; [326] "ATG29284"     "AQM74761"     "ATG29287"     "ATG29303"     "AWF93619"    
-#&gt; [331] "AWF93618"     "AWF93617"     "APC60215"     "ART29828"     "ATG29291"    
-#&gt; [336] "ATG29301"     "AOY08533"     "AQZ41954"     "ATI21641"     "APO08503"    
-#&gt; [341] "ATG29292"     "ATG29295"     "AOY08536"     "ASL68974"     "AMQ48986"    
-#&gt; [346] "ATG29315"     "ATG29307"     "ATG29270"     "ARI68105"     "ASU55505"    
-#&gt; [351] "AQM74762"     "AUD54964"     "AOW32303"     "AOC50654"     "AQZ41952"    
-#&gt; [356] "AQZ41955"     "AMC13913"     "AMC13912"    
+#&gt; $`402`
+#&gt; [1] "ALX35659" "APY24198" "APO36913" "ANQ92019" "AOX49264" "AOX49265"
 #&gt; 
-#&gt; $`507`
-#&gt; [1] "AMD61711" "AQS26698" "APG56458"
+#&gt; $`400`
+#&gt;  [1] "APY24199" "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087"
+#&gt;  [7] "AMA12084" "AML81028" "AOY08518" "ARB07962" "AOY08538" "AOG18295"
+#&gt; [13] "AOY08517" "AOY08541" "AMM39805" "ARX97119" "AMK79468" "AML82110"
+#&gt; [19] "AMR39831" "AMX81918" "APY24200" "AOO19564" "AUI42194" "AOG18296"
+#&gt; [25] "ATG29267" "ART29828" "AQX32985" "AWF93617" "APC60215" "AQZ41948"
+#&gt; [31] "ATG29306" "AQZ41954" "AOY08533" "ASL68978" "AQZ41953" "AQZ41947"
+#&gt; [37] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"
+#&gt; [43] "AVZ25033" "ATG29291" "ATG29301" "ASL68979" "ATG29299" "AQZ41949"
+#&gt; [49] "AQZ41950" "AQZ41951" "ATI21641" "ANO46297" "ANO46298" "APO08503"
+#&gt; [55] "ANG09399" "ARU07183" "AQZ41956" "ATG29276" "AOW32303" "ATG29292"
+#&gt; [61] "ATG29295" "AOY08536" "ASL68974" "AMQ48986" "ATG29315" "ATG29307"
+#&gt; [67] "ATG29270" "AOC50654" "AMC13913" "AMC13912" "APO39243" "APO39229"
+#&gt; [73] "AQZ41952" "AQZ41955" "ARI68105" "ASU55505" "AQM74762" "AUD54964"
+#&gt; 
+#&gt; $`409`
+#&gt;  [1] "AQU12485" "AMQ48981" "APH11492" "AOO54270" "AND01116" "AMS00611"
+#&gt;  [7] "ARB07967" "ANF04752" "AOE22997" "ASU55403" "ASU55393" "ANB66184"
+#&gt; [13] "AMC33116" "ASU55400" "ASU55409" "AMQ34003" "AMQ34004" "AMM39804"
+#&gt; [19] "ASU55411" "ASU55395" "AMZ03557" "APQ41784" "ASU55391" "ASU55396"
+#&gt; [25] "ASU55392" "AOY08524" "ASU55394" "APQ41782" "ASU55399" "APQ41783"
+#&gt; [31] "ANS60026" "ASU55408" "ANC90428" "ASU55418" "ASU55424" "AQX32987"
+#&gt; [37] "APB03017" "ASU55410" "ASU55397" "ASU55413" "ASU55420" "ASU55404"
+#&gt; [43] "ASU55423" "ANB66182" "ASU55425" "ASU55406" "ASU55398" "ASU55407"
+#&gt; [49] "ASU55414" "ASU55405" "ASU55401" "ASU55402" "ASU55421" "ASU55415"
+#&gt; [55] "ASU55426" "ASU55412" "ASU55419" "APQ41786" "ASU55390" "AQX32986"
+#&gt; [61] "ASU55422" "ARM59239" "ANB66183"
+#&gt; 
+#&gt; $`628`
+#&gt;  [1] "ARU07074"     "AMX81919"     "AMB37295"     "ANC90426"     "ALU33341"    
+#&gt;  [6] "ASB32509"     "ARU07076"     "ATB53752"     "AOR82893"     "ARU07075"    
+#&gt; [11] "AMQ48982"     "AMK49164"     "APG56457"     "ANH10698"     "AOR82892"    
+#&gt; [16] "AMB18850"     "YP_009428568" "ART29823"     "ASK51714"     "ARB07953"    
+#&gt; [21] "AOY08537"     "AVZ25035"     "AOY08542"     "ARB07932"     "AOS90223"    
+#&gt; [26] "AOY08523"     "AOS90220"     "ASW34087"     "AOS90224"     "BAV82373"    
+#&gt; [31] "APO39232"     "ART29826"     "ART29825"     "AOY08525"     "AOY08535"    
+#&gt; [36] "APW84875"     "APW84874"     "APW84873"     "APW84876"     "APO39233"    
+#&gt; [41] "ANH22038"     "APW84877"     "APW84872"     "AMN14620"     "AOO85388"    
+#&gt; [46] "AOO53981"     "AOS90222"     "APO39228"     "AOS90221"     "AOY08546"    
+#&gt; [51] "AOY08521"     "AOY08516"     "APB03021"     "APO39236"     "APO39237"    
+#&gt; [56] "APB03020"    
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
