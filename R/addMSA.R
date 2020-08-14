@@ -1,3 +1,7 @@
+#' @importFrom ape read.tree
+#' @export
+ape::read.tree
+
 #' @rdname addMSA
 #' @name phyMSAmatched
 #' @title Prepare data for sitePath analysis
