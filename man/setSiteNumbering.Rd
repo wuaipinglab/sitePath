@@ -6,9 +6,9 @@
 \alias{setSiteNumbering.lineagePath}
 \title{Set site numbering to the reference sequence}
 \usage{
-\method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", ...)
+\method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", gapSiteSize = NULL, ...)
 
-\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", ...)
+\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", gapSiteSize = NULL, ...)
 }
 \arguments{
 \item{x}{The object to set site numbering. It could be a
@@ -20,7 +20,11 @@ of the sequences' name. The default uses the intrinsic alignment numbering}
 \item{gapChar}{The character to indicate gap. The numbering will skip the
 gapChar for the reference sequence.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{gapSiteSize}{The minimum number of tips to have gap for a site to be
+ignored in other analysis. This will not affect the numbering. The default
+is 0.8 of the tree tip.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 The input \code{x} with numbering mapped to \code{reference}.

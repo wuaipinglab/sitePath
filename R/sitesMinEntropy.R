@@ -59,14 +59,7 @@ sitesMinEntropy.lineagePath <- function(x,
     reference <- attr(paths, "msaNumbering")
     align <- attr(paths, "align")
     # Exclude the invariant sites
-    loci <- which(vapply(
-        X = seq_along(reference),
-        FUN = function(s) {
-            s <- reference[s]
-            length(unique(substr(align, s, s))) > 1
-        },
-        FUN.VALUE = logical(1)
-    ))
+    loci <- attr(x, "loci")
     # In case root node does not have any tips (because itself is a divergent
     # node)
     excludedNodes <- divNodes

@@ -91,6 +91,7 @@ SNPsites <- function(tree, minSNP = NULL) {
     attr(receive, "tree") <- attr(give, "tree")
     attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
     attr(receive, "reference") <- attr(give, "reference")
+    attr(receive, "loci") <- attr(give, "loci")
     return(receive)
 }
 

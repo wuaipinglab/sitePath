@@ -10,7 +10,10 @@
 #'   of the sequences' name. The default uses the intrinsic alignment numbering
 #' @param gapChar The character to indicate gap. The numbering will skip the
 #'   gapChar for the reference sequence.
-#' @param ... further arguments passed to or from other methods.
+#' @param gapSiteSize The minimum number of tips to have gap for a site to be
+#'   ignored in other analysis. This will not affect the numbering. The default
+#'   is 0.8 of the tree tip.
+#' @param ... Further arguments passed to or from other methods.
 #' @return The input \code{x} with numbering mapped to \code{reference}.
 #' @export
 #' @examples
@@ -21,12 +24,13 @@
 setSiteNumbering.phyMSAmatched <- function(x,
                                            reference = NULL,
                                            gapChar = "-",
+                                           gapSiteSize = NULL,
                                            ...) {
-    res <- .checkReference(x, reference, gapChar)
+    res <- .checkReference(x, reference, gapChar, gapSiteSize)
     return(res)
 }
 
-.checkReference <- function(x, reference, gapChar) {
+.checkReference <- function(x, reference, gapChar, gapSiteSize) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
     if (is.null(reference)) {
@@ -42,6 +46,34 @@ setSiteNumbering.phyMSAmatched <- function(x,
             getReference(align[reference], gapChar)
         attr(x, "reference") <- reference
     }
+    # Check and set the minimum size to remove a site
+    if (is.null(gapSiteSize)) {
+        gapSiteSize <- 0.8 * length(align)
+    } else if (gapSiteSize <= 0) {
+        stop("'gapSiteSize' cannot be zero or negative.")
+    } else if (gapSiteSize < 1 && gapSiteSize > 0) {
+        gapSiteSize <- gapSiteSize * length(align)
+    }
+    attr(x, "loci") <- which(vapply(
+        X = attr(x, "msaNumbering") - 1,
+        FUN = function(s) {
+            # Summarize the number aa/nt for the site
+            siteSummary <- tableAA(align, s)
+            # Drop the site if completely conserved
+            if (length(siteSummary) == 1) {
+                return(FALSE)
+            } else {
+                # Drop the site if number of tips having gap on this site
+                # exceeds the threshold
+                if (any(names(siteSummary) == gapChar) &&
+                    siteSummary[[gapChar]] >= gapSiteSize) {
+                    return(FALSE)
+                }
+            }
+            return(TRUE)
+        },
+        FUN.VALUE = logical(1)
+    ))
     return(x)
 }
 
@@ -56,7 +88,7 @@ setSiteNumbering.phyMSAmatched <- function(x,
     } else if (length(unique(nchar(align))) > 1) {
         stop("Sequence lengths are not the same in alignment.")
     }
-    # Saftguard tree object
+    # Safeguard tree object
     tree <- attr(x, "tree")
     if (is.null(tree)) {
         stop("No phylogenetic tree found.")
@@ -78,16 +110,18 @@ setSiteNumbering.phyMSAmatched <- function(x,
 setSiteNumbering.lineagePath <- function(x,
                                          reference = NULL,
                                          gapChar = "-",
+                                         gapSiteSize = NULL,
                                          ...) {
-    res <- .checkReference(x, reference, gapChar)
+    res <- .checkReference(x, reference, gapChar, gapSiteSize)
     return(res)
 }
 
 setSiteNumbering.fixationSites <- function(x,
                                            reference = NULL,
                                            gapChar = '-',
+                                           gapSiteSize = NULL,
                                            ...) {
-    site2newRef <- cds2genome
+    site2newRef <- NULL
     names(x) <- vapply(
         X = names(x),
         FUN = function(n) {
@@ -126,8 +160,9 @@ setSiteNumbering.fixationSites <- function(x,
 setSiteNumbering.fixationPath <- function(x,
                                           reference = NULL,
                                           gapChar = '-',
+                                          gapSiteSize = NULL,
                                           ...) {
-    site2newRef <- cds2genome
+    site2newRef <- NULL
     attr(x, "SNPtracing")@data[["SNPs"]] <- vapply(
         X = strsplit(attr(x, "SNPtracing")@data[["SNPs"]], ", "),
         FUN = function(allSNPs) {
