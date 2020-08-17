@@ -1,3 +1,23 @@
+#' @rdname sars2_align
+#' @title Multiple sequence alignment of SARS-CoV-2 genome CDS
+#' @description The raw sequences were downloaded from GISAID database
+#'   (\url{https://www.gisaid.org/}) and aligned using MAFFT
+#'   (\url{https://mafft.cbrc.jp/alignment/software/}) with default settings.
+#' @format an \code{alignment} object
+#' @usage data(sars2_align)
+#' @docType data
+"sars2_align"
+
+#' @rdname sars2_tree
+#' @title Phylogenetic tree of SARS-CoV-2 genome CDS
+#' @description Tree was built from \code{\link{sars2_align}} using RAxML
+#'   (\url{http://www.exelixis-lab.org/}) with default settings. The tip
+#'   \code{EPI_ISL_402125} was used as the outgroup to root the tree.
+#' @format a \code{phylo} object
+#' @usage data(sars2_tree)
+#' @docType data
+"sars2_tree"
+
 #' @rdname zikv_align
 #' @title Multiple sequence alignment of Zika virus polyprotein
 #' @description The raw protein sequences were downloaded from ViPR database
