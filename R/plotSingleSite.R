@@ -41,7 +41,7 @@ plotSingleSite.lineagePath <- function(x,
         pathLabel <- ".lineage"
         # Color the path node black
         levels(group) <- c(levels(group), pathLabel)
-        group[unique(unlist(paths))] <- pathLabel
+        group[unique(unlist(x))] <- pathLabel
         lineageColor <- "black"
         names(lineageColor) <- pathLabel
         groupColors <- c(groupColors, lineageColor)
