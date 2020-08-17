@@ -1,8 +1,8 @@
 #' @rdname plotSingleSite
 #' @name plotSingleSite
 #' @title Color the tree by a single site
-#' @description For \code{lineagePath}, the tree will be colored according to
-#'   the amino acid of the site. The color scheme tries to assign
+#' @description For \code{\link{lineagePath}}, the tree will be colored
+#'   according to the amino acid of the site. The color scheme tries to assign
 #'   distinguishable color for each amino acid.
 #' @param x A \code{fixationSites} object from \code{\link{fixationSites}} or
 #'   the return from \code{\link{lineagePath}} function.
@@ -10,7 +10,7 @@
 #'   length. For \code{fixationSites}, it is restrained to a predicted fixation
 #'   site. The numbering is consistent with \code{reference} defined in the
 #'   object.
-#' @param showPath If plot the lineage result from lineagePath.
+#' @param showPath If plot the lineage result from \code{\link{lineagePath}}.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Arguments in \code{plot.phylo} functions and other arguments.
 #' @return A ggplot object to make the plot. It does not behavior like the
@@ -31,8 +31,15 @@ plotSingleSite.lineagePath <- function(x,
                                        showTips = FALSE,
                                        ...) {
     group <- extractTips.lineagePath(x, site)
-    names(group) <- AA_FULL_NAMES[names(group)]
-    groupColors <- AA_COLORS
+    # Use different color scheme depending on the sequence type
+    seqType <- attr(x, "seqType")
+    if (seqType == "AA") {
+        names(group) <- AA_FULL_NAMES[names(group)]
+        groupColors <- AA_COLORS
+    } else {
+        names(group) <- toupper(names(group))
+        groupColors <- NT_COLORS
+    }
     tree <- attr(x, "tree")
     group <- groupOTU(as_tibble(tree), group)
     group <- group[["group"]]
@@ -58,8 +65,8 @@ plotSingleSite.lineagePath <- function(x,
 }
 
 #' @rdname plotSingleSite
-#' @description For \code{parallelSites}, the tree will be colored according to
-#'   the amino acid of the site if the mutation is not fixed.
+#' @description For \code{\link{parallelSites}}, the tree will be colored
+#'   according to the amino acid of the site if the mutation is not fixed.
 #' @importFrom ggtree geom_tippoint
 #' @export
 plotSingleSite.parallelSites <- function(x,
@@ -140,31 +147,48 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
         }
         sitePaths <- x[y]
     }
+    # Specify the color of mutations by pre-defined color set.
+    if (attr(x, "seqType") == "AA") {
+        groupColors <- vapply(
+            X = AA_FULL_NAMES,
+            FUN = function(i) {
+                AA_COLORS[[i]]
+            },
+            FUN.VALUE = character(1)
+        )
+    } else {
+        groupColors <- NT_COLORS
+    }
+    names(groupColors) <- toupper(names(groupColors))
+    # Collect the fixation mutation for each evolutionary pathway
     subtitle <- character()
     group <- list()
     for (sp in sitePaths) {
         aaName <- character()
         for (tips in sp) {
-            aa <- AA_FULL_NAMES[tolower(attr(tips, "AA"))]
+            aa <- toupper(attr(tips, "AA"))
             aaName <- c(aaName, aa)
             group[[aa]] <- c(group[[aa]], tips)
         }
         subtitle <- c(subtitle,
-                      paste0(AA_SHORT_NAMES[aaName], collapse = " -> "))
+                      paste0(aaName, collapse = " -> "))
     }
-    groupColors <- AA_COLORS
     tree <- groupOTU(tree, group)
+    # Color the excluded branch gray as the excluded lineage
     excludedLabel <- ".excluded"
     groupColors[[excludedLabel]] <- "#dcdcdc"
     levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
         excludedLabel
+    # Use dashed line for excluded branches
     linetype <- as.integer(attr(tree, "group") == excludedLabel)
     linetype <- factor(linetype)
+    # Just in case the fixation mutation name is too long
     sepChar <- "\n"
     if (sum(nchar(subtitle) <= 18)) {
         sepChar <- ", "
     }
     subtitle <- paste(subtitle, collapse = sepChar)
+    # Make the plot
     p <- ggtree(tree, aes(color = group, linetype = linetype)) +
         scale_color_manual(values = groupColors) +
         guides(linetype = FALSE,

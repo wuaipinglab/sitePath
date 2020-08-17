@@ -24,7 +24,9 @@ SNPsites <- function(tree, minSNP = NULL) {
     }
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
-    allSNP <- .findSNPsites(align, msaNumbering, NULL)
+    refSeqName <- attr(x, "reference")
+    loci <- attr(x, "loci")
+    allSNP <- .findSNPsites(align, msaNumbering, loci, refSeqName)
     # Calculate the frequency of each mutation/SNP
     snpSummary <- as.data.frame(table(allSNP[["Pos"]],
                                       allSNP[["SNP"]]))
@@ -49,7 +51,7 @@ SNPsites <- function(tree, minSNP = NULL) {
     return(res)
 }
 
-.findSNPsites <- function(align, msaNumbering, refSeqName) {
+.findSNPsites <- function(align, msaNumbering, loci, refSeqName) {
     # Find SNP for each tree tip by comparing with the consensus sequence
     if (is.null(refSeqName)) {
         # Find the major SNP of each site as the consensus sequence
@@ -67,7 +69,7 @@ SNPsites <- function(tree, minSNP = NULL) {
         align <- strsplit(x = align, split = "")
         referenceSeq <- align[[refSeqName]]
     }
-    allSNP <- lapply(seq_along(referenceSeq), function(site) {
+    allSNP <- lapply(loci, function(site) {
         snp <- vapply(
             X = align,
             FUN = "[[",
@@ -84,15 +86,6 @@ SNPsites <- function(tree, minSNP = NULL) {
     })
     allSNP <- do.call(rbind, allSNP)
     return(allSNP)
-}
-
-.phyMSAtransfer <- function(receive, give) {
-    attr(receive, "align") <- attr(give, "align")
-    attr(receive, "tree") <- attr(give, "tree")
-    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
-    attr(receive, "reference") <- attr(give, "reference")
-    attr(receive, "loci") <- attr(give, "loci")
-    return(receive)
 }
 
 #' @export
@@ -121,13 +114,17 @@ print.SNPsites <- function(x, ...) {
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     allSNP <- attr(x, "allSNP")
     # Specify the color of mutations by pre-defined color set.
-    snpColors <- vapply(
-        X = AA_FULL_NAMES,
-        FUN = function(i) {
-            AA_COLORS[[i]]
-        },
-        FUN.VALUE = character(1)
-    )
+    if (attr(x, "seqType") == "AA") {
+        snpColors <- vapply(
+            X = AA_FULL_NAMES,
+            FUN = function(i) {
+                AA_COLORS[[i]]
+            },
+            FUN.VALUE = character(1)
+        )
+    } else {
+        snpColors <- NT_COLORS
+    }
     names(snpColors) <- toupper(names(snpColors))
     # Use 'ggplot' to make SNP plot as dots
     snpPlot <- ggplot(allSNP, aes(x = Pos,

@@ -28,7 +28,7 @@ length. For \code{fixationSites}, it is restrained to a predicted fixation
 site. The numbering is consistent with \code{reference} defined in the
 object.}
 
-\item{showPath}{If plot the lineage result from lineagePath.}
+\item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
@@ -47,12 +47,12 @@ A ggplot object to make the plot. It does not behavior like the
   generic \code{\link{plot}} function.
 }
 \description{
-For \code{lineagePath}, the tree will be colored according to
-  the amino acid of the site. The color scheme tries to assign
+For \code{\link{lineagePath}}, the tree will be colored
+  according to the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
 
-For \code{parallelSites}, the tree will be colored according to
-  the amino acid of the site if the mutation is not fixed.
+For \code{\link{parallelSites}}, the tree will be colored
+  according to the amino acid of the site if the mutation is not fixed.
 
 Visualize the \code{sitePath} object which can be extracted by
   using \code{\link{extractSite}} on the return of
