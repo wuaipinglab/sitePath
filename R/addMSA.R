@@ -17,14 +17,20 @@ ape::read.tree
 #'   \code{tip.label} should be found in the sequence alignment. The tree is
 #'   supposed to fully resolved (bifurcated) and will be resolved by
 #'   \code{\link{multi2di}} if \code{\link{is.binary}} gives \code{FALSE}.
-#' @param msaPath The file path to the multiple sequence alignment file
-#' @param msaFormat The format of the multiple sequence alignment file
+#' @param msaPath The file path to the multiple sequence alignment file.
+#' @param msaFormat The format of the multiple sequence alignment file. The
+#'   internal uses the \code{\link{read.alignment}} from \code{\link{seqinr}}
+#'   package to parse the sequence alignment. The default is "fasta" and it also
+#'   accepts "clustal", "phylip", "mase", "msf".
 #' @param alignment An \code{alignment} object. This commonly can be from
 #'   sequence parsing function in the \code{\link{seqinr}} package. Sequence
 #'   names in the alignment should include all \code{tip.label} in the tree
+#' @param seqType The type of the sequence in the alignment file. The default is
+#'   "AA" for amino acid. The other options are "DNA" and "RNA".
 #' @return Since 1.5.12, the function returns a \code{phyMSAmatched} object to
 #'   avoid S3 methods used on \code{phylo} (better encapsulation).
-#' @importFrom ape as.phylo multi2di is.binary
+#' @seealso \code{\link{read.alignment}}
+#' @importFrom ape multi2di is.binary
 #' @importFrom seqinr read.alignment
 #' @importFrom methods is
 #' @export
@@ -34,15 +40,17 @@ ape::read.tree
 #' addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 addMSA <- function(tree,
                    msaPath = "",
-                   msaFormat = "",
-                   alignment = NULL) {
+                   msaFormat = c("fasta", "clustal", "phylip", "mase", "msf"),
+                   alignment = NULL,
+                   seqType = c("AA", "DNA", "RNA")) {
     # String as the placeholder for the 'phyMSAmatched' object
     # Might be using S4 class in the later version
     res <- "This is a 'phyMSAmatched' object."
     class(res) <- "phyMSAmatched"
-    # Read alignment from the file or check the class of 'aligment'
+    # Read alignment from the file or check the class of 'alignment'
     if (file.exists(msaPath)) {
-        alignment <- read.alignment(file = msaPath, format = msaFormat)
+        alignment <- read.alignment(file = msaPath,
+                                    format = match.arg(msaFormat))
     } else if (is.null(alignment)) {
         stop("Alignment file \"", msaPath, "\" does not exist.")
     } else if (!is(alignment, "alignment")) {
@@ -52,6 +60,8 @@ addMSA <- function(tree,
     align <- toupper(alignment[["seq"]])
     names(align) <- alignment[["nam"]]
     attr(res, "align") <- align
+    # Set the sequence type
+    attr(res, "seqType") <- match.arg(seqType)
     # Set 'tree' attribute
     if (!is.binary(tree)) {
         tree <- multi2di(tree, random = FALSE)
