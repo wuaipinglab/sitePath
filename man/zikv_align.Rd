@@ -17,7 +17,7 @@ data(zikv_align_reduced)
 }
 \description{
 The raw protein sequences were downloaded from ViPR database
-  (\url{https://www.viprbrc.org/}) and aliged using MAFFT
+  (\url{https://www.viprbrc.org/}) and aligned using MAFFT
   (\url{https://mafft.cbrc.jp/alignment/software/}). with default settings.
 
 \code{zikv_align_reduced} is a truncated version of

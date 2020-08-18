@@ -3,16 +3,18 @@
 #' @title Set site numbering to the reference sequence
 #' @description A reference sequence can be used to define a global site
 #'   numbering scheme for multiple sequence alignment. The gap in the reference
-#'   will be skipped so the site ignored in numbering.
+#'   sequence will be skipped for the numbering. Also, the site that is gap or
+#'   amino acid/nucleotide for too many tips will be ignored but won't affect
+#'   numbering.
 #' @param x The object to set site numbering. It could be a
-#'   \code{\link{phyMSAmatched}} or a \code{lineagePath} object.
+#'   \code{\link{phyMSAmatched}} or a \code{\link{lineagePath}} object.
 #' @param reference Name of reference for site numbering. The name has to be one
 #'   of the sequences' name. The default uses the intrinsic alignment numbering
 #' @param gapChar The character to indicate gap. The numbering will skip the
-#'   gapChar for the reference sequence.
-#' @param gapSiteSize The minimum number of tips to have gap for a site to be
-#'   ignored in other analysis. This will not affect the numbering. The default
-#'   is 0.8 of the tree tip.
+#'   \code{gapChar} for the reference sequence.
+#' @param minSkipSize The minimum number of tips to have gap or ambiguous amino
+#'   acid/nucleotide for a site to be ignored in other analysis. This will not
+#'   affect the numbering. The default is 0.8.
 #' @param ... Further arguments passed to or from other methods.
 #' @return The input \code{x} with numbering mapped to \code{reference}.
 #' @export
@@ -24,19 +26,19 @@
 setSiteNumbering.phyMSAmatched <- function(x,
                                            reference = NULL,
                                            gapChar = "-",
-                                           gapSiteSize = NULL,
+                                           minSkipSize = NULL,
                                            ...) {
-    res <- .checkReference(x, reference, gapChar, gapSiteSize)
+    res <- .checkReference(x, reference, gapChar, minSkipSize)
     return(res)
 }
 
-.checkReference <- function(x, reference, gapChar, gapSiteSize) {
+.checkReference <- function(x, reference, gapChar, minSkipSize) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
     if (is.null(reference)) {
         # Use numbering of MSA when now reference provided
         attr(x, "msaNumbering") <- seq_len(nchar(align[1]))
-    } else if (!is.character(gapChar) || length(gapChar) != 1  ||
+    } else if (!is.character(gapChar) || length(gapChar) != 1 ||
                nchar(gapChar) != 1) {
         stop("\"gapChar\" only accepts one single character")
     } else {
@@ -47,27 +49,36 @@ setSiteNumbering.phyMSAmatched <- function(x,
         attr(x, "reference") <- reference
     }
     # Check and set the minimum size to remove a site
-    if (is.null(gapSiteSize)) {
-        gapSiteSize <- 0.8 * length(align)
-    } else if (gapSiteSize <= 0) {
-        stop("'gapSiteSize' cannot be zero or negative.")
-    } else if (gapSiteSize < 1 && gapSiteSize > 0) {
-        gapSiteSize <- gapSiteSize * length(align)
+    if (is.null(minSkipSize)) {
+        minSkipSize <- 0.8 * length(align)
+    } else if (minSkipSize <= 0) {
+        stop("'minSkipSize' cannot be zero or negative.")
+    } else if (minSkipSize < 1 && minSkipSize > 0) {
+        minSkipSize <- minSkipSize * length(align)
+    }
+    if (attr(x, "seqType") == "AA") {
+        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
+    } else {
+        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
     }
     attr(x, "loci") <- which(vapply(
         X = attr(x, "msaNumbering") - 1,
         FUN = function(s) {
-            # Summarize the number aa/nt for the site
+            # Summarize the number amino acid/nucleotide for the site
             siteSummary <- tableAA(align, s)
             # Drop the site if completely conserved
             if (length(siteSummary) == 1) {
                 return(FALSE)
             } else {
-                # Drop the site if number of tips having gap on this site
-                # exceeds the threshold
-                if (any(names(siteSummary) == gapChar) &&
-                    siteSummary[[gapChar]] >= gapSiteSize) {
-                    return(FALSE)
+                siteChars <- names(siteSummary)
+                ambiguousChars <-
+                    siteChars[which(!siteChars %in% unambiguous)]
+                if (length(ambiguousChars) != 0) {
+                    # Drop the site if number of tips having gap or ambiguous on
+                    # this site is over the threshold
+                    if (sum(siteSummary[ambiguousChars]) >= minSkipSize) {
+                        return(FALSE)
+                    }
                 }
             }
             return(TRUE)
@@ -110,16 +121,15 @@ setSiteNumbering.phyMSAmatched <- function(x,
 setSiteNumbering.lineagePath <- function(x,
                                          reference = NULL,
                                          gapChar = "-",
-                                         gapSiteSize = NULL,
+                                         minSkipSize = NULL,
                                          ...) {
-    res <- .checkReference(x, reference, gapChar, gapSiteSize)
+    res <- .checkReference(x, reference, gapChar, minSkipSize)
     return(res)
 }
 
 setSiteNumbering.fixationSites <- function(x,
                                            reference = NULL,
                                            gapChar = '-',
-                                           gapSiteSize = NULL,
                                            ...) {
     site2newRef <- NULL
     names(x) <- vapply(
@@ -160,7 +170,6 @@ setSiteNumbering.fixationSites <- function(x,
 setSiteNumbering.fixationPath <- function(x,
                                           reference = NULL,
                                           gapChar = '-',
-                                          gapSiteSize = NULL,
                                           ...) {
     site2newRef <- NULL
     attr(x, "SNPtracing")@data[["SNPs"]] <- vapply(

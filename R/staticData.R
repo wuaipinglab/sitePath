@@ -21,7 +21,7 @@
 #' @rdname zikv_align
 #' @title Multiple sequence alignment of Zika virus polyprotein
 #' @description The raw protein sequences were downloaded from ViPR database
-#'   (\url{https://www.viprbrc.org/}) and aliged using MAFFT
+#'   (\url{https://www.viprbrc.org/}) and aligned using MAFFT
 #'   (\url{https://mafft.cbrc.jp/alignment/software/}). with default settings.
 #' @format an \code{alignment} object
 #' @usage data(zikv_align)
@@ -176,6 +176,29 @@ AA_SHORT_NAMES <- c(
     "Glu_or_Gln" = "Z"
 )
 
+AA_UNAMBIGUOUS <- c(
+    "H",
+    "R",
+    "K",
+    "I",
+    "F",
+    "L",
+    "W",
+    "A",
+    "M",
+    "P",
+    "V",
+    "N",
+    "C",
+    "G",
+    "S",
+    "Y",
+    "Q",
+    "T",
+    "E",
+    "D"
+)
+
 NT_COLORS <- c(
     "A" = "#5050ff",
     "C" = "#e00000",
@@ -196,3 +219,9 @@ NT_COLORS <- c(
     "H" = "#000000",
     "B" = "#000000"
 )
+
+NT_UNAMBIGUOUS <- c("A",
+                    "C",
+                    "G",
+                    "T",
+                    "U")
