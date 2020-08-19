@@ -2,18 +2,18 @@
 % Please edit documentation in R/parallelSites.R
 \name{parallelSites}
 \alias{parallelSites}
-\alias{parallelSites.sitesMinEntropy}
 \alias{parallelSites.lineagePath}
+\alias{parallelSites.sitesMinEntropy}
 \title{Mutation in multiple lineages}
 \usage{
-\method{parallelSites}{sitesMinEntropy}(
+\method{parallelSites}{lineagePath}(
   x,
   minSNP = NULL,
   mutMode = c("all", "exact", "pre", "post"),
   ...
 )
 
-\method{parallelSites}{lineagePath}(
+\method{parallelSites}{sitesMinEntropy}(
   x,
   minSNP = NULL,
   mutMode = c("all", "exact", "pre", "post"),

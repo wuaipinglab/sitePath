@@ -19,6 +19,20 @@
 #' paths <- lineagePath(tree)
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
+parallelSites.lineagePath <- function(x,
+                                      minSNP = NULL,
+                                      mutMode = c("all", "exact",
+                                                  "pre", "post"),
+                                      ...) {
+    minEntropy <- sitesMinEntropy.lineagePath(x, ...)
+    res <- parallelSites.sitesMinEntropy(x = minEntropy,
+                                         minSNP = minSNP,
+                                         mutMode = mutMode)
+    return(res)
+}
+
+#' @rdname parallelSites
+#' @export
 parallelSites.sitesMinEntropy <- function(x,
                                           minSNP = NULL,
                                           mutMode = c("all", "exact",
@@ -284,20 +298,6 @@ parallelSites.sitesMinEntropy <- function(x,
         FUN.VALUE = character(1)
     )
     res[which(!is.na(res))]
-}
-
-#' @rdname parallelSites
-#' @export
-parallelSites.lineagePath <- function(x,
-                                      minSNP = NULL,
-                                      mutMode = c("all", "exact",
-                                                  "pre", "post"),
-                                      ...) {
-    minEntropy <- sitesMinEntropy.lineagePath(x, ...)
-    res <- parallelSites.sitesMinEntropy(x = minEntropy,
-                                         minSNP = minSNP,
-                                         mutMode = mutMode)
-    return(res)
 }
 
 #' @export
