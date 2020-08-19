@@ -48,6 +48,7 @@ setSiteNumbering.phyMSAmatched <- function(x,
             getReference(align[reference], gapChar)
         attr(x, "reference") <- reference
     }
+    attr(x, "gapChar") <- gapChar
     # Check and set the minimum size to remove a site
     if (is.null(minSkipSize)) {
         minSkipSize <- 0.8 * length(align)
@@ -114,6 +115,17 @@ setSiteNumbering.phyMSAmatched <- function(x,
     # Update 'align' attribute as matched with tree tips
     attr(x, "align") <- align[m]
     return(x)
+}
+
+.phyMSAtransfer <- function(receive, give) {
+    attr(receive, "tree") <- attr(give, "tree")
+    attr(receive, "align") <- attr(give, "align")
+    attr(receive, "seqType") <- attr(give, "seqType")
+    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
+    attr(receive, "reference") <- attr(give, "reference")
+    attr(receive, "gapChar") <- attr(give, "gapChar")
+    attr(receive, "loci") <- attr(give, "loci")
+    return(receive)
 }
 
 #' @rdname setSiteNumbering

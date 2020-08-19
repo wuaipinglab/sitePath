@@ -76,16 +76,6 @@ addMSA <- function(tree,
     return(res)
 }
 
-.phyMSAtransfer <- function(receive, give) {
-    attr(receive, "tree") <- attr(give, "tree")
-    attr(receive, "align") <- attr(give, "align")
-    attr(receive, "seqType") <- attr(give, "seqType")
-    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
-    attr(receive, "reference") <- attr(give, "reference")
-    attr(receive, "loci") <- attr(give, "loci")
-    return(receive)
-}
-
 #' @export
 print.phyMSAmatched <- function(x, ...) {
     cat(x, "\n")

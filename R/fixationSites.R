@@ -46,6 +46,12 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
     seqType <- attr(paths, "seqType")
+    gapChar <- attr(paths, "gapChar")
+    if (seqType == "AA") {
+        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
+    } else {
+        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
+    }
     # 'res' is going to be the return of this function. Each entry in the list
     # is the 'sitePath' for a site. Each site ('sitePath') consists of 'mutPath'
     # that is named by the starting node name. The fixed AA and number of
@@ -54,8 +60,16 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
     for (segs in x) {
         for (site in names(segs)) {
             seg <- segs[[site]]
-            # There has to be at least one fixation on the lineage
-            if (length(seg) >= 2) {
+            # There has to be at least one fixation on the lineage and at least
+            # two of the mutation is neither gap nor ambiguous character
+            qualifiedMut <- sum(vapply(
+                X = seg,
+                FUN = function(tips) {
+                    attr(tips, "AA") %in% unambiguous
+                },
+                FUN.VALUE = logical(1)
+            )) >= 2
+            if (qualifiedMut) {
                 i <- as.integer(site)
                 # Test if the slot for the site is empty
                 if (is.null(res[[site]])) {
