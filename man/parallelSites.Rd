@@ -4,7 +4,7 @@
 \alias{parallelSites}
 \alias{parallelSites.lineagePath}
 \alias{parallelSites.sitesMinEntropy}
-\title{Mutation in multiple lineages}
+\title{Mutation across multiple phylogenetic lineages}
 \usage{
 \method{parallelSites}{lineagePath}(
   x,
@@ -21,23 +21,31 @@
 )
 }
 \arguments{
-\item{x}{A \code{\link{sitesMinEntropy}} object.}
+\item{x}{A \code{\link{lineagePath}} or a \code{\link{sitesMinEntropy}}
+object.}
 
 \item{minSNP}{The minimum number of mutations to be qualified as parallel on
 at least two lineages. The default is 1.}
 
-\item{mutMode}{The strategy for finding parallel site. The default is to
-consider any mutation regardless of the amino acid/nucleotide before and
-after mutation; Or the exact same mutation; Or the mutation having amino
-acid/nucleotide before or after mutation.}
+\item{mutMode}{The strategy for finding parallel site. The default \code{all}
+is to consider any mutation regardless of the amino acid/nucleotide before
+and after mutation; Or \code{exact} to force mutation to be the same; Or
+\code{pre}/\code{post} to select the site having amino acid/nucleotide
+before/after mutation.}
 
-\item{...}{Other arguments.}
+\item{...}{The arguments in \code{\link{sitesMinEntropy}}.}
 }
 \value{
-A \code{sitesMinEntropy} object
+A \code{parallelSites} object
 }
 \description{
-A site may have mutated on parallel lineages.
+A site may have mutated on parallel lineages. Mutation can occur
+  on the same site across the phylogenetic lineages solved by
+  \code{\link{lineagePath}}. The site will be considered mutated in parallel
+  if the mutation occurs on the non-overlap part of more than two lineages.
+  The amino acid/nucleotide before and after the mutation can be allowed
+  different on different lineages or only the exact same mutations are
+  considered.
 }
 \examples{
 data(zikv_tree_reduced)

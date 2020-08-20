@@ -1,16 +1,24 @@
 #' @rdname parallelSites
 #' @name parallelSites
-#' @title Mutation in multiple lineages
-#' @description A site may have mutated on parallel lineages.
-#' @param x A \code{\link{sitesMinEntropy}} object.
+#' @title Mutation across multiple phylogenetic lineages
+#' @description A site may have mutated on parallel lineages. Mutation can occur
+#'   on the same site across the phylogenetic lineages solved by
+#'   \code{\link{lineagePath}}. The site will be considered mutated in parallel
+#'   if the mutation occurs on the non-overlap part of more than two lineages.
+#'   The amino acid/nucleotide before and after the mutation can be allowed
+#'   different on different lineages or only the exact same mutations are
+#'   considered.
+#' @param x A \code{\link{lineagePath}} or a \code{\link{sitesMinEntropy}}
+#'   object.
 #' @param minSNP The minimum number of mutations to be qualified as parallel on
 #'   at least two lineages. The default is 1.
-#' @param mutMode The strategy for finding parallel site. The default is to
-#'   consider any mutation regardless of the amino acid/nucleotide before and
-#'   after mutation; Or the exact same mutation; Or the mutation having amino
-#'   acid/nucleotide before or after mutation.
-#' @param ... Other arguments.
-#' @return A \code{sitesMinEntropy} object
+#' @param mutMode The strategy for finding parallel site. The default \code{all}
+#'   is to consider any mutation regardless of the amino acid/nucleotide before
+#'   and after mutation; Or \code{exact} to force mutation to be the same; Or
+#'   \code{pre}/\code{post} to select the site having amino acid/nucleotide
+#'   before/after mutation.
+#' @param ... The arguments in \code{\link{sitesMinEntropy}}.
+#' @return A \code{parallelSites} object
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -41,9 +49,31 @@ parallelSites.sitesMinEntropy <- function(x,
     paths <- attr(x, "paths")
     align <- attr(paths, "align")
     reference <- attr(paths, "msaNumbering")
-    # There must be at least two lineages to have mutations
-    hasParallelMut <- Reduce("+", lapply(x, lengths))
-    hasParallelMut <- names(which(hasParallelMut > 1))
+    gapChar <- attr(paths, "gapChar")
+    if (attr(paths, "seqType") == "AA") {
+        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
+    } else {
+        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
+    }
+    # There must be at least two lineages to have mutations and one of the fixed
+    # amino acids/nucleotides should be unambiguous
+    hasParallelMut <- Reduce("+", lapply(x, function(segs) {
+        # If the amino acid/nucleotide on the lineage for each site is qualified
+        vapply(
+            X = segs,
+            FUN = function(seg) {
+                # All amino acid/nucleotide on the 'mutPath'
+                allSiteChars <- character()
+                for (tips in seg) {
+                    allSiteChars <- c(allSiteChars,
+                                      names(attr(tips, "aaSummary")))
+                }
+                as.integer(sum(allSiteChars %in% unambiguous) >= 2)
+            },
+            FUN.VALUE = integer(1)
+        )
+    }))
+    hasParallelMut <- names(which(hasParallelMut >= 2))
     if (length(hasParallelMut) == 0) {
         stop("There doesn't seem to have any mutation in parallel lineages")
     }
@@ -85,13 +115,17 @@ parallelSites.sitesMinEntropy <- function(x,
             for (tips in seg) {
                 # The fixed AA/nucleotide of the group
                 fixedAA <- attr(tips, "AA")
+                # Skip the group if the fixed AA/nucleotide is ambiguous or gap
+                if (!fixedAA %in% unambiguous ||
+                    length(attr(tips, "aaSummary")) < 2)
+                    next
                 # The real AA/nucleotide of each tip named with tip name
                 tipsAA <- substr(x = align[tips],
                                  start = site,
                                  stop = site)
                 # The tips with AA/nucleotide different from the fixed one
                 mut <- lapply(
-                    X = which(tipsAA != fixedAA & tipsAA != '-'),
+                    X = which(tipsAA != fixedAA & tipsAA %in% unambiguous),
                     FUN = function(i) {
                         # The tip name to return
                         mutTips <- names(tipsAA[i])
@@ -117,8 +151,17 @@ parallelSites.sitesMinEntropy <- function(x,
                     }
                 }
             }
+            # There has to be at least one fixation on the lineage and at least
+            # two of the mutation is neither gap nor ambiguous character
+            qualifiedMut <- length(seg) >= 2 && sum(vapply(
+                X = seg,
+                FUN = function(tips) {
+                    attr(tips, "AA") %in% unambiguous
+                },
+                FUN.VALUE = logical(1)
+            )) >= 2
             # Collect all fixation mutations if any for the site
-            if (length(seg) >= 2) {
+            if (qualifiedMut) {
                 # Compare the fixed AA/nucleotide between two adjacent groups
                 for (i in seq_along(seg)[-1]) {
                     prevTips <- seg[[i - 1]]
@@ -301,9 +344,8 @@ parallelSites.sitesMinEntropy <- function(x,
 }
 
 #' @export
-parallelSites <- function(x, ...) {
+parallelSites <- function(x, ...)
     UseMethod("parallelSites")
-}
 
 #' @export
 print.parallelSites <- function(x, ...) {
