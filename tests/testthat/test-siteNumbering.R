@@ -102,7 +102,9 @@ test_that("The function works for amino acid", {
 test_that("The function works for nucleotide", {
     data(sars2_align)
     data(sars2_tree)
-    tr <- addMSA(sars2_tree, alignment = sars2_align)
+    tr <- addMSA(sars2_tree,
+                 alignment = sars2_align,
+                 seqType = "DNA")
     tipNames <- sars2_tree[["tip.label"]]
     align <- attr(tr, "align")
     # Find the index of sequence which has gap character

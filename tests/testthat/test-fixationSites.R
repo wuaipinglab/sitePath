@@ -80,7 +80,9 @@ test_that("The function works for amino acid", {
 test_that("The function works for nucleotide", {
     data(sars2_align)
     data(sars2_tree)
-    tr <- addMSA(sars2_tree, alignment = sars2_align)
+    tr <- addMSA(sars2_tree,
+                 alignment = sars2_align,
+                 seqType = "DNA")
     # Set an arbitrary gap character
     gapChar <- "G"
     tr <- setSiteNumbering(tr, gapChar = gapChar)

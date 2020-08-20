@@ -63,14 +63,7 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
             seg <- segs[[site]]
             # There has to be at least one fixation on the lineage and at least
             # two of the mutation is neither gap nor ambiguous character
-            qualifiedMut <- length(seg) >= 2 && sum(vapply(
-                X = seg,
-                FUN = function(tips) {
-                    attr(tips, "AA") %in% unambiguous
-                },
-                FUN.VALUE = logical(1)
-            )) >= 2
-            if (qualifiedMut) {
+            if (.qualifiedFixation(seg, unambiguous)) {
                 i <- as.integer(site)
                 # Test if the slot for the site is empty
                 if (is.null(res[[site]])) {
@@ -156,6 +149,16 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
     attr(res, "clustersByPath") <- attr(x, "clustersByPath")
     class(res) <- "fixationSites"
     return(res)
+}
+
+.qualifiedFixation <- function(seg, unambiguous) {
+    siteChars <- unique(vapply(
+        X = seg,
+        FUN = attr,
+        FUN.VALUE = character(1),
+        which = "AA"
+    ))
+    sum(siteChars %in% unambiguous) >= 2
 }
 
 #' @export

@@ -153,15 +153,8 @@ parallelSites.sitesMinEntropy <- function(x,
             }
             # There has to be at least one fixation on the lineage and at least
             # two of the mutation is neither gap nor ambiguous character
-            qualifiedMut <- length(seg) >= 2 && sum(vapply(
-                X = seg,
-                FUN = function(tips) {
-                    attr(tips, "AA") %in% unambiguous
-                },
-                FUN.VALUE = logical(1)
-            )) >= 2
             # Collect all fixation mutations if any for the site
-            if (qualifiedMut) {
+            if (.qualifiedFixation(seg, unambiguous)) {
                 # Compare the fixed AA/nucleotide between two adjacent groups
                 for (i in seq_along(seg)[-1]) {
                     prevTips <- seg[[i - 1]]
