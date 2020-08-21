@@ -6,21 +6,25 @@
 \alias{setSiteNumbering.lineagePath}
 \title{Set site numbering to the reference sequence}
 \usage{
-\method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", ...)
+\method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", minSkipSize = NULL, ...)
 
-\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", ...)
+\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", minSkipSize = NULL, ...)
 }
 \arguments{
 \item{x}{The object to set site numbering. It could be a
-\code{\link{phyMSAmatched}} or a \code{lineagePath} object.}
+\code{\link{phyMSAmatched}} or a \code{\link{lineagePath}} object.}
 
 \item{reference}{Name of reference for site numbering. The name has to be one
 of the sequences' name. The default uses the intrinsic alignment numbering}
 
 \item{gapChar}{The character to indicate gap. The numbering will skip the
-gapChar for the reference sequence.}
+\code{gapChar} for the reference sequence.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{minSkipSize}{The minimum number of tips to have gap or ambiguous amino
+acid/nucleotide for a site to be ignored in other analysis. This will not
+affect the numbering. The default is 0.8.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 The input \code{x} with numbering mapped to \code{reference}.
@@ -28,7 +32,9 @@ The input \code{x} with numbering mapped to \code{reference}.
 \description{
 A reference sequence can be used to define a global site
   numbering scheme for multiple sequence alignment. The gap in the reference
-  will be skipped so the site ignored in numbering.
+  sequence will be skipped for the numbering. Also, the site that is gap or
+  amino acid/nucleotide for too many tips will be ignored but won't affect
+  numbering.
 }
 \examples{
 data(zikv_tree)
