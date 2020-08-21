@@ -17,16 +17,65 @@
 #' SNPsites(tree)
 SNPsites <- function(tree, minSNP = NULL) {
     x <- .phyMSAmatch(tree)
-    tree <- attr(x, "tree")
+    nTips <- length(attr(x, "tree")[["tip.label"]])
     # Set default 'minSNP' value
     if (is.null(minSNP)) {
-        minSNP <- length(tree[["tip.label"]]) / 10
+        minSNP <-  nTips / 10
+    } else if (!is.numeric(minSNP)) {
+        stop("\"minSNP\" only accepts numeric")
+    } else if (minSNP >= nTips / 2) {
+        stop("\"minSNP\": ",
+             minSNP,
+             " is greater than half of the total tips: ",
+             floor(nTips / 2))
     }
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
     refSeqName <- attr(x, "reference")
-    loci <- attr(x, "loci")
-    allSNP <- .findSNPsites(align, msaNumbering, loci, refSeqName)
+    gapChar <- attr(x, "gapChar")
+    if (attr(x, "seqType") == "AA") {
+        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
+    } else {
+        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
+    }
+    # Find SNP for each tree tip by comparing with the consensus sequence or the
+    # reference sequence if specified
+    if (is.null(refSeqName)) {
+        # Find the major SNP of each site as the consensus sequence
+        refSeq <- vapply(
+            X = msaNumbering,
+            FUN = function(s) {
+                aaSummary <- tableAA(align, s - 1)
+                # The amino acid/nucleotide having the most appearance
+                names(aaSummary)[which.max(aaSummary)]
+            },
+            FUN.VALUE = character(1)
+        )
+        align <- strsplit(x = align, split = "")
+    } else {
+        align <- strsplit(x = align, split = "")
+        refSeq <- align[[refSeqName]]
+    }
+    # Get the amino acid/nucleotide of each locus
+    allSNP <- lapply(attr(x, "loci"), function(site) {
+        snp <- vapply(
+            X = align,
+            FUN = "[[",
+            i = msaNumbering[site],
+            FUN.VALUE = character(1)
+        )
+        # An SNP has to be different from the reference and not gap or ambiguous
+        # character
+        snp <-
+            snp[which(snp != refSeq[[site]] & snp %in% unambiguous)]
+        res <- data.frame(
+            "Accession" = names(snp),
+            "Pos" = rep(site, length(snp)),
+            "SNP" = snp
+        )
+        return(res)
+    })
+    allSNP <- do.call(rbind, allSNP)
     # Calculate the frequency of each mutation/SNP
     snpSummary <- as.data.frame(table(allSNP[["Pos"]],
                                       allSNP[["SNP"]]))
@@ -49,43 +98,6 @@ SNPsites <- function(tree, minSNP = NULL) {
     res <- .phyMSAtransfer(res, x)
     class(res) <- "SNPsites"
     return(res)
-}
-
-.findSNPsites <- function(align, msaNumbering, loci, refSeqName) {
-    # Find SNP for each tree tip by comparing with the consensus sequence
-    if (is.null(refSeqName)) {
-        # Find the major SNP of each site as the consensus sequence
-        referenceSeq <- vapply(
-            X = msaNumbering,
-            FUN = function(s) {
-                aaSummary <- tableAA(align, s - 1)
-                # The amino acid/nucleotide having the most appearance
-                names(aaSummary)[which.max(aaSummary)]
-            },
-            FUN.VALUE = character(1)
-        )
-        align <- strsplit(x = align, split = "")
-    } else {
-        align <- strsplit(x = align, split = "")
-        referenceSeq <- align[[refSeqName]]
-    }
-    allSNP <- lapply(loci, function(site) {
-        snp <- vapply(
-            X = align,
-            FUN = "[[",
-            i = msaNumbering[site],
-            FUN.VALUE = character(1)
-        )
-        snp <- snp[which(snp != referenceSeq[[site]] & snp != '-')]
-        res <- data.frame(
-            "Accession" = names(snp),
-            "Pos" = rep(site, length(snp)),
-            "SNP" = snp
-        )
-        return(res)
-    })
-    allSNP <- do.call(rbind, allSNP)
-    return(allSNP)
 }
 
 #' @export
