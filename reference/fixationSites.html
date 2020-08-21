@@ -42,10 +42,11 @@
 <meta property="og:title" content="Fixation sites prediction — fixationSites" />
 <meta property="og:description" content="After finding the lineagePath of a phylogenetic
   tree, fixationSites uses the result to find those sites that show
-  fixation on some, if not all, of the lineages. Parallel evolution is
-  relatively common in RNA virus. There is chance that some site be fixed in
-  one lineage but does not show fixation because of different sequence
-  context." />
+  fixation on some, if not all, of the lineages. The number of tips before
+  and after the fixation mutation is expected to be more than
+  minEffectiveSize. Also, the fixation will be skipped if the amino
+  acid/nucleotide is gap or ambiguous character. A lineage has to have at
+  least one fixation mutation to be reported." />
 
 
 
@@ -124,10 +125,11 @@
     <div class="ref-description">
     <p>After finding the <code><a href='lineagePath.html'>lineagePath</a></code> of a phylogenetic
   tree, <code>fixationSites</code> uses the result to find those sites that show
-  fixation on some, if not all, of the lineages. Parallel evolution is
-  relatively common in RNA virus. There is chance that some site be fixed in
-  one lineage but does not show fixation because of different sequence
-  context.</p>
+  fixation on some, if not all, of the lineages. The number of tips before
+  and after the fixation mutation is expected to be more than
+  <code>minEffectiveSize</code>. Also, the fixation will be skipped if the amino
+  acid/nucleotide is gap or ambiguous character. A lineage has to have at
+  least one fixation mutation to be reported.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for lineagePath</span>

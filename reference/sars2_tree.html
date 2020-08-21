@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set site numbering to the reference sequence — setSiteNumbering • sitePath</title>
+<title>Phylogenetic tree of SARS-CoV-2 genome CDS — sars2_tree • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,10 @@
 
 
 
-<meta property="og:title" content="Set site numbering to the reference sequence — setSiteNumbering" />
-<meta property="og:description" content="A reference sequence can be used to define a global site
-  numbering scheme for multiple sequence alignment. The gap in the reference
-  sequence will be skipped for the numbering. Also, the site that is gap or
-  amino acid/nucleotide for too many tips will be ignored but won't affect
-  numbering." />
+<meta property="og:title" content="Phylogenetic tree of SARS-CoV-2 genome CDS — sars2_tree" />
+<meta property="og:description" content="Tree was built from sars2_align using RAxML
+  (http://www.exelixis-lab.org/) with default settings. The tip
+  EPI_ISL_402125 was used as the outgroup to root the tree." />
 
 
 
@@ -115,64 +113,24 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Set site numbering to the reference sequence</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/siteNumbering.R'><code>R/siteNumbering.R</code></a></small>
-    <div class="hidden name"><code>setSiteNumbering.Rd</code></div>
+    <h1>Phylogenetic tree of SARS-CoV-2 genome CDS</h1>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/staticData.R'><code>R/staticData.R</code></a></small>
+    <div class="hidden name"><code>sars2_tree.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A reference sequence can be used to define a global site
-  numbering scheme for multiple sequence alignment. The gap in the reference
-  sequence will be skipped for the numbering. Also, the site that is gap or
-  amino acid/nucleotide for too many tips will be ignored but won't affect
-  numbering.</p>
+    <p>Tree was built from <code><a href='sars2_align.html'>sars2_align</a></code> using RAxML
+  (<a href='http://www.exelixis-lab.org/'>http://www.exelixis-lab.org/</a>) with default settings. The tip
+  <code>EPI_ISL_402125</code> was used as the outgroup to root the tree.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
-<span class='fu'>setSiteNumbering</span>(<span class='kw'>x</span>, reference = <span class='kw'>NULL</span>, gapChar = <span class='st'>"-"</span>, minSkipSize = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>sars2_tree</span>)</pre>
 
-<span class='co'># S3 method for lineagePath</span>
-<span class='fu'>setSiteNumbering</span>(<span class='kw'>x</span>, reference = <span class='kw'>NULL</span>, gapChar = <span class='st'>"-"</span>, minSkipSize = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>The object to set site numbering. It could be a
-<code><a href='phyMSAmatched.html'>phyMSAmatched</a></code> or a <code><a href='lineagePath.html'>lineagePath</a></code> object.</p></td>
-    </tr>
-    <tr>
-      <th>reference</th>
-      <td><p>Name of reference for site numbering. The name has to be one
-of the sequences' name. The default uses the intrinsic alignment numbering</p></td>
-    </tr>
-    <tr>
-      <th>gapChar</th>
-      <td><p>The character to indicate gap. The numbering will skip the
-<code>gapChar</code> for the reference sequence.</p></td>
-    </tr>
-    <tr>
-      <th>minSkipSize</th>
-      <td><p>The minimum number of tips to have gap or ambiguous amino
-acid/nucleotide for a site to be ignored in other analysis. This will not
-affect the numbering. The default is 0.8.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Further arguments passed to or from other methods.</p></td>
-    </tr>
-    </table>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <p>a <code>phylo</code> object</p>
 
-    <p>The input <code>x</code> with numbering mapped to <code>reference</code>.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
-<span class='kw'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package = <span class='st'>'sitePath'</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, msaPath = <span class='kw'>msaPath</span>, msaFormat = <span class='st'>'fasta'</span>)
-<span class='fu'>setSiteNumbering</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; This is a 'phyMSAmatched' object. </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

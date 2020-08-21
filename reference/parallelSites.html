@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mutation in multiple lineages — parallelSites • sitePath</title>
+<title>Mutation across multiple phylogenetic lineages — parallelSites • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,14 @@
 
 
 
-<meta property="og:title" content="Mutation in multiple lineages — parallelSites" />
-<meta property="og:description" content="A site may have mutated on parallel lineages." />
+<meta property="og:title" content="Mutation across multiple phylogenetic lineages — parallelSites" />
+<meta property="og:description" content="A site may have mutated on parallel lineages. Mutation can occur
+  on the same site across the phylogenetic lineages solved by
+  lineagePath. The site will be considered mutated in parallel
+  if the mutation occurs on the non-overlap part of more than two lineages.
+  The amino acid/nucleotide before and after the mutation can be allowed
+  different on different lineages or only the exact same mutations are
+  considered." />
 
 
 
@@ -111,16 +117,22 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Mutation in multiple lineages</h1>
+    <h1>Mutation across multiple phylogenetic lineages</h1>
     <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/parallelSites.R'><code>R/parallelSites.R</code></a></small>
     <div class="hidden name"><code>parallelSites.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A site may have mutated on parallel lineages.</p>
+    <p>A site may have mutated on parallel lineages. Mutation can occur
+  on the same site across the phylogenetic lineages solved by
+  <code><a href='lineagePath.html'>lineagePath</a></code>. The site will be considered mutated in parallel
+  if the mutation occurs on the non-overlap part of more than two lineages.
+  The amino acid/nucleotide before and after the mutation can be allowed
+  different on different lineages or only the exact same mutations are
+  considered.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for sitesMinEntropy</span>
+    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
 <span class='fu'>parallelSites</span>(
   <span class='kw'>x</span>,
   minSNP = <span class='kw'>NULL</span>,
@@ -128,7 +140,7 @@
   <span class='kw'>...</span>
 )
 
-<span class='co'># S3 method for lineagePath</span>
+<span class='co'># S3 method for sitesMinEntropy</span>
 <span class='fu'>parallelSites</span>(
   <span class='kw'>x</span>,
   minSNP = <span class='kw'>NULL</span>,
@@ -141,7 +153,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code> object.</p></td>
+      <td><p>A <code><a href='lineagePath.html'>lineagePath</a></code> or a <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code>
+object.</p></td>
     </tr>
     <tr>
       <th>minSNP</th>
@@ -150,20 +163,21 @@ at least two lineages. The default is 1.</p></td>
     </tr>
     <tr>
       <th>mutMode</th>
-      <td><p>The strategy for finding parallel site. The default is to
-consider any mutation regardless of the amino acid/nucleotide before and
-after mutation; Or the exact same mutation; Or the mutation having amino
-acid/nucleotide before or after mutation.</p></td>
+      <td><p>The strategy for finding parallel site. The default <code>all</code>
+is to consider any mutation regardless of the amino acid/nucleotide before
+and after mutation; Or <code>exact</code> to force mutation to be the same; Or
+<code>pre</code>/<code>post</code> to select the site having amino acid/nucleotide
+before/after mutation.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments.</p></td>
+      <td><p>The arguments in <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>sitesMinEntropy</code> object</p>
+    <p>A <code>parallelSites</code> object</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
