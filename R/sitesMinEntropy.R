@@ -57,16 +57,8 @@ sitesMinEntropy.lineagePath <- function(x,
                                         divNodes = divNodes)
     # Get the MSA numbering
     reference <- attr(paths, "msaNumbering")
-    align <- attr(paths, "align")
     # Exclude the invariant sites
-    loci <- which(vapply(
-        X = seq_along(reference),
-        FUN = function(s) {
-            s <- reference[s]
-            length(unique(substr(align, s, s))) > 1
-        },
-        FUN.VALUE = logical(1)
-    ))
+    loci <- attr(x, "loci")
     # In case root node does not have any tips (because itself is a divergent
     # node)
     excludedNodes <- divNodes
@@ -160,8 +152,8 @@ sitesMinEntropy.lineagePath <- function(x,
                                     minimizeEntropy,
                                     minEffectiveSize,
                                     searchDepth) {
-    # Assign a variable to store the tip names and their info on amino
-    # acids. They are the potential fixation segment
+    # Assign a variable to store the tip names and their info on amino acids.
+    # They are the potential fixation segment
     nodeTips <- integer()
     previousAA <- NULL
     currentAA <- NULL
@@ -182,8 +174,8 @@ sitesMinEntropy.lineagePath <- function(x,
         } else {
             currentAA <- NULL
         }
-        # Attach the node to the previous node if they're both purely fixed
-        # and have the same AA fixed.
+        # Attach the node to the previous node if they're both purely fixed and
+        # have the same AA fixed.
         if (!is.null(previousAA) &&
             !is.null(currentAA) &&
             previousAA == currentAA) {
@@ -194,7 +186,7 @@ sitesMinEntropy.lineagePath <- function(x,
             attr(nodeTips, "aaSummary") <-
                 attr(nodeSummaries[[node]], "aaSummary") +
                 aaSummary
-            # Oddly, R uses the name of the first variable when adding two
+            # R uses the name of the first vector variable when adding two
             # numeric vectors. So there is no need for names (AA) assignment
         }
         # Assign or re-assign the 'nodeTips' with 'aaSummary' to the
@@ -204,11 +196,14 @@ sitesMinEntropy.lineagePath <- function(x,
         previousNode <- node
     }
     # Return empty value if the site is purely fixed on the lineage
-    seg <- list()
     if (length(nodeSummaries) >= 2) {
         seg <- minimizeEntropy(nodeSummaries,
                                minEffectiveSize,
                                searchDepth)
+    } else {
+        seg <- nodeSummaries
+        attr(seg[[1]], "AA") <-
+            names(attr(nodeSummaries[[1]], "aaSummary"))
     }
     return(seg)
 }
@@ -262,7 +257,7 @@ sitesMinEntropy.lineagePath <- function(x,
                         # A new cluster formed when there is overlapped between
                         # new coming tips and existing tips in a cluster
                         if (identical(sort(gp), common)) {
-                            # The new coming tips includes the current group
+                            # The new coming tips includes the current group.
                             # The extra tips stay for the next loop
                             tips <- setdiff(tips, gp)
                             # Update the SNP site info for the current group
@@ -467,9 +462,8 @@ sitesMinEntropy.lineagePath <- function(x,
 }
 
 #' @export
-sitesMinEntropy <- function(x, ...) {
+sitesMinEntropy <- function(x, ...)
     UseMethod("sitesMinEntropy")
-}
 
 #' @export
 print.sitesMinEntropy <- function(x, ...) {

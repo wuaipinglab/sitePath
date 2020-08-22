@@ -38,10 +38,11 @@ A \code{fixationSites} object.
 \description{
 After finding the \code{\link{lineagePath}} of a phylogenetic
   tree, \code{fixationSites} uses the result to find those sites that show
-  fixation on some, if not all, of the lineages. Parallel evolution is
-  relatively common in RNA virus. There is chance that some site be fixed in
-  one lineage but does not show fixation because of different sequence
-  context.
+  fixation on some, if not all, of the lineages. The number of tips before
+  and after the fixation mutation is expected to be more than
+  \code{minEffectiveSize}. Also, the fixation will be skipped if the amino
+  acid/nucleotide is gap or ambiguous character. A lineage has to have at
+  least one fixation mutation to be reported.
 }
 \examples{
 data(zikv_tree_reduced)

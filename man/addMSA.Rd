@@ -5,7 +5,13 @@
 \alias{addMSA}
 \title{Prepare data for sitePath analysis}
 \usage{
-addMSA(tree, msaPath = "", msaFormat = "", alignment = NULL)
+addMSA(
+  tree,
+  msaPath = "",
+  msaFormat = c("fasta", "clustal", "phylip", "mase", "msf"),
+  alignment = NULL,
+  seqType = c("AA", "DNA", "RNA")
+)
 }
 \arguments{
 \item{tree}{A \code{\link{phylo}} object. This commonly can be from tree
@@ -14,13 +20,19 @@ parsing function in \code{\link{ape}} or \code{\link{ggtree}}. All the
 supposed to fully resolved (bifurcated) and will be resolved by
 \code{\link{multi2di}} if \code{\link{is.binary}} gives \code{FALSE}.}
 
-\item{msaPath}{The file path to the multiple sequence alignment file}
+\item{msaPath}{The file path to the multiple sequence alignment file.}
 
-\item{msaFormat}{The format of the multiple sequence alignment file}
+\item{msaFormat}{The format of the multiple sequence alignment file. The
+internal uses the \code{\link{read.alignment}} from \code{\link{seqinr}}
+package to parse the sequence alignment. The default is "fasta" and it also
+accepts "clustal", "phylip", "mase", "msf".}
 
 \item{alignment}{An \code{alignment} object. This commonly can be from
 sequence parsing function in the \code{\link{seqinr}} package. Sequence
 names in the alignment should include all \code{tip.label} in the tree}
+
+\item{seqType}{The type of the sequence in the alignment file. The default is
+"AA" for amino acid. The other options are "DNA" and "RNA".}
 }
 \value{
 Since 1.5.12, the function returns a \code{phyMSAmatched} object to
@@ -39,4 +51,7 @@ sitePath requires both tree and sequence alignment to do the
 data(zikv_tree)
 msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
+}
+\seealso{
+\code{\link{read.alignment}}
 }
