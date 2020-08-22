@@ -38,7 +38,6 @@ Both the phylogenetic tree and the matching multiple sequence alignment
 files are required.
 
 ``` r
-library(ape)
 library(sitePath)
 
 # The file names of your tree and multiple sequence alignment
