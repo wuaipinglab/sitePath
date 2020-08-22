@@ -1,34 +1,31 @@
-context("test-lineagPath")
-
-test_that("SNP-dependent trimming", {
+test_that("Using SNP to get phylogenetic lineages", {
     data(zikv_align)
     data(zikv_tree)
-    tree <- addMSA(zikv_tree, alignment = zikv_align)
-    nTips <- length(as.phylo(tree)[["tip.label"]])
-    expect_identical(as.phylo(tree), zikv_tree)
-    align <- attr(tree, "align")
-    reference <- attr(tree, "msaNumbering")
+    tr <- addMSA(zikv_tree, alignment = zikv_align)
+    expect_true(is(tr, "phyMSAmatched"))
+    tipNames <- zikv_tree[["tip.label"]]
+    nTips <- length(tipNames)
+    # The tree is bifurcated and should be identical to the original tree
+    expect_identical(as.phylo(tr), zikv_tree)
+    align <- attr(tr, "align")
+    reference <- attr(tr, "msaNumbering")
     similarity <- nTips * 0.1
-    paths <- lineagePath(
-        tree = tree,
-        similarity = similarity,
-        forbidTrivial = FALSE
-    )
+    paths <- lineagePath(tree = tr,
+                         similarity = similarity,
+                         forbidTrivial = FALSE)
     # Exclude the invariant sites
-    loci <- which(vapply(
-        X = seq_along(reference),
-        FUN = function(s) {
-            s <- reference[s]
-            length(unique(substr(align, s, s))) > 1
-        },
-        FUN.VALUE = logical(1)
-    ))
+    loci <- attr(tr, "loci")
     majorSNPsites <- list()
     for (site in loci) {
         for (p in paths) {
-            seqs <- align[sitePath:::.childrenTips(as.phylo(tree), p[length(p)])]
+            # The descendant tips of the terminal node of the path
+            seqs <-
+                align[sitePath:::.childrenTips(as.phylo(tr), p[length(p)])]
             siteSummary <- sitePath:::tableAA(seqs, site - 1)
-            siteChar <- names(siteSummary)[which(siteSummary == length(seqs))]
+            # Get the SNP possibly exclusive to the descendant tips
+            siteChar <-
+                names(siteSummary)[which(siteSummary == length(seqs))]
+            # Add the SNP to 'majorSNPsites'
             if (length(siteSummary) != 0) {
                 s <- as.character(site)
                 if (s %in% names(majorSNPsites)) {
@@ -39,8 +36,23 @@ test_that("SNP-dependent trimming", {
             }
         }
     }
+    # The SNP should meet the 'similarity' threshold
     for (site in names(majorSNPsites)) {
         siteSummary <- sitePath:::tableAA(align, as.integer(site) - 1)
         expect_true(any(siteSummary > similarity))
     }
+})
+
+test_that("The sneakPeek function works", {
+    data(zikv_align_reduced)
+    data(zikv_tree_reduced)
+    tr <- addMSA(zikv_tree_reduced,
+                 alignment = zikv_align_reduced)
+    paths <- sneakPeek(tr)
+    expect_error(sneakPeek(tr), NA)
+    pathRight <- apply(paths, 1, function(i) {
+        p <- lineagePath(paths, similarity = i[["similarity"]])
+        is(p, "lineagePath") && length(p) == i[["pathNum"]]
+    })
+    expect_true(all(pathRight))
 })

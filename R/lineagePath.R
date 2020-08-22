@@ -77,6 +77,17 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
+treemerBySite <- function(x, ...) {
+    tree <- attr(x, "tree")
+    align <- attr(x, "align")
+    # Generate the site mapping from reference
+    # Exclude the invariant sites
+    loci <- attr(x, "loci")
+    res <- runTreemerBySite(nodepath(tree), align, loci)
+    return(res)
+}
+
+
 #' @export
 lineagePath <- function(tree, similarity, ...)
     UseMethod("lineagePath")
@@ -231,7 +242,5 @@ sneakPeek <- function(tree,
 #' lineagePath(x, similarity = 0.05)
 lineagePath.sneakPeekedPaths <- function(tree, similarity, ...) {
     allPaths <- attr(tree, "allPaths")
-    res <-
-        allPaths[which.min(abs(as.numeric(names(allPaths)) - similarity))]
-    return(res)
+    allPaths[[which.min(abs(as.numeric(names(allPaths)) - similarity))]]
 }
