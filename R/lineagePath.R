@@ -159,7 +159,7 @@ plot.lineagePath <- function(x,
         linetype = group,
         size = size
     )) +
-        scale_size(range = c(0.5, 2)) +
+        scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
         scale_color_manual(values = c("black", "gainsboro")) +
         theme(legend.position = "none") +
         ggtitle(attr(x, "similarity"))

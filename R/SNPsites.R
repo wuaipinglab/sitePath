@@ -126,18 +126,7 @@ print.SNPsites <- function(x, ...) {
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     allSNP <- attr(x, "allSNP")
     # Specify the color of mutations by pre-defined color set.
-    if (attr(x, "seqType") == "AA") {
-        snpColors <- vapply(
-            X = AA_FULL_NAMES,
-            FUN = function(i) {
-                AA_COLORS[[i]]
-            },
-            FUN.VALUE = character(1)
-        )
-    } else {
-        snpColors <- NT_COLORS
-    }
-    names(snpColors) <- toupper(names(snpColors))
+    snpColors <- .siteColorScheme(attr(x, "seqType"))
     # Use 'ggplot' to make SNP plot as dots
     snpPlot <- ggplot(allSNP, aes(x = Pos,
                                   y = Accession,
@@ -168,6 +157,5 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
 }
 
 #' @export
-plotMutSites <- function(x, ...) {
+plotMutSites <- function(x, ...)
     UseMethod("plotMutSites")
-}
