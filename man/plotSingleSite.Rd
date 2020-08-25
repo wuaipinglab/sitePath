@@ -9,9 +9,9 @@
 \alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
-\method{plotSingleSite}{lineagePath}(x, site, showPath = FALSE, showTips = FALSE, ...)
+\method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
 
-\method{plotSingleSite}{parallelSites}(x, site, showPath = FALSE, ...)
+\method{plotSingleSite}{parallelSites}(x, site, showPath = TRUE, ...)
 
 \method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 
@@ -24,15 +24,18 @@
 the return from \code{\link{lineagePath}} function.}
 
 \item{site}{For \code{lineagePath}, it can be any site within sequence
-length. For \code{fixationSites}, it is restrained to a predicted fixation
-site. The numbering is consistent with \code{reference} defined in the
-object.}
+length. For \code{fixationSites} and \code{parallelSites}, it is restrained
+to a predicted fixation site. The numbering is consistent with
+the reference defined by \code{\link{setSiteNumbering}}.}
 
-\item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.}
+\item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.
+The default is \code{TRUE}.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
-\item{...}{Arguments in \code{plot.phylo} functions and other arguments.}
+\item{...}{Other arguments. Since 1.5.4, the function uses
+\code{\link{ggtree}} as the base function to make plots so the arguments in
+\code{plot.phylo} will no longer work.}
 
 \item{y}{For a \code{sitePath} object, it can have more than one fixation
 path. This is to select which path to plot. The default is \code{NULL}
@@ -43,8 +46,8 @@ which will plot all the paths. It is the same as \code{select} in
 which will plot all the fixations.}
 }
 \value{
-A ggplot object to make the plot. It does not behavior like the
-  generic \code{\link{plot}} function.
+Since 1.5.4, the function returns a ggplot object so on longer
+  behaviors like the generic \code{\link{plot}} function.
 }
 \description{
 For \code{\link{lineagePath}}, the tree will be colored
@@ -73,7 +76,5 @@ plot(sp)
 plotSingleSite(fixations, 139)
 }
 \seealso{
-\code{\link{plot.sitePath}}
-
 \code{\link{plotSingleSite}}, \code{\link{extractSite}}
 }
