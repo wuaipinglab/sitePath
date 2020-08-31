@@ -1,4 +1,5 @@
 #' @rdname SNPsites
+#' @name SNPsites
 #' @title Finding sites with variation
 #' @description Single nucleotide polymorphism (SNP) in the whole package refers
 #'   to variation of amino acid. \code{SNPsite} will try to find SNP in the
@@ -7,6 +8,7 @@
 #' @param tree A \code{\link{phyMSAmatched}} object.
 #' @param minSNP Minimum number of a mutation to be a SNP. The default is 10th
 #'   of the total tree tips.
+#' @param ... Other arguments
 #' @return A \code{SNPsites} object.
 #' @importFrom stats complete.cases
 #' @export
@@ -15,7 +17,7 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
-SNPsites <- function(tree, minSNP = NULL) {
+SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     x <- .phyMSAmatch(tree)
     nTips <- length(attr(x, "tree")[["tip.label"]])
     # Set default 'minSNP' value
@@ -95,10 +97,14 @@ SNPsites <- function(tree, minSNP = NULL) {
     res <- sort(unique(allSNP[["Pos"]]))
     attr(res, "allSNP") <- allSNP
     # Transfer attributes
-    res <- .phyMSAtransfer(res, x)
+    attr(res, "phyMSAmatched") <- x
     class(res) <- "SNPsites"
     return(res)
 }
+
+#' @export
+SNPsites <- function(tree, ...)
+    UseMethod("SNPsites")
 
 #' @export
 print.SNPsites <- function(x, ...) {
@@ -125,19 +131,9 @@ print.SNPsites <- function(x, ...) {
 #' plotMutSites(SNPsites(tree))
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     allSNP <- attr(x, "allSNP")
+    phyMSAmatched <- attr(x, "phyMSAmatched")
     # Specify the color of mutations by pre-defined color set.
-    if (attr(x, "seqType") == "AA") {
-        snpColors <- vapply(
-            X = AA_FULL_NAMES,
-            FUN = function(i) {
-                AA_COLORS[[i]]
-            },
-            FUN.VALUE = character(1)
-        )
-    } else {
-        snpColors <- NT_COLORS
-    }
-    names(snpColors) <- toupper(names(snpColors))
+    snpColors <- .siteColorScheme(attr(phyMSAmatched, "seqType"))
     # Use 'ggplot' to make SNP plot as dots
     snpPlot <- ggplot(allSNP, aes(x = Pos,
                                   y = Accession,
@@ -159,7 +155,7 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             legend.position = "none"
         )
     # Use 'ggtree' to make tree plot
-    treePlot <- ggtree(attr(x, "tree"))
+    treePlot <- plot(phyMSAmatched)
     if (showTips) {
         treePlot <- treePlot + geom_tiplab()
     }
@@ -168,6 +164,5 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
 }
 
 #' @export
-plotMutSites <- function(x, ...) {
+plotMutSites <- function(x, ...)
     UseMethod("plotMutSites")
-}

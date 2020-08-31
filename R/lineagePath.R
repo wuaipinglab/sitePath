@@ -15,7 +15,7 @@
 #' @param forbidTrivial Does not allow trivial trimming.
 #' @param ... Other arguments.
 #' @return Lineage path represent by node number.
-#' @importFrom ape nodepath
+#' @importFrom ape nodepath getMRCA
 #' @export
 #' @examples
 #' data('zikv_tree')
@@ -37,8 +37,22 @@ lineagePath.phyMSAmatched <- function(tree,
         similarity <- 0.05
     } else if (!is.numeric(similarity) || similarity <= 0) {
         stop("\"similarity\" only accepts positive numeric")
-    } else if (similarity > 0 && similarity < 1) {
+    } else if (similarity > 0 && similarity < 0.5) {
         minSNP <- nTips * similarity
+    } else if (similarity >= 0.5 && similarity < 1) {
+        minSNP <- nTips * (1 - similarity)
+        # The reminder of using major SNP to find lineages
+        if (forbidTrivial) {
+            warning(
+                "\"lineagePath\" now uses 'major SNP' to find lineages ",
+                "rather than sequence similarities. And the parameter ",
+                "\"similarity\" decides the least percentage/number of ",
+                "'major SNPs'. The input \"similarity\" of value ",
+                similarity,
+                "is over 0.5 and the resulting lineage path will ",
+                "probably be trivial for other analysis."
+            )
+        }
     } else if (similarity > 1 && similarity < nTips) {
         minSNP <- ceiling(similarity)
         similarity <- minSNP / nTips
@@ -49,32 +63,31 @@ lineagePath.phyMSAmatched <- function(tree,
         )
     }
     align <- attr(x, "align")
+    rootNode <- getMRCA(tree, tree[["tip.label"]])
     # Get all lineages using the terminal node found by SNP
     paths <- mergePaths(lapply(
         X = majorSNPtips(align, minSNP),
         FUN = function(tips) {
-            nodepath(tree, from = nTips + 1, to = getMRCA(tree, tips))
+            nodepath(tree, from = rootNode, to = getMRCA(tree, tips))
         }
     ))
-    # The reminder of using major SNP to find lineages
-    if (length(paths) == 0 && forbidTrivial) {
-        warning(
-            "\"lineagePath\" now uses 'major SNP' to find lineages ",
-            "rather than sequence similarities. And the parameter ",
-            "\"similarity\" decides the least percentage/number of ",
-            "'major SNPs'. The input \"similarity\" of value ",
-            similarity,
-            "is too high leading to no usable 'major SNP' and ",
-            "hence no lineage path found."
-        )
-    }
     # Transfer attributes
-    paths <- .phyMSAtransfer(paths, x)
+    attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'rootNode'
     attr(paths, "similarity") <- similarity
-    attr(paths, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
-    class(paths) <- "lineagePath"
+    attr(paths, "rootNode") <- rootNode
+    class(paths) <- c("lineagePath", class(paths))
     return(paths)
+}
+
+treemerBySite <- function(x, ...) {
+    tree <- attr(x, "tree")
+    align <- attr(x, "align")
+    # Generate the site mapping from reference
+    # Exclude the invariant sites
+    loci <- attr(x, "loci")
+    res <- runTreemerBySite(nodepath(tree), align, loci)
+    return(res)
 }
 
 #' @export
@@ -84,6 +97,7 @@ lineagePath <- function(tree, similarity, ...)
 #' @export
 print.lineagePath <- function(x, ...) {
     cat(
+        "This is a 'lineagePath' object.\n\n",
         length(x),
         " lineage paths using ",
         attr(x, "similarity") * 100,
@@ -100,11 +114,14 @@ print.lineagePath <- function(x, ...) {
 #'   underlying function applies \code{\link{ggplot2}}.
 #' @param x Could be a \code{\link{lineagePath}} object,
 #'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
-#' @param y For \code{\link{lineagePath}} object, it is whether to emphasize the
-#'   lineage branches by using thicker line. For a \code{\link{fixationSites}}
-#'   or a \code{\link{fixationPath}} object, it is whether to show the fixation
+#' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
+#'   have effect since 1.5.4. For a \code{\link{fixationSites}} or a
+#'   \code{\link{fixationPath}} object, it is whether to show the fixation
 #'   mutation between clusters.
-#' @param ... Other arguments. The \code{showTips} argument has been deprecated.
+#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
+#' @param ... Other arguments. Since 1.5.4, the function uses
+#'   \code{\link{ggtree}} as the base function to make plots so the arguments in
+#'   \code{plot.phylo} will no longer work.
 #' @return A ggplot object to make the plot. A \code{\link{lineagePath}} object
 #'   will be plotted as a tree diagram will be plotted and paths are black solid
 #'   line while the trimmed nodes and tips will use grey dashed line. A
@@ -116,9 +133,12 @@ print.lineagePath <- function(x, ...) {
 #'   number of fixation mutation between two clusters. The name of the tree tips
 #'   indicate the number of sequences in the cluster.
 #' @importFrom ggtree ggtree
-#' @importFrom ggplot2 aes theme ggtitle scale_color_manual
+#' @importFrom ggplot2 aes theme scale_color_manual scale_size
 #' @export
-plot.lineagePath <- function(x, y = TRUE, ...) {
+plot.lineagePath <- function(x,
+                             y = TRUE,
+                             showTips = FALSE,
+                             ...) {
     tree <- attr(x, "tree")
     # Get number of ancestral nodes plus tip nodes
     nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
@@ -127,21 +147,20 @@ plot.lineagePath <- function(x, y = TRUE, ...) {
     group[unique(unlist(x))] <- 0
     group <- factor(group)
     # Set line size
-    if (y) {
-        size <- rep(0.5, times = nNodes)
-        size[unique(unlist(x))] <- 1
-    } else {
-        size <- NULL
-    }
+    size <- rep(1, times = nNodes)
+    size[unique(unlist(x))] <- 2
     # Tree plot
     p <- ggtree(tree, aes(
         color = group,
         linetype = group,
         size = size
     )) +
-        scale_color_manual(values = c("black", "grey")) +
-        theme(legend.position = "none") +
-        ggtitle(attr(x, "similarity"))
+        scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
+        scale_color_manual(values = c("black", "gainsboro")) +
+        theme(legend.position = "none")
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
     return(p)
 }
 
@@ -215,7 +234,9 @@ sneakPeek <- function(tree,
     class(res) <- c(class(res), "sneakPeekedPaths")
     # Combine all plots of the lineages
     if (makePlot) {
-        g <- lapply(allPaths, plot, y = FALSE)
+        g <- lapply(allPaths, function(path) {
+            plot(path) + ggtitle(attr(path, "similarity"))
+        })
         grid.arrange(arrangeGrob(grobs = g))
     }
     return(res)
@@ -231,7 +252,5 @@ sneakPeek <- function(tree,
 #' lineagePath(x, similarity = 0.05)
 lineagePath.sneakPeekedPaths <- function(tree, similarity, ...) {
     allPaths <- attr(tree, "allPaths")
-    res <-
-        allPaths[which.min(abs(as.numeric(names(allPaths)) - similarity))]
-    return(res)
+    allPaths[[which.min(abs(as.numeric(names(allPaths)) - similarity))]]
 }

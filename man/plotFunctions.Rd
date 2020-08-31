@@ -11,18 +11,22 @@
 
 \method{plot}{fixationSites}(x, y = TRUE, ...)
 
-\method{plot}{lineagePath}(x, y = TRUE, ...)
+\method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
 }
 \arguments{
 \item{x}{Could be a \code{\link{lineagePath}} object,
 \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.}
 
-\item{y}{For \code{\link{lineagePath}} object, it is whether to emphasize the
-lineage branches by using thicker line. For a \code{\link{fixationSites}}
-or a \code{\link{fixationPath}} object, it is whether to show the fixation
+\item{y}{For \code{\link{lineagePath}} object, it is deprecated and no longer
+have effect since 1.5.4. For a \code{\link{fixationSites}} or a
+\code{\link{fixationPath}} object, it is whether to show the fixation
 mutation between clusters.}
 
-\item{...}{Other arguments. The \code{showTips} argument has been deprecated.}
+\item{...}{Other arguments. Since 1.5.4, the function uses
+\code{\link{ggtree}} as the base function to make plots so the arguments in
+\code{plot.phylo} will no longer work.}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 }
 \value{
 A ggplot object to make the plot. A \code{\link{lineagePath}} object

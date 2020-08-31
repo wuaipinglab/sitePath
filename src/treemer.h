@@ -4,8 +4,8 @@
  * towards the root node. Only when more than two nodes meet each other along
  * the way do the nodes make a real move otherwise the node stays.
  *
- * The tree is represented by tipPaths (from the R function "nodepath" in
- * "ape" package). The algorithm is performed on the tipPaths along with the
+ * The tree is represented by tipPaths (from the R function "nodepath" in "ape"
+ * package). The algorithm is performed on the tipPaths along with the
  * corresponding aligned sequences for each tip.
  */
 
@@ -95,9 +95,9 @@ private:
 
 class BySite: public Base {
     /*
-     * Trim the tree by amino acid of a site. This is going to exhaust the
-     * trimming to reach the root node for each tip and produce segments
-     * of tips grouped by amino acid and ordered as of nodePath
+     * Trim the tree by aa/nt of a site. The trimming stops when the
+     * non-dominant aa/nt in a group is greater than the SNP percentage
+     * threshold
      */
 public:
     BySite(
@@ -127,24 +127,8 @@ public:
 protected:
     // The constrain of the largest similarity difference
     const float m_simCut;
-    // Keep a record of pair-wise similiarity to avoid repeating computation
+    // Keep a record of pair-wise similarity to avoid repeating computation
     std::map<std::pair<int, int>, float> *m_compared;
-private:
-    bool qualified(const clusters::iterator &clusters_it) const;
-};
-
-class ByAverageSimilarity: public BySimilarity {
-    /*
-     * Trim the tree and stop the process when the average similarity
-     * in each tip cluster is about to be lower than the threshold
-     */
-public:
-    ByAverageSimilarity(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const float simThreshold,
-        std::map<std::pair<int, int>, float> &simMatrix
-    );
 private:
     bool qualified(const clusters::iterator &clusters_it) const;
 };

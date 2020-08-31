@@ -80,3 +80,8 @@ addMSA <- function(tree,
 print.phyMSAmatched <- function(x, ...) {
     cat(x, "\n")
 }
+
+plot.phyMSAmatched <- function(x, y = TRUE) {
+    p <- ggtree(as.phylo.phyMSAmatched(x))
+    return(p)
+}

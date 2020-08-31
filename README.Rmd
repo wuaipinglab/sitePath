@@ -35,7 +35,6 @@ remotes::install_github("wuaipinglab/sitePath")
 Both the phylogenetic tree and the matching multiple sequence alignment files are required.
 
 ```{r import_data, message=FALSE}
-library(ape)
 library(sitePath)
 
 # The file names of your tree and multiple sequence alignment
