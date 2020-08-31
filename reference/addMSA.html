@@ -145,11 +145,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>tree</th>
-      <td><p>A <code><a href='https://rdrr.io/pkg/ape/man/read.tree.html'>phylo</a></code> object. This commonly can be from tree
-parsing function in <code><a href='https://rdrr.io/pkg/ape/man/ape-package.html'>ape</a></code> or <code>ggtree</code>. All the
+      <td><p>A <code>phylo</code> object. This commonly can be from tree
+parsing function in <code>ape</code> or <code>ggtree</code>. All the
 <code>tip.label</code> should be found in the sequence alignment. The tree is
 supposed to fully resolved (bifurcated) and will be resolved by
-<code><a href='https://rdrr.io/pkg/ape/man/multi2di.html'>multi2di</a></code> if <code><a href='https://rdrr.io/pkg/ape/man/is.binary.tree.html'>is.binary</a></code> gives <code>FALSE</code>.</p></td>
+<code>multi2di</code> if <code>is.binary</code> gives <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>msaPath</th>
@@ -186,7 +186,8 @@ names in the alignment should include all <code>tip.label</code> in the tree</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
 <span class='kw'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package = <span class='st'>'sitePath'</span>)
-<span class='fu'>addMSA</span>(<span class='kw'>zikv_tree</span>, msaPath = <span class='kw'>msaPath</span>, msaFormat = <span class='st'>'fasta'</span>)</div><div class='output co'>#&gt; This is a 'phyMSAmatched' object. </div></pre>
+<span class='fu'>addMSA</span>(<span class='kw'>zikv_tree</span>, msaPath = <span class='kw'>msaPath</span>, msaFormat = <span class='st'>'fasta'</span>)
+</div><div class='output co'>#&gt; This is a 'phyMSAmatched' object. </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -222,13 +222,18 @@ see the impact of threshold on path number. The default is 1.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_tree'</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>'zikv_align'</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
-<span class='fu'>lineagePath</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; 3 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)</div><div class='output co'>#&gt;   similarity pathNum
+<span class='fu'>lineagePath</span>(<span class='kw'>tree</span>)
+</div><div class='output co'>#&gt; This is a 'lineagePath' object.
+#&gt; 
+#&gt; 3 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
+</div><div class='output co'>#&gt;   similarity pathNum
 #&gt; 1       0.05       3
 #&gt; 2       0.03       5
 #&gt; 3       0.01      12</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
-<span class='fu'>lineagePath</span>(<span class='kw'>x</span>, similarity = <span class='fl'>0.05</span>)</div><div class='output co'>#&gt; $`0.05`
-#&gt; 3 lineage paths using 5% as "major SNP" threshold 
-#&gt; </div></pre>
+<span class='fu'>lineagePath</span>(<span class='kw'>x</span>, similarity = <span class='fl'>0.05</span>)
+</div><div class='output co'>#&gt; This is a 'lineagePath' object.
+#&gt; 
+#&gt; 3 lineage paths using 5% as "major SNP" threshold </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -139,10 +139,10 @@ For fixationSites, it will color the ancestral
     </div>
 
     <pre class="usage"><span class='co'># S3 method for lineagePath</span>
-<span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>FALSE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+<span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>TRUE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for parallelSites</span>
-<span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+<span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for sitePath</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='kw'>NULL</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
@@ -164,13 +164,14 @@ the return from <code><a href='lineagePath.html'>lineagePath</a></code> function
     <tr>
       <th>site</th>
       <td><p>For <code>lineagePath</code>, it can be any site within sequence
-length. For <code>fixationSites</code>, it is restrained to a predicted fixation
-site. The numbering is consistent with <code>reference</code> defined in the
-object.</p></td>
+length. For <code>fixationSites</code> and <code>parallelSites</code>, it is restrained
+to a predicted fixation site. The numbering is consistent with
+the reference defined by <code><a href='setSiteNumbering.html'>setSiteNumbering</a></code>.</p></td>
     </tr>
     <tr>
       <th>showPath</th>
-      <td><p>If plot the lineage result from <code><a href='lineagePath.html'>lineagePath</a></code>.</p></td>
+      <td><p>If plot the lineage result from <code><a href='lineagePath.html'>lineagePath</a></code>.
+The default is <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>showTips</th>
@@ -178,7 +179,9 @@ object.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments in <code>plot.phylo</code> functions and other arguments.</p></td>
+      <td><p>Other arguments. Since 1.5.4, the function uses
+<code>ggtree</code> as the base function to make plots so the arguments in
+<code>plot.phylo</code> will no longer work.</p></td>
     </tr>
     <tr>
       <th>y</th>
@@ -196,25 +199,27 @@ which will plot all the fixations.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot object to make the plot. It does not behavior like the
-  generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function.</p>
+    <p>Since 1.5.4, the function returns a ggplot object so on longer
+  behaviors like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>plot.sitePath</code></p>
-<p><code>plotSingleSite</code>, <code><a href='extractSite.html'>extractSite</a></code></p></div>
+    <div class='dont-index'><p><code>plotSingleSite</code>, <code><a href='extractSite.html'>extractSite</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
 <span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
-<span class='fu'>plotSingleSite</span>(<span class='kw'>paths</span>, <span class='fl'>139</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
+<span class='fu'>plotSingleSite</span>(<span class='kw'>paths</span>, <span class='fl'>139</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
 #&gt; <span class='warning'>Please use `filter()` instead.</span>
 #&gt; <span class='warning'>See vignette('programming') for more help</span>
-#&gt; <span class='warning'>This warning is displayed once every 8 hours.</span>
-#&gt; <span class='warning'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span></div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
 <span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>plotSingleSite</span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)</div><div class='img'><img src='plotSingleSite-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)
+</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>plotSingleSite</span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
+</div><div class='img'><img src='plotSingleSite-3.png' alt='' width='700' height='433' /></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

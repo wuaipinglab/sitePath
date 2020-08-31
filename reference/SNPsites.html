@@ -126,7 +126,8 @@
   specified to number the site.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, minSNP = <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+<span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, minSNP = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +141,10 @@
       <td><p>Minimum number of a mutation to be a SNP. The default is 10th
 of the total tree tips.</p></td>
     </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -150,7 +155,8 @@ of the total tree tips.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
-<span class='fu'>SNPsites</span>(<span class='kw'>tree</span>)</div><div class='output co'>#&gt; [1]  139  894  988 2074 2086 2634 3045</div></pre>
+<span class='fu'>SNPsites</span>(<span class='kw'>tree</span>)
+</div><div class='output co'>#&gt; [1]  139  894  988 2074 2086 2634 3045</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -133,7 +133,7 @@
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for lineagePath</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,14 +145,20 @@
     </tr>
     <tr>
       <th>y</th>
-      <td><p>For <code><a href='lineagePath.html'>lineagePath</a></code> object, it is whether to emphasize the
-lineage branches by using thicker line. For a <code><a href='fixationSites.html'>fixationSites</a></code>
-or a <code><a href='fixationPath.html'>fixationPath</a></code> object, it is whether to show the fixation
+      <td><p>For <code><a href='lineagePath.html'>lineagePath</a></code> object, it is deprecated and no longer
+have effect since 1.5.4. For a <code><a href='fixationSites.html'>fixationSites</a></code> or a
+<code><a href='fixationPath.html'>fixationPath</a></code> object, it is whether to show the fixation
 mutation between clusters.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments. The <code>showTips</code> argument has been deprecated.</p></td>
+      <td><p>Other arguments. Since 1.5.4, the function uses
+<code>ggtree</code> as the base function to make plots so the arguments in
+<code>plot.phylo</code> will no longer work.</p></td>
+    </tr>
+    <tr>
+      <th>showTips</th>
+      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 
@@ -174,9 +180,12 @@ mutation between clusters.</p></td>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
 <span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>paths</span>)</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>fixations</span>)</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span>(<span class='kw'>fixations</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>)</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>paths</span>)
+</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>fixations</span>)
+</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span>(<span class='kw'>fixations</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>)
+</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
