@@ -19,7 +19,7 @@
 #' @return Since 1.5.4, the function returns a ggplot object so on longer
 #'   behaviors like the generic \code{\link{plot}} function.
 #' @importFrom graphics plot
-#' @importFrom ggplot2 GeomSegment
+#' @importFrom ggplot2 GeomSegment ggtitle
 #' @export
 #' @examples
 #' data(zikv_tree)

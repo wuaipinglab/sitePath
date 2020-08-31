@@ -17,9 +17,9 @@
 \item{x}{Could be a \code{\link{lineagePath}} object,
 \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.}
 
-\item{y}{For \code{\link{lineagePath}} object, it is whether to emphasize the
-lineage branches by using thicker line. For a \code{\link{fixationSites}}
-or a \code{\link{fixationPath}} object, it is whether to show the fixation
+\item{y}{For \code{\link{lineagePath}} object, it is deprecated and no longer
+have effect since 1.5.4. For a \code{\link{fixationSites}} or a
+\code{\link{fixationPath}} object, it is whether to show the fixation
 mutation between clusters.}
 
 \item{...}{Other arguments. Since 1.5.4, the function uses

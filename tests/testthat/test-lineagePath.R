@@ -9,6 +9,11 @@ test_that("Using SNP to get phylogenetic lineages", {
     expect_identical(as.phylo(tr), zikv_tree)
     align <- attr(tr, "align")
     reference <- attr(tr, "msaNumbering")
+    # Test the input of 'similarity'
+    expect_error(lineagePath(tree = tr, similarity = "0.96"))
+    expect_error(lineagePath(tree = tr, similarity = -0.1))
+    expect_error(lineagePath(tree = tr, similarity = 1))
+    # Use 0.1 as the input for 'similarity'
     similarity <- nTips * 0.1
     paths <- lineagePath(tree = tr,
                          similarity = similarity,

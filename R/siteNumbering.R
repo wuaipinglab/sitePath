@@ -117,28 +117,6 @@ setSiteNumbering.phyMSAmatched <- function(x,
     return(x)
 }
 
-.phyMSAtransfer <- function(receive, give) {
-    attr(receive, "tree") <- attr(give, "tree")
-    attr(receive, "align") <- attr(give, "align")
-    attr(receive, "seqType") <- attr(give, "seqType")
-    attr(receive, "msaNumbering") <- attr(give, "msaNumbering")
-    attr(receive, "reference") <- attr(give, "reference")
-    attr(receive, "gapChar") <- attr(give, "gapChar")
-    attr(receive, "loci") <- attr(give, "loci")
-    return(receive)
-}
-
-#' @rdname setSiteNumbering
-#' @export
-setSiteNumbering.lineagePath <- function(x,
-                                         reference = NULL,
-                                         gapChar = "-",
-                                         minSkipSize = NULL,
-                                         ...) {
-    res <- .checkReference(x, reference, gapChar, minSkipSize)
-    return(res)
-}
-
 setSiteNumbering.fixationSites <- function(x,
                                            reference = NULL,
                                            gapChar = '-',

@@ -3,12 +3,9 @@
 \name{setSiteNumbering}
 \alias{setSiteNumbering}
 \alias{setSiteNumbering.phyMSAmatched}
-\alias{setSiteNumbering.lineagePath}
 \title{Set site numbering to the reference sequence}
 \usage{
 \method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", minSkipSize = NULL, ...)
-
-\method{setSiteNumbering}{lineagePath}(x, reference = NULL, gapChar = "-", minSkipSize = NULL, ...)
 }
 \arguments{
 \item{x}{The object to set site numbering. It could be a

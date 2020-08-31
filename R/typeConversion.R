@@ -117,7 +117,7 @@ as.data.frame.parallelSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    tree <- as.phylo.lineagePath(attr(x, "paths"))
+    tree <- as.phylo.phyMSAmatched(attr(x, "paths"))
     tipNames <- tree[["tip.label"]]
     clustersByPath <- attr(x, "clustersByPath")
     clusterInfo <- character()
@@ -190,12 +190,6 @@ ape::as.phylo
 
 #' @export
 as.phylo.phyMSAmatched <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.lineagePath <- function(x, ...) {
     res <- attr(x, "tree")
     return(res)
 }

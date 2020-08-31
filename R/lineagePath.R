@@ -72,11 +72,11 @@ lineagePath.phyMSAmatched <- function(tree,
         }
     ))
     # Transfer attributes
-    paths <- .phyMSAtransfer(paths, x)
+    attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'rootNode'
     attr(paths, "similarity") <- similarity
     attr(paths, "rootNode") <- rootNode
-    class(paths) <- "lineagePath"
+    class(paths) <- c("lineagePath", class(paths))
     return(paths)
 }
 
@@ -90,7 +90,6 @@ treemerBySite <- function(x, ...) {
     return(res)
 }
 
-
 #' @export
 lineagePath <- function(tree, similarity, ...)
     UseMethod("lineagePath")
@@ -98,6 +97,7 @@ lineagePath <- function(tree, similarity, ...)
 #' @export
 print.lineagePath <- function(x, ...) {
     cat(
+        "This is a 'lineagePath' object.\n\n",
         length(x),
         " lineage paths using ",
         attr(x, "similarity") * 100,
@@ -114,9 +114,9 @@ print.lineagePath <- function(x, ...) {
 #'   underlying function applies \code{\link{ggplot2}}.
 #' @param x Could be a \code{\link{lineagePath}} object,
 #'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
-#' @param y For \code{\link{lineagePath}} object, it is whether to emphasize the
-#'   lineage branches by using thicker line. For a \code{\link{fixationSites}}
-#'   or a \code{\link{fixationPath}} object, it is whether to show the fixation
+#' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
+#'   have effect since 1.5.4. For a \code{\link{fixationSites}} or a
+#'   \code{\link{fixationPath}} object, it is whether to show the fixation
 #'   mutation between clusters.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Other arguments. Since 1.5.4, the function uses
@@ -133,7 +133,7 @@ print.lineagePath <- function(x, ...) {
 #'   number of fixation mutation between two clusters. The name of the tree tips
 #'   indicate the number of sequences in the cluster.
 #' @importFrom ggtree ggtree
-#' @importFrom ggplot2 aes theme ggtitle scale_color_manual scale_size
+#' @importFrom ggplot2 aes theme scale_color_manual scale_size
 #' @export
 plot.lineagePath <- function(x,
                              y = TRUE,
@@ -147,12 +147,8 @@ plot.lineagePath <- function(x,
     group[unique(unlist(x))] <- 0
     group <- factor(group)
     # Set line size
-    if (y) {
-        size <- rep(1, times = nNodes)
-        size[unique(unlist(x))] <- 2
-    } else {
-        size <- NULL
-    }
+    size <- rep(1, times = nNodes)
+    size[unique(unlist(x))] <- 2
     # Tree plot
     p <- ggtree(tree, aes(
         color = group,
@@ -161,8 +157,7 @@ plot.lineagePath <- function(x,
     )) +
         scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
         scale_color_manual(values = c("black", "gainsboro")) +
-        theme(legend.position = "none") +
-        ggtitle(attr(x, "similarity"))
+        theme(legend.position = "none")
     if (showTips) {
         p <- p + geom_tiplab()
     }
@@ -239,7 +234,9 @@ sneakPeek <- function(tree,
     class(res) <- c(class(res), "sneakPeekedPaths")
     # Combine all plots of the lineages
     if (makePlot) {
-        g <- lapply(allPaths, plot, y = FALSE)
+        g <- lapply(allPaths, function(path) {
+            plot(path) + ggtitle(attr(path, "similarity"))
+        })
         grid.arrange(arrangeGrob(grobs = g))
     }
     return(res)
