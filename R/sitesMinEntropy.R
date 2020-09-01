@@ -21,7 +21,6 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' sitesMinEntropy(lineagePath(tree))
-#' @export
 sitesMinEntropy.lineagePath <- function(x,
                                         minEffectiveSize = NULL,
                                         searchDepth = 1,
@@ -200,10 +199,12 @@ sitesMinEntropy.lineagePath <- function(x,
         seg <- minimizeEntropy(nodeSummaries,
                                minEffectiveSize,
                                searchDepth)
+        names(seg) <- vapply(seg, attr, character(1), "node")
     } else {
         seg <- nodeSummaries
         attr(seg[[1]], "AA") <-
             names(attr(nodeSummaries[[1]], "aaSummary"))
+        attr(seg[[1]], "node") <- names(seg)
     }
     return(seg)
 }
