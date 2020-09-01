@@ -226,15 +226,6 @@ plotSingleSite.fixationSites <- function(x,
     plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
 
-#' @rdname plotSingleSite
-#' @export
-plotSingleSite.multiFixationSites <- function(x,
-                                              site,
-                                              select = NULL,
-                                              ...) {
-    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
-}
-
 #' @export
 plotSingleSite <- function(x, ...)
     UseMethod("plotSingleSite")

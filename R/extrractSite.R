@@ -46,12 +46,6 @@ extractSite.fixationSites <- function(x, site, ...) {
     return(site)
 }
 
-#' @rdname extractSite
-#' @export
-extractSite.multiFixationSites <- function(x, site, ...) {
-    return(.actualExtractSite(x, site))
-}
-
 #' @export
 extractSite.parallelSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))

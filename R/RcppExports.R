@@ -41,7 +41,3 @@ minEntropyByComparing <- function(nodeSummaries, minEffectiveSize, searchDepth) 
     .Call('_sitePath_minEntropyByComparing', PACKAGE = 'sitePath', nodeSummaries, minEffectiveSize, searchDepth)
 }
 
-summarizeAA <- function(allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb) {
-    .Call('_sitePath_summarizeAA', PACKAGE = 'sitePath', allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb)
-}
-

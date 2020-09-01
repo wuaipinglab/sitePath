@@ -4,7 +4,6 @@
 \alias{extractTips}
 \alias{extractTips.sitePath}
 \alias{extractTips.fixationSites}
-\alias{extractTips.multiFixationSites}
 \alias{extractTips.lineagePath}
 \alias{extractTips.sitePara}
 \alias{extractTips.parallelSites}
@@ -13,8 +12,6 @@
 \method{extractTips}{sitePath}(x, select = 1, ...)
 
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
-
-\method{extractTips}{multiFixationSites}(x, site, select = 1, ...)
 
 \method{extractTips}{lineagePath}(x, site, ...)
 

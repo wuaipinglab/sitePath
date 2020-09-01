@@ -6,7 +6,6 @@
 \alias{plotSingleSite.parallelSites}
 \alias{plot.sitePath}
 \alias{plotSingleSite.fixationSites}
-\alias{plotSingleSite.multiFixationSites}
 \title{Color the tree by a single site}
 \usage{
 \method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
@@ -16,8 +15,6 @@
 \method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 
 \method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
-
-\method{plotSingleSite}{multiFixationSites}(x, site, select = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} object from \code{\link{fixationSites}} or

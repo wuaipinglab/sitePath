@@ -3,12 +3,9 @@
 \name{extractSite}
 \alias{extractSite}
 \alias{extractSite.fixationSites}
-\alias{extractSite.multiFixationSites}
 \title{Extract tips for a single site}
 \usage{
 \method{extractSite}{fixationSites}(x, site, ...)
-
-\method{extractSite}{multiFixationSites}(x, site, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{parallelSites} object. More type

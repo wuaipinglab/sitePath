@@ -2,57 +2,15 @@
 % Please edit documentation in R/fixationSitesBS.R
 \name{sitePath-deprecated}
 \alias{sitePath-deprecated}
-\alias{multiFixationSites.lineagePath}
 \alias{multiFixationSites}
 \title{Deprecated functions in package \sQuote{sitePath}}
-\usage{
-\method{multiFixationSites}{lineagePath}(
-  paths,
-  samplingSize = NULL,
-  samplingTimes = 100,
-  minEffectiveSize = 0,
-  searchDepth = 1,
-  method = c("compare", "insert", "delete"),
-  ...
-)
-}
-\arguments{
-\item{paths}{a \code{lineagePath} object returned from
-\code{\link{lineagePath}} function or a \code{phylo} object after
-\code{\link{addMSA}}}
-
-\item{samplingSize}{The number of tips sampled for each round of resampling.
-It shoud be at least 10th and at most nine 10ths of the tree tips.}
-
-\item{samplingTimes}{The total times of random sampling to do. It should be
-greater than 100.}
-
-\item{minEffectiveSize}{A vector of two integers to specifiy minimum tree
-tips involved before/after mutation. Otherwise the mutation will not be
-counted into the return. If more than one number is given, the ancestral
-takes the first and descendant takes the second as the minimum. If only
-given one number, it's the minimum for both ancestral and descendant.}
-
-\item{searchDepth}{The function uses heuristic search but the termination of
-the search cannot be intrinsically decided. \code{searchDepth} is needed to
-tell the search when to stop.}
-
-\item{method}{The strategy for predicting the fixation. The basic approach is
-entropy minimization and can be achieved by adding or removing fixation
-point, or by comparing the two.}
-
-\item{...}{further arguments passed to or from other methods.}
-}
-\value{
-Sites with multiple fixations.
-}
 \description{
-These functions are provided for compatibility with older versions
-of \sQuote{sitePath} only, and will be defunct at the next release.
+These functions are provided for compatibility with older
+  versions of \sQuote{sitePath} only, and will be defunct at the next
+  release.
 }
-\examples{
-data(zikv_tree_reduced)
-data(zikv_align_reduced)
-tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
-fixationSites(lineagePath(tree))
+\details{
+The following functions are deprecated and will be made defunct; use
+  the replacement indicated below: \itemize{ \item{multiFixationSites:
+  \code{\link{fixationSites}}} }
 }

@@ -126,21 +126,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// summarizeAA
-Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > summarizeAA(const Rcpp::List& allMutations, const Rcpp::ListOf<Rcpp::CharacterVector>& allSampledTips, const Rcpp::ListOf<Rcpp::CharacterVector>& originalNodeTips, const Rcpp::Function& setTxtProgressBar, const Rcpp::List& pb);
-RcppExport SEXP _sitePath_summarizeAA(SEXP allMutationsSEXP, SEXP allSampledTipsSEXP, SEXP originalNodeTipsSEXP, SEXP setTxtProgressBarSEXP, SEXP pbSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type allMutations(allMutationsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type allSampledTips(allSampledTipsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type originalNodeTips(originalNodeTipsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Function& >::type setTxtProgressBar(setTxtProgressBarSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type pb(pbSEXP);
-    rcpp_result_gen = Rcpp::wrap(summarizeAA(allMutations, allSampledTips, originalNodeTips, setTxtProgressBar, pb));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
@@ -153,7 +138,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_minEntropyByInserting", (DL_FUNC) &_sitePath_minEntropyByInserting, 3},
     {"_sitePath_minEntropyByDeleting", (DL_FUNC) &_sitePath_minEntropyByDeleting, 3},
     {"_sitePath_minEntropyByComparing", (DL_FUNC) &_sitePath_minEntropyByComparing, 3},
-    {"_sitePath_summarizeAA", (DL_FUNC) &_sitePath_summarizeAA, 5},
     {NULL, NULL, 0}
 };
 

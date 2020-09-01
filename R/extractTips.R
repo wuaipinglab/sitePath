@@ -60,16 +60,6 @@ extractTips.fixationSites <- function(x,
 }
 
 #' @rdname extractTips
-#' @export
-extractTips.multiFixationSites <- function(x,
-                                           site,
-                                           select = 1,
-                                           ...) {
-    sp <- extractSite.multiFixationSites(x, site)
-    return(extractTips.sitePath(sp, select))
-}
-
-#' @rdname extractTips
 #' @description For \code{\link{lineagePath}}, the function \code{extractTips}
 #'   groups all the tree tips according to the amino acid/nucleotide of the
 #'   \code{site}.
