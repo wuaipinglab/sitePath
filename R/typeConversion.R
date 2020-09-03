@@ -19,10 +19,11 @@ as.data.frame.fixationSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    tree <- as.phylo.fixationSites(x)
-    grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
-    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
-    res <- .mutationTable(x, tree, grp)
+    res <- .mutationTable(
+        fixations = x,
+        tree = as.phylo.fixationSites(x),
+        grp = groupTips.fixationSites(x, tipnames = FALSE)
+    )
     res <- res[, c("mutation", "from", "to")]
     return(res)
 }
@@ -57,12 +58,14 @@ as.data.frame.fixationSites <- function(x,
     for (sp in fixations) {
         site <- attr(sp, "site")
         for (mp in sp) {
+            nodeNames <- names(mp)
             for (i in seq_along(mp)[-1]) {
                 prevTips <- mp[[i - 1]]
                 currTips <- mp[[i]]
                 mutation <- paste0(attr(prevTips, "AA"),
                                    site,
                                    attr(currTips, "AA"))
+                trans <- nodeNames[i]
                 prev <- unique(clusterInfo[as.character(prevTips)])
                 names(prev) <- prev
                 # Choose the most recent cluster to stay un-mutated
@@ -82,9 +85,6 @@ as.data.frame.fixationSites <- function(x,
                         length(clusterPaths[[cluster]])
                     }
                 )))
-                # Find the transition node
-                currPath <- clusterPaths[[curr]]
-                trans <- currPath[length(currPath)]
                 # Add the new transition mutation
                 prevCls <- c(prevCls, prev)
                 currCls <- c(currCls, curr)
@@ -167,8 +167,7 @@ tidytree::as.treedata
 as.treedata.fixationSites <- function(tree, ...) {
     x <- tree
     tree <- as.phylo.fixationSites(x)
-    grp <- fixationPath.fixationSites(x, minEffectiveSize = 0)
-    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
+    grp <- groupTips.fixationSites(tree = x, tipnames = FALSE)
     mutTable <- .mutationTable(x, tree, grp)
     transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
                        FUN = "[[",

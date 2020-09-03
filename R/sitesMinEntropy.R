@@ -212,40 +212,48 @@ sitesMinEntropy.lineagePath <- function(x,
 .clustersByPath <- function(fixations) {
     # Find the clustering for each lineage path
     res <- lapply(fixations, function(sp) {
-        # Remove the site purely conserved on the lineage
-        group <- list()
-        for (site in names(sp)) {
-            mp <- sp[[site]]
-            if (length(mp) >= 2) {
-                toAdd <- lapply(mp, function(tips) {
-                    siteChar <- attr(tips, "AA")
-                    attributes(tips) <- NULL
-                    attr(tips, "site") <- siteChar
-                    names(attr(tips, "site")) <- site
-                    tips
-                })
-                group <- c(group, list(toAdd))
-            }
-        }
-        if (length(group) == 0) {
-            return(group)
-        }
+        # Set the site and amino acid/nucleotide info for each group of tips
+        group <- lapply(names(sp), function(site) {
+            lapply(sp[[site]], function(tips) {
+                siteChar <- attr(tips, "AA")
+                node <- attr(tips, "node")
+                # Purge the attributes and keep only the node and amino
+                # acid/nucleotide info
+                attributes(tips) <- NULL
+                attr(tips, "site") <- siteChar
+                names(attr(tips, "site")) <- site
+                attr(tips, "node") <- node
+                return(tips)
+            })
+        })
         # Group tips according to fixation points
         res <- group[[1]]
-        for (p in group[-1]) {
-            for (tips in p) {
+        for (seg in group[-1]) {
+            # the node name for each group of tips
+            nodeNames <- names(seg)
+            # Iterate each group of tips to contribute to grouping
+            for (n in seq_along(seg)) {
+                tips <- seg[[n]]
+                # The site number and its amino acid/nucleotide
                 site <- attr(tips, "site")
                 # Update grouping for each tips by growing a new list
                 newGrouping <- list()
+                # Compare with each group of the current grouping
                 for (i in seq_along(res)) {
                     gp <- res[[i]]
                     common <- sort(intersect(tips, gp))
                     # No new cluster when the coming tips have no overlap or are
                     # identical to tips in an existing cluster
                     if (length(common) == 0) {
+                        # Keep the current grouping if the coming group has no
+                        # overlap yet
                         newGrouping <- res[seq_len(i)]
                     } else if (identical(sort(gp), sort(tips))) {
-                        attr(gp, "site") <- c(attr(gp, "site"), site)
+                        # The only effect here is to add the new 'site' info to
+                        # the group
+                        attr(gp, "site") <-
+                            c(attr(gp, "site"), site)
+                        # The groups after the current group to be added
                         if (i + 1 <= length(res)) {
                             trailing <- res[(i + 1):length(res)]
                         } else {
@@ -259,7 +267,8 @@ sitesMinEntropy.lineagePath <- function(x,
                         # new coming tips and existing tips in a cluster
                         if (identical(sort(gp), common)) {
                             # The new coming tips includes the current group.
-                            # The extra tips stay for the next loop
+                            # The extra tips stay for the next loop just in case
+                            # it has impact on the grouping
                             tips <- setdiff(tips, gp)
                             # Update the SNP site info for the current group
                             attr(gp, "site") <-
@@ -267,11 +276,17 @@ sitesMinEntropy.lineagePath <- function(x,
                             newGrouping <- c(newGrouping, list(gp))
                         } else if (identical(sort(tips), common)) {
                             # The new coming tips are included in the group
-                            # (they are used up at this point)
+                            # (they are used up at this point) and they split
+                            # the original grouping
                             separate <- setdiff(gp, tips)
                             attributes(separate) <- attributes(gp)
+                            attr(separate, "node") <-
+                                nodeNames[n + 1]
+                            # 'tips' is the common part and inherit the
+                            # attributes of the to-be-split original group
                             attr(tips, "site") <-
                                 c(attr(gp, "site"), site)
+                            attr(tips, "node") <- attr(gp, "node")
                             if (i + 1 <= length(res)) {
                                 trailing <- res[(i + 1):length(res)]
                             } else {
@@ -294,19 +309,20 @@ sitesMinEntropy.lineagePath <- function(x,
         }
         return(res)
     })
-    res <- res[which(lengths(res) != 0)]
     return(res)
 }
 
 .mergeClusters <- function(clustersByPath) {
-    # Find the divergent point and remove the overlapped part
-    res <- list(clustersByPath[[1]])
+    clustersByPath <-
+        clustersByPath[which(lengths(clustersByPath) != 0)]
     # 'res' stores all the non-overlapped parts which means all the clusters are
-    # unique
+    # unique but it still splits into each path
+    res <- list(clustersByPath[[1]])
+    # Find the divergent point and remove the overlapped part
     for (gpIndex in seq_along(clustersByPath)[-1]) {
         # 'gp' is the complete path with overlapped parts
         gp <- clustersByPath[[gpIndex]]
-        # Reset the variables to NULL for in case of no overlap
+        # Assume there is no overlapped tips
         t <- integer()
         # The index of 'res' which to merge with 'gp'
         toMergeIndex <- NULL
@@ -316,7 +332,8 @@ sitesMinEntropy.lineagePath <- function(x,
         # The number of shared tips at divergent point will be used to decide if
         # the two clusters are completely diverged or not
         sharedAtDiv <- integer()
-        # Loop through 'res' to find the most related group
+        # Loop through 'res' to find the most related group ('res' is changed
+        # after each iteration)
         for (i in seq_along(res)) {
             # All existing tips in another 'gp' to see if overlapped with tips
             # in the 'gp' to be merged
@@ -327,7 +344,7 @@ sitesMinEntropy.lineagePath <- function(x,
             for (j in seq_along(gp)) {
                 # Once a potential divergent point having being found, safeguard
                 # the truncated 'gp' (in 'res') to merge with have actual
-                # overlap with the 'gp'
+                # overlap with the current non-truncated 'gp'
                 if (any(!gp[[j]] %in% allTips) &&
                     any(unlist(gp) %in% unlist(res[[i]]))) {
                     t <- intersect(gp[[j]], allTips)
@@ -348,10 +365,12 @@ sitesMinEntropy.lineagePath <- function(x,
         # Find the tips when diverged
         divergedTips <- gp[[divergedIndex]]
         refSites <- attr(divergedTips, "site")
+        ancestralNode <- attr(divergedTips, "node")
         # The non-shared part of the 'divergedTips'. This part will not be empty
         divergedTips <- setdiff(divergedTips,
                                 unlist(clustersByPath[[toMergeIndex]]))
         attr(divergedTips, "site") <- refSites
+        attr(divergedTips, "node") <- ancestralNode
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
             # No more trailing tips besides the non-shared part
@@ -387,10 +406,12 @@ sitesMinEntropy.lineagePath <- function(x,
                           attr(toMerge[[i - 1]], "toMerge"))
                     sharedTips <- list()
                 } else {
-                    # When 'sharedTips' is not empty, the fixation site should
+                    # When 'sharedTips' is not empty, the site and node should
                     # be the only info to give back to
                     attr(sharedTips, "site") <-
                         attr(toMerge[[i]], "site")
+                    attr(sharedTips, "node") <-
+                        attr(toMerge[[i]], "node")
                     attr(sharedTips, "toMerge") <-
                         c(toMergeRefSites,
                           attr(sharedTips, "toMerge"))
