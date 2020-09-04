@@ -1,5 +1,3 @@
-context("test-typeConversion")
-
 test_that("as.phylo", {
     data(zikv_align_reduced)
     data(zikv_tree_reduced)

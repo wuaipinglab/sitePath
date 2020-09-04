@@ -16,8 +16,7 @@ plotSingleSite(x, site, ...)
 \method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} object from \code{\link{fixationSites}} or
-the return from \code{\link{lineagePath}} function.}
+\item{x}{The object to plot.}
 
 \item{site}{For \code{lineagePath}, it can be any site within sequence
 length. For \code{fixationSites} and \code{parallelSites}, it is restrained

@@ -10,8 +10,7 @@
 #' @description Plot and color the tree according to amino acid/nucleotide of
 #'   the selected site. The color scheme depends on the \code{seqType} set in
 #'   \code{\link{addMSA}} function.
-#' @param x A \code{fixationSites} object from \code{\link{fixationSites}} or
-#'   the return from \code{\link{lineagePath}} function.
+#' @param x The object to plot.
 #' @param site For \code{lineagePath}, it can be any site within sequence
 #'   length. For \code{fixationSites} and \code{parallelSites}, it is restrained
 #'   to a predicted fixation site. The numbering is consistent with the
@@ -163,5 +162,5 @@ plotSingleSite.fixationSites <- function(x,
                                          site,
                                          select = NULL,
                                          ...) {
-    plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site), select = select, ...)
 }

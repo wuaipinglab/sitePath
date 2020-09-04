@@ -22,15 +22,10 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #' @description A \code{\link{lineagePath}} object will be plotted as a tree
 #'   diagram and paths are black solid line while the trimmed nodes and tips
 #'   will use gray dashed line.
-#' @param x Could be a \code{\link{lineagePath}} object,
-#'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
-#' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
-#'   have effect since 1.5.4. For a \code{sitePath} object, it can have more
-#'   than one fixation path. This is to select which path to plot. The default
-#'   is \code{NULL} which will plot all the paths. It is the same as
-#'   \code{select} in \code{\link{plotSingleSite}}. For a
-#'   \code{\link{fixationSites}} or a \code{\link{fixationPath}} object, it is
-#'   whether to show the fixation mutation between clusters.
+#' @param x The object to plot.
+#' @param y Whether to show the fixation mutation between clusters. For
+#'   \code{lineagePath} object and \code{sitePath} object, it is deprecated and
+#'   no longer have effect since 1.5.4.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Other arguments. Since 1.5.4, the function uses
 #'   \code{\link{ggtree}} as the base function to make plots so the arguments in
@@ -109,16 +104,24 @@ plot.fixationSites <- function(x,
 #' @rdname plotFunctions
 #' @description A \code{sitePath} object can be extracted by using
 #'   \code{\link{extractSite}} on the return of \code{\link{fixationSites}}.
+#' @param select For a \code{sitePath} object, it can have result on more than
+#'   one evolution pathway. This is to select which path to plot. The default is
+#'   \code{NULL} which will plot all the paths. It is the same as \code{select}
+#'   in \code{\link{plotSingleSite}}.
 #' @export
 #' @examples
 #' sp <- extractSite(fixations, 139)
 #' plot(sp)
-plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
+plot.sitePath <- function(x,
+                          y = NULL,
+                          select = NULL,
+                          showTips = FALSE,
+                          ...) {
     tree <- attr(x, "tree")
-    if (is.null(y)) {
+    if (is.null(select)) {
         sitePaths <- x[]
     } else {
-        if (length(x) < y) {
+        if (length(x) < select) {
             stop(
                 "There are ",
                 length(x),
@@ -126,7 +129,7 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
                 "The selection \"y\" is out of bounds."
             )
         }
-        sitePaths <- x[y]
+        sitePaths <- x[select]
     }
     # Specify the color of mutations by pre-defined color set.
     groupColors <- .siteColorScheme(attr(x, "seqType"))

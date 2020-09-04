@@ -11,27 +11,27 @@
 
 \method{plot}{fixationSites}(x, y = TRUE, ...)
 
-\method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
+\method{plot}{sitePath}(x, y = NULL, select = NULL, showTips = FALSE, ...)
 
 \method{plot}{fixationPath}(x, y = TRUE, ...)
 }
 \arguments{
-\item{x}{Could be a \code{\link{lineagePath}} object,
-\code{\link{fixationSites}} object or \code{\link{fixationPath}} object.}
+\item{x}{The object to plot.}
 
-\item{y}{For \code{\link{lineagePath}} object, it is deprecated and no longer
-have effect since 1.5.4. For a \code{sitePath} object, it can have more
-than one fixation path. This is to select which path to plot. The default
-is \code{NULL} which will plot all the paths. It is the same as
-\code{select} in \code{\link{plotSingleSite}}. For a
-\code{\link{fixationSites}} or a \code{\link{fixationPath}} object, it is
-whether to show the fixation mutation between clusters.}
+\item{y}{Whether to show the fixation mutation between clusters. For
+\code{lineagePath} object and \code{sitePath} object, it is deprecated and
+no longer have effect since 1.5.4.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{...}{Other arguments. Since 1.5.4, the function uses
 \code{\link{ggtree}} as the base function to make plots so the arguments in
 \code{plot.phylo} will no longer work.}
+
+\item{select}{For a \code{sitePath} object, it can have result on more than
+one evolution pathway. This is to select which path to plot. The default is
+\code{NULL} which will plot all the paths. It is the same as \code{select}
+in \code{\link{plotSingleSite}}.}
 }
 \value{
 A ggplot object to make the plot.

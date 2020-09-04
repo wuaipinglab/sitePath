@@ -1,5 +1,3 @@
-context("test-plotSingleSite")
-
 test_that("The function plotSingleSite works for AA", {
     data(zikv_align)
     data(zikv_tree)
@@ -38,5 +36,4 @@ test_that("Warnings in plotSingleSite works", {
     sp <- extractSite(muts, 139)
     nSP <- length(sp)
     expect_error(extractTips(sp, nSP + 1))
-    expect_error(plot(sp, nSP + 1))
 })
