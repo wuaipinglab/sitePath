@@ -1,5 +1,9 @@
 #' @importFrom stats complete.cases
 
+#' @export
+SNPsites <- function(tree, ...)
+    UseMethod("SNPsites")
+
 #' @rdname SNPsites
 #' @name SNPsites
 #' @title Finding sites with variation
@@ -101,14 +105,4 @@ SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     attr(res, "phyMSAmatched") <- x
     class(res) <- "SNPsites"
     return(res)
-}
-
-#' @export
-SNPsites <- function(tree, ...)
-    UseMethod("SNPsites")
-
-#' @export
-print.SNPsites <- function(x, ...) {
-    x <- as.integer(x)
-    print(x)
 }

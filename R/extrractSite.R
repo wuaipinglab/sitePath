@@ -1,3 +1,7 @@
+#' @export
+extractSite <- function(x, site, ...)
+    UseMethod("extractSite")
+
 #' @rdname extractSite
 #' @name extractSite
 #' @title Extract tips for a single site
@@ -50,7 +54,3 @@ extractSite.fixationSites <- function(x, site, ...) {
 extractSite.parallelSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))
 }
-
-#' @export
-extractSite <- function(x, site, ...)
-    UseMethod("extractSite")

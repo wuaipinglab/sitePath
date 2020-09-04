@@ -1,3 +1,7 @@
+#' @export
+setSiteNumbering <- function(x, reference, gapChar, ...)
+    UseMethod("setSiteNumbering")
+
 #' @rdname setSiteNumbering
 #' @name setSiteNumbering
 #' @title Set site numbering to the reference sequence
@@ -187,7 +191,3 @@ setSiteNumbering.fixationPath <- function(x,
     )
     return(x)
 }
-
-#' @export
-setSiteNumbering <- function(x, reference, gapChar, ...)
-    UseMethod("setSiteNumbering")

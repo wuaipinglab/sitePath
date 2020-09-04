@@ -1,3 +1,7 @@
+#' @export
+extractTips <- function(x, ...)
+    UseMethod("extractTips")
+
 #' @rdname extractTips
 #' @name extractTips
 #' @title Extract grouped tips for a single site
@@ -119,7 +123,3 @@ extractTips.parallelSites <- function(x, site, ...) {
     parallelMut <- extractSite.parallelSites(x, site)
     return(extractTips.sitePara(parallelMut))
 }
-
-#' @export
-extractTips <- function(x, ...)
-    UseMethod("extractTips")

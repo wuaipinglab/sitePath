@@ -4,15 +4,12 @@
 \alias{plotSingleSite}
 \alias{plotSingleSite.lineagePath}
 \alias{plotSingleSite.parallelSites}
-\alias{plot.sitePath}
 \alias{plotSingleSite.fixationSites}
 \title{Color the tree by a single site}
 \usage{
 \method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
 
 \method{plotSingleSite}{parallelSites}(x, site, showPath = TRUE, ...)
-
-\method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 
 \method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
 }
@@ -34,11 +31,6 @@ The default is \code{TRUE}.}
 \code{\link{ggtree}} as the base function to make plots so the arguments in
 \code{plot.phylo} will no longer work.}
 
-\item{y}{For a \code{sitePath} object, it can have more than one fixation
-path. This is to select which path to plot. The default is \code{NULL}
-which will plot all the paths. It is the same as \code{select} in
-\code{plotSingleSite}}
-
 \item{select}{Select which fixation path in to plot. The default is NULL
 which will plot all the fixations.}
 }
@@ -54,10 +46,6 @@ For \code{\link{lineagePath}}, the tree will be colored
 For \code{\link{parallelSites}}, the tree will be colored
   according to the amino acid of the site if the mutation is not fixed.
 
-Visualize the \code{sitePath} object which can be extracted by
-  using \code{\link{extractSite}} on the return of
-  \code{\link{fixationSites}}.
-
 For \code{\link{fixationSites}}, it will color the ancestral
   tips in red, descendant tips in blue and excluded tips in grey.
 }
@@ -67,11 +55,8 @@ data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 paths <- lineagePath(tree)
 plotSingleSite(paths, 139)
-fixations <- fixationSites(paths)
-sp <- extractSite(fixations, 139)
-plot(sp)
 plotSingleSite(fixations, 139)
 }
 \seealso{
-\code{\link{plotSingleSite}}, \code{\link{extractSite}}
+\code{\link{plot.sitePath}}
 }

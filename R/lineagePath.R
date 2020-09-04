@@ -1,6 +1,10 @@
 #' @importFrom ape nodepath getMRCA
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
+#' @export
+lineagePath <- function(tree, similarity, ...)
+    UseMethod("lineagePath")
+
 #' @rdname lineagePath
 #' @name lineagePath
 #' @title Resolving lineage paths using SNP
@@ -82,7 +86,7 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
-treemerBySite <- function(x, ...) {
+.treemerBySite <- function(x, ...) {
     tree <- attr(x, "tree")
     align <- attr(x, "align")
     # Generate the site mapping from reference
@@ -90,22 +94,6 @@ treemerBySite <- function(x, ...) {
     loci <- attr(x, "loci")
     res <- runTreemerBySite(nodepath(tree), align, loci)
     return(res)
-}
-
-#' @export
-lineagePath <- function(tree, similarity, ...)
-    UseMethod("lineagePath")
-
-#' @export
-print.lineagePath <- function(x, ...) {
-    cat(
-        "This is a 'lineagePath' object.\n\n",
-        length(x),
-        " lineage paths using ",
-        attr(x, "similarity") * 100,
-        "% as \"major SNP\" threshold \n",
-        sep = ""
-    )
 }
 
 #' @rdname lineagePath

@@ -3,12 +3,15 @@
 \name{plot.lineagePath}
 \alias{plot.lineagePath}
 \alias{plot.fixationSites}
+\alias{plot.sitePath}
 \alias{plot.fixationPath}
 \title{Visualize the results}
 \usage{
 \method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
 
 \method{plot}{fixationSites}(x, y = TRUE, ...)
+
+\method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
 
 \method{plot}{fixationPath}(x, y = TRUE, ...)
 }
@@ -17,8 +20,11 @@
 \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.}
 
 \item{y}{For \code{\link{lineagePath}} object, it is deprecated and no longer
-have effect since 1.5.4. For a \code{\link{fixationSites}} or a
-\code{\link{fixationPath}} object, it is whether to show the fixation
+have effect since 1.5.4. For a \code{sitePath} object, it can have more
+than one fixation path. This is to select which path to plot. The default
+is \code{NULL} which will plot all the paths. It is the same as
+\code{select} in \code{plotSingleSite} For a \code{\link{fixationSites}} or
+a \code{\link{fixationPath}} object, it is whether to show the fixation
 mutation between clusters.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
@@ -41,9 +47,14 @@ A ggplot object to make the plot. A \code{\link{lineagePath}} object
 }
 \description{
 The plot function to visualize the return of functions in the
-  package. Though the function name \code{plot} is used, the plot functions
-  here do not behave like the generic \code{\link{plot}} function. The
-  underlying function applies \code{\link{ggplot2}}.
+  package. The underlying function applies \code{\link{ggplot2}}. The
+  function name \code{plot} is used to keep the compatibility with previous
+  versions, but they do not behave like the generic \code{\link{plot}}
+  function since 1.5.4.
+
+Visualize the \code{sitePath} object which can be extracted by
+  using \code{\link{extractSite}} on the return of
+  \code{\link{fixationSites}}.
 }
 \examples{
 data(zikv_tree)
@@ -53,6 +64,8 @@ paths <- lineagePath(tree)
 plot(paths)
 fixations <- fixationSites(paths)
 plot(fixations)
+sp <- extractSite(fixations, 139)
+plot(sp)
 x <- fixationPath(fixations)
 plot(x)
 }

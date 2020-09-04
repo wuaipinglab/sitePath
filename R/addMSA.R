@@ -1,5 +1,5 @@
-#' @importFrom seqinr read.alignment
 #' @importFrom methods is
+#' @importFrom seqinr read.alignment
 #' @importFrom ape read.tree multi2di is.binary
 
 #' @export
@@ -74,9 +74,4 @@ addMSA <- function(tree,
     # Use the numbering of MSA as the default site numbering
     res <- setSiteNumbering.phyMSAmatched(res)
     return(res)
-}
-
-#' @export
-print.phyMSAmatched <- function(x, ...) {
-    cat(x, "\n")
 }

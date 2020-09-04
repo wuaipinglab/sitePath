@@ -1,22 +1,6 @@
-#' @rdname similarityMatrix
-#' @title Similarity between sequences
-#' @description Get similarity between aligned sequences with gap ignored.
-#' @param tree The return from \code{\link{addMSA}} function.
-#' @return A diagonal matrix of similarity between sequences.
-#' @seealso \code{\link{lineagePath}}
 #' @export
-#' @examples
-#' data(zikv_tree)
-#' data(zikv_align)
-#' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' simMatrix <- similarityMatrix(tree)
-similarityMatrix <- function(tree) {
-    x <- .phyMSAmatch(tree)
-    sim <- getSimilarityMatrix(attr(x, "align"))
-    tree <- attr(x, "tree")
-    dimnames(sim) <- list(tree[["tip.label"]], tree[["tip.label"]])
-    return(sim)
-}
+groupTips <- function(tree, ...)
+    UseMethod("groupTips")
 
 #' @rdname groupTips
 #' @name groupTips
@@ -154,7 +138,21 @@ groupTips.fixationPath <- function(tree, tipnames = TRUE, ...) {
     return(res)
 }
 
+#' @rdname similarityMatrix
+#' @title Similarity between sequences
+#' @description Get similarity between aligned sequences with gap ignored.
+#' @param tree The return from \code{\link{addMSA}} function.
+#' @return A diagonal matrix of similarity between sequences.
 #' @export
-groupTips <- function(tree, ...) {
-    UseMethod("groupTips")
+#' @examples
+#' data(zikv_tree)
+#' data(zikv_align)
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' simMatrix <- similarityMatrix(tree)
+similarityMatrix <- function(tree) {
+    x <- .phyMSAmatch(tree)
+    sim <- getSimilarityMatrix(attr(x, "align"))
+    tree <- attr(x, "tree")
+    dimnames(sim) <- list(tree[["tip.label"]], tree[["tip.label"]])
+    return(sim)
 }

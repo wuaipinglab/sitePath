@@ -1,6 +1,9 @@
-#' @importFrom graphics plot
-#' @importFrom ggplot2 GeomSegment ggtitle GeomText GeomPoint
-#' @importFrom ggtree geom_tippoint
+#' @importFrom ggplot2 aes ggtitle guides theme guide_legend
+#' @importFrom ggplot2 scale_size scale_color_manual
+#' @importFrom ggplot2 GeomSegment GeomText GeomPoint
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom tidytree groupOTU
+#' @importFrom ggtree ggtree geom_tippoint geom_tiplab
 
 #' @rdname plotSingleSite
 #' @name plotSingleSite
@@ -22,6 +25,7 @@
 #'   \code{plot.phylo} will no longer work.
 #' @return Since 1.5.4, the function returns a ggplot object so on longer
 #'   behaviors like the generic \code{\link{plot}} function.
+#' @seealso \code{\link{plot.sitePath}}
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -135,78 +139,6 @@ plotSingleSite.parallelSites <- function(x,
     if (any(sporadicTip)) {
         p <- p + geom_tippoint(aes(subset = sporadicTip,
                                    size = GeomPoint[["default_aes"]][["size"]]))
-    }
-    return(p)
-}
-
-#' @rdname plotSingleSite
-#' @description Visualize the \code{sitePath} object which can be extracted by
-#'   using \code{\link{extractSite}} on the return of
-#'   \code{\link{fixationSites}}.
-#' @param y For a \code{sitePath} object, it can have more than one fixation
-#'   path. This is to select which path to plot. The default is \code{NULL}
-#'   which will plot all the paths. It is the same as \code{select} in
-#'   \code{plotSingleSite}
-#' @export
-#' @seealso \code{\link{plotSingleSite}}, \code{\link{extractSite}}
-#' @examples
-#' fixations <- fixationSites(paths)
-#' sp <- extractSite(fixations, 139)
-#' plot(sp)
-plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
-    tree <- attr(x, "tree")
-    if (is.null(y)) {
-        sitePaths <- x[]
-    } else {
-        if (length(x) < y) {
-            stop(
-                "There are ",
-                length(x),
-                "lineages with fixation mutation. ",
-                "The selection \"y\" is out of bounds."
-            )
-        }
-        sitePaths <- x[y]
-    }
-    # Specify the color of mutations by pre-defined color set.
-    groupColors <- .siteColorScheme(attr(x, "seqType"))
-    # Collect the fixation mutation for each evolutionary pathway
-    subtitle <- character()
-    group <- list()
-    for (sp in sitePaths) {
-        aaName <- character()
-        for (tips in sp) {
-            aa <- toupper(attr(tips, "AA"))
-            aaName <- c(aaName, aa)
-            group[[aa]] <- c(group[[aa]], tips)
-        }
-        subtitle <- c(subtitle,
-                      paste0(aaName, collapse = " -> "))
-    }
-    tree <- groupOTU(tree, group)
-    # Color the excluded branch gray as the excluded lineage
-    excludedLabel <- ".excluded"
-    groupColors[[excludedLabel]] <- "#dcdcdc"
-    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
-        excludedLabel
-    # Use dashed line for excluded branches
-    linetype <- as.integer(attr(tree, "group") == excludedLabel)
-    linetype <- factor(linetype)
-    # Just in case the fixation mutation name is too long
-    sepChar <- "\n"
-    if (sum(nchar(subtitle) <= 18)) {
-        sepChar <- ", "
-    }
-    subtitle <- paste(subtitle, collapse = sepChar)
-    # Make the plot
-    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
-        scale_color_manual(values = groupColors) +
-        guides(linetype = FALSE,
-               color = guide_legend(override.aes = list(size = 3))) +
-        theme(legend.position = "left") +
-        ggtitle(label = attr(x, "site"), subtitle = subtitle)
-    if (showTips) {
-        p <- p + geom_tiplab()
     }
     return(p)
 }

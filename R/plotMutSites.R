@@ -1,5 +1,6 @@
-#' @importFrom ggplot2 ggplot geom_point element_blank element_rect
+#' @importFrom ggplot2 ggplot geom_point theme element_blank element_rect
 #' @importFrom aplot insert_left
+#' @importFrom ggtree geom_tiplab
 
 #' @rdname plotMutSites
 #' @name plotMutSites

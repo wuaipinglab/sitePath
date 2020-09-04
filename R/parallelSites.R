@@ -1,3 +1,7 @@
+#' @export
+parallelSites <- function(x, ...)
+    UseMethod("parallelSites")
+
 #' @rdname parallelSites
 #' @name parallelSites
 #' @title Mutation across multiple phylogenetic lineages
@@ -334,55 +338,4 @@ parallelSites.sitesMinEntropy <- function(x,
         FUN.VALUE = character(1)
     )
     res[which(!is.na(res))]
-}
-
-#' @export
-parallelSites <- function(x, ...)
-    UseMethod("parallelSites")
-
-#' @export
-print.parallelSites <- function(x, ...) {
-    cat("This is a 'parallelSites' object.\n\nResult for",
-        length(attr(x, "paths")),
-        "paths:\n\n")
-    if (length(x) == 0) {
-        cat("No parallel site found\n")
-    } else {
-        cat(paste(names(x), collapse = " "), "\n")
-        refSeqName <- attr(x, "reference")
-        if (is.null(refSeqName)) {
-            cat("No reference sequence specified.",
-                "Using alignment numbering\n")
-        } else {
-            cat("Reference sequence: ", refSeqName, "\n", sep = "")
-        }
-    }
-}
-
-#' @export
-print.sitePara <- function(x, ...) {
-    cat(
-        "This is a 'sitePara' object.\n\nSite",
-        attr(x, "site"),
-        "may have parallel mutation on",
-        length(x),
-        "pair of paths:\n\n"
-    )
-    mutSummary <- table(vapply(
-        X = extractTips.sitePara(x),
-        FUN = function(mutTips) {
-            attr(mutTips, "mutName")[4]
-        },
-        FUN.VALUE = character(1)
-    ))
-    mutInfo <- character()
-    for (mutName in names(mutSummary)) {
-        mutInfo <-
-            c(mutInfo, paste0(mutName, "(", mutSummary[[mutName]], ")"))
-    }
-    cat(
-        paste0(mutInfo, collapse = ", "),
-        "\n\nIn the bracket are the number of tips",
-        "involved in the mutation\n"
-    )
 }

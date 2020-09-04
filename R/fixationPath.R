@@ -1,6 +1,10 @@
 #' @importFrom stats na.omit
 #' @importFrom tidytree as_tibble full_join as.treedata
 
+#' @export
+fixationPath <- function(x, ...)
+    UseMethod("fixationPath")
+
 #' @rdname fixationPath
 #' @name fixationPath
 #' @title Accumulation of fixed mutation as a tree
@@ -246,14 +250,4 @@ fixationPath.fixationSites <- function(x,
     tree <- as.phylo.fixationSites(x)
     res <- .findFixationPath(x, minEffectiveSize, tree)
     return(res)
-}
-
-#' @export
-fixationPath <- function(x, ...) {
-    UseMethod("fixationPath")
-}
-
-#' @export
-print.fixationPath <- function(x, ...) {
-    print(names(x))
 }

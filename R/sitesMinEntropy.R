@@ -1,5 +1,9 @@
 #' @importFrom utils tail
 
+#' @export
+sitesMinEntropy <- function(x, ...)
+    UseMethod("sitesMinEntropy")
+
 #' @rdname sitesMinEntropy
 #' @name sitesMinEntropy
 #' @title Fixation sites prediction
@@ -484,13 +488,4 @@ sitesMinEntropy.lineagePath <- function(x,
         }
     }
     return(grouping)
-}
-
-#' @export
-sitesMinEntropy <- function(x, ...)
-    UseMethod("sitesMinEntropy")
-
-#' @export
-print.sitesMinEntropy <- function(x, ...) {
-    cat("This is a 'sitesMinEntropy' object.", "\n")
 }

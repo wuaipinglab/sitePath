@@ -1,7 +1,8 @@
+#' @importFrom graphics plot
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
-#' @importFrom ggplot2 scale_color_manual guides guide_legend
-#' @importFrom ggplot2 aes theme scale_color_manual scale_size
+#' @importFrom ggplot2 aes guides theme ggtitle guide_legend
+#' @importFrom ggplot2 scale_size scale_color_manual
 #' @importFrom tidytree groupOTU
 #' @importFrom ggtree ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
@@ -14,14 +15,18 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #' @rdname plotFunctions
 #' @title Visualize the results
 #' @description The plot function to visualize the return of functions in the
-#'   package. Though the function name \code{plot} is used, the plot functions
-#'   here do not behave like the generic \code{\link{plot}} function. The
-#'   underlying function applies \code{\link{ggplot2}}.
+#'   package. The underlying function applies \code{\link{ggplot2}}. The
+#'   function name \code{plot} is used to keep the compatibility with previous
+#'   versions, but they do not behave like the generic \code{\link{plot}}
+#'   function since 1.5.4.
 #' @param x Could be a \code{\link{lineagePath}} object,
 #'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
 #' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
-#'   have effect since 1.5.4. For a \code{\link{fixationSites}} or a
-#'   \code{\link{fixationPath}} object, it is whether to show the fixation
+#'   have effect since 1.5.4. For a \code{sitePath} object, it can have more
+#'   than one fixation path. This is to select which path to plot. The default
+#'   is \code{NULL} which will plot all the paths. It is the same as
+#'   \code{select} in \code{plotSingleSite} For a \code{\link{fixationSites}} or
+#'   a \code{\link{fixationPath}} object, it is whether to show the fixation
 #'   mutation between clusters.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Other arguments. Since 1.5.4, the function uses
@@ -38,6 +43,12 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #'   number of fixation mutation between two clusters. The name of the tree tips
 #'   indicate the number of sequences in the cluster.
 #' @export
+#' @examples
+#' data(zikv_tree)
+#' data(zikv_align)
+#' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' paths <- lineagePath(tree)
+#' plot(paths)
 plot.lineagePath <- function(x,
                              y = TRUE,
                              showTips = FALSE,
@@ -68,17 +79,10 @@ plot.lineagePath <- function(x,
 }
 
 #' @rdname plotFunctions
-#' @export
 #' @examples
-#' data(zikv_tree)
-#' data(zikv_align)
-#' tree <- addMSA(zikv_tree, alignment = zikv_align)
-#' paths <- lineagePath(tree)
-#' plot(paths)
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
-#' x <- fixationPath(fixations)
-#' plot(x)
+#' @export
 plot.fixationSites <- function(x,
                                y = TRUE,
                                ...) {
@@ -107,6 +111,75 @@ plot.fixationSites <- function(x,
 }
 
 #' @rdname plotFunctions
+#' @description Visualize the \code{sitePath} object which can be extracted by
+#'   using \code{\link{extractSite}} on the return of
+#'   \code{\link{fixationSites}}.
+#' @export
+#' @examples
+#' sp <- extractSite(fixations, 139)
+#' plot(sp)
+plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
+    tree <- attr(x, "tree")
+    if (is.null(y)) {
+        sitePaths <- x[]
+    } else {
+        if (length(x) < y) {
+            stop(
+                "There are ",
+                length(x),
+                "lineages with fixation mutation. ",
+                "The selection \"y\" is out of bounds."
+            )
+        }
+        sitePaths <- x[y]
+    }
+    # Specify the color of mutations by pre-defined color set.
+    groupColors <- .siteColorScheme(attr(x, "seqType"))
+    # Collect the fixation mutation for each evolutionary pathway
+    subtitle <- character()
+    group <- list()
+    for (sp in sitePaths) {
+        aaName <- character()
+        for (tips in sp) {
+            aa <- toupper(attr(tips, "AA"))
+            aaName <- c(aaName, aa)
+            group[[aa]] <- c(group[[aa]], tips)
+        }
+        subtitle <- c(subtitle,
+                      paste0(aaName, collapse = " -> "))
+    }
+    tree <- groupOTU(tree, group)
+    # Color the excluded branch gray as the excluded lineage
+    excludedLabel <- ".excluded"
+    groupColors[[excludedLabel]] <- "#dcdcdc"
+    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
+        excludedLabel
+    # Use dashed line for excluded branches
+    linetype <- as.integer(attr(tree, "group") == excludedLabel)
+    linetype <- factor(linetype)
+    # Just in case the fixation mutation name is too long
+    sepChar <- "\n"
+    if (sum(nchar(subtitle) <= 18)) {
+        sepChar <- ", "
+    }
+    subtitle <- paste(subtitle, collapse = sepChar)
+    # Make the plot
+    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
+        scale_color_manual(values = groupColors) +
+        guides(linetype = FALSE,
+               color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(label = attr(x, "site"), subtitle = subtitle)
+    if (showTips) {
+        p <- p + geom_tiplab()
+    }
+    return(p)
+}
+
+#' @rdname plotFunctions
+#' @examples
+#' x <- fixationPath(fixations)
+#' plot(x)
 #' @export
 plot.fixationPath <- function(x,
                               y = TRUE,
