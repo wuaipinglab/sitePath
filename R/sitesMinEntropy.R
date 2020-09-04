@@ -15,6 +15,7 @@
 #'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
 #' @return A \code{sitesMinEntropy} object.
+#' @importFrom utils tail
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -259,14 +260,14 @@ sitesMinEntropy.lineagePath <- function(x,
                     # the group
                     attr(gp, "site") <- c(attr(gp, "site"), site)
                     # The groups after the current group to be added
-                    if (i + 1 <= length(res)) {
-                        trailing <- res[(i + 1):length(res)]
-                    } else {
-                        trailing <- list()
-                    }
+                    # if (i + 1 <= length(res)) {
+                    #     trailing <- res[(i + 1):length(res)]
+                    # } else {
+                    #     trailing <- list()
+                    # }
                     newGrouping <- c(newGrouping,
                                      list(gp),
-                                     trailing)
+                                     tail(res, length(res) - i))
                     break
                 } else {
                     # A new cluster formed when there is overlapped between new
@@ -292,15 +293,15 @@ sitesMinEntropy.lineagePath <- function(x,
                         attr(tips, "site") <-
                             c(attr(gp, "site"), site)
                         attr(tips, "node") <- attr(gp, "node")
-                        if (i + 1 <= length(res)) {
-                            trailing <- res[(i + 1):length(res)]
-                        } else {
-                            trailing <- list()
-                        }
+                        # if (i + 1 <= length(res)) {
+                        #     trailing <- res[(i + 1):length(res)]
+                        # } else {
+                        #     trailing <- list()
+                        # }
                         newGrouping <- c(newGrouping,
                                          list(tips),
                                          list(separate),
-                                         trailing)
+                                         tail(res, length(res) - i))
                         # Go for the next new coming tips
                         break
                     } else {
