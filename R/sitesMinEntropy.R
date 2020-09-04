@@ -30,15 +30,23 @@ sitesMinEntropy.lineagePath <- function(x,
     tree <- attr(paths, "tree")
     # Set the minimal size of the group during the search
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <-
-            length(tree[["tip.label"]]) / length(unique(unlist(paths)))
+        tipNum <- length(tree[["tip.label"]])
+        pathNodeNum <- length(unique(unlist(paths)))
+        minEffectiveSize <- ceiling(tipNum / pathNodeNum)
     } else if (!is.numeric(minEffectiveSize)) {
-        stop("\"minEffectiveSize\" only accepts numeric")
+        stop("'minEffectiveSize' (",
+             minEffectiveSize,
+             ") is not numeric")
+    } else if (minEffectiveSize < 0) {
+        stop("'minEffectiveSize' (",
+             minEffectiveSize,
+             ")  is negative")
+    } else {
+        minEffectiveSize <- ceiling(minEffectiveSize)
     }
-    minEffectiveSize <- ceiling(minEffectiveSize)
     # Set the search depth for heuristic search
     if (searchDepth < 1) {
-        stop("\"searchDepth\" should be at least 1")
+        stop("'searchDepth' (", searchDepth, ")  is less than 1")
     } else {
         searchDepth <- ceiling(searchDepth)
     }
@@ -83,7 +91,7 @@ sitesMinEntropy.lineagePath <- function(x,
         )
     })
     # Cluster tips according to fixation sites
-    clustersByPath <- .clustersByPath(res)
+    clustersByPath <- lapply(res, .clusterByFixation)
     clustersByPath <- .mergeClusters(clustersByPath)
     attr(res, "clustersByPath") <-
         .assignClusterNames(clustersByPath)
@@ -209,112 +217,105 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.clustersByPath <- function(fixations) {
-    # Find the clustering for each lineage path
-    res <- lapply(fixations, function(sp) {
-        # Set the site and amino acid/nucleotide info for each group of tips
-        group <- lapply(names(sp), function(site) {
-            lapply(sp[[site]], function(tips) {
-                siteChar <- attr(tips, "AA")
-                node <- attr(tips, "node")
-                # Purge the attributes and keep only the node and amino
-                # acid/nucleotide info
-                attributes(tips) <- NULL
-                attr(tips, "site") <- siteChar
-                names(attr(tips, "site")) <- site
-                attr(tips, "node") <- node
-                return(tips)
-            })
+.clusterByFixation <- function(sp) {
+    # Set the site and amino acid/nucleotide info for each group of tips
+    group <- lapply(names(sp), function(site) {
+        lapply(sp[[site]], function(tips) {
+            siteChar <- attr(tips, "AA")
+            node <- attr(tips, "node")
+            # Purge the attributes and keep only the node and amino
+            # acid/nucleotide info
+            attributes(tips) <- NULL
+            attr(tips, "site") <- siteChar
+            names(attr(tips, "site")) <- site
+            attr(tips, "node") <- node
+            return(tips)
         })
-        # Group tips according to fixation points
-        res <- group[[1]]
-        for (seg in group[-1]) {
-            # the node name for each group of tips
-            nodeNames <- names(seg)
-            # Iterate each group of tips to contribute to grouping
-            for (n in seq_along(seg)) {
-                tips <- seg[[n]]
-                # The site number and its amino acid/nucleotide
-                site <- attr(tips, "site")
-                # Update grouping for each tips by growing a new list
-                newGrouping <- list()
-                # Compare with each group of the current grouping
-                for (i in seq_along(res)) {
-                    gp <- res[[i]]
-                    common <- sort(intersect(tips, gp))
-                    # No new cluster when the coming tips have no overlap or are
-                    # identical to tips in an existing cluster
-                    if (length(common) == 0) {
-                        # Keep the current grouping if the coming group has no
-                        # overlap yet
-                        newGrouping <- res[seq_len(i)]
-                    } else if (identical(sort(gp), sort(tips))) {
-                        # The only effect here is to add the new 'site' info to
-                        # the group
+    })
+    # Group tips according to fixation points
+    res <- group[[1]]
+    for (seg in group[-1]) {
+        # the node name for each group of tips
+        nodeNames <- names(seg)
+        # Iterate each group of tips to contribute to grouping
+        for (n in seq_along(seg)) {
+            tips <- seg[[n]]
+            # The site number and its amino acid/nucleotide
+            site <- attr(tips, "site")
+            # Update grouping for each tips by growing a new list
+            newGrouping <- list()
+            # Compare with each group of the current grouping
+            for (i in seq_along(res)) {
+                gp <- res[[i]]
+                common <- sort(intersect(tips, gp))
+                # No new cluster when the coming tips have no overlap or are
+                # identical to tips in an existing cluster
+                if (length(common) == 0) {
+                    # Keep the current grouping if the coming group has no
+                    # overlap yet
+                    newGrouping <- res[seq_len(i)]
+                } else if (identical(sort(gp), sort(tips))) {
+                    # The only effect here is to add the new 'site' info to
+                    # the group
+                    attr(gp, "site") <- c(attr(gp, "site"), site)
+                    # The groups after the current group to be added
+                    if (i + 1 <= length(res)) {
+                        trailing <- res[(i + 1):length(res)]
+                    } else {
+                        trailing <- list()
+                    }
+                    newGrouping <- c(newGrouping,
+                                     list(gp),
+                                     trailing)
+                    break
+                } else {
+                    # A new cluster formed when there is overlapped between new
+                    # coming tips and existing tips in a cluster
+                    if (identical(sort(gp), common)) {
+                        # The new coming tips includes the current group. The
+                        # extra tips stay for the next loop just in case it has
+                        # impact on the grouping
+                        tips <- setdiff(tips, gp)
+                        # Update the SNP site info for the current group
                         attr(gp, "site") <-
                             c(attr(gp, "site"), site)
-                        # The groups after the current group to be added
+                        newGrouping <- c(newGrouping, list(gp))
+                    } else if (identical(sort(tips), common)) {
+                        # The new coming tips are included in the group (they
+                        # are used up at this point) and they split the original
+                        # grouping
+                        separate <- setdiff(gp, tips)
+                        attributes(separate) <- attributes(gp)
+                        attr(separate, "node") <- nodeNames[n + 1]
+                        # 'tips' is the common part and inherit the attributes
+                        # of the to-be-split original group
+                        attr(tips, "site") <-
+                            c(attr(gp, "site"), site)
+                        attr(tips, "node") <- attr(gp, "node")
                         if (i + 1 <= length(res)) {
                             trailing <- res[(i + 1):length(res)]
                         } else {
                             trailing <- list()
                         }
-                        newGrouping <-
-                            c(newGrouping, list(gp), trailing)
+                        newGrouping <- c(newGrouping,
+                                         list(tips),
+                                         list(separate),
+                                         trailing)
+                        # Go for the next new coming tips
                         break
                     } else {
-                        # A new cluster formed when there is overlapped between
-                        # new coming tips and existing tips in a cluster
-                        if (identical(sort(gp), common)) {
-                            # The new coming tips includes the current group.
-                            # The extra tips stay for the next loop just in case
-                            # it has impact on the grouping
-                            tips <- setdiff(tips, gp)
-                            # Update the SNP site info for the current group
-                            attr(gp, "site") <-
-                                c(attr(gp, "site"), site)
-                            newGrouping <- c(newGrouping, list(gp))
-                        } else if (identical(sort(tips), common)) {
-                            # The new coming tips are included in the group
-                            # (they are used up at this point) and they split
-                            # the original grouping
-                            separate <- setdiff(gp, tips)
-                            attributes(separate) <- attributes(gp)
-                            attr(separate, "node") <-
-                                nodeNames[n + 1]
-                            # 'tips' is the common part and inherit the
-                            # attributes of the to-be-split original group
-                            attr(tips, "site") <-
-                                c(attr(gp, "site"), site)
-                            attr(tips, "node") <- attr(gp, "node")
-                            if (i + 1 <= length(res)) {
-                                trailing <- res[(i + 1):length(res)]
-                            } else {
-                                trailing <- list()
-                            }
-                            newGrouping <- c(newGrouping,
-                                             list(tips),
-                                             list(separate),
-                                             trailing)
-                            # Go for the next new coming tips
-                            break
-                        } else {
-                            stop("Something's not right")
-                        }
+                        stop("Something's not right")
                     }
                 }
-                # The new coming tips are used up and update the grouping
-                res <- newGrouping
             }
+            # The new coming tips are used up and update the grouping
+            res <- newGrouping
         }
-        return(res)
-    })
+    }
     return(res)
 }
 
 .mergeClusters <- function(clustersByPath) {
-    clustersByPath <-
-        clustersByPath[which(lengths(clustersByPath) != 0)]
     # 'res' stores all the non-overlapped parts which means all the clusters are
     # unique but it still splits into each path
     res <- list(clustersByPath[[1]])
