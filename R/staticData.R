@@ -1,3 +1,7 @@
+#' @useDynLib sitePath
+#' @importFrom Rcpp sourceCpp
+NULL
+
 #' @rdname sars2_align
 #' @title Multiple sequence alignment of SARS-CoV-2 genome CDS
 #' @description The raw sequences were downloaded from GISAID database
@@ -87,10 +91,6 @@
 #' @usage data(h3n2_tree_reduced)
 #' @docType data
 "h3n2_tree_reduced"
-
-#' @useDynLib sitePath
-#' @importFrom Rcpp sourceCpp
-NULL
 
 AA_COLORS <- c(
     "His" = "#8282D2",

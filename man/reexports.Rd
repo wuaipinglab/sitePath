@@ -4,8 +4,8 @@
 \name{reexports}
 \alias{reexports}
 \alias{read.tree}
-\alias{as.treedata}
 \alias{as.phylo}
+\alias{as.treedata}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{

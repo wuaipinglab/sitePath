@@ -1,3 +1,5 @@
+#' @importFrom utils tail
+
 #' @rdname sitesMinEntropy
 #' @name sitesMinEntropy
 #' @title Fixation sites prediction
@@ -15,7 +17,6 @@
 #'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
 #' @return A \code{sitesMinEntropy} object.
-#' @importFrom utils tail
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)

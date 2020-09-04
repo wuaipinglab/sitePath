@@ -1,3 +1,58 @@
+#' @importFrom ape as.phylo
+#' @importFrom tidytree as.treedata
+
+#' @export
+ape::as.phylo
+
+#' @export
+as.phylo.phyMSAmatched <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.sitePath <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.sitesMinEntropy <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.fixationSites <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
+tidytree::as.treedata
+
+#' @export
+as.treedata.fixationSites <- function(tree, ...) {
+    x <- tree
+    tree <- as.phylo.fixationSites(x)
+    grp <- groupTips.fixationSites(tree = x, tipnames = FALSE)
+    mutTable <- .mutationTable(x, tree, grp)
+    transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
+                       FUN = "[[",
+                       i = "mutation")
+    tree <- .annotateSNPonTree(tree, transMut)
+    tree <- groupOTU(tree, grp, group_name = "Groups")
+    return(tree)
+}
+
+#' @export
+as.treedata.fixationPath <- function(tree, ...) {
+    res <- attr(tree, "SNPtracing")
+    return(res)
+}
+
 #' @rdname as.data.frame
 #' @title Convert results to Data Frame
 #' @description Convert return of functions in \code{sitePath} package to a
@@ -156,59 +211,5 @@ as.data.frame.parallelSites <- function(x,
         "mutTo" = mutTo,
         "fixation" = isFixed
     )
-    return(res)
-}
-
-#' @importFrom tidytree as.treedata
-#' @export
-tidytree::as.treedata
-
-#' @export
-as.treedata.fixationSites <- function(tree, ...) {
-    x <- tree
-    tree <- as.phylo.fixationSites(x)
-    grp <- groupTips.fixationSites(tree = x, tipnames = FALSE)
-    mutTable <- .mutationTable(x, tree, grp)
-    transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
-                       FUN = "[[",
-                       i = "mutation")
-    tree <- .annotateSNPonTree(tree, transMut)
-    tree <- groupOTU(tree, grp, group_name = "Groups")
-    return(tree)
-}
-
-#' @export
-as.treedata.fixationPath <- function(tree, ...) {
-    res <- attr(tree, "SNPtracing")
-    return(res)
-}
-
-#' @importFrom ape as.phylo
-#' @export
-ape::as.phylo
-
-#' @export
-as.phylo.phyMSAmatched <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitePath <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitesMinEntropy <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.fixationSites <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
     return(res)
 }

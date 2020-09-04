@@ -1,3 +1,7 @@
+#' @importFrom graphics plot
+#' @importFrom ggplot2 GeomSegment ggtitle GeomText GeomPoint
+#' @importFrom ggtree geom_tippoint
+
 #' @rdname plotSingleSite
 #' @name plotSingleSite
 #' @title Color the tree by a single site
@@ -18,8 +22,6 @@
 #'   \code{plot.phylo} will no longer work.
 #' @return Since 1.5.4, the function returns a ggplot object so on longer
 #'   behaviors like the generic \code{\link{plot}} function.
-#' @importFrom graphics plot
-#' @importFrom ggplot2 GeomSegment ggtitle
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -86,8 +88,6 @@ plotSingleSite.lineagePath <- function(x,
 #' @rdname plotSingleSite
 #' @description For \code{\link{parallelSites}}, the tree will be colored
 #'   according to the amino acid of the site if the mutation is not fixed.
-#' @importFrom ggtree geom_tippoint
-#' @importFrom ggplot2 GeomText GeomPoint
 #' @export
 plotSingleSite.parallelSites <- function(x,
                                          site,

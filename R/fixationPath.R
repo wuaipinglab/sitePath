@@ -1,3 +1,6 @@
+#' @importFrom stats na.omit
+#' @importFrom tidytree as_tibble full_join as.treedata
+
 #' @rdname fixationPath
 #' @name fixationPath
 #' @title Accumulation of fixed mutation as a tree
@@ -10,8 +13,6 @@
 #' @param minEffectiveSize The minimum size for a tip cluster.
 #' @param ... Further arguments passed to or from other methods.
 #' @return An \code{fixationPath} object
-#' @importFrom stats na.omit
-#' @importFrom tidytree as_tibble full_join as.treedata
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -255,28 +256,4 @@ fixationPath <- function(x, ...) {
 #' @export
 print.fixationPath <- function(x, ...) {
     print(names(x))
-}
-
-#' @rdname plotFunctions
-#' @importFrom ggtree geom_tiplab theme_tree2
-#' @importFrom ggrepel geom_label_repel
-#' @export
-plot.fixationPath <- function(x,
-                              y = TRUE,
-                              ...) {
-    tr <- attr(x, "SNPtracing")
-    p <- ggtree(tr) +
-        geom_tiplab(hjust = 0.5,
-                    align = TRUE,
-                    offset = 0.5) +
-        theme_tree2()
-    if (y) {
-        p <- p + geom_label_repel(
-            aes(x = branch, label = SNPs),
-            fill = 'lightgreen',
-            min.segment.length = 0,
-            na.rm = TRUE
-        )
-    }
-    return(p)
 }

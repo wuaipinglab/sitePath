@@ -1,3 +1,6 @@
+#' @importFrom ape nodepath getMRCA
+#' @importFrom gridExtra arrangeGrob grid.arrange
+
 #' @rdname lineagePath
 #' @name lineagePath
 #' @title Resolving lineage paths using SNP
@@ -15,7 +18,6 @@
 #' @param forbidTrivial Does not allow trivial trimming.
 #' @param ... Other arguments.
 #' @return Lineage path represent by node number.
-#' @importFrom ape nodepath getMRCA
 #' @export
 #' @examples
 #' data('zikv_tree')
@@ -106,64 +108,6 @@ print.lineagePath <- function(x, ...) {
     )
 }
 
-#' @rdname plotFunctions
-#' @title Visualize the results
-#' @description The plot function to visualize the return of functions in the
-#'   package. Though the function name \code{plot} is used, the plot functions
-#'   here do not behave like the generic \code{\link{plot}} function. The
-#'   underlying function applies \code{\link{ggplot2}}.
-#' @param x Could be a \code{\link{lineagePath}} object,
-#'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
-#' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
-#'   have effect since 1.5.4. For a \code{\link{fixationSites}} or a
-#'   \code{\link{fixationPath}} object, it is whether to show the fixation
-#'   mutation between clusters.
-#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
-#' @param ... Other arguments. Since 1.5.4, the function uses
-#'   \code{\link{ggtree}} as the base function to make plots so the arguments in
-#'   \code{plot.phylo} will no longer work.
-#' @return A ggplot object to make the plot. A \code{\link{lineagePath}} object
-#'   will be plotted as a tree diagram will be plotted and paths are black solid
-#'   line while the trimmed nodes and tips will use grey dashed line. A
-#'   \code{\link{fixationSites}} object will be plotted as original phylogenetic
-#'   tree marked with fixation substitutions. A \code{\link{fixationPath}}
-#'   object will be plotted as a \code{phylo} object. The tips are clustered
-#'   according to the fixation sites. The transition of fixation sites will be
-#'   plotted as a phylogenetic tree. The length of each branch represents the
-#'   number of fixation mutation between two clusters. The name of the tree tips
-#'   indicate the number of sequences in the cluster.
-#' @importFrom ggtree ggtree
-#' @importFrom ggplot2 aes theme scale_color_manual scale_size
-#' @export
-plot.lineagePath <- function(x,
-                             y = TRUE,
-                             showTips = FALSE,
-                             ...) {
-    tree <- attr(x, "tree")
-    # Get number of ancestral nodes plus tip nodes
-    nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
-    # Set lineage nodes and non-lineage nodes as separate group
-    group <- rep(1, times = nNodes)
-    group[unique(unlist(x))] <- 0
-    group <- factor(group)
-    # Set line size
-    size <- rep(1, times = nNodes)
-    size[unique(unlist(x))] <- 2
-    # Tree plot
-    p <- ggtree(tree, aes(
-        color = group,
-        linetype = group,
-        size = size
-    )) +
-        scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
-        scale_color_manual(values = c("black", "gainsboro")) +
-        theme(legend.position = "none")
-    if (showTips) {
-        p <- p + geom_tiplab()
-    }
-    return(p)
-}
-
 #' @rdname lineagePath
 #' @description \code{sneakPeek} is intended to plot 'similarity' (actually the
 #'   least percentage of 'major SNP') as a threshold against number of output
@@ -185,7 +129,6 @@ plot.lineagePath <- function(x,
 #' @return \code{sneakPeek} return the similarity threhold against number of
 #'   lineagePath. There will be a simple dot plot between threshold and path
 #'   number if \code{makePlot} is TRUE.
-#' @importFrom gridExtra arrangeGrob grid.arrange
 #' @export
 #' @examples
 #' sneakPeek(tree, step = 3)
