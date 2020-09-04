@@ -1,9 +1,3 @@
-#' @importFrom ape as.phylo
-#' @importFrom tidytree as.treedata
-
-#' @export
-ape::as.phylo
-
 #' @export
 as.phylo.phyMSAmatched <- function(x, ...) {
     res <- attr(x, "tree")
@@ -29,9 +23,6 @@ as.phylo.fixationSites <- function(x, ...) {
     res <- attr(paths, "tree")
     return(res)
 }
-
-#' @export
-tidytree::as.treedata
 
 #' @export
 as.treedata.fixationSites <- function(tree, ...) {

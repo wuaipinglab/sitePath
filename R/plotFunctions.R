@@ -19,29 +19,23 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #'   function name \code{plot} is used to keep the compatibility with previous
 #'   versions, but they do not behave like the generic \code{\link{plot}}
 #'   function since 1.5.4.
+#' @description A \code{\link{lineagePath}} object will be plotted as a tree
+#'   diagram and paths are black solid line while the trimmed nodes and tips
+#'   will use gray dashed line.
 #' @param x Could be a \code{\link{lineagePath}} object,
 #'   \code{\link{fixationSites}} object or \code{\link{fixationPath}} object.
 #' @param y For \code{\link{lineagePath}} object, it is deprecated and no longer
 #'   have effect since 1.5.4. For a \code{sitePath} object, it can have more
 #'   than one fixation path. This is to select which path to plot. The default
 #'   is \code{NULL} which will plot all the paths. It is the same as
-#'   \code{select} in \code{plotSingleSite} For a \code{\link{fixationSites}} or
-#'   a \code{\link{fixationPath}} object, it is whether to show the fixation
-#'   mutation between clusters.
+#'   \code{select} in \code{\link{plotSingleSite}}. For a
+#'   \code{\link{fixationSites}} or a \code{\link{fixationPath}} object, it is
+#'   whether to show the fixation mutation between clusters.
 #' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
 #' @param ... Other arguments. Since 1.5.4, the function uses
 #'   \code{\link{ggtree}} as the base function to make plots so the arguments in
 #'   \code{plot.phylo} will no longer work.
-#' @return A ggplot object to make the plot. A \code{\link{lineagePath}} object
-#'   will be plotted as a tree diagram will be plotted and paths are black solid
-#'   line while the trimmed nodes and tips will use grey dashed line. A
-#'   \code{\link{fixationSites}} object will be plotted as original phylogenetic
-#'   tree marked with fixation substitutions. A \code{\link{fixationPath}}
-#'   object will be plotted as a \code{phylo} object. The tips are clustered
-#'   according to the fixation sites. The transition of fixation sites will be
-#'   plotted as a phylogenetic tree. The length of each branch represents the
-#'   number of fixation mutation between two clusters. The name of the tree tips
-#'   indicate the number of sequences in the cluster.
+#' @return A ggplot object to make the plot.
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -79,6 +73,8 @@ plot.lineagePath <- function(x,
 }
 
 #' @rdname plotFunctions
+#' @description A \code{\link{fixationSites}} object will be plotted as original
+#'   phylogenetic tree marked with fixation substitutions.
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
@@ -111,9 +107,8 @@ plot.fixationSites <- function(x,
 }
 
 #' @rdname plotFunctions
-#' @description Visualize the \code{sitePath} object which can be extracted by
-#'   using \code{\link{extractSite}} on the return of
-#'   \code{\link{fixationSites}}.
+#' @description A \code{sitePath} object can be extracted by using
+#'   \code{\link{extractSite}} on the return of \code{\link{fixationSites}}.
 #' @export
 #' @examples
 #' sp <- extractSite(fixations, 139)
@@ -177,6 +172,11 @@ plot.sitePath <- function(x, y = NULL, showTips = FALSE, ...) {
 }
 
 #' @rdname plotFunctions
+#' @description A \code{\link{fixationPath}} object will be plotted as a
+#'   \code{phylo} object. The tips are clustered according to the fixation
+#'   sites. The transition of fixation sites will be plotted as a phylogenetic
+#'   tree. The length of each branch represents the number of fixation mutation
+#'   between two clusters.
 #' @examples
 #' x <- fixationPath(fixations)
 #' plot(x)

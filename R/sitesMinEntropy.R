@@ -1,11 +1,6 @@
 #' @importFrom utils tail
 
-#' @export
-sitesMinEntropy <- function(x, ...)
-    UseMethod("sitesMinEntropy")
-
 #' @rdname sitesMinEntropy
-#' @name sitesMinEntropy
 #' @title Fixation sites prediction
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{sitesMinEntropy} perform entropy minimization on every site of
@@ -27,6 +22,11 @@ sitesMinEntropy <- function(x, ...)
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' sitesMinEntropy(lineagePath(tree))
+sitesMinEntropy <- function(x, ...)
+    UseMethod("sitesMinEntropy")
+
+#' @rdname sitesMinEntropy
+#' @export
 sitesMinEntropy.lineagePath <- function(x,
                                         minEffectiveSize = NULL,
                                         searchDepth = 1,

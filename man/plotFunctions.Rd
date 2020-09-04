@@ -23,9 +23,9 @@
 have effect since 1.5.4. For a \code{sitePath} object, it can have more
 than one fixation path. This is to select which path to plot. The default
 is \code{NULL} which will plot all the paths. It is the same as
-\code{select} in \code{plotSingleSite} For a \code{\link{fixationSites}} or
-a \code{\link{fixationPath}} object, it is whether to show the fixation
-mutation between clusters.}
+\code{select} in \code{\link{plotSingleSite}}. For a
+\code{\link{fixationSites}} or a \code{\link{fixationPath}} object, it is
+whether to show the fixation mutation between clusters.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
@@ -34,16 +34,7 @@ mutation between clusters.}
 \code{plot.phylo} will no longer work.}
 }
 \value{
-A ggplot object to make the plot. A \code{\link{lineagePath}} object
-  will be plotted as a tree diagram will be plotted and paths are black solid
-  line while the trimmed nodes and tips will use grey dashed line. A
-  \code{\link{fixationSites}} object will be plotted as original phylogenetic
-  tree marked with fixation substitutions. A \code{\link{fixationPath}}
-  object will be plotted as a \code{phylo} object. The tips are clustered
-  according to the fixation sites. The transition of fixation sites will be
-  plotted as a phylogenetic tree. The length of each branch represents the
-  number of fixation mutation between two clusters. The name of the tree tips
-  indicate the number of sequences in the cluster.
+A ggplot object to make the plot.
 }
 \description{
 The plot function to visualize the return of functions in the
@@ -52,9 +43,21 @@ The plot function to visualize the return of functions in the
   versions, but they do not behave like the generic \code{\link{plot}}
   function since 1.5.4.
 
-Visualize the \code{sitePath} object which can be extracted by
-  using \code{\link{extractSite}} on the return of
-  \code{\link{fixationSites}}.
+A \code{\link{lineagePath}} object will be plotted as a tree
+  diagram and paths are black solid line while the trimmed nodes and tips
+  will use gray dashed line.
+
+A \code{\link{fixationSites}} object will be plotted as original
+  phylogenetic tree marked with fixation substitutions.
+
+A \code{sitePath} object can be extracted by using
+  \code{\link{extractSite}} on the return of \code{\link{fixationSites}}.
+
+A \code{\link{fixationPath}} object will be plotted as a
+  \code{phylo} object. The tips are clustered according to the fixation
+  sites. The transition of fixation sites will be plotted as a phylogenetic
+  tree. The length of each branch represents the number of fixation mutation
+  between two clusters.
 }
 \examples{
 data(zikv_tree)

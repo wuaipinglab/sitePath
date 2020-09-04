@@ -1,11 +1,6 @@
 #' @importFrom stats complete.cases
 
-#' @export
-SNPsites <- function(tree, ...)
-    UseMethod("SNPsites")
-
 #' @rdname SNPsites
-#' @name SNPsites
 #' @title Finding sites with variation
 #' @description Single nucleotide polymorphism (SNP) in the whole package refers
 #'   to variation of amino acid. \code{SNPsite} will try to find SNP in the
@@ -22,6 +17,11 @@ SNPsites <- function(tree, ...)
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
+SNPsites <- function(tree, ...)
+    UseMethod("SNPsites")
+
+#' @rdname SNPsites
+#' @export
 SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     x <- .phyMSAmatch(tree)
     nTips <- length(attr(x, "tree")[["tip.label"]])

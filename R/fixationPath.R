@@ -1,12 +1,7 @@
 #' @importFrom stats na.omit
 #' @importFrom tidytree as_tibble full_join as.treedata
 
-#' @export
-fixationPath <- function(x, ...)
-    UseMethod("fixationPath")
-
 #' @rdname fixationPath
-#' @name fixationPath
 #' @title Accumulation of fixed mutation as a tree
 #' @description The tips are clustered according to the fixation sites. The
 #'   transition of fixation sites will be plotted as a phylogenetic tree. The
@@ -25,6 +20,11 @@ fixationPath <- function(x, ...)
 #' paths <- lineagePath(tree)
 #' mutations <- fixationSites(paths)
 #' fixationPath(mutations)
+fixationPath <- function(x, ...)
+    UseMethod("fixationPath")
+
+#' @rdname fixationPath
+#' @export
 fixationPath.sitesMinEntropy <- function(x,
                                          minEffectiveSize = NULL,
                                          ...) {

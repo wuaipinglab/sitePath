@@ -7,6 +7,8 @@
 \alias{plotSingleSite.fixationSites}
 \title{Color the tree by a single site}
 \usage{
+plotSingleSite(x, site, ...)
+
 \method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
 
 \method{plotSingleSite}{parallelSites}(x, site, showPath = TRUE, ...)
@@ -19,17 +21,17 @@ the return from \code{\link{lineagePath}} function.}
 
 \item{site}{For \code{lineagePath}, it can be any site within sequence
 length. For \code{fixationSites} and \code{parallelSites}, it is restrained
-to a predicted fixation site. The numbering is consistent with
-the reference defined by \code{\link{setSiteNumbering}}.}
+to a predicted fixation site. The numbering is consistent with the
+reference defined by \code{\link{setSiteNumbering}}.}
+
+\item{...}{Other arguments. Since 1.5.4, the function uses
+\code{\link{ggtree}} as the base function to make plots so the arguments in
+\code{plot.phylo} will no longer work.}
 
 \item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.
 The default is \code{TRUE}.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
-
-\item{...}{Other arguments. Since 1.5.4, the function uses
-\code{\link{ggtree}} as the base function to make plots so the arguments in
-\code{plot.phylo} will no longer work.}
 
 \item{select}{Select which fixation path in to plot. The default is NULL
 which will plot all the fixations.}
@@ -39,6 +41,10 @@ Since 1.5.4, the function returns a ggplot object so on longer
   behaviors like the generic \code{\link{plot}} function.
 }
 \description{
+Plot and color the tree according to amino acid/nucleotide of
+  the selected site. The color scheme depends on the \code{seqType} set in
+  \code{\link{addMSA}} function.
+
 For \code{\link{lineagePath}}, the tree will be colored
   according to the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
@@ -55,6 +61,7 @@ data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 paths <- lineagePath(tree)
 plotSingleSite(paths, 139)
+fixations <- fixationSites(paths)
 plotSingleSite(fixations, 139)
 }
 \seealso{

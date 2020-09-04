@@ -9,6 +9,8 @@
 \alias{groupTips.fixationPath}
 \title{The grouping of tree tips}
 \usage{
+groupTips(tree, ...)
+
 \method{groupTips}{phyMSAmatched}(
   tree,
   similarity = NULL,
@@ -30,6 +32,8 @@
 \item{tree}{The return from \code{\link{addMSA}}, \code{\link{lineagePath}},
 \code{\link{sitesMinEntropy}} or other functions.}
 
+\item{...}{Other arguments.}
+
 \item{similarity}{This decides how minor SNPs are to remove. If provided as
 fraction between 0 and 1, then the minimum number of SNP will be total tips
 times \code{similariy}. If provided as integer greater than 1, the minimum
@@ -41,8 +45,6 @@ number will be \code{similariy}. The default \code{similariy} is 0.05 for
 \item{forbidTrivial}{Does not allow trivial trimming.}
 
 \item{tipnames}{If return tips as integer or tip names.}
-
-\item{...}{Other arguments.}
 }
 \value{
 \code{groupTips} returns grouping of tips.

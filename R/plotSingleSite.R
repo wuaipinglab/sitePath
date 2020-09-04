@@ -6,20 +6,16 @@
 #' @importFrom ggtree ggtree geom_tippoint geom_tiplab
 
 #' @rdname plotSingleSite
-#' @name plotSingleSite
 #' @title Color the tree by a single site
-#' @description For \code{\link{lineagePath}}, the tree will be colored
-#'   according to the amino acid of the site. The color scheme tries to assign
-#'   distinguishable color for each amino acid.
+#' @description Plot and color the tree according to amino acid/nucleotide of
+#'   the selected site. The color scheme depends on the \code{seqType} set in
+#'   \code{\link{addMSA}} function.
 #' @param x A \code{fixationSites} object from \code{\link{fixationSites}} or
 #'   the return from \code{\link{lineagePath}} function.
 #' @param site For \code{lineagePath}, it can be any site within sequence
 #'   length. For \code{fixationSites} and \code{parallelSites}, it is restrained
-#'   to a predicted fixation site. The numbering is consistent with
-#'   the reference defined by \code{\link{setSiteNumbering}}.
-#' @param showPath If plot the lineage result from \code{\link{lineagePath}}.
-#'   The default is \code{TRUE}.
-#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
+#'   to a predicted fixation site. The numbering is consistent with the
+#'   reference defined by \code{\link{setSiteNumbering}}.
 #' @param ...  Other arguments. Since 1.5.4, the function uses
 #'   \code{\link{ggtree}} as the base function to make plots so the arguments in
 #'   \code{plot.phylo} will no longer work.
@@ -33,6 +29,17 @@
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
 #' plotSingleSite(paths, 139)
+plotSingleSite <- function(x, site, ...)
+    UseMethod("plotSingleSite")
+
+#' @rdname plotSingleSite
+#' @description For \code{\link{lineagePath}}, the tree will be colored
+#'   according to the amino acid of the site. The color scheme tries to assign
+#'   distinguishable color for each amino acid.
+#' @param showPath If plot the lineage result from \code{\link{lineagePath}}.
+#'   The default is \code{TRUE}.
+#' @param showTips Whether to plot the tip labels. The default is \code{FALSE}.
+#' @export
 plotSingleSite.lineagePath <- function(x,
                                        site,
                                        showPath = TRUE,
@@ -150,6 +157,7 @@ plotSingleSite.parallelSites <- function(x,
 #'   which will plot all the fixations.
 #' @export
 #' @examples
+#' fixations <- fixationSites(paths)
 #' plotSingleSite(fixations, 139)
 plotSingleSite.fixationSites <- function(x,
                                          site,
@@ -157,7 +165,3 @@ plotSingleSite.fixationSites <- function(x,
                                          ...) {
     plot.sitePath(x = .actualExtractSite(x, site), y = select, ...)
 }
-
-#' @export
-plotSingleSite <- function(x, ...)
-    UseMethod("plotSingleSite")

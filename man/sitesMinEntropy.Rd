@@ -5,6 +5,8 @@
 \alias{sitesMinEntropy.lineagePath}
 \title{Fixation sites prediction}
 \usage{
+sitesMinEntropy(x, ...)
+
 \method{sitesMinEntropy}{lineagePath}(
   x,
   minEffectiveSize = NULL,
@@ -17,6 +19,8 @@
 \item{x}{A \code{lineagePath} object returned from \code{\link{lineagePath}}
 function.}
 
+\item{...}{further arguments passed to or from other methods.}
+
 \item{minEffectiveSize}{The minimum number of tips in a group.}
 
 \item{searchDepth}{The function uses heuristic search but the termination of
@@ -26,8 +30,6 @@ tell the search when to stop.}
 \item{method}{The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.}
-
-\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 A \code{sitesMinEntropy} object.

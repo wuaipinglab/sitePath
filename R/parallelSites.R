@@ -1,9 +1,4 @@
-#' @export
-parallelSites <- function(x, ...)
-    UseMethod("parallelSites")
-
 #' @rdname parallelSites
-#' @name parallelSites
 #' @title Mutation across multiple phylogenetic lineages
 #' @description A site may have mutated on parallel lineages. Mutation can occur
 #'   on the same site across the phylogenetic lineages solved by
@@ -31,6 +26,11 @@ parallelSites <- function(x, ...)
 #' paths <- lineagePath(tree)
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
+parallelSites <- function(x, ...)
+    UseMethod("parallelSites")
+
+#' @rdname parallelSites
+#' @export
 parallelSites.lineagePath <- function(x,
                                       minSNP = NULL,
                                       mutMode = c("all", "exact",

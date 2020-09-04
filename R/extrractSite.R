@@ -1,9 +1,4 @@
-#' @export
-extractSite <- function(x, site, ...)
-    UseMethod("extractSite")
-
 #' @rdname extractSite
-#' @name extractSite
 #' @title Extract tips for a single site
 #' @description The functions in \code{sitePath} usually include the results on
 #'   more than one site. The function \code{extractSite} can be used to extract
@@ -20,6 +15,11 @@ extractSite <- function(x, site, ...)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractSite(mutations, 139)
+extractSite <- function(x, site, ...)
+    UseMethod("extractSite")
+
+#' @rdname extractSite
+#' @export
 extractSite.fixationSites <- function(x, site, ...) {
     return(.actualExtractSite(x, site))
 }

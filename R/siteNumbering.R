@@ -1,9 +1,4 @@
-#' @export
-setSiteNumbering <- function(x, reference, gapChar, ...)
-    UseMethod("setSiteNumbering")
-
 #' @rdname setSiteNumbering
-#' @name setSiteNumbering
 #' @title Set site numbering to the reference sequence
 #' @description A reference sequence can be used to define a global site
 #'   numbering scheme for multiple sequence alignment. The gap in the reference
@@ -27,6 +22,11 @@ setSiteNumbering <- function(x, reference, gapChar, ...)
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
+setSiteNumbering <- function(x, reference, gapChar, ...)
+    UseMethod("setSiteNumbering")
+
+#' @rdname setSiteNumbering
+#' @export
 setSiteNumbering.phyMSAmatched <- function(x,
                                            reference = NULL,
                                            gapChar = "-",

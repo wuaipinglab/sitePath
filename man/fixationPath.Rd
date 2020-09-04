@@ -6,6 +6,8 @@
 \alias{fixationPath.fixationSites}
 \title{Accumulation of fixed mutation as a tree}
 \usage{
+fixationPath(x, ...)
+
 \method{fixationPath}{sitesMinEntropy}(x, minEffectiveSize = NULL, ...)
 
 \method{fixationPath}{fixationSites}(x, minEffectiveSize = NULL, ...)
@@ -13,9 +15,9 @@
 \arguments{
 \item{x}{The return from \code{\link{fixationSites}} function.}
 
-\item{minEffectiveSize}{The minimum size for a tip cluster.}
-
 \item{...}{Further arguments passed to or from other methods.}
+
+\item{minEffectiveSize}{The minimum size for a tip cluster.}
 }
 \value{
 An \code{fixationPath} object

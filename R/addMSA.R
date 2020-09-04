@@ -1,9 +1,6 @@
 #' @importFrom methods is
 #' @importFrom seqinr read.alignment
-#' @importFrom ape read.tree multi2di is.binary
-
-#' @export
-ape::read.tree
+#' @importFrom ape multi2di is.binary
 
 #' @rdname addMSA
 #' @name phyMSAmatched

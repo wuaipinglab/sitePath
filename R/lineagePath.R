@@ -1,12 +1,7 @@
 #' @importFrom ape nodepath getMRCA
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
-#' @export
-lineagePath <- function(tree, similarity, ...)
-    UseMethod("lineagePath")
-
 #' @rdname lineagePath
-#' @name lineagePath
 #' @title Resolving lineage paths using SNP
 #' @description \code{lineagePath} finds the lineages of a phylogenetic tree
 #'   providing the corresponding sequence alignment. This is done by finding
@@ -28,6 +23,11 @@ lineagePath <- function(tree, similarity, ...)
 #' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' lineagePath(tree)
+lineagePath <- function(tree, similarity, ...)
+    UseMethod("lineagePath")
+
+#' @rdname lineagePath
+#' @export
 lineagePath.phyMSAmatched <- function(tree,
                                       similarity = NULL,
                                       simMatrix = NULL,

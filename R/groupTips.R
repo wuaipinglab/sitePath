@@ -1,9 +1,4 @@
-#' @export
-groupTips <- function(tree, ...)
-    UseMethod("groupTips")
-
 #' @rdname groupTips
-#' @name groupTips
 #' @title The grouping of tree tips
 #' @description The tips between divergent nodes or fixation mutations on the
 #'   lineages are each gathered as group.
@@ -25,6 +20,11 @@ groupTips <- function(tree, ...)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' groupTips(tree)
+groupTips <- function(tree, ...)
+    UseMethod("groupTips")
+
+#' @rdname groupTips
+#' @export
 groupTips.phyMSAmatched <- function(tree,
                                     similarity = NULL,
                                     simMatrix = NULL,

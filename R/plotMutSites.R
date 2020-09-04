@@ -3,7 +3,6 @@
 #' @importFrom ggtree geom_tiplab
 
 #' @rdname plotMutSites
-#' @name plotMutSites
 #' @title Plot tree and mutation sites
 #' @description The mutated sites for each tip in a phylogenetic tree will be
 #'   represented as colored dots positioned by their site number.
@@ -17,6 +16,11 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' plotMutSites(SNPsites(tree))
+plotMutSites <- function(x, ...)
+    UseMethod("plotMutSites")
+
+#' @rdname plotMutSites
+#' @export
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     allSNP <- attr(x, "allSNP")
     phyMSAmatched <- attr(x, "phyMSAmatched")
@@ -50,7 +54,3 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     # Combine the two plots and return
     return(insert_left(snpPlot, treePlot, 2))
 }
-
-#' @export
-plotMutSites <- function(x, ...)
-    UseMethod("plotMutSites")

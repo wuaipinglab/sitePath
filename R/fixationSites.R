@@ -1,9 +1,4 @@
-#' @export
-fixationSites <- function(paths, ...)
-    UseMethod("fixationSites")
-
 #' @rdname fixationSites
-#' @name fixationSites
 #' @title Fixation sites prediction
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{fixationSites} uses the result to find those sites that show
@@ -30,6 +25,11 @@ fixationSites <- function(paths, ...)
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' fixationSites(lineagePath(tree))
+fixationSites <- function(paths, ...)
+    UseMethod("fixationSites")
+
+#' @rdname fixationSites
+#' @export
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
                                       searchDepth = 1,

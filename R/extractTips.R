@@ -1,9 +1,4 @@
-#' @export
-extractTips <- function(x, ...)
-    UseMethod("extractTips")
-
 #' @rdname extractTips
-#' @name extractTips
 #' @title Extract grouped tips for a single site
 #' @description The result of \code{\link{fixationSites}} and \code{sitePath}
 #'   contains all the possible sites with fixation mutation. The function
@@ -22,6 +17,49 @@ extractTips <- function(x, ...)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
+extractTips <- function(x, ...)
+    UseMethod("extractTips")
+
+#' @rdname extractTips
+#' @description For \code{\link{lineagePath}}, the function \code{extractTips}
+#'   groups all the tree tips according to the amino acid/nucleotide of the
+#'   \code{site}.
+#' @export
+extractTips.lineagePath <- function(x, site, ...) {
+    site <- .checkSite(site)
+    align <- attr(x, "align")
+    align <- strsplit(tolower(align), "")
+    reference <- attr(x, "msaNumbering")
+    # Get the site index of the alignment
+    tryCatch(
+        expr = site <- reference[[site]],
+        error = function(e) {
+            stop("The site: ",
+                 attr(x, "site"),
+                 "is not within the length of sequence alignment.")
+        }
+    )
+    # Group the tree tips by amino acid/nucleotide of the site
+    group <- list()
+    for (tipName in names(align)) {
+        siteChar <- align[[tipName]][site]
+        group[[siteChar]] <- c(group[[siteChar]], tipName)
+    }
+    return(group)
+}
+
+#' @rdname extractTips
+#' @export
+extractTips.fixationSites <- function(x,
+                                      site,
+                                      select = 1,
+                                      ...) {
+    sp <- extractSite.fixationSites(x, site)
+    return(extractTips.sitePath(sp, select))
+}
+
+#' @rdname extractTips
+#' @export
 extractTips.sitePath <- function(x, select = 1, ...) {
     tree <- attr(x, "tree")
     if (select <= 0 || as.integer(select) != select) {
@@ -54,46 +92,15 @@ extractTips.sitePath <- function(x, select = 1, ...) {
 }
 
 #' @rdname extractTips
-#' @export
-extractTips.fixationSites <- function(x,
-                                      site,
-                                      select = 1,
-                                      ...) {
-    sp <- extractSite.fixationSites(x, site)
-    return(extractTips.sitePath(sp, select))
-}
-
-#' @rdname extractTips
-#' @description For \code{\link{lineagePath}}, the function \code{extractTips}
-#'   groups all the tree tips according to the amino acid/nucleotide of the
-#'   \code{site}.
-#' @export
-extractTips.lineagePath <- function(x, site, ...) {
-    site <- .checkSite(site)
-    align <- attr(x, "align")
-    align <- strsplit(tolower(align), "")
-    reference <- attr(x, "msaNumbering")
-    # Get the site index of the alignment
-    tryCatch(
-        expr = site <- reference[[site]],
-        error = function(e) {
-            stop("The site: ",
-                 attr(x, "site"),
-                 "is not within the length of sequence alignment.")
-        }
-    )
-    # Group the tree tips by amino acid/nucleotide of the site
-    group <- list()
-    for (tipName in names(align)) {
-        siteChar <- align[[tipName]][site]
-        group[[siteChar]] <- c(group[[siteChar]], tipName)
-    }
-    return(group)
-}
-
-#' @rdname extractTips
 #' @description For \code{\link{parallelSites}} and \code{sitePara} object, the
 #'   function \code{extractTips} retrieve all the tips with parallel mutation.
+#' @export
+extractTips.parallelSites <- function(x, site, ...) {
+    parallelMut <- extractSite.parallelSites(x, site)
+    return(extractTips.sitePara(parallelMut))
+}
+
+#' @rdname extractTips
 #' @export
 extractTips.sitePara <- function(x, ...) {
     # The duplicated nodes should be removed because they are not truly parallel
@@ -115,11 +122,4 @@ extractTips.sitePara <- function(x, ...) {
         }
     }
     return(res)
-}
-
-#' @rdname extractTips
-#' @export
-extractTips.parallelSites <- function(x, site, ...) {
-    parallelMut <- extractSite.parallelSites(x, site)
-    return(extractTips.sitePara(parallelMut))
 }

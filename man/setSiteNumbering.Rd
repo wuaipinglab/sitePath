@@ -5,6 +5,8 @@
 \alias{setSiteNumbering.phyMSAmatched}
 \title{Set site numbering to the reference sequence}
 \usage{
+setSiteNumbering(x, reference, gapChar, ...)
+
 \method{setSiteNumbering}{phyMSAmatched}(x, reference = NULL, gapChar = "-", minSkipSize = NULL, ...)
 }
 \arguments{
@@ -17,11 +19,11 @@ of the sequences' name. The default uses the intrinsic alignment numbering}
 \item{gapChar}{The character to indicate gap. The numbering will skip the
 \code{gapChar} for the reference sequence.}
 
+\item{...}{Further arguments passed to or from other methods.}
+
 \item{minSkipSize}{The minimum number of tips to have gap or ambiguous amino
 acid/nucleotide for a site to be ignored in other analysis. This will not
 affect the numbering. The default is 0.8.}
-
-\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 The input \code{x} with numbering mapped to \code{reference}.
