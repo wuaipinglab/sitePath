@@ -92,7 +92,10 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
 #' @rdname groupTips
 #' @export
 groupTips.sitesMinEntropy <- function(tree, tipnames = TRUE, ...) {
-    x <- tree
+    .unpackClustersByPath(x = tree, tipnames = tipnames)
+}
+
+.unpackClustersByPath <- function(x, tipnames) {
     clustersByPath <- attr(x, "clustersByPath")
     tree <- as.phylo.sitesMinEntropy(x)
     tipLabels <- tree[["tip.label"]]
@@ -111,9 +114,7 @@ groupTips.sitesMinEntropy <- function(tree, tipnames = TRUE, ...) {
 #' @rdname groupTips
 #' @export
 groupTips.fixationSites <- function(tree, tipnames = TRUE, ...) {
-    grp <- fixationPath.fixationSites(tree, minEffectiveSize = 0)
-    res <- groupTips.fixationPath(grp, tipnames = tipnames)
-    return(res)
+    .unpackClustersByPath(x = tree, tipnames = tipnames)
 }
 
 #' @rdname groupTips

@@ -78,14 +78,14 @@ plot.fixationSites <- function(x,
                                y = TRUE,
                                ...) {
     tree <- as.treedata.fixationSites(x)
-    grp <- levels(attr(tree@phylo, "Groups"))
+    grp <- levels(tree@data[["group"]])
     grp <- grp[which(grp != "0")]
     groupColors <-
         colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
     names(groupColors) <- grp
     groupColors["0"] <- "black"
 
-    p <- ggtree(tree, aes(color = Groups)) +
+    p <- ggtree(tree, aes(color = group)) +
         scale_color_manual(values = groupColors) +
         guides(color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left")

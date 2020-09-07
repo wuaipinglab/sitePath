@@ -32,11 +32,6 @@ setSiteNumbering.phyMSAmatched <- function(x,
                                            gapChar = "-",
                                            minSkipSize = NULL,
                                            ...) {
-    res <- .checkReference(x, reference, gapChar, minSkipSize)
-    return(res)
-}
-
-.checkReference <- function(x, reference, gapChar, minSkipSize) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
     if (is.null(reference)) {

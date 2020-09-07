@@ -26,15 +26,13 @@ as.phylo.fixationSites <- function(x, ...) {
 
 #' @export
 as.treedata.fixationSites <- function(tree, ...) {
-    x <- tree
-    tree <- as.phylo.fixationSites(x)
-    grp <- groupTips.fixationSites(tree = x, tipnames = FALSE)
-    mutTable <- .mutationTable(x, tree, grp)
+    mutTable <- .mutationTable(tree)
     transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
                        FUN = "[[",
                        i = "mutation")
+    tree <- groupOTU(as.phylo.fixationSites(tree),
+                     groupTips.fixationSites(tree))
     tree <- .annotateSNPonTree(tree, transMut)
-    tree <- groupOTU(tree, grp, group_name = "Groups")
     return(tree)
 }
 
@@ -65,35 +63,38 @@ as.data.frame.fixationSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    res <- .mutationTable(
-        fixations = x,
-        tree = as.phylo.fixationSites(x),
-        grp = groupTips.fixationSites(x, tipnames = FALSE)
-    )
+    res <- .mutationTable(x)
     res <- res[, c("mutation", "from", "to")]
     return(res)
 }
 
-.mutationTable <- function(fixations, tree, grp) {
+.mutationTable <- function(fixations) {
+    # The original tree
+    tree <- as.phylo.fixationSites(fixations)
+    # The clusters sorted by path
+    clustersByPath <- attr(fixations, "clustersByPath")
     # The cluster each tip belongs to
     clusterInfo <- character()
     # Extract the node path for each tip cluster
     clusterPaths <- list()
     rootNode <- getMRCA(tree, tree[["tip.label"]])
-    # Iterate the cluster and grow the two above
-    for (cluster in names(grp)) {
-        tips <- grp[[cluster]]
-        # The cluster named by the tips
-        clsNames <- rep(cluster, length(tips))
-        names(clsNames) <- as.character(tips)
-        clusterInfo <- c(clusterInfo, clsNames)
-        # The node path towards the cluster
-        ancestral <- getMRCA(tree, tips)
-        if (is.null(ancestral)) {
-            np <- nodepath(tree, rootNode, tips)
-            clusterPaths[[cluster]] <- np[seq_len(length(np) - 1)]
-        } else {
-            clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+    # The cluster name and node of each group
+    for (gp in clustersByPath) {
+        for (tips in gp) {
+            cluster <- attr(tips, "clsName")
+            # The cluster named by the tips
+            clsNames <- rep(cluster, length(tips))
+            names(clsNames) <- as.character(tips)
+            clusterInfo <- c(clusterInfo, clsNames)
+            # The node path towards the cluster
+            ancestral <- as.integer(attr(tips, "node"))
+            if (is.null(ancestral)) {
+                np <- nodepath(tree, rootNode, tips)
+                clusterPaths[[cluster]] <-
+                    np[seq_len(length(np) - 1)]
+            } else {
+                clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+            }
         }
     }
     # Info for the transition mutation
