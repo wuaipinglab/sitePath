@@ -1,54 +1,12 @@
-#' @export
-as.phylo.phyMSAmatched <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitePath <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitesMinEntropy <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.fixationSites <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
-    return(res)
-}
-
-#' @export
-as.treedata.fixationSites <- function(tree, ...) {
-    mutTable <- .mutationTable(tree)
-    transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
-                       FUN = "[[",
-                       i = "mutation")
-    tree <- groupOTU(as.phylo.fixationSites(tree),
-                     groupTips.fixationSites(tree))
-    tree <- .annotateSNPonTree(tree, transMut)
-    return(tree)
-}
-
-#' @export
-as.treedata.fixationPath <- function(tree, ...) {
-    res <- attr(tree, "SNPtracing")
-    return(res)
-}
-
 #' @rdname as.data.frame
 #' @title Convert results to Data Frame
 #' @description Convert return of functions in \code{sitePath} package to a
-#'   \code{\link{data.frame}} so can be better worked with.
-#' @param x A \code{\link{fixationSites}} object.
-#' @param row.names NULL or a character vector giving the row names for the data
-#'   frame. Missing values are not allowed.
+#'   \code{\link{data.frame}} so can be better worked with. The group name for
+#'   each tip is the same as \code{\link{groupTips}}.
+#' @description A \code{\link{fixationSites}} object will output the mutation
+#'   name of the fixation and the cluster name before and after the mutation.
+#' @param x The object to be converted to \code{data.frame}.
+#' @param row.names Unimplemented.
 #' @param optional Unimplemented.
 #' @param ... Other arguments.
 #' @return A \code{\link{data.frame}} object.
@@ -150,6 +108,9 @@ as.data.frame.fixationSites <- function(x,
     return(res)
 }
 
+#' @rdname as.data.frame
+#' @description An \code{\link{SNPsites}} object will output the tip name with
+#'   the SNP and its position.
 #' @export
 as.data.frame.SNPsites <- function(x,
                                    row.names = NULL,
@@ -159,6 +120,9 @@ as.data.frame.SNPsites <- function(x,
     return(res)
 }
 
+#' @rdname as.data.frame
+#' @description An \code{\link{parallelSites}} object will output the tip name
+#'   with the group name and mutation info.
 #' @export
 as.data.frame.parallelSites <- function(x,
                                         row.names = NULL,

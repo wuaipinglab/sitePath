@@ -8,4 +8,48 @@ ape::read.tree
 ape::as.phylo
 
 #' @export
+as.phylo.phyMSAmatched <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.sitePath <- function(x, ...) {
+    res <- attr(x, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.sitesMinEntropy <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
+as.phylo.fixationSites <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- attr(paths, "tree")
+    return(res)
+}
+
+#' @export
 tidytree::as.treedata
+
+#' @export
+as.treedata.fixationSites <- function(tree, ...) {
+    mutTable <- .mutationTable(tree)
+    transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
+                       FUN = "[[",
+                       i = "mutation")
+    tree <- groupOTU(as.phylo.fixationSites(tree),
+                     groupTips.fixationSites(tree))
+    tree <- .annotateSNPonTree(tree, transMut)
+    return(tree)
+}
+
+#' @export
+as.treedata.fixationPath <- function(tree, ...) {
+    res <- attr(tree, "SNPtracing")
+    return(res)
+}
