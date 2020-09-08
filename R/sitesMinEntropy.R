@@ -39,14 +39,11 @@ sitesMinEntropy.lineagePath <- function(x,
         tipNum <- length(tree[["tip.label"]])
         pathNodeNum <- length(unique(unlist(paths)))
         minEffectiveSize <- ceiling(tipNum / pathNodeNum)
-    } else if (!is.numeric(minEffectiveSize)) {
+    } else if (!is.numeric(minEffectiveSize) ||
+               minEffectiveSize < 0) {
         stop("'minEffectiveSize' (",
              minEffectiveSize,
-             ") is not numeric")
-    } else if (minEffectiveSize < 0) {
-        stop("'minEffectiveSize' (",
-             minEffectiveSize,
-             ")  is negative")
+             ") is not positive numeric")
     } else {
         minEffectiveSize <- ceiling(minEffectiveSize)
     }
@@ -66,21 +63,17 @@ sitesMinEntropy.lineagePath <- function(x,
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching
-    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
-                                        divNodes = divNodes)
-    # Get the MSA numbering
-    reference <- attr(paths, "msaNumbering")
-    # Exclude the invariant sites
-    loci <- attr(x, "loci")
-    # In case root node does not have any tips (because itself is a divergent
-    # node)
+    nodeAlign <- .tipSeqsAlongPathNodes(paths, divNodes)
+    # In case root node does not have any tips
     excludedNodes <- divNodes
     rootNode <- attr(paths, "rootNode")
     if (!rootNode %in% names(nodeAlign)) {
         excludedNodes <- c(rootNode, excludedNodes)
     }
+    # Exclude the invariant sites
+    loci <- attr(x, "loci")
     # Turn the site number into index for C++ code
-    siteIndices <- reference[loci] - 1
+    siteIndices <- attr(paths, "msaNumbering")[loci] - 1
     names(siteIndices) <- as.character(loci)
     # Group the result by path for all loci
     res <- lapply(paths, function(path) {
@@ -97,66 +90,29 @@ sitesMinEntropy.lineagePath <- function(x,
         )
     })
     # Cluster tips according to fixation sites
-    clustersByPath <- lapply(res, .clusterByFixation)
+    clustersByPath <- lapply(res, function(segs) {
+        # Set the site and amino acid/nucleotide info for each group of tips
+        group <- lapply(names(segs), function(site) {
+            lapply(segs[[site]], function(tips) {
+                siteChar <- attr(tips, "AA")
+                node <- attr(tips, "node")
+                # Purge the attributes and keep only the node and amino
+                # acid/nucleotide info
+                attributes(tips) <- NULL
+                attr(tips, "site") <- siteChar
+                names(attr(tips, "site")) <- site
+                attr(tips, "node") <- node
+                return(tips)
+            })
+        })
+        .clusterByFixation(group)
+    })
     clustersByPath <- .mergeClusters(clustersByPath)
     attr(res, "clustersByPath") <-
         .assignClusterNames(clustersByPath)
     attr(res, "paths") <- paths
     class(res) <- "sitesMinEntropy"
     return(res)
-}
-
-.tipSeqsAlongPathNodes <- function(paths, divNodes) {
-    tree <- attr(paths, "tree")
-    align <- attr(paths, "align")
-    allNodes <- unlist(paths)
-    terminalNodes <- vapply(
-        X = paths,
-        FUN = function(p) {
-            p[length(p)]
-        },
-        FUN.VALUE = integer(1)
-    )
-    # Get all the nodes that are not at divergent point
-    nodes <- setdiff(allNodes, divNodes)
-    # Get the sequence of the children tips that are descendant of
-    # the nodes. Assign the tip index to the sequences for
-    # retrieving the tip name
-    nodeAlign <- lapply(nodes, function(n) {
-        isTerminal <- FALSE
-        if (n %in% terminalNodes) {
-            childrenNode <- n
-            isTerminal <- TRUE
-        } else {
-            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
-            # Keep the node that is not on the path.
-            childrenNode <- setdiff(childrenNode, allNodes)
-        }
-        tips <- .childrenTips(tree, childrenNode)
-        res <- align[tips]
-        attr(res, "isTerminal") <- isTerminal
-        names(res) <- tips
-        return(res)
-    })
-    # Assign the node names to the 'nodeAlign' list
-    names(nodeAlign) <- nodes
-    return(nodeAlign)
-}
-
-.childrenTips <- function(tree, node) {
-    maxTip <- length(tree[["tip.label"]])
-    children <- integer()
-    getChildren <- function(edges, parent) {
-        children <<- c(children, parent[which(parent <= maxTip)])
-        i <- which(edges[, 1] %in% parent)
-        if (length(i) == 0L) {
-            return(children)
-        } else {
-            parent <- edges[i, 2]
-            return(getChildren(edges, parent))
-        }
-    }
-    return(getChildren(tree[["edge"]], node))
 }
 
 .runEntropyMinimization <- function(siteIndex,
@@ -223,21 +179,7 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.clusterByFixation <- function(sp) {
-    # Set the site and amino acid/nucleotide info for each group of tips
-    group <- lapply(names(sp), function(site) {
-        lapply(sp[[site]], function(tips) {
-            siteChar <- attr(tips, "AA")
-            node <- attr(tips, "node")
-            # Purge the attributes and keep only the node and amino
-            # acid/nucleotide info
-            attributes(tips) <- NULL
-            attr(tips, "site") <- siteChar
-            names(attr(tips, "site")) <- site
-            attr(tips, "node") <- node
-            return(tips)
-        })
-    })
+.clusterByFixation <- function(group) {
     # Group tips according to fixation points
     res <- group[[1]]
     for (seg in group[-1]) {
@@ -265,11 +207,6 @@ sitesMinEntropy.lineagePath <- function(x,
                     # the group
                     attr(gp, "site") <- c(attr(gp, "site"), site)
                     # The groups after the current group to be added
-                    # if (i + 1 <= length(res)) {
-                    #     trailing <- res[(i + 1):length(res)]
-                    # } else {
-                    #     trailing <- list()
-                    # }
                     newGrouping <- c(newGrouping,
                                      list(gp),
                                      tail(res, length(res) - i))
@@ -298,15 +235,12 @@ sitesMinEntropy.lineagePath <- function(x,
                         attr(tips, "site") <-
                             c(attr(gp, "site"), site)
                         attr(tips, "node") <- attr(gp, "node")
-                        # if (i + 1 <= length(res)) {
-                        #     trailing <- res[(i + 1):length(res)]
-                        # } else {
-                        #     trailing <- list()
-                        # }
-                        newGrouping <- c(newGrouping,
-                                         list(tips),
-                                         list(separate),
-                                         tail(res, length(res) - i))
+                        newGrouping <- c(
+                            newGrouping,
+                            list(tips),
+                            list(separate),
+                            tail(res, length(res) - i)
+                        )
                         # Go for the next new coming tips
                         break
                     } else {
@@ -468,16 +402,11 @@ sitesMinEntropy.lineagePath <- function(x,
             currMini <- currMini + 1
             toMerge <- attr(grouping[[i]][[j]], "toMerge")
             if (!is.null(toMerge)) {
-                if (identical(attr(grouping[[i]][[j]], "site"),
-                              attr(grouping[[i]][[j + 1]], "site"))) {
-                    nextMajor <- currMajor + 1
-                } else {
-                    # Create a new major number when encounter a divergent point
-                    currMajor <- currMajor + 1L
-                    # Reset mini number
-                    currMini <- 1L
-                    nextMajor <- currMajor
-                }
+                # Create a new major number when encounter a divergent point
+                currMajor <- currMajor + 1L
+                # Reset mini number
+                currMini <- 1L
+                nextMajor <- currMajor
                 # Assign the starting major number for the 'gp' to be merged
                 toMergeIndex <- as.integer(names(toMerge))
                 startingMajors[toMergeIndex] <-

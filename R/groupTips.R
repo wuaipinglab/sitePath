@@ -50,8 +50,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and the corresponding ancestral node
-    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
-                                        divNodes = divNodes)
+    nodeAlign <- .tipSeqsAlongPathNodes(paths, divNodes)
     nodeTips <- lapply(nodeAlign, function(i) {
         as.integer(names(i))
     })
@@ -87,6 +86,59 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
         })
     }
     return(res)
+}
+
+.tipSeqsAlongPathNodes <- function(paths, divNodes) {
+    tree <- attr(paths, "tree")
+    align <- attr(paths, "align")
+    allNodes <- unlist(paths)
+    terminalNodes <- vapply(
+        X = paths,
+        FUN = function(p) {
+            p[length(p)]
+        },
+        FUN.VALUE = integer(1)
+    )
+    # Get all the nodes that are not at divergent point
+    nodes <- setdiff(allNodes, divNodes)
+    # Get the sequence of the children tips that are descendant of
+    # the nodes. Assign the tip index to the sequences for
+    # retrieving the tip name
+    nodeAlign <- lapply(nodes, function(n) {
+        isTerminal <- FALSE
+        if (n %in% terminalNodes) {
+            childrenNode <- n
+            isTerminal <- TRUE
+        } else {
+            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
+            # Keep the node that is not on the path.
+            childrenNode <- setdiff(childrenNode, allNodes)
+        }
+        tips <- .childrenTips(tree, childrenNode)
+        res <- align[tips]
+        attr(res, "isTerminal") <- isTerminal
+        names(res) <- tips
+        return(res)
+    })
+    # Assign the node names to the 'nodeAlign' list
+    names(nodeAlign) <- nodes
+    return(nodeAlign)
+}
+
+.childrenTips <- function(tree, node) {
+    maxTip <- length(tree[["tip.label"]])
+    children <- integer()
+    getChildren <- function(edges, parent) {
+        children <<- c(children, parent[which(parent <= maxTip)])
+        i <- which(edges[, 1] %in% parent)
+        if (length(i) == 0L) {
+            return(children)
+        } else {
+            parent <- edges[i, 2]
+            return(getChildren(edges, parent))
+        }
+    }
+    return(getChildren(tree[["edge"]], node))
 }
 
 #' @rdname groupTips
