@@ -3,6 +3,7 @@
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom ggplot2 aes guides theme ggtitle guide_legend
 #' @importFrom ggplot2 scale_size scale_color_manual
+#' @importFrom ggplot2 GeomText
 #' @importFrom tidytree groupOTU
 #' @importFrom ggtree ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
@@ -117,31 +118,38 @@ plot.sitePath <- function(x,
                           select = NULL,
                           showTips = FALSE,
                           ...) {
-    tree <- attr(x, "tree")
     if (is.null(select)) {
         sitePaths <- x[]
     } else {
-        if (length(x) < select) {
-            stop(
-                "There are ",
-                length(x),
-                "lineages with fixation mutation. ",
-                "The selection \"y\" is out of bounds."
-            )
+        if (any(length(x) < select)) {
+            stop("Some in 'select' is out of bounds for 'x'.")
         }
         sitePaths <- x[select]
     }
+    tree <- attr(x, "tree")
+    siteName <- attr(x, "site")
     # Specify the color of mutations by pre-defined color set.
     groupColors <- .siteColorScheme(attr(x, "seqType"))
     # Collect the fixation mutation for each evolutionary pathway
     subtitle <- character()
+    fixationMut <- character()
     group <- list()
     for (sp in sitePaths) {
-        aaName <- character()
-        for (tips in sp) {
+        # The first group is separately done
+        tips <- sp[[1]]
+        prevAA <- toupper(attr(tips, "AA"))
+        aaName <- prevAA
+        group[[prevAA]] <- c(group[[prevAA]], tips)
+        # Do the rest
+        for (i in seq_along(sp)[-1]) {
+            tips <- sp[[i]]
             aa <- toupper(attr(tips, "AA"))
             aaName <- c(aaName, aa)
             group[[aa]] <- c(group[[aa]], tips)
+            fixationMut[names(sp[i])] <- paste0(prevAA,
+                                                siteName,
+                                                aa)
+            prevAA <- aa
         }
         subtitle <- c(subtitle,
                       paste0(aaName, collapse = " -> "))
@@ -161,13 +169,27 @@ plot.sitePath <- function(x,
         sepChar <- ", "
     }
     subtitle <- paste(subtitle, collapse = sepChar)
+    # Annotate the mutation on the tree
+    if (is.null(y) || !y) {
+        p <- ggtree(tree, aes(color = group, linetype = linetype))
+    } else {
+        tree <- .annotateSNPonTree(tree, fixationMut)
+        p <- ggtree(tree, aes(color = group, linetype = linetype)) +
+            geom_label_repel(
+                aes(x = branch, label = SNPs),
+                fill = 'lightgreen',
+                color = "black",
+                min.segment.length = 0,
+                na.rm = TRUE,
+                size = GeomText[["default_aes"]][["size"]]
+            )
+    }
     # Make the plot
-    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
-        scale_color_manual(values = groupColors) +
+    p <- p + scale_color_manual(values = groupColors) +
         guides(linetype = FALSE,
                color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
-        ggtitle(label = attr(x, "site"), subtitle = subtitle)
+        ggtitle(label = siteName, subtitle = subtitle)
     if (showTips) {
         p <- p + geom_tiplab()
     }

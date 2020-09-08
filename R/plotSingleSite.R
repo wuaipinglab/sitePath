@@ -162,5 +162,7 @@ plotSingleSite.fixationSites <- function(x,
                                          site,
                                          select = NULL,
                                          ...) {
-    plot.sitePath(x = .actualExtractSite(x, site), select = select, ...)
+    plot.sitePath(x = .actualExtractSite(x, site),
+                  y = TRUE,
+                  select = select, ...)
 }
