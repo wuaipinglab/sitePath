@@ -95,12 +95,12 @@ sitesMinEntropy.lineagePath <- function(x,
         group <- lapply(names(segs), function(site) {
             lapply(segs[[site]], function(tips) {
                 siteChar <- attr(tips, "AA")
+                names(siteChar) <- site
                 node <- attr(tips, "node")
                 # Purge the attributes and keep only the node and amino
                 # acid/nucleotide info
                 attributes(tips) <- NULL
-                attr(tips, "site") <- siteChar
-                names(attr(tips, "site")) <- site
+                attr(tips, "AA") <- siteChar
                 attr(tips, "node") <- node
                 return(tips)
             })
@@ -189,7 +189,7 @@ sitesMinEntropy.lineagePath <- function(x,
         for (n in seq_along(seg)) {
             tips <- seg[[n]]
             # The site number and its amino acid/nucleotide
-            site <- attr(tips, "site")
+            site <- attr(tips, "AA")
             # Update grouping for each tips by growing a new list
             newGrouping <- list()
             # Compare with each group of the current grouping
@@ -203,9 +203,9 @@ sitesMinEntropy.lineagePath <- function(x,
                     # overlap yet
                     newGrouping <- res[seq_len(i)]
                 } else if (identical(sort(gp), sort(tips))) {
-                    # The only effect here is to add the new 'site' info to
+                    # The only effect here is to add the new 'AA' info to
                     # the group
-                    attr(gp, "site") <- c(attr(gp, "site"), site)
+                    attr(gp, "AA") <- c(attr(gp, "AA"), site)
                     # The groups after the current group to be added
                     newGrouping <- c(newGrouping,
                                      list(gp),
@@ -220,8 +220,7 @@ sitesMinEntropy.lineagePath <- function(x,
                         # impact on the grouping
                         tips <- setdiff(tips, gp)
                         # Update the SNP site info for the current group
-                        attr(gp, "site") <-
-                            c(attr(gp, "site"), site)
+                        attr(gp, "AA") <- c(attr(gp, "AA"), site)
                         newGrouping <- c(newGrouping, list(gp))
                     } else if (identical(sort(tips), common)) {
                         # The new coming tips are included in the group (they
@@ -232,8 +231,7 @@ sitesMinEntropy.lineagePath <- function(x,
                         attr(separate, "node") <- nodeNames[n + 1]
                         # 'tips' is the common part and inherit the attributes
                         # of the to-be-split original group
-                        attr(tips, "site") <-
-                            c(attr(gp, "site"), site)
+                        attr(tips, "AA") <- c(attr(gp, "AA"), site)
                         attr(tips, "node") <- attr(gp, "node")
                         newGrouping <- c(
                             newGrouping,
@@ -305,13 +303,12 @@ sitesMinEntropy.lineagePath <- function(x,
         }
         # Find the tips when diverged
         divergedTips <- gp[[divergedIndex]]
-        refSites <- attr(divergedTips, "site")
-        ancestralNode <- attr(divergedTips, "node")
+        tempAttrs <- attributes(divergedTips)
         # The non-shared part of the 'divergedTips'. This part will not be empty
         divergedTips <- setdiff(divergedTips,
                                 unlist(clustersByPath[[toMergeIndex]]))
-        attr(divergedTips, "site") <- refSites
-        attr(divergedTips, "node") <- ancestralNode
+        attributes(divergedTips) <- tempAttrs
+        refSites <- attr(divergedTips, "AA")
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
             # No more trailing tips besides the non-shared part
@@ -349,10 +346,8 @@ sitesMinEntropy.lineagePath <- function(x,
                 } else {
                     # When 'sharedTips' is not empty, the site and node should
                     # be the only info to give back to
-                    attr(sharedTips, "site") <-
-                        attr(toMerge[[i]], "site")
-                    attr(sharedTips, "node") <-
-                        attr(toMerge[[i]], "node")
+                    attributes(sharedTips) <-
+                        attributes(toMerge[[i]])
                     attr(sharedTips, "toMerge") <-
                         c(toMergeRefSites,
                           attr(sharedTips, "toMerge"))

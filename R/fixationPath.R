@@ -75,7 +75,7 @@ fixationPath.sitesMinEntropy <- function(x,
         # The initial tips of the group
         currentTips <- gp[[1]]
         # Assume the initial reference site
-        refSites <- attr(currentTips, "site")
+        refSites <- attr(currentTips, "AA")
         # Find where to merge and parent node, update reference site maybe
         for (i in seq_along(tipClusters)) {
             toMerge <- attr(tipClusters[[i]], "toMerge")
@@ -102,7 +102,7 @@ fixationPath.sitesMinEntropy <- function(x,
                 X = names(refSites),
                 FUN = function(site) {
                     ref <- refSites[site]
-                    snp <- attr(currentTips, "site")[site]
+                    snp <- attr(currentTips, "AA")[site]
                     if (ref == snp) {
                         return(NA_character_)
                     }
@@ -116,14 +116,14 @@ fixationPath.sitesMinEntropy <- function(x,
         for (tipIndex in seq_along(gp)[-1]) {
             tipNode <- tipNode + 1L
             currentTips <- gp[[tipIndex]]
-            currentSites <- attr(currentTips, "site")
+            currentSites <- attr(currentTips, "AA")
             # Attach the tip near the most related tips. Assume the reference
             # tips are the most related (least number of SNP)
             mostRelatedTipNode <- startingNode
             leastSNPnum <- sum(refSites != currentSites)
             # Loop through the rest existing tip clusters
             for (otherTipNode in seq_along(tipClusters)[-seq_len(startingNode)]) {
-                otherSites <- attr(tipClusters[[otherTipNode]], "site")
+                otherSites <- attr(tipClusters[[otherTipNode]], "AA")
                 snpNum <- sum(otherSites != currentSites)
                 if (snpNum < leastSNPnum) {
                     mostRelatedTipNode <- otherTipNode

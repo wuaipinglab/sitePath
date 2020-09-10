@@ -135,8 +135,8 @@ setSiteNumbering.fixationSites <- function(x,
     for (gpIndex in seq_along(attr(x, "clustersByPath"))) {
         for (i in seq_along(attr(x, "clustersByPath")[[gpIndex]])) {
             oldSiteName <-
-                names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site"))
-            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site")) <-
+                names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA"))
+            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA")) <-
                 site2newRef[oldSiteName]
             toMerge <-
                 attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "toMerge")
