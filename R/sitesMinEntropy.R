@@ -89,6 +89,7 @@ sitesMinEntropy.lineagePath <- function(x,
             searchDepth = searchDepth
         )
     })
+    # res <- .unifyEntropyGrouping(res, names(siteIndices))
     # Cluster tips according to fixation sites
     clustersByPath <- lapply(res, function(segs) {
         # Set the site and amino acid/nucleotide info for each group of tips
@@ -177,6 +178,68 @@ sitesMinEntropy.lineagePath <- function(x,
         attr(seg[[1]], "node") <- names(seg)
     }
     return(seg)
+}
+
+.unifyEntropyGrouping <- function(res, lociNames) {
+    pathNum <- length(res)
+    # Iterate each locus
+    for (locus in lociNames) {
+        # Get the merged group of each loci
+        mergedGroupings <- .mergeClusters(lapply(res, "[[", locus))
+        # Find the index pathing of the group in each lineage path
+        mergePathing <- list()
+        for (i in seq_len(pathNum)) {
+            # The index pathing for the current group. The index of an
+            # irrelevant grouping will hold a NA value while the index of a
+            # relevant grouping will hold a number indicating the divergent
+            # point
+            indexPathing <- rep(NA_integer_, pathNum)
+            # Iterate the merged grouping of each path to find the 'toMerge'
+            # index
+            for (pIndex in seq_along(mergePathing)) {
+                # The group with the merging index
+                mGrouping <- mergedGroupings[[pIndex]]
+                isFound <- FALSE
+                # Iterate each group in the merged grouping of the path
+                for (j in seq_along(mGrouping)) {
+                    toMergeIndex <- as.integer(names(attr(
+                        mGrouping[[j]],
+                        "toMerge"
+                    )))
+                    # Trace back to the root when the current grouping if found
+                    # as 'toMerge' for the 'pIndex'
+                    if (i %in% toMergeIndex) {
+                        # The index pathing to trace back
+                        indexPathing <- mergePathing[[pIndex]]
+                        # The extra pathing index to link to the current
+                        indexPathing[pIndex] <- j
+                        isFound <- TRUE
+                    }
+                    break
+                }
+                if (isFound) {
+                    break
+                }
+            }
+            # Attach the index pathing for back tracing of the groups in the
+            # remaining path
+            mergePathing <- c(mergePathing, list(indexPathing))
+            # Reconstruct the grouping for the current path
+            indexPathing[i] <- 1
+            reconstructed <- list()
+            for (pIndex in seq_along(indexPathing)) {
+                j <- indexPathing[pIndex]
+                if (!is.na(j)) {
+                    newGroup <- list()
+                    reconstructed <- c(reconstructed, newGroup)
+                }
+            }
+            # Re-assign the merged result to the original
+            names(reconstructed) <- names(res[[i]][[locus]])
+            res[[i]][[locus]] <- reconstructed
+        }
+    }
+    return(res)
 }
 
 .clusterByFixation <- function(group) {
