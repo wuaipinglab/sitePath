@@ -1,8 +1,15 @@
+#include <map>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+#include <Rcpp.h>
+
 #include "treemer.h"
 
 float Treemer::compare(const std::string &query, const std::string &subject) {
-    // Get the similarity between two aligned sequences.
-    // Site is skipped for total length if both are gaps in alignment
+    // Get the similarity between two aligned sequences. Site is skipped for
+    // total length if both are gaps in alignment
     float match = 0.0, length = 0.0;
     for (
             std::string::const_iterator q = query.begin(), s = subject.begin();
@@ -26,10 +33,9 @@ Treemer::TipSeqLinker::TipSeqLinker(
     m_cIndex(m_tipIndex) {}
 
 void Treemer::TipSeqLinker::proceed() {
-    // Proceed towards the root node along the path
-    // as the current index should decrement.
-    // An index of 0 means reaching the root node.
-    // Setting index greater than 1 is to prevent trivial trimming
+    // Proceed towards the root node along the path as the current index should
+    // decrement. An index of 0 means reaching the root node. Setting index
+    // greater than 1 is to prevent trivial trimming
     if (m_cIndex > 1) { m_cIndex--; }
 }
 
@@ -39,8 +45,7 @@ int Treemer::TipSeqLinker::currentClade() const {
 }
 
 int Treemer::TipSeqLinker::nextClade() const {
-    // Look up the immediate ancestral node
-    // aka fake 'proceed'
+    // Look up the immediate ancestral node aka fake 'proceed'
     if (m_cIndex > 1) {
         return m_path[m_cIndex - 1];
     } else {
@@ -59,8 +64,8 @@ int Treemer::TipSeqLinker::getRoot() const {
 }
 
 int Treemer::TipSeqLinker::getSeqLen() const {
-    // The length of the aligned sequence
-    // This is going to be done for every sequence to make sure they're aligned
+    // The length of the aligned sequence. This is going to be done for every
+    // sequence to make sure they're aligned
     return m_seq.size();
 }
 
@@ -125,8 +130,8 @@ void Treemer::Base::initTips(
         // The initial clustering is each tip as a cluster
         m_clusters[tip->getTip()].push_back(tip);
 
-        // The root of each tipPath should be the same
-        // The sequences should be of the same length
+        // The root of each tipPath should be the same The sequences should be
+        // of the same length
         if (m_tips[i]->getRoot() != m_root) {
             throw std::invalid_argument("Root in tree paths not equal");
         } else if (m_tips[i]->getSeqLen() != m_seqLen) {
@@ -144,38 +149,37 @@ void Treemer::Base::pruneTree() {
         for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
             m_clusters[(*it)->nextClade()].push_back(*it);
         }
-        // if no more group 'kissed' each other by a common ancestral node
-        // after fake 'proceed', then pruning is done
+        // if no more group 'kissed' each other by a common ancestral node after
+        // fake 'proceed', then pruning is done
         if (m_clusters.size() == oldClusters.size()) {
             m_clusters.clear();
             break;
         }
-        // only 'kissed' group can do real 'proceed'
-        // if a grouping doesn't exist in 'oldClusters'
-        // then all tips in that group can 'proceed'
+        // only 'kissed' group can do real 'proceed' if a grouping doesn't exist
+        // in 'oldClusters' then all tips in that group can 'proceed'
         for (
                 clusters::iterator it = m_clusters.begin();
                 it != m_clusters.end(); ++it
         ) {
-            // assume a group is kissed with another
-            // (give it benefit of the doubt)
+            // assume a group is kissed with another (give it benefit of the
+            // doubt)
             bool kissed = true;
             for (
                     clusters::iterator it2 = oldClusters.begin();
                     it2 != oldClusters.end(); ++it2
             ) {
-                // a group is 'non-kissed' after fake 'proceed'
-                // if it can be found in 'oldClusters'
+                // a group is 'non-kissed' after fake 'proceed' if it can be
+                // found in 'oldClusters'
                 if (it->second == it2->second) {
                     kissed = false;
-                    // a 'non-kissed' group won't appear twice in
-                    // 'clusters' so deleted
+                    // a 'non-kissed' group won't appear twice in 'clusters' so
+                    // deleted
                     oldClusters.erase(it2);
                     break;
                 }
             }
-            // clusters_it group needs to pass some requirement to
-            // be qualified 'kissed'
+            // clusters_it group needs to pass some requirement to be qualified
+            // 'kissed'
             if (kissed && qualified(it)) {
                 for (
                         tips::iterator tips_itr = it->second.begin();
@@ -245,8 +249,8 @@ bool Treemer::BySimilarity::qualified(const clusters::iterator &clusters_it) con
                 (*it)->getTip(),
                 (*it2)->getTip()
             );
-            // Retrieve similarity from existing values
-            // Calculate the value otherwise
+            // Retrieve similarity from existing values. Calculate the value
+            // otherwise
             float sim = 0;
             std::map<std::pair<int, int>, float>::iterator
                 pos = m_compared->find(pairing);

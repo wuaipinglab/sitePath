@@ -1,7 +1,20 @@
-#include <set>
+/*
+ * Here are all the functions exported to the R interface. This is all made
+ * possible by the excellent Rcpp package. The cpp11 package has come out and as
+ * one of the depending package ggplot2 uses cpp11, migrating from Rcpp to cpp11
+ * might be considered in the future.
+ */
+
 #include <algorithm>
-#include "treemer.h"
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+#include <Rcpp.h>
+
+#include "lumpyCluster.h"
 #include "minEntropy.h"
+#include "treemer.h"
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
@@ -29,13 +42,13 @@ Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(
         const Rcpp::IntegerVector &loci
 ) {
     std::map< int, std::map< int, std::vector<int> > > res;
-for (
-        Rcpp::IntegerVector::const_iterator it = loci.begin();
-        it != loci.end(); it++
-) {
-    Treemer::BySite match(tipPaths, alignedSeqs, *it);
-    res[*it] = match.getTips();
-}
+    for (
+            Rcpp::IntegerVector::const_iterator it = loci.begin();
+            it != loci.end(); it++
+    ) {
+        Treemer::BySite match(tipPaths, alignedSeqs, *it);
+        res[*it] = match.getTips();
+    }
     return Rcpp::wrap(res);
 }
 

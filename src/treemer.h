@@ -12,22 +12,22 @@
 #ifndef SITEPATH_TREEMER_H
 #define SITEPATH_TREEMER_H
 
-#include <utility>
-#include <string>
-#include <vector>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 #include <Rcpp.h>
 
 namespace Treemer {
 
 float compare(const std::string &query, const std::string &subject);
 
+/*
+ * To hold all necessary data for a tree tip, including sequence, nodePath to
+ * the tree root and the current node during treemer. Provides way to store
+ * index of the 'kissed' node on the nodePath.
+ */
 class TipSeqLinker {
-    /*
-     * To hold all necessary data for a tree tip, including sequence,
-     * nodePath to the tree root and the current node during treemer.
-     * Provides way to store index of the 'kissed' node on the nodePath.
-     */
 public:
     TipSeqLinker(
         const Rcpp::CharacterVector &sequence,
@@ -53,15 +53,15 @@ private:
 typedef std::vector<TipSeqLinker *> tips;
 typedef std::map<int, tips> clusters;
 
+/*
+ * The Base class provides the structure for performing the trimming algorithm.
+ * Depending on the extra constrain for cluster of tips, the class can be
+ * derived to achieve a variety of behaviors.
+ *
+ * The extra constrain could be the largest similarity difference within a
+ * cluster, the amino acid of the site and the average similarity.
+ */
 class Base {
-    /*
-     * The Base class provides the structure for performing the trimming
-     * algorithm. Depending on the extra constrain for cluster of tips,
-     * the class can be derived to achieve a variety of behaviors.
-     *
-     * The extra constrain could be the largest similarity difference within
-     * a cluster, the amino acid of the site and the average similarity.
-     */
 public:
     Base(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
@@ -70,8 +70,8 @@ public:
     virtual ~Base();
     // Cluster of tree tips after trimming
     std::map< int, std::vector<int> > getTips() const;
-    // Paths from root to trimming-node for all tips
-    // Tips in the same cluster will have the same path
+    // Paths from root to trimming-node for all tips. Tips in the same cluster
+    // will have the same path
     std::vector<Rcpp::IntegerVector> getPaths() const;
 protected:
     // Match tipPath and alignedSeq
@@ -93,12 +93,11 @@ private:
     const int m_root, m_seqLen;
 };
 
+/*
+ * Trim the tree by aa/nt of a site. The trimming stops when the non-dominant
+ * aa/nt in a group is greater than the SNP percentage threshold
+ */
 class BySite: public Base {
-    /*
-     * Trim the tree by aa/nt of a site. The trimming stops when the
-     * non-dominant aa/nt in a group is greater than the SNP percentage
-     * threshold
-     */
 public:
     BySite(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
@@ -112,11 +111,11 @@ private:
     const int m_siteIndex;
 };
 
+/*
+ * Trim the tree and stop the process when the largest similarity difference in
+ * each tip cluster is about to exceed the constrain
+ */
 class BySimilarity: public Base {
-    /*
-     * Trim the tree and stop the process when the largest similarity
-     * difference in each tip cluster is about to exceed the constrain
-     */
 public:
     BySimilarity(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,

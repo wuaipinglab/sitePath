@@ -1,4 +1,8 @@
 #include <cmath>
+#include <string>
+#include <vector>
+#include <Rcpp.h>
+
 #include "minEntropy.h"
 
 float MinEntropy::shannonEntropy(
