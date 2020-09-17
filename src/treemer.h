@@ -33,6 +33,7 @@ public:
         const Rcpp::CharacterVector &sequence,
         const Rcpp::IntegerVector &tipPath
     );
+    void reset();
     void proceed();
     int nextClade() const;
     int currentClade() const;
@@ -41,13 +42,12 @@ public:
     int getSeqLen() const;
     Rcpp::IntegerVector getPath() const;
     std::string getSeq() const;
-    char getSiteChar(const int site) const;
+    char siteChar(const int siteIndex) const;
 private:
     const std::string m_seq;
     const Rcpp::IntegerVector m_path;
     const int m_tipIndex;
     int m_cIndex;
-    int m_site;
 };
 
 typedef std::vector<TipSeqLinker *> tips;
@@ -63,10 +63,7 @@ typedef std::map<int, tips> clusters;
  */
 class Base {
 public:
-    Base(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
-    );
+    Base(const tips &tips, const clusters initClusters);
     virtual ~Base();
     // Cluster of tree tips after trimming
     std::map< int, std::vector<int> > getTips() const;
@@ -74,23 +71,15 @@ public:
     // will have the same path
     std::vector<Rcpp::IntegerVector> getPaths() const;
 protected:
-    // Match tipPath and alignedSeq
-    void initTips(
-            const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-            const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
-    );
     // The actual trimming process happens here
     void pruneTree();
     // Whether the cluster of tips satisfy the extra constrain to be valid
     virtual bool qualified(const clusters::iterator &clusters_it) const = 0;
 protected:
     // The container to hold all the tips
-    tips m_tips;
+    const tips m_tips;
     // The clustering of tips during trimming process
     clusters m_clusters;
-private:
-    // The root node and length of aligned sequences
-    const int m_root, m_seqLen;
 };
 
 /*
@@ -100,11 +89,12 @@ private:
 class BySite: public Base {
 public:
     BySite(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const int site
+        const tips &tips,
+        const clusters initClusters,
+        const int siteIndex
     );
-    clusters finalClusters();
+    // Cluster of TipSeqLinker grouped by aa/nt after trimming
+    std::map<char, clusters> siteClusters() const;
 private:
     bool qualified(const clusters::iterator &clusters_it) const;
 private:
@@ -118,8 +108,8 @@ private:
 class BySimilarity: public Base {
 public:
     BySimilarity(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const tips &tips,
+        const clusters initClusters,
         const float simThreshold,
         std::map<std::pair<int, int>, float> &simMatrix
     );

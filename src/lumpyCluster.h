@@ -14,32 +14,91 @@
 #include <vector>
 #include <Rcpp.h>
 
+#include "treemer.h"
+
 namespace LumpyCluster {
 
-class Tips {
+typedef std::vector<Treemer::tips> lumpingTips;
+
+class Base {
 public:
-    Tips(const int tipIndex);
-    void fakeAddTip(const int tipIndex);
-    float averageSim(const Rcpp::NumericMatrix &simMatrix) const;
-    int popOutlier();
-private:
-    std::vector<int> m_tips;
+    Base(const Rcpp::NumericMatrix &metricMatrix);
+    std::vector< std::vector<int> > finalClusters() const;
+protected:
+    void mergeClusters(
+            const Treemer::clusters &clusters,
+            const int zValue
+    );
+    virtual void setThreshold(
+            const float average,
+            const float stdev,
+            const int zValue
+    ) = 0;
+    float clusterCompare(
+            const Treemer::tips &query,
+            const Treemer::tips &subject
+    );
+    virtual bool betterMetric(
+            const float query,
+            const float subject
+    ) const = 0;
+    virtual bool qualifiedMetric(const float metric) const = 0;
+protected:
+    const Rcpp::NumericMatrix m_metricMatrix;
+    // The merged clusters output
+    lumpingTips m_merged;
+    // The threshold for clustering and the metric standard deviation of all
+    // tips pairs
+    float m_metricThreshold;
 };
 
-class Clusters {
+/*
+ * The clusters tend to merge when their metric is larger.
+ */
+
+class BySimMatrix: public Base {
 public:
-    Clusters(
-        const Rcpp::CharacterVector &alignedSeqs,
+    BySimMatrix(
         const Rcpp::NumericMatrix &simMatrix,
-        const float similarity
+        const Treemer::clusters &clusters,
+        const int zValue
     );
-    std::vector<int> getClusters();
-    void addTip(const int tipIndex);
-private:
-    const Rcpp::CharacterVector m_alignedSeqs;
-    const Rcpp::NumericMatrix m_simMatrix;
-    const float m_similarity;
-    std::vector<Tips *> m_clusters;
+protected:
+    void setThreshold(
+            const float average,
+            const float stdev,
+            const int zValue
+    );
+    bool betterMetric(
+            const float query,
+            const float subject
+    ) const;
+    bool qualifiedMetric(const float metric) const;
+};
+
+/*
+ * The initiation of clustering by distance is the same as clustering by
+ * similarity. Only the test of better metric and qualification is reversed. The
+ * clusters tend to merge when their metric is smaller.
+ */
+class ByDistMatrix: public Base {
+public:
+    ByDistMatrix(
+        const Rcpp::NumericMatrix &distMatrix,
+        const Treemer::clusters &clusters,
+        const int zValue
+    );
+protected:
+    void setThreshold(
+            const float average,
+            const float stdev,
+            const int zValue
+    );
+    bool betterMetric(
+            const float query,
+            const float subject
+    ) const;
+    bool qualifiedMetric(const float metric) const;
 };
 
 }

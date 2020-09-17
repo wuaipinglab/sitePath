@@ -68,11 +68,24 @@ lineagePath.phyMSAmatched <- function(tree,
             "And better not be equal to 1."
         )
     }
+    if (is.null(simMatrix)) {
+        simMatrix <- similarityMatrix(x)
+    }
+    zValue <- 2
     align <- attr(x, "align")
+    loci <- attr(x, "loci")
+    siteIndices <- attr(x, "msaNumbering")[loci] - 1L
     rootNode <- getMRCA(tree, tree[["tip.label"]])
     # Get all lineages using the terminal node found by SNP
     paths <- mergePaths(lapply(
-        X = majorSNPtips(align, minSNP),
+        X = lineageTerminalTips(
+            tipPaths = nodepath(tree),
+            alignedSeqs = align,
+            simMatrix = simMatrix,
+            siteIndices = siteIndices,
+            minSNPnum = minSNP,
+            zValue = zValue
+        ),
         FUN = function(tips) {
             nodepath(tree, from = rootNode, to = getMRCA(tree, tips))
         }
@@ -84,16 +97,6 @@ lineagePath.phyMSAmatched <- function(tree,
     attr(paths, "rootNode") <- rootNode
     class(paths) <- c("lineagePath", class(paths))
     return(paths)
-}
-
-.treemerBySite <- function(x, ...) {
-    tree <- attr(x, "tree")
-    align <- attr(x, "align")
-    # Generate the site mapping from reference
-    # Exclude the invariant sites
-    loci <- attr(x, "loci")
-    res <- runTreemerBySite(nodepath(tree), align, loci)
-    return(res)
 }
 
 #' @rdname lineagePath
