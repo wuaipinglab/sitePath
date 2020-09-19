@@ -16,9 +16,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// lineageTerminalTips
-Rcpp::ListOf<Rcpp::IntegerVector> lineageTerminalTips(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& simMatrix, const Rcpp::IntegerVector& siteIndices, const int minSNPnum, const int zValue);
-RcppExport SEXP _sitePath_lineageTerminalTips(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixSEXP, SEXP siteIndicesSEXP, SEXP minSNPnumSEXP, SEXP zValueSEXP) {
+// terminalTipsBySim
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& simMatrix, const Rcpp::IntegerVector& siteIndices, const int minSNPnum, const int zValue);
+RcppExport SEXP _sitePath_terminalTipsBySim(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixSEXP, SEXP siteIndicesSEXP, SEXP minSNPnumSEXP, SEXP zValueSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,7 +28,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
     Rcpp::traits::input_parameter< const int >::type minSNPnum(minSNPnumSEXP);
     Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
-    rcpp_result_gen = Rcpp::wrap(lineageTerminalTips(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue));
+    rcpp_result_gen = Rcpp::wrap(terminalTipsBySim(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue));
+    return rcpp_result_gen;
+END_RCPP
+}
+// terminalTipsByDist
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsByDist(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& simMatrix, const Rcpp::IntegerVector& siteIndices, const int minSNPnum, const int zValue);
+RcppExport SEXP _sitePath_terminalTipsByDist(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixSEXP, SEXP siteIndicesSEXP, SEXP minSNPnumSEXP, SEXP zValueSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type simMatrix(simMatrixSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
+    Rcpp::traits::input_parameter< const int >::type minSNPnum(minSNPnumSEXP);
+    Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
+    rcpp_result_gen = Rcpp::wrap(terminalTipsByDist(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -120,7 +136,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
-    {"_sitePath_lineageTerminalTips", (DL_FUNC) &_sitePath_lineageTerminalTips, 6},
+    {"_sitePath_terminalTipsBySim", (DL_FUNC) &_sitePath_terminalTipsBySim, 6},
+    {"_sitePath_terminalTipsByDist", (DL_FUNC) &_sitePath_terminalTipsByDist, 6},
     {"_sitePath_mergePaths", (DL_FUNC) &_sitePath_mergePaths, 1},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},

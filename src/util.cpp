@@ -36,8 +36,8 @@ Rcpp::NumericMatrix getSimilarityMatrix(
     return simMatrix;
 }
 
-// [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> lineageTerminalTips(
+template <class T>
+LumpyCluster::tipNodes LumpyCluster::terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &simMatrix,
@@ -63,8 +63,6 @@ Rcpp::ListOf<Rcpp::IntegerVector> lineageTerminalTips(
             throw std::invalid_argument("Sequence length not equal");
         }
     }
-    typedef std::map<char, Treemer::clusters> clsByAA;
-    typedef std::vector< std::vector<int> > tipNodes;
     tipNodes res;
     for (
             Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
@@ -76,11 +74,7 @@ Rcpp::ListOf<Rcpp::IntegerVector> lineageTerminalTips(
                 clsByAA::iterator clusters_itr = siteClusters.begin();
                 clusters_itr != siteClusters.end(); ++clusters_itr
         ) {
-            LumpyCluster::BySimMatrix merger(
-                simMatrix,
-                clusters_itr->second,
-                zValue
-            );
+            T merger(simMatrix, clusters_itr->second, zValue);
             tipNodes mergedCls = merger.finalClusters();
             for (
                     tipNodes::iterator cls_itr = mergedCls.begin();
@@ -96,6 +90,48 @@ Rcpp::ListOf<Rcpp::IntegerVector> lineageTerminalTips(
     for (Treemer::tips::iterator it = tips.begin(); it != tips.end(); ++it) {
         delete *it;
     }
+    return res;
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::IntegerVector &siteIndices,
+        const int minSNPnum,
+        const int zValue
+) {
+    using namespace LumpyCluster;
+    tipNodes res = terminalTips<BySimMatrix>(
+        tipPaths,
+        alignedSeqs,
+        simMatrix,
+        siteIndices,
+        minSNPnum,
+        zValue
+    );
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsByDist(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::IntegerVector &siteIndices,
+        const int minSNPnum,
+        const int zValue
+) {
+    using namespace LumpyCluster;
+    tipNodes res = terminalTips<ByDistMatrix>(
+        tipPaths,
+        alignedSeqs,
+        simMatrix,
+        siteIndices,
+        minSNPnum,
+        zValue
+    );
     return Rcpp::wrap(res);
 }
 

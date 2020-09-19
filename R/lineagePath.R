@@ -46,19 +46,11 @@ lineagePath.phyMSAmatched <- function(tree,
     } else if (similarity > 0 && similarity < 0.5) {
         minSNP <- nTips * similarity
     } else if (similarity >= 0.5 && similarity < 1) {
-        minSNP <- nTips * (1 - similarity)
         # The reminder of using major SNP to find lineages
         if (forbidTrivial) {
-            warning(
-                "\"lineagePath\" now uses 'major SNP' to find lineages ",
-                "rather than sequence similarities. And the parameter ",
-                "\"similarity\" decides the least percentage/number of ",
-                "'major SNPs'. The input \"similarity\" of value ",
-                similarity,
-                "is over 0.5 and the resulting lineage path will ",
-                "probably be trivial for other analysis."
-            )
+            similarity <- 1 - similarity
         }
+        minSNP <- nTips * similarity
     } else if (similarity > 1 && similarity < nTips) {
         minSNP <- ceiling(similarity)
         similarity <- minSNP / nTips
@@ -70,6 +62,19 @@ lineagePath.phyMSAmatched <- function(tree,
     }
     if (is.null(simMatrix)) {
         simMatrix <- similarityMatrix(x)
+    } else if (!isSymmetric.matrix(simMatrix) ||
+               !is.numeric(simMatrix)) {
+        stop("The 'simMatrix' is not a symmetric numeric matrix")
+    } else if (anyNA(simMatrix)) {
+        stop("Missing value in 'simMatrix'")
+    }
+    diagValue <- diag(simMatrix)
+    if (all(diagValue == 1)) {
+        lineageTerminalTips <- terminalTipsBySim
+    } else if (all(diagValue == 0)) {
+        lineageTerminalTips <- terminalTipsByDist
+    } else {
+        stop("The diagonal value of 'simMatrix' are not all 1 or 0.")
     }
     zValue <- 2
     align <- attr(x, "align")

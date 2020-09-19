@@ -101,6 +101,19 @@ protected:
     bool qualifiedMetric(const float metric) const;
 };
 
+typedef std::map<char, Treemer::clusters> clsByAA;
+typedef std::vector< std::vector<int> > tipNodes;
+
+template <class T>
+tipNodes terminalTips(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::IntegerVector &siteIndices,
+        const int minSNPnum,
+        const int zValue
+);
+
 }
 
 #endif /* SITEPATH_LUMPCLUSTER_H */

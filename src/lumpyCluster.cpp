@@ -165,8 +165,8 @@ void LumpyCluster::BySimMatrix::setThreshold(
 }
 
 bool LumpyCluster::BySimMatrix::betterMetric(
-    const float query,
-    const float subject
+        const float query,
+        const float subject
 ) const {
     return query > subject;
 }

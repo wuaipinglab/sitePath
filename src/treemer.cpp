@@ -5,7 +5,6 @@
 #include <vector>
 #include <Rcpp.h>
 
-#include "lumpyCluster.h"
 #include "treemer.h"
 
 float Treemer::compare(const std::string &query, const std::string &subject) {
