@@ -104,7 +104,7 @@ protected:
 typedef std::map<char, Treemer::clusters> clsByAA;
 typedef std::vector< std::vector<int> > tipNodes;
 
-template <class T>
+template<class T>
 tipNodes terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,

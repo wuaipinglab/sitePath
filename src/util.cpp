@@ -36,63 +36,6 @@ Rcpp::NumericMatrix getSimilarityMatrix(
     return simMatrix;
 }
 
-template <class T>
-LumpyCluster::tipNodes LumpyCluster::terminalTips(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &simMatrix,
-        const Rcpp::IntegerVector &siteIndices,
-        const int minSNPnum,
-        const int zValue
-) {
-    Treemer::tips tips;
-    Treemer::clusters initClusters;
-    // Iterate tipPaths and alignedSeqs to construct a list of TipSeqLinkers
-    for (int i = 0; i < tipPaths.size(); i++) {
-        Treemer::TipSeqLinker *tip = new Treemer::TipSeqLinker(
-            alignedSeqs[i], tipPaths[i]
-        );
-        tips.push_back(tip);
-        // The initial clustering is each tip as a cluster
-        initClusters[tip->getTip()].push_back(tip);
-        // The root of each tipPath should be the same. The sequences should be
-        // of the same length
-        if (tips[i]->getRoot() != tips[0]->getRoot()) {
-            throw std::invalid_argument("Root in tree paths not equal");
-        } else if (tips[i]->getSeqLen() != tips[0]->getSeqLen()) {
-            throw std::invalid_argument("Sequence length not equal");
-        }
-    }
-    tipNodes res;
-    for (
-            Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
-            it != siteIndices.end(); it++
-    ) {
-        Treemer::BySite matched(tips, initClusters, *it);
-        clsByAA siteClusters = matched.siteClusters();
-        for (
-                clsByAA::iterator clusters_itr = siteClusters.begin();
-                clusters_itr != siteClusters.end(); ++clusters_itr
-        ) {
-            T merger(simMatrix, clusters_itr->second, zValue);
-            tipNodes mergedCls = merger.finalClusters();
-            for (
-                    tipNodes::iterator cls_itr = mergedCls.begin();
-                    cls_itr != mergedCls.end(); ++cls_itr
-            ) {
-                if (cls_itr->size() >= minSNPnum) {
-                    res.push_back(*cls_itr);
-                }
-            }
-        }
-    }
-    // Manually free the memory allocated by new
-    for (Treemer::tips::iterator it = tips.begin(); it != tips.end(); ++it) {
-        delete *it;
-    }
-    return res;
-}
-
 // [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,

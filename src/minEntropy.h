@@ -153,7 +153,7 @@ private:
  * nodePath segmentation and search constrain. It's gonna carry the heuristic
  * search for minimum entropy
  */
-template <class T>
+template<class T>
 class SearchTree {
 public:
     SearchTree(
@@ -197,15 +197,15 @@ private:
     T *updateParent();
 };
 
-template <> void SearchTree<Segmentor>::initSearch();
-template <> void SearchTree<Amalgamator>::initSearch();
+template<> void SearchTree<Segmentor>::initSearch();
+template<> void SearchTree<Amalgamator>::initSearch();
 
-template <> void SearchTree<Segmentor>::growTree(Segmentor *seg);
-template <> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
+template<> void SearchTree<Segmentor>::growTree(Segmentor *seg);
+template<> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
 
 // Not yet implemented
-template <> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
-template <> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
+template<> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
+template<> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
 
 }
 

@@ -5,7 +5,7 @@
 
 #include "minEntropy.h"
 
-template <class T>
+template<class T>
 MinEntropy::SearchTree<T>::SearchTree(
     const unsigned int minEffectiveSize,
     const unsigned int searchDepth,
@@ -35,7 +35,7 @@ MinEntropy::SearchTree<T>::SearchTree(
     initSearch();
 }
 
-template <class T>
+template<class T>
 MinEntropy::SearchTree<T>::~SearchTree() {
     // Release the memory used by search nodes
     typedef typename std::vector<T *>::iterator iter;
@@ -45,17 +45,17 @@ MinEntropy::SearchTree<T>::~SearchTree() {
     m_segList.clear();
 }
 
-template <class T>
+template<class T>
 MinEntropy::segment MinEntropy::SearchTree<T>::getFinal() const {
     return m_final;
 }
 
-template <class T>
+template<class T>
 float MinEntropy::SearchTree<T>::getMinEntropy() const {
     return m_minEntropy;
 }
 
-template <class T>
+template<class T>
 void MinEntropy::SearchTree<T>::search() {
     unsigned int depth = 0;
     const unsigned int maxDepth = m_enclosed * m_searchDepth;
@@ -110,7 +110,7 @@ void MinEntropy::SearchTree<T>::search() {
     }
 }
 
-template <class T>
+template<class T>
 void MinEntropy::SearchTree<T>::resumeSearch() {
     if (!m_segList.empty()) {
         m_parent = updateParent();
@@ -120,7 +120,7 @@ void MinEntropy::SearchTree<T>::resumeSearch() {
 
 template class MinEntropy::SearchTree<MinEntropy::Segmentor>;
 
-template <>
+template<>
 void MinEntropy::SearchTree<MinEntropy::Segmentor>::initSearch() {
     // The adding search starts with only the last segment point and all the
     // rest are open for children nodes
@@ -134,7 +134,7 @@ void MinEntropy::SearchTree<MinEntropy::Segmentor>::initSearch() {
     m_minEntropy = m_parent->getEntropy();
 }
 
-template <>
+template<>
 void MinEntropy::SearchTree<MinEntropy::Segmentor>::growTree(
         MinEntropy::Segmentor *seg
 ) {
@@ -149,7 +149,7 @@ void MinEntropy::SearchTree<MinEntropy::Segmentor>::growTree(
 
 template class MinEntropy::SearchTree<MinEntropy::Amalgamator>;
 
-template <>
+template<>
 void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
     // Use the initial entropy is the starting parent node of the adding search
     // because the starting parent node of the removing search can be invalid
@@ -170,7 +170,7 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::initSearch() {
     );
 }
 
-template <>
+template<>
 void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
         MinEntropy::Amalgamator *seg
 ) {
@@ -191,7 +191,7 @@ void MinEntropy::SearchTree<MinEntropy::Amalgamator>::growTree(
     }
 }
 
-template <class T>
+template<class T>
 T *MinEntropy::SearchTree<T>::updateParent() {
     typedef typename std::vector<T *>::iterator iter;
     // Assume the first search node in the active list is the new parent node.
