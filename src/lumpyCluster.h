@@ -22,18 +22,13 @@ typedef std::vector<Treemer::tips> lumpingTips;
 
 class Base {
 public:
-    Base(const Rcpp::NumericMatrix &metricMatrix);
+    Base(
+        const Rcpp::NumericMatrix &metricMatrix,
+        const float metricThreshold
+    );
     std::vector< std::vector<int> > finalClusters() const;
 protected:
-    void mergeClusters(
-            const Treemer::clusters &clusters,
-            const int zValue
-    );
-    virtual void setThreshold(
-            const float average,
-            const float stdev,
-            const int zValue
-    ) = 0;
+    void mergeClusters(const Treemer::clusters &clusters);
     float clusterCompare(
             const Treemer::tips &query,
             const Treemer::tips &subject
@@ -61,14 +56,9 @@ public:
     BySimMatrix(
         const Rcpp::NumericMatrix &simMatrix,
         const Treemer::clusters &clusters,
-        const int zValue
+        const float simThreshold
     );
 protected:
-    void setThreshold(
-            const float average,
-            const float stdev,
-            const int zValue
-    );
     bool betterMetric(
             const float query,
             const float subject
@@ -86,14 +76,9 @@ public:
     ByDistMatrix(
         const Rcpp::NumericMatrix &distMatrix,
         const Treemer::clusters &clusters,
-        const int zValue
+        const float distThreshold
     );
 protected:
-    void setThreshold(
-            const float average,
-            const float stdev,
-            const int zValue
-    );
     bool betterMetric(
             const float query,
             const float subject
@@ -110,8 +95,8 @@ tipNodes terminalTips(
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &simMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const int minSNPnum,
-        const int zValue
+        const float metricThreshold,
+        const int minSNPnum
 );
 
 }

@@ -17,34 +17,34 @@ BEGIN_RCPP
 END_RCPP
 }
 // terminalTipsBySim
-Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& simMatrix, const Rcpp::IntegerVector& siteIndices, const int minSNPnum, const int zValue);
-RcppExport SEXP _sitePath_terminalTipsBySim(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixSEXP, SEXP siteIndicesSEXP, SEXP minSNPnumSEXP, SEXP zValueSEXP) {
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix, const Rcpp::IntegerVector& siteIndices, const float metricthreshold, const int minSNPnum);
+RcppExport SEXP _sitePath_terminalTipsBySim(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP, SEXP siteIndicesSEXP, SEXP metricthresholdSEXP, SEXP minSNPnumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type simMatrix(simMatrixSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type metricMatrix(metricMatrixSEXP);
     Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
+    Rcpp::traits::input_parameter< const float >::type metricthreshold(metricthresholdSEXP);
     Rcpp::traits::input_parameter< const int >::type minSNPnum(minSNPnumSEXP);
-    Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
-    rcpp_result_gen = Rcpp::wrap(terminalTipsBySim(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue));
+    rcpp_result_gen = Rcpp::wrap(terminalTipsBySim(tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum));
     return rcpp_result_gen;
 END_RCPP
 }
 // terminalTipsByDist
-Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsByDist(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& simMatrix, const Rcpp::IntegerVector& siteIndices, const int minSNPnum, const int zValue);
-RcppExport SEXP _sitePath_terminalTipsByDist(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP simMatrixSEXP, SEXP siteIndicesSEXP, SEXP minSNPnumSEXP, SEXP zValueSEXP) {
+Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsByDist(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix, const Rcpp::IntegerVector& siteIndices, const float metricthreshold, const int minSNPnum);
+RcppExport SEXP _sitePath_terminalTipsByDist(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP, SEXP siteIndicesSEXP, SEXP metricthresholdSEXP, SEXP minSNPnumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type simMatrix(simMatrixSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type metricMatrix(metricMatrixSEXP);
     Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
+    Rcpp::traits::input_parameter< const float >::type metricthreshold(metricthresholdSEXP);
     Rcpp::traits::input_parameter< const int >::type minSNPnum(minSNPnumSEXP);
-    Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
-    rcpp_result_gen = Rcpp::wrap(terminalTipsByDist(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue));
+    rcpp_result_gen = Rcpp::wrap(terminalTipsByDist(tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum));
     return rcpp_result_gen;
 END_RCPP
 }

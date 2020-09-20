@@ -5,12 +5,12 @@ getSimilarityMatrix <- function(alignedSeqs) {
     .Call('_sitePath_getSimilarityMatrix', PACKAGE = 'sitePath', alignedSeqs)
 }
 
-terminalTipsBySim <- function(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue) {
-    .Call('_sitePath_terminalTipsBySim', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue)
+terminalTipsBySim <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum) {
+    .Call('_sitePath_terminalTipsBySim', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum)
 }
 
-terminalTipsByDist <- function(tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue) {
-    .Call('_sitePath_terminalTipsByDist', PACKAGE = 'sitePath', tipPaths, alignedSeqs, simMatrix, siteIndices, minSNPnum, zValue)
+terminalTipsByDist <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum) {
+    .Call('_sitePath_terminalTipsByDist', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, metricthreshold, minSNPnum)
 }
 
 mergePaths <- function(paths) {

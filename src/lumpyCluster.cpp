@@ -4,8 +4,12 @@
 #include "lumpyCluster.h"
 #include "treemer.h"
 
-LumpyCluster::Base::Base(const Rcpp::NumericMatrix &metricMatrix):
-    m_metricMatrix(metricMatrix) {}
+LumpyCluster::Base::Base(
+    const Rcpp::NumericMatrix &metricMatrix,
+    const float metricThreshold
+):
+    m_metricMatrix(metricMatrix),
+    m_metricThreshold(metricThreshold) {}
 
 std::vector< std::vector<int> > LumpyCluster::Base::finalClusters() const {
     std::vector< std::vector<int> > res;
@@ -27,10 +31,7 @@ std::vector< std::vector<int> > LumpyCluster::Base::finalClusters() const {
     return res;
 }
 
-void LumpyCluster::Base::mergeClusters(
-        const Treemer::clusters &clusters,
-        const int zValue
-) {
+void LumpyCluster::Base::mergeClusters(const Treemer::clusters &clusters) {
     // The fist raw cluster
     Treemer::clusters::const_iterator it = clusters.begin();
     m_merged.push_back(it->second);
@@ -43,44 +44,44 @@ void LumpyCluster::Base::mergeClusters(
     // Initiate the merged clusters with the first raw clusters so the size of
     // the reformatted raw cluster will be one size less
     rawClusters.reserve(clusters.size()-1);
-    // Collect all tips for later calculating the average paired metric
-    Treemer::tips allTips = it->second;
+    // // Collect all tips for later calculating the average paired metric
+    // Treemer::tips allTips = it->second;
     // Calculate the threshold value and reformat the data structure from map to
     // vector
     for (++it; it != clusters.end(); ++it) {
         // Reformat
         rawClusters.push_back(it->second);
-        // Collect tips
-        allTips.insert(
-            allTips.begin(),
-            it->second.begin(),
-            it->second.end()
-        );
+        // // Collect tips
+        // allTips.insert(
+        //     allTips.begin(),
+        //     it->second.begin(),
+        //     it->second.end()
+        // );
     }
-    int count = 0;
-    float metricSum = 0.0;
-    float squareSum = 0.0;
-    for (
-            Treemer::tips::iterator it1 = allTips.begin();
-            it1 != allTips.end()-1; ++it1
-    ) {
-        for (
-                Treemer::tips::iterator it2 = it1 + 1;
-                it2 != allTips.end(); ++it2
-        ) {
-            count++;
-            float pairMetric = m_metricMatrix(
-                (**it1).getTip(),
-                (**it2).getTip()
-            );
-            metricSum += pairMetric;
-            squareSum += pairMetric*pairMetric;
-        }
-    }
-    float average = metricSum/count;
-    float variance = (count*squareSum-metricSum*metricSum)/(count*count);
-    // The distance and similarity metric will have different offsetting
-    setThreshold(average, std::sqrt(variance), zValue);
+    // int count = 0;
+    // float metricSum = 0.0;
+    // float squareSum = 0.0;
+    // for (
+    //         Treemer::tips::iterator it1 = allTips.begin();
+    //         it1 != allTips.end()-1; ++it1
+    // ) {
+    //     for (
+    //             Treemer::tips::iterator it2 = it1 + 1;
+    //             it2 != allTips.end(); ++it2
+    //     ) {
+    //         count++;
+    //         float pairMetric = m_metricMatrix(
+    //             (**it1).getTip(),
+    //             (**it2).getTip()
+    //         );
+    //         metricSum += pairMetric;
+    //         squareSum += pairMetric*pairMetric;
+    //     }
+    // }
+    // float average = metricSum/count;
+    // float variance = (count*squareSum-metricSum*metricSum)/(count*count);
+    // // The distance and similarity metric will have different offsetting
+    // setThreshold(average, std::sqrt(variance), zValue);
     // Iterate the raw clusters from treemerBySite as the candidate for merging
     // or adding
     for (
@@ -148,21 +149,21 @@ float LumpyCluster::Base::clusterCompare(
 LumpyCluster::BySimMatrix::BySimMatrix(
     const Rcpp::NumericMatrix &simMatrix,
     const Treemer::clusters &clusters,
-    const int zValue
+    const float simThreshold
 ):
-    Base(simMatrix) {
-    mergeClusters(clusters, zValue);
+    Base(simMatrix, simThreshold) {
+    mergeClusters(clusters);
 }
 
-void LumpyCluster::BySimMatrix::setThreshold(
-        const float average,
-        const float stdev,
-        const int zValue
-) {
-    // When using similarity, the number goes up to indicate closer
-    // relationship.
-    m_metricThreshold = average+stdev*zValue;
-}
+// void LumpyCluster::BySimMatrix::setThreshold(
+//         const float average,
+//         const float stdev,
+//         const int zValue
+// ) {
+//     // When using similarity, the number goes up to indicate closer
+//     // relationship.
+//     m_metricThreshold = average+stdev*zValue;
+// }
 
 bool LumpyCluster::BySimMatrix::betterMetric(
         const float query,
@@ -176,23 +177,23 @@ bool LumpyCluster::BySimMatrix::qualifiedMetric(const float metric) const {
 }
 
 LumpyCluster::ByDistMatrix::ByDistMatrix(
-    const Rcpp::NumericMatrix &simMatrix,
+    const Rcpp::NumericMatrix &distMatrix,
     const Treemer::clusters &clusters,
-    const int zValue
+    const float distThreshold
 ):
-    Base(simMatrix) {
-    mergeClusters(clusters, zValue);
+    Base(distMatrix, distThreshold) {
+    mergeClusters(clusters);
 }
 
-void LumpyCluster::ByDistMatrix::setThreshold(
-        const float average,
-        const float stdev,
-        const int zValue
-) {
-    // When using distance, the number goes down to indicate closer
-    // relationship.
-    m_metricThreshold = average-stdev*zValue;
-}
+// void LumpyCluster::ByDistMatrix::setThreshold(
+//         const float average,
+//         const float stdev,
+//         const int zValue
+// ) {
+//     // When using distance, the number goes down to indicate closer
+//     // relationship.
+//     m_metricThreshold = average-stdev*zValue;
+// }
 
 bool LumpyCluster::ByDistMatrix::betterMetric(
         const float query,
@@ -209,10 +210,10 @@ template<class T>
 LumpyCluster::tipNodes LumpyCluster::terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const int minSNPnum,
-        const int zValue
+        const float metricThreshold,
+        const int minSNPnum
 ) {
     Treemer::tips tips;
     Treemer::clusters initClusters;
@@ -237,13 +238,15 @@ LumpyCluster::tipNodes LumpyCluster::terminalTips(
             Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
             it != siteIndices.end(); it++
     ) {
+        // Use treemer to group tips having monophyletic relationship
         Treemer::BySite matched(tips, initClusters, *it);
+        // Group the treemer result by aa/nt of the site
         clsByAA siteClusters = matched.siteClusters();
         for (
                 clsByAA::iterator clusters_itr = siteClusters.begin();
                 clusters_itr != siteClusters.end(); ++clusters_itr
         ) {
-            T merger(simMatrix, clusters_itr->second, zValue);
+            T merger(metricMatrix, clusters_itr->second, metricThreshold);
             tipNodes mergedCls = merger.finalClusters();
             for (
                     tipNodes::iterator cls_itr = mergedCls.begin();
@@ -266,18 +269,18 @@ template LumpyCluster::tipNodes
     LumpyCluster::terminalTips<LumpyCluster::BySimMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const int minSNPnum,
-        const int zValue
-);
+        const float metricThreshold,
+        const int minSNPnum
+    );
 
 template LumpyCluster::tipNodes
     LumpyCluster::terminalTips<LumpyCluster::ByDistMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const int minSNPnum,
-        const int zValue
-);
+        const float metricThreshold,
+        const int minSNPnum
+    );

@@ -37,8 +37,7 @@ sitesMinEntropy.lineagePath <- function(x,
     # Set the minimal size of the group during the search
     if (is.null(minEffectiveSize)) {
         tipNum <- length(tree[["tip.label"]])
-        pathNodeNum <- length(unique(unlist(paths)))
-        minEffectiveSize <- ceiling(tipNum / pathNodeNum)
+        minEffectiveSize <- ceiling(tipNum * attr(x, "similarity"))
     } else if (!is.numeric(minEffectiveSize) ||
                minEffectiveSize < 0) {
         stop("'minEffectiveSize' (",

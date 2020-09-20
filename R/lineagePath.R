@@ -68,33 +68,48 @@ lineagePath.phyMSAmatched <- function(tree,
     } else if (anyNA(simMatrix)) {
         stop("Missing value in 'simMatrix'")
     }
+    # The extra arguments
+    dotsArgs <- list(...)
+    # To calculate the threshold for clustering
+    allPairMetric <- simMatrix[upper.tri(simMatrix)]
+    metricthreshold <- mean(allPairMetric)
+    zValue <- dotsArgs[["zValue"]]
+    if (is.null(zValue)) {
+        zValue <- 2
+    }
+    deviation <- sd(allPairMetric) * zValue
+    # Use diagonal values to guess if it's distance or similarity matrix
     diagValue <- diag(simMatrix)
     if (all(diagValue == 1)) {
         lineageTerminalTips <- terminalTipsBySim
+        metricthreshold <- metricthreshold + deviation
     } else if (all(diagValue == 0)) {
         lineageTerminalTips <- terminalTipsByDist
+        metricthreshold <- metricthreshold - deviation
     } else {
         stop("The diagonal value of 'simMatrix' are not all 1 or 0.")
     }
-    zValue <- 2
     align <- attr(x, "align")
     loci <- attr(x, "loci")
     siteIndices <- attr(x, "msaNumbering")[loci] - 1L
     rootNode <- getMRCA(tree, tree[["tip.label"]])
     # Get all lineages using the terminal node found by SNP
-    paths <- mergePaths(lapply(
-        X = lineageTerminalTips(
-            tipPaths = nodepath(tree),
-            alignedSeqs = align,
-            simMatrix = simMatrix,
-            siteIndices = siteIndices,
-            minSNPnum = minSNP,
-            zValue = zValue
-        ),
+    terminalTips <- lineageTerminalTips(
+        tipPaths = nodepath(tree),
+        alignedSeqs = align,
+        metricMatrix = simMatrix,
+        siteIndices = siteIndices,
+        metricthreshold = metricthreshold,
+        minSNPnum = minSNP
+    )
+    candidatePaths <- lapply(
+        X = terminalTips,
         FUN = function(tips) {
-            nodepath(tree, from = rootNode, to = getMRCA(tree, tips))
+            terminalNode <- getMRCA(tree, tips)
+            nodepath(tree, from = rootNode, to = terminalNode)
         }
-    ))
+    )
+    paths <- mergePaths(candidatePaths)
     # Transfer attributes
     attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'rootNode'
