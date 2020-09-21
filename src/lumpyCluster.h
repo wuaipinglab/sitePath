@@ -24,7 +24,8 @@ class Base {
 public:
     Base(
         const Rcpp::NumericMatrix &metricMatrix,
-        const float metricThreshold
+        const float metricThreshold,
+        const int maxSNPnum
     );
     std::vector< std::vector<int> > finalClusters() const;
 protected:
@@ -44,7 +45,9 @@ protected:
     lumpingTips m_merged;
     // The threshold for clustering and the metric standard deviation of all
     // tips pairs
-    float m_metricThreshold;
+    const float m_metricThreshold;
+    // The maximum number of SNP
+    const int m_maxSNPnum;
 };
 
 /*
@@ -56,7 +59,8 @@ public:
     BySimMatrix(
         const Rcpp::NumericMatrix &simMatrix,
         const Treemer::clusters &clusters,
-        const float simThreshold
+        const float simThreshold,
+        const int maxSNPnum
     );
 protected:
     bool betterMetric(
@@ -76,7 +80,8 @@ public:
     ByDistMatrix(
         const Rcpp::NumericMatrix &distMatrix,
         const Treemer::clusters &clusters,
-        const float distThreshold
+        const float distThreshold,
+        const int maxSNPnum
     );
 protected:
     bool betterMetric(
