@@ -113,8 +113,8 @@ float LumpyCluster::Base::clusterCompare(
                 it2 != subject.end(); ++it2
         ) {
             metricSum += m_metricMatrix(
-                (**it1).getTip(),
-                (**it2).getTip()
+                (**it1).getTip()-1,
+                (**it2).getTip()-1
             );
             count++;
         }
