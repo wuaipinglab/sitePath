@@ -178,7 +178,7 @@ Treemer::BySite::BySite(
     Base(tips, initClusters),
     m_siteIndex(siteIndex) { pruneTree(); }
 
-std::map<char, Treemer::clusters> Treemer::BySite::siteClusters() const {
+Treemer::siteClusters Treemer::BySite::getSiteClusters() const {
     std::map<char, clusters> res;
     for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
         res[(**it).siteChar(m_siteIndex)][(**it).currentClade()].push_back(*it);

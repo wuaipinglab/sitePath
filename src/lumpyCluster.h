@@ -24,12 +24,18 @@ class Base {
 public:
     Base(
         const Rcpp::NumericMatrix &metricMatrix,
-        const float metricThreshold,
         const int maxSNPnum
     );
     std::vector< std::vector<int> > finalClusters() const;
 protected:
-    void mergeClusters(const Treemer::clusters &clusters);
+    void mergeClusters(
+            const Treemer::clusters &clusters,
+            const int zValue
+    );
+    virtual void thresholdOffset(
+            const float stdev,
+            const int zValue
+    ) = 0;
     float clusterCompare(
             const Treemer::tips &query,
             const Treemer::tips &subject
@@ -42,12 +48,12 @@ protected:
 protected:
     const Rcpp::NumericMatrix m_metricMatrix;
     // The merged clusters output
-    lumpingTips m_merged;
+    const int m_maxSNPnum;
     // The threshold for clustering and the metric standard deviation of all
     // tips pairs
-    const float m_metricThreshold;
+    lumpingTips m_merged;
     // The maximum number of SNP
-    const int m_maxSNPnum;
+    float m_metricThreshold;
 };
 
 /*
@@ -59,10 +65,14 @@ public:
     BySimMatrix(
         const Rcpp::NumericMatrix &simMatrix,
         const Treemer::clusters &clusters,
-        const float simThreshold,
-        const int maxSNPnum
+        const int maxSNPnum,
+        const int zValue
     );
 protected:
+    void thresholdOffset(
+            const float stdev,
+            const int zValue
+    );
     bool betterMetric(
             const float query,
             const float subject
@@ -80,10 +90,14 @@ public:
     ByDistMatrix(
         const Rcpp::NumericMatrix &distMatrix,
         const Treemer::clusters &clusters,
-        const float distThreshold,
-        const int maxSNPnum
+        const int maxSNPnum,
+        const int zValue
     );
 protected:
+    void thresholdOffset(
+            const float stdev,
+            const int zValue
+    );
     bool betterMetric(
             const float query,
             const float subject
@@ -91,17 +105,15 @@ protected:
     bool qualifiedMetric(const float metric) const;
 };
 
-typedef std::map<char, Treemer::clusters> clsByAA;
 typedef std::vector< std::vector<int> > tipNodes;
 
 template<class T>
-tipNodes terminalTips(
+std::map<int, tipNodes> terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &simMatrix,
+        const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricThreshold,
-        const int minSNPnum
+        const int zValue
 );
 
 }

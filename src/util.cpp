@@ -37,43 +37,75 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 }
 
 // [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsBySim(
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > majorSNPtips(
+        const Rcpp::CharacterVector &alignedSeqs,
+        const Rcpp::IntegerVector &siteIndices,
+        const int minSNPnum
+) {
+    const int totalTipNum = alignedSeqs.size();
+    std::map<int, std::map<std::string, std::vector<int> > > res;
+    // Select the major SNPs for each site (aa/nt)
+    for (
+            Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
+            it != siteIndices.end(); it++
+    ) {
+        int siteIndex = *it;
+        std::map<char, int> snpSummary;
+        for (int i = 0; i < totalTipNum; ++i) {
+            snpSummary[alignedSeqs[i][siteIndex]]++;
+        }
+        // Select major SNPs
+        for (
+                std::map<char, int>::iterator it = snpSummary.begin();
+                it != snpSummary.end(); it++
+        ) {
+            if (it->second > minSNPnum && it->second < totalTipNum/2) {
+                // Find the tips with the SNP and record the site
+                for (int i = 0; i < totalTipNum; ++i) {
+                    if (alignedSeqs[i][siteIndex] == it->first) {
+                        res[siteIndex+1][std::string(1, it->first)].push_back(i+1);
+                    }
+                }
+            }
+        }
+    }
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricthreshold,
-        const int minSNPnum
+        const int zValue
 ) {
     using namespace LumpyCluster;
-    tipNodes res = terminalTips<BySimMatrix>(
+    std::map<int, tipNodes> res = terminalTips<BySimMatrix>(
         tipPaths,
         alignedSeqs,
         metricMatrix,
         siteIndices,
-        metricthreshold,
-        minSNPnum
+        zValue
     );
     return Rcpp::wrap(res);
 }
 
 // [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> terminalTipsByDist(
+Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricthreshold,
-        const int minSNPnum
+        const int zValue
 ) {
     using namespace LumpyCluster;
-    tipNodes res = terminalTips<ByDistMatrix>(
+    std::map<int, tipNodes> res = terminalTips<ByDistMatrix>(
         tipPaths,
         alignedSeqs,
         metricMatrix,
         siteIndices,
-        metricthreshold,
-        minSNPnum
+        zValue
     );
     return Rcpp::wrap(res);
 }

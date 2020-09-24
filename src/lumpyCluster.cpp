@@ -1,4 +1,6 @@
 #include <cmath>
+#include <map>
+#include <string>
 #include <vector>
 
 #include "lumpyCluster.h"
@@ -6,11 +8,9 @@
 
 LumpyCluster::Base::Base(
     const Rcpp::NumericMatrix &metricMatrix,
-    const float metricThreshold,
     const int maxSNPnum
 ):
     m_metricMatrix(metricMatrix),
-    m_metricThreshold(metricThreshold),
     m_maxSNPnum(maxSNPnum) {}
 
 std::vector< std::vector<int> > LumpyCluster::Base::finalClusters() const {
@@ -33,7 +33,10 @@ std::vector< std::vector<int> > LumpyCluster::Base::finalClusters() const {
     return res;
 }
 
-void LumpyCluster::Base::mergeClusters(const Treemer::clusters &clusters) {
+void LumpyCluster::Base::mergeClusters(
+        const Treemer::clusters &clusters,
+        const int zValue
+) {
     // The fist raw cluster
     Treemer::clusters::const_iterator it = clusters.begin();
     m_merged.push_back(it->second);
@@ -46,18 +49,46 @@ void LumpyCluster::Base::mergeClusters(const Treemer::clusters &clusters) {
     // Initiate the merged clusters with the first raw clusters so the size of
     // the reformatted raw cluster will be one size less
     rawClusters.reserve(clusters.size()-1);
-    // The total number of tips for the SNP
-    int totalTipNum = 0;
+    // Collect all tips for later calculating the average paired metric
+    Treemer::tips allTips = it->second;
     // Calculate the threshold value and reformat the data structure from map to
     // vector
     for (++it; it != clusters.end(); ++it) {
         // Reformat
         rawClusters.push_back(it->second);
-        totalTipNum += it->second.size();
+        // Collect tips
+        allTips.insert(
+            allTips.begin(),
+            it->second.begin(),
+            it->second.end()
+        );
     }
-    if (totalTipNum >= m_maxSNPnum) {
+    if (allTips.size() >= m_maxSNPnum) {
         return;
     }
+    int count = 0;
+    float metricSum = 0.0;
+    float squareSum = 0.0;
+    for (
+            Treemer::tips::iterator it1 = allTips.begin();
+            it1 != allTips.end()-1; ++it1
+    ) {
+        for (
+                Treemer::tips::iterator it2 = it1 + 1;
+                it2 != allTips.end(); ++it2
+        ) {
+            count++;
+            float pairMetric = m_metricMatrix(
+                (**it1).getTip()-1,
+                (**it2).getTip()-1
+            );
+            metricSum += pairMetric;
+            squareSum += pairMetric*pairMetric;
+        }
+    }
+    m_metricThreshold = metricSum/count;
+    float variance = (count*squareSum-metricSum*metricSum)/(count*count);
+    thresholdOffset(std::sqrt(variance), zValue);
     // Iterate the raw clusters from treemerBySite as the candidate for merging
     // or adding
     for (
@@ -125,11 +156,20 @@ float LumpyCluster::Base::clusterCompare(
 LumpyCluster::BySimMatrix::BySimMatrix(
     const Rcpp::NumericMatrix &simMatrix,
     const Treemer::clusters &clusters,
-    const float simThreshold,
-    const int maxSNPnum
+    const int maxSNPnum,
+    const int zValue
 ):
-    Base(simMatrix, simThreshold, maxSNPnum) {
-    mergeClusters(clusters);
+    Base(simMatrix, maxSNPnum) {
+    mergeClusters(clusters, zValue);
+}
+
+void LumpyCluster::BySimMatrix::thresholdOffset(
+        const float stdev,
+        const int zValue
+) {
+    // When using similarity, the number goes up to indicate closer
+    // relationship.
+    m_metricThreshold += stdev*zValue;
 }
 
 bool LumpyCluster::BySimMatrix::betterMetric(
@@ -146,11 +186,20 @@ bool LumpyCluster::BySimMatrix::qualifiedMetric(const float metric) const {
 LumpyCluster::ByDistMatrix::ByDistMatrix(
     const Rcpp::NumericMatrix &distMatrix,
     const Treemer::clusters &clusters,
-    const float distThreshold,
-    const int maxSNPnum
+    const int maxSNPnum,
+    const int zValue
 ):
-    Base(distMatrix, distThreshold, maxSNPnum) {
-    mergeClusters(clusters);
+    Base(distMatrix, maxSNPnum) {
+    mergeClusters(clusters, zValue);
+}
+
+void LumpyCluster::ByDistMatrix::thresholdOffset(
+        const float stdev,
+        const int zValue
+) {
+    // When using distance, the number goes down to indicate closer
+    // relationship.
+    m_metricThreshold -= stdev*zValue;
 }
 
 bool LumpyCluster::ByDistMatrix::betterMetric(
@@ -165,13 +214,12 @@ bool LumpyCluster::ByDistMatrix::qualifiedMetric(const float metric) const {
 }
 
 template<class T>
-LumpyCluster::tipNodes LumpyCluster::terminalTips(
+std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricThreshold,
-        const int minSNPnum
+        const int zValue
 ) {
     const int totalNum = tipPaths.size();
     Treemer::tips tips;
@@ -192,7 +240,7 @@ LumpyCluster::tipNodes LumpyCluster::terminalTips(
             throw std::invalid_argument("Sequence length not equal");
         }
     }
-    tipNodes res;
+    std::map<int, tipNodes> res;
     const int maxSNPnum = totalNum/2;
     for (
             Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
@@ -201,24 +249,24 @@ LumpyCluster::tipNodes LumpyCluster::terminalTips(
         // Use treemer to group tips having monophyletic relationship
         Treemer::BySite matched(tips, initClusters, *it);
         // Group the treemer result by aa/nt of the site
-        clsByAA siteClusters = matched.siteClusters();
+        Treemer::siteClusters clsByAA = matched.getSiteClusters();
         for (
-                clsByAA::iterator clusters_itr = siteClusters.begin();
-                clusters_itr != siteClusters.end(); ++clusters_itr
+                Treemer::siteClusters::iterator clusters_itr = clsByAA.begin();
+                clusters_itr != clsByAA.end(); ++clusters_itr
         ) {
             T merger(
                     metricMatrix,
                     clusters_itr->second,
-                    metricThreshold,
-                    maxSNPnum
+                    maxSNPnum,
+                    zValue
             );
             tipNodes mergedCls = merger.finalClusters();
             for (
                     tipNodes::iterator cls_itr = mergedCls.begin();
                     cls_itr != mergedCls.end(); ++cls_itr
             ) {
-                if (cls_itr->size() >= minSNPnum) {
-                    res.push_back(*cls_itr);
+                if (cls_itr->size() > 1) {
+                    res[*it+1].push_back(*cls_itr);
                 }
             }
         }
@@ -230,22 +278,20 @@ LumpyCluster::tipNodes LumpyCluster::terminalTips(
     return res;
 }
 
-template LumpyCluster::tipNodes
+template std::map<int, LumpyCluster::tipNodes>
     LumpyCluster::terminalTips<LumpyCluster::BySimMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricThreshold,
-        const int minSNPnum
+        const int zValue
     );
 
-template LumpyCluster::tipNodes
+template std::map<int, LumpyCluster::tipNodes>
     LumpyCluster::terminalTips<LumpyCluster::ByDistMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
         const Rcpp::IntegerVector &siteIndices,
-        const float metricThreshold,
-        const int minSNPnum
+        const int zValue
     );

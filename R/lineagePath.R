@@ -71,21 +71,16 @@ lineagePath.phyMSAmatched <- function(tree,
     # The extra arguments
     dotsArgs <- list(...)
     # To calculate the threshold for clustering
-    allPairMetric <- simMatrix[upper.tri(simMatrix)]
-    metricthreshold <- mean(allPairMetric)
     zValue <- dotsArgs[["zValue"]]
     if (is.null(zValue)) {
-        zValue <- 2
+        zValue <- 0
     }
-    deviation <- sd(allPairMetric) * zValue
     # Use diagonal values to guess if it's distance or similarity matrix
     diagValue <- diag(simMatrix)
     if (all(diagValue == 1)) {
         lineageTerminalTips <- terminalTipsBySim
-        metricthreshold <- metricthreshold + deviation
     } else if (all(diagValue == 0)) {
         lineageTerminalTips <- terminalTipsByDist
-        metricthreshold <- metricthreshold - deviation
     } else {
         stop("The diagonal value of 'simMatrix' are not all 1 or 0.")
     }
@@ -99,9 +94,13 @@ lineagePath.phyMSAmatched <- function(tree,
         alignedSeqs = align,
         metricMatrix = simMatrix,
         siteIndices = siteIndices,
-        metricthreshold = metricthreshold,
-        minSNPnum = minSNP
+        zValue = zValue
     )
+    terminalTips <- unlist(x = terminalTips,
+                           recursive = FALSE,
+                           use.names = FALSE)
+    terminalTips <-
+        terminalTips[which(lengths(terminalTips) > minSNP)]
     candidatePaths <- lapply(
         X = terminalTips,
         FUN = function(tips) {

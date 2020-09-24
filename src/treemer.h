@@ -82,6 +82,8 @@ protected:
     clusters m_clusters;
 };
 
+typedef std::map<char, clusters> siteClusters;
+
 /*
  * Trim the tree by aa/nt of a site. The trimming stops when the non-dominant
  * aa/nt in a group is greater than the SNP percentage threshold
@@ -94,7 +96,7 @@ public:
         const int siteIndex
     );
     // Cluster of TipSeqLinker grouped by aa/nt after trimming
-    std::map<char, clusters> siteClusters() const;
+    siteClusters getSiteClusters() const;
 private:
     bool qualified(const clusters::iterator &clusters_it) const;
 private:
