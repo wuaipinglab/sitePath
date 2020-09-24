@@ -22,8 +22,9 @@
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
-setSiteNumbering <- function(x, reference, gapChar, ...)
+setSiteNumbering <- function(x, reference, gapChar, ...) {
     UseMethod("setSiteNumbering")
+}
 
 #' @rdname setSiteNumbering
 #' @export

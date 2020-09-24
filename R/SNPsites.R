@@ -17,8 +17,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
-SNPsites <- function(tree, ...)
+SNPsites <- function(tree, ...) {
     UseMethod("SNPsites")
+}
 
 #' @rdname SNPsites
 #' @export

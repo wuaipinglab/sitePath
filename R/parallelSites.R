@@ -26,8 +26,9 @@
 #' paths <- lineagePath(tree)
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
-parallelSites <- function(x, ...)
+parallelSites <- function(x, ...) {
     UseMethod("parallelSites")
+}
 
 #' @rdname parallelSites
 #' @export

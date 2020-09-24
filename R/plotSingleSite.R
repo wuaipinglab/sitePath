@@ -28,8 +28,9 @@
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' paths <- lineagePath(tree)
 #' plotSingleSite(paths, 139)
-plotSingleSite <- function(x, site, ...)
+plotSingleSite <- function(x, site, ...) {
     UseMethod("plotSingleSite")
+}
 
 #' @rdname plotSingleSite
 #' @description For \code{\link{lineagePath}}, the tree will be colored

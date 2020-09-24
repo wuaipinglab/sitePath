@@ -15,8 +15,9 @@
 NULL
 
 #' @export
-multiFixationSites <- function(paths, ...)
+multiFixationSites <- function(paths, ...) {
     UseMethod("multiFixationSites")
+}
 
 #' @export
 multiFixationSites.lineagePath <- function(paths,

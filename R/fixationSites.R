@@ -25,8 +25,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' fixationSites(lineagePath(tree))
-fixationSites <- function(paths, ...)
+fixationSites <- function(paths, ...) {
     UseMethod("fixationSites")
+}
 
 #' @rdname fixationSites
 #' @export

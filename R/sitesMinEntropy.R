@@ -22,8 +22,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' sitesMinEntropy(lineagePath(tree))
-sitesMinEntropy <- function(x, ...)
+sitesMinEntropy <- function(x, ...) {
     UseMethod("sitesMinEntropy")
+}
 
 #' @rdname sitesMinEntropy
 #' @export
