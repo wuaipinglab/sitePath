@@ -1,6 +1,6 @@
-#' @importFrom ape read.tree
-#' @export
-ape::read.tree
+#' @importFrom methods is
+#' @importFrom seqinr read.alignment
+#' @importFrom ape multi2di is.binary
 
 #' @rdname addMSA
 #' @name phyMSAmatched
@@ -30,9 +30,6 @@ ape::read.tree
 #' @return Since 1.5.12, the function returns a \code{phyMSAmatched} object to
 #'   avoid S3 methods used on \code{phylo} (better encapsulation).
 #' @seealso \code{\link{read.alignment}}
-#' @importFrom ape multi2di is.binary
-#' @importFrom seqinr read.alignment
-#' @importFrom methods is
 #' @export
 #' @examples
 #' data(zikv_tree)
@@ -74,14 +71,4 @@ addMSA <- function(tree,
     # Use the numbering of MSA as the default site numbering
     res <- setSiteNumbering.phyMSAmatched(res)
     return(res)
-}
-
-#' @export
-print.phyMSAmatched <- function(x, ...) {
-    cat(x, "\n")
-}
-
-plot.phyMSAmatched <- function(x, y = TRUE) {
-    p <- ggtree(as.phylo.phyMSAmatched(x))
-    return(p)
 }

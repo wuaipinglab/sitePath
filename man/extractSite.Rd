@@ -5,6 +5,8 @@
 \alias{extractSite.fixationSites}
 \title{Extract tips for a single site}
 \usage{
+extractSite(x, site, ...)
+
 \method{extractSite}{fixationSites}(x, site, ...)
 }
 \arguments{

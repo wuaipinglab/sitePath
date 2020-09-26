@@ -16,9 +16,9 @@
 #ifndef SITEPATH_MINENTROPY_H
 #define SITEPATH_MINENTROPY_H
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 #include <Rcpp.h>
 
 namespace MinEntropy {
@@ -34,12 +34,12 @@ Rcpp::ListOf<Rcpp::IntegerVector> updatedSegmentation(
         const segment &final
 );
 
+/*
+ * The base class for implementing node in tree search for minimum entropy The
+ * node stores the segment points and calculates the total entropy of the
+ * current segmentation
+ */
 class TreeSearchNode {
-    /*
-     * The base class for implementing node in tree search for minimum entropy
-     * The node stores the segment points and calculates the total entropy of
-     * the current segmentation
-     */
 public:
     // Pure virtual methods
     virtual unsigned int getOpenSize() const = 0;
@@ -73,14 +73,13 @@ protected:
     bool m_qualified;
 };
 
+/*
+ * The class to implement the node in the adding search. Store segment indices
+ * of a nodePath and the remaining unused indices The growing of the tree search
+ * is by adding one segment point from the open list to the used list for each
+ * children node
+ */
 class Segmentor: public TreeSearchNode {
-    /*
-     * The class to implement the node in the adding search
-     *
-     * Store segment indices of a nodePath and the remaining unused indices
-     * The growing of the tree search is by adding one segment point from
-     * the open list to the used list for each children node
-     */
 public:
     // Initially only the terminal enclosed point is used.
     Segmentor(
@@ -89,8 +88,8 @@ public:
         const std::vector<aaSummary> &aaSummaries,
         const unsigned int minEffectiveSize
     );
-    // Genetrat a children node from the parent node
-    // Simply pick the "i"th segment point from the parent's open list
+    // Generate a children node from the parent node. Simply pick the "i"th
+    // segment point from the parent's open list
     Segmentor(
         const Segmentor *parent,
         const unsigned int i,
@@ -117,14 +116,12 @@ private:
     ) const;
 };
 
+/*
+ * The class to implemenet the node in the removing search. Only the used list
+ * is needed tracking as it's also the open list. The growing of the search tree
+ * is by removing one segment point from the used list
+ */
 class Amalgamator: public TreeSearchNode {
-    /*
-     * The class to implemenet the node in the removing search
-     *
-     * Only the used list is needed tracking as it's also the open list.
-     * The growing of the search tree is by removing one segment point
-     * from the used list
-     */
 public:
     // All segment points are being used initially
     Amalgamator(
@@ -151,14 +148,13 @@ private:
     ) const;
 };
 
-template <class T>
+/*
+ * The template class for implementing the tree search. Store the original
+ * nodePath segmentation and search constrain. It's gonna carry the heuristic
+ * search for minimum entropy
+ */
+template<class T>
 class SearchTree {
-    /*
-     * The template class for implementing the tree search
-     *
-     * Store the original nodePath segmentation and search constrain.
-     * It's gonna carry the heuristic search for minimum entropy
-     */
 public:
     SearchTree(
         const unsigned int minEffectiveSize,
@@ -177,8 +173,8 @@ private:
     const unsigned int m_minTipNum, m_searchDepth;
     // The terminal segment point essential for enclosing the segmenting
     const segIndex m_enclosed;
-    // Store all possible segment points (except the enclosed point).
-    // Track final list of segment points which gives minimum entropy
+    // Store all possible segment points (except the enclosed point). Track
+    // final list of segment points which gives minimum entropy
     segment m_all, m_final;
     // The transformed AA summaries for each node
     std::vector<aaSummary> m_aaSummaries;
@@ -195,20 +191,21 @@ private:
     void initSearch();
     // Grow the tree from the current parent node
     void growTree(T *seg);
+    // Not yet implemented
     void updateFinal(T *tempMin);
     // Decide the new parent node
     T *updateParent();
 };
 
-template <> void SearchTree<Segmentor>::initSearch();
-template <> void SearchTree<Amalgamator>::initSearch();
+template<> void SearchTree<Segmentor>::initSearch();
+template<> void SearchTree<Amalgamator>::initSearch();
 
-template <> void SearchTree<Segmentor>::growTree(Segmentor *seg);
-template <> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
+template<> void SearchTree<Segmentor>::growTree(Segmentor *seg);
+template<> void SearchTree<Amalgamator>::growTree(Amalgamator *seg);
 
 // Not yet implemented
-template <> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
-template <> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
+template<> void SearchTree<Segmentor>::updateFinal(Segmentor *tempMin);
+template<> void SearchTree<Amalgamator>::updateFinal(Amalgamator *tempMin);
 
 }
 

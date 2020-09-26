@@ -1,5 +1,3 @@
-context("test-groupTips")
-
 test_that("The grouped tips include all tree tips", {
     data(zikv_align_reduced)
     data(zikv_tree_reduced)

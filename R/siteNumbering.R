@@ -1,5 +1,4 @@
 #' @rdname setSiteNumbering
-#' @name setSiteNumbering
 #' @title Set site numbering to the reference sequence
 #' @description A reference sequence can be used to define a global site
 #'   numbering scheme for multiple sequence alignment. The gap in the reference
@@ -23,16 +22,16 @@
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
+setSiteNumbering <- function(x, reference, gapChar, ...)
+    UseMethod("setSiteNumbering")
+
+#' @rdname setSiteNumbering
+#' @export
 setSiteNumbering.phyMSAmatched <- function(x,
                                            reference = NULL,
                                            gapChar = "-",
                                            minSkipSize = NULL,
                                            ...) {
-    res <- .checkReference(x, reference, gapChar, minSkipSize)
-    return(res)
-}
-
-.checkReference <- function(x, reference, gapChar, minSkipSize) {
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
     if (is.null(reference)) {
@@ -136,8 +135,8 @@ setSiteNumbering.fixationSites <- function(x,
     for (gpIndex in seq_along(attr(x, "clustersByPath"))) {
         for (i in seq_along(attr(x, "clustersByPath")[[gpIndex]])) {
             oldSiteName <-
-                names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site"))
-            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "site")) <-
+                names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA"))
+            names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA")) <-
                 site2newRef[oldSiteName]
             toMerge <-
                 attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "toMerge")
@@ -187,7 +186,3 @@ setSiteNumbering.fixationPath <- function(x,
     )
     return(x)
 }
-
-#' @export
-setSiteNumbering <- function(x, reference, gapChar, ...)
-    UseMethod("setSiteNumbering")

@@ -1,8 +1,15 @@
+#include <map>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+#include <Rcpp.h>
+
 #include "treemer.h"
 
 float Treemer::compare(const std::string &query, const std::string &subject) {
-    // Get the similarity between two aligned sequences.
-    // Site is skipped for total length if both are gaps in alignment
+    // Get the similarity between two aligned sequences. Site is skipped for
+    // total length if both are gaps in alignment
     float match = 0.0, length = 0.0;
     for (
             std::string::const_iterator q = query.begin(), s = subject.begin();
@@ -13,7 +20,7 @@ float Treemer::compare(const std::string &query, const std::string &subject) {
             if (*q == *s) { match++; }
         }
     }
-    return match / length;
+    return match/length;
 }
 
 Treemer::TipSeqLinker::TipSeqLinker(
@@ -25,11 +32,14 @@ Treemer::TipSeqLinker::TipSeqLinker(
     m_tipIndex(tipPath.size() - 1), // last node of a path is the tip node
     m_cIndex(m_tipIndex) {}
 
+void Treemer::TipSeqLinker::reset() {
+    m_cIndex = m_tipIndex;
+}
+
 void Treemer::TipSeqLinker::proceed() {
-    // Proceed towards the root node along the path
-    // as the current index should decrement.
-    // An index of 0 means reaching the root node.
-    // Setting index greater than 1 is to prevent trivial trimming
+    // Proceed towards the root node along the path as the current index should
+    // decrement. An index of 0 means reaching the root node. Setting index
+    // greater than 1 is to prevent trivial trimming
     if (m_cIndex > 1) { m_cIndex--; }
 }
 
@@ -39,8 +49,7 @@ int Treemer::TipSeqLinker::currentClade() const {
 }
 
 int Treemer::TipSeqLinker::nextClade() const {
-    // Look up the immediate ancestral node
-    // aka fake 'proceed'
+    // Look up the immediate ancestral node aka fake 'proceed'
     if (m_cIndex > 1) {
         return m_path[m_cIndex - 1];
     } else {
@@ -59,8 +68,8 @@ int Treemer::TipSeqLinker::getRoot() const {
 }
 
 int Treemer::TipSeqLinker::getSeqLen() const {
-    // The length of the aligned sequence
-    // This is going to be done for every sequence to make sure they're aligned
+    // The length of the aligned sequence. This is going to be done for every
+    // sequence to make sure they're aligned
     return m_seq.size();
 }
 
@@ -74,26 +83,22 @@ std::string Treemer::TipSeqLinker::getSeq() const {
     return m_seq;
 }
 
-char Treemer::TipSeqLinker::getSiteChar(const int site) const {
-    return m_seq[site - 1];
+char Treemer::TipSeqLinker::siteChar(const int siteIndex) const {
+    return m_seq[siteIndex];
 }
 
 Treemer::Base::Base(
-    const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-    const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
+    const tips &tips,
+    const clusters initClusters
 ):
-    m_root(*(tipPaths[0].begin())),
-    m_seqLen((Rcpp::as<std::string>(alignedSeqs[0])).size()) {
-    // Match tip and seq (tip class can be overridden by children class)
-    initTips(tipPaths, alignedSeqs);
-}
+    m_tips(tips),
+    m_clusters(initClusters) {}
 
 Treemer::Base::~Base() {
-    // Release the memory used by TipSeqLinkers
-    for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
-        delete *it;
+    // Reset all TipSeqLinkers
+    for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+        (**it).reset();
     }
-    m_tips.clear();
 }
 
 std::map< int, std::vector<int> > Treemer::Base::getTips() const {
@@ -114,26 +119,6 @@ std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
     return res;
 }
 
-void Treemer::Base::initTips(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
-) {
-    // Iterate tipPaths and alignedSeqs to construct a list of TipSeqLinkers
-    for (int i = 0; i < tipPaths.size(); i++) {
-        TipSeqLinker *tip = new TipSeqLinker(alignedSeqs[i], tipPaths[i]);
-        m_tips.push_back(tip);
-        // The initial clustering is each tip as a cluster
-        m_clusters[tip->getTip()].push_back(tip);
-
-        // The root of each tipPath should be the same
-        // The sequences should be of the same length
-        if (m_tips[i]->getRoot() != m_root) {
-            throw std::invalid_argument("Root in tree paths not equal");
-        } else if (m_tips[i]->getSeqLen() != m_seqLen) {
-            throw std::invalid_argument("Sequence length not equal");
-        }
-    }
-}
 
 void Treemer::Base::pruneTree() {
     while (true) {
@@ -141,41 +126,40 @@ void Treemer::Base::pruneTree() {
         m_clusters.clear();
         // look down one more node (fake 'proceed')
         // group each tip after new positioning
-        for (tips::iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
+        for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
             m_clusters[(*it)->nextClade()].push_back(*it);
         }
-        // if no more group 'kissed' each other by a common ancestral node
-        // after fake 'proceed', then pruning is done
+        // if no more group 'kissed' each other by a common ancestral node after
+        // fake 'proceed', then pruning is done
         if (m_clusters.size() == oldClusters.size()) {
             m_clusters.clear();
             break;
         }
-        // only 'kissed' group can do real 'proceed'
-        // if a grouping doesn't exist in 'oldClusters'
-        // then all tips in that group can 'proceed'
+        // only 'kissed' group can do real 'proceed' if a grouping doesn't exist
+        // in 'oldClusters' then all tips in that group can 'proceed'
         for (
                 clusters::iterator it = m_clusters.begin();
                 it != m_clusters.end(); ++it
         ) {
-            // assume a group is kissed with another
-            // (give it benefit of the doubt)
+            // assume a group is kissed with another (give it benefit of the
+            // doubt)
             bool kissed = true;
             for (
                     clusters::iterator it2 = oldClusters.begin();
                     it2 != oldClusters.end(); ++it2
             ) {
-                // a group is 'non-kissed' after fake 'proceed'
-                // if it can be found in 'oldClusters'
+                // a group is 'non-kissed' after fake 'proceed' if it can be
+                // found in 'oldClusters'
                 if (it->second == it2->second) {
                     kissed = false;
-                    // a 'non-kissed' group won't appear twice in
-                    // 'clusters' so deleted
+                    // a 'non-kissed' group won't appear twice in 'clusters' so
+                    // deleted
                     oldClusters.erase(it2);
                     break;
                 }
             }
-            // clusters_it group needs to pass some requirement to
-            // be qualified 'kissed'
+            // clusters_it group needs to pass some requirement to be qualified
+            // 'kissed'
             if (kissed && qualified(it)) {
                 for (
                         tips::iterator tips_itr = it->second.begin();
@@ -187,25 +171,26 @@ void Treemer::Base::pruneTree() {
 }
 
 Treemer::BySite::BySite(
-    const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-    const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-    const int site
+    const tips &tips,
+    const clusters initClusters,
+    const int siteIndex
 ):
-    Base(tipPaths, alignedSeqs),
-    m_siteIndex(site - 1) { pruneTree(); }
+    Base(tips, initClusters),
+    m_siteIndex(siteIndex) { pruneTree(); }
 
-Treemer::clusters Treemer::BySite::finalClusters() {
+Treemer::siteClusters Treemer::BySite::getSiteClusters() const {
+    std::map<char, clusters> res;
     for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
-        m_clusters[(*it)->currentClade()].push_back(*it);
+        res[(**it).siteChar(m_siteIndex)][(**it).currentClade()].push_back(*it);
     }
-    return m_clusters;
+    return res;
 }
 
 bool Treemer::BySite::qualified(const clusters::iterator &clusters_it) const {
     tips::const_iterator it  = clusters_it->second.begin();
-    char ref_value = (*it)->getSeq()[m_siteIndex];
+    char ref_value = (**it).siteChar(m_siteIndex);
     for (++it; it != clusters_it->second.end(); ++it) {
-        if ((*it)->getSeq()[m_siteIndex] != ref_value) {
+        if ((**it).siteChar(m_siteIndex) != ref_value) {
             return false;
         }
     }
@@ -213,12 +198,12 @@ bool Treemer::BySite::qualified(const clusters::iterator &clusters_it) const {
 }
 
 Treemer::BySimilarity::BySimilarity(
-    const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-    const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+    const tips &tips,
+    const clusters initClusters,
     const float simThreshold,
     std::map<std::pair<int, int>, float> &simMatrix
 ):
-    Base(tipPaths, alignedSeqs),
+    Base(tips, initClusters),
     m_simCut(simThreshold),
     m_compared(&simMatrix) {
     // The similarity threshold should be between 0 and 1
@@ -245,8 +230,8 @@ bool Treemer::BySimilarity::qualified(const clusters::iterator &clusters_it) con
                 (*it)->getTip(),
                 (*it2)->getTip()
             );
-            // Retrieve similarity from existing values
-            // Calculate the value otherwise
+            // Retrieve similarity from existing values. Calculate the value
+            // otherwise
             float sim = 0;
             std::map<std::pair<int, int>, float>::iterator
                 pos = m_compared->find(pairing);

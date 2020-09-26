@@ -5,12 +5,16 @@ getSimilarityMatrix <- function(alignedSeqs) {
     .Call('_sitePath_getSimilarityMatrix', PACKAGE = 'sitePath', alignedSeqs)
 }
 
-runTreemerBySite <- function(tipPaths, alignedSeqs, loci) {
-    .Call('_sitePath_runTreemerBySite', PACKAGE = 'sitePath', tipPaths, alignedSeqs, loci)
+majorSNPtips <- function(alignedSeqs, siteIndices, minSNPnum) {
+    .Call('_sitePath_majorSNPtips', PACKAGE = 'sitePath', alignedSeqs, siteIndices, minSNPnum)
 }
 
-majorSNPtips <- function(alignedSeqs, minSNPnum) {
-    .Call('_sitePath_majorSNPtips', PACKAGE = 'sitePath', alignedSeqs, minSNPnum)
+terminalTipsBySim <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue) {
+    .Call('_sitePath_terminalTipsBySim', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue)
+}
+
+terminalTipsByDist <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue) {
+    .Call('_sitePath_terminalTipsByDist', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue)
 }
 
 mergePaths <- function(paths) {

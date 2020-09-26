@@ -1,5 +1,3 @@
-context("test-fixationPath")
-
 test_that("The output is valid phylo", {
     data(h3n2_tree_reduced)
     data(h3n2_align_reduced)

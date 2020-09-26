@@ -5,15 +5,17 @@
 \alias{SNPsites.phyMSAmatched}
 \title{Finding sites with variation}
 \usage{
+SNPsites(tree, ...)
+
 \method{SNPsites}{phyMSAmatched}(tree, minSNP = NULL, ...)
 }
 \arguments{
 \item{tree}{A \code{\link{phyMSAmatched}} object.}
 
+\item{...}{Other arguments}
+
 \item{minSNP}{Minimum number of a mutation to be a SNP. The default is 10th
 of the total tree tips.}
-
-\item{...}{Other arguments}
 }
 \value{
 A \code{SNPsites} object.

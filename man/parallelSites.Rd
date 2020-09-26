@@ -6,6 +6,8 @@
 \alias{parallelSites.sitesMinEntropy}
 \title{Mutation across multiple phylogenetic lineages}
 \usage{
+parallelSites(x, ...)
+
 \method{parallelSites}{lineagePath}(
   x,
   minSNP = NULL,
@@ -24,6 +26,8 @@
 \item{x}{A \code{\link{lineagePath}} or a \code{\link{sitesMinEntropy}}
 object.}
 
+\item{...}{The arguments in \code{\link{sitesMinEntropy}}.}
+
 \item{minSNP}{The minimum number of mutations to be qualified as parallel on
 at least two lineages. The default is 1.}
 
@@ -32,8 +36,6 @@ is to consider any mutation regardless of the amino acid/nucleotide before
 and after mutation; Or \code{exact} to force mutation to be the same; Or
 \code{pre}/\code{post} to select the site having amino acid/nucleotide
 before/after mutation.}
-
-\item{...}{The arguments in \code{\link{sitesMinEntropy}}.}
 }
 \value{
 A \code{parallelSites} object

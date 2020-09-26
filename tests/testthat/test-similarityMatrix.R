@@ -1,5 +1,3 @@
-context("test-similarityMatrix")
-
 test_that("Calculate similarity matrix", {
     data(zikv_align_reduced)
     data(zikv_tree_reduced)

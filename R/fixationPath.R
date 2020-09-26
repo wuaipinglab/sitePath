@@ -1,5 +1,7 @@
+#' @importFrom stats na.omit
+#' @importFrom tidytree as_tibble full_join as.treedata
+
 #' @rdname fixationPath
-#' @name fixationPath
 #' @title Accumulation of fixed mutation as a tree
 #' @description The tips are clustered according to the fixation sites. The
 #'   transition of fixation sites will be plotted as a phylogenetic tree. The
@@ -10,8 +12,6 @@
 #' @param minEffectiveSize The minimum size for a tip cluster.
 #' @param ... Further arguments passed to or from other methods.
 #' @return An \code{fixationPath} object
-#' @importFrom stats na.omit
-#' @importFrom tidytree as_tibble full_join as.treedata
 #' @export
 #' @examples
 #' data(zikv_tree_reduced)
@@ -20,6 +20,11 @@
 #' paths <- lineagePath(tree)
 #' mutations <- fixationSites(paths)
 #' fixationPath(mutations)
+fixationPath <- function(x, ...)
+    UseMethod("fixationPath")
+
+#' @rdname fixationPath
+#' @export
 fixationPath.sitesMinEntropy <- function(x,
                                          minEffectiveSize = NULL,
                                          ...) {
@@ -70,7 +75,7 @@ fixationPath.sitesMinEntropy <- function(x,
         # The initial tips of the group
         currentTips <- gp[[1]]
         # Assume the initial reference site
-        refSites <- attr(currentTips, "site")
+        refSites <- attr(currentTips, "AA")
         # Find where to merge and parent node, update reference site maybe
         for (i in seq_along(tipClusters)) {
             toMerge <- attr(tipClusters[[i]], "toMerge")
@@ -97,7 +102,7 @@ fixationPath.sitesMinEntropy <- function(x,
                 X = names(refSites),
                 FUN = function(site) {
                     ref <- refSites[site]
-                    snp <- attr(currentTips, "site")[site]
+                    snp <- attr(currentTips, "AA")[site]
                     if (ref == snp) {
                         return(NA_character_)
                     }
@@ -111,14 +116,14 @@ fixationPath.sitesMinEntropy <- function(x,
         for (tipIndex in seq_along(gp)[-1]) {
             tipNode <- tipNode + 1L
             currentTips <- gp[[tipIndex]]
-            currentSites <- attr(currentTips, "site")
+            currentSites <- attr(currentTips, "AA")
             # Attach the tip near the most related tips. Assume the reference
             # tips are the most related (least number of SNP)
             mostRelatedTipNode <- startingNode
             leastSNPnum <- sum(refSites != currentSites)
             # Loop through the rest existing tip clusters
             for (otherTipNode in seq_along(tipClusters)[-seq_len(startingNode)]) {
-                otherSites <- attr(tipClusters[[otherTipNode]], "site")
+                otherSites <- attr(tipClusters[[otherTipNode]], "AA")
                 snpNum <- sum(otherSites != currentSites)
                 if (snpNum < leastSNPnum) {
                     mostRelatedTipNode <- otherTipNode
@@ -245,38 +250,4 @@ fixationPath.fixationSites <- function(x,
     tree <- as.phylo.fixationSites(x)
     res <- .findFixationPath(x, minEffectiveSize, tree)
     return(res)
-}
-
-#' @export
-fixationPath <- function(x, ...) {
-    UseMethod("fixationPath")
-}
-
-#' @export
-print.fixationPath <- function(x, ...) {
-    print(names(x))
-}
-
-#' @rdname plotFunctions
-#' @importFrom ggtree geom_tiplab theme_tree2
-#' @importFrom ggrepel geom_label_repel
-#' @export
-plot.fixationPath <- function(x,
-                              y = TRUE,
-                              ...) {
-    tr <- attr(x, "SNPtracing")
-    p <- ggtree(tr) +
-        geom_tiplab(hjust = 0.5,
-                    align = TRUE,
-                    offset = 0.5) +
-        theme_tree2()
-    if (y) {
-        p <- p + geom_label_repel(
-            aes(x = branch, label = SNPs),
-            fill = 'lightgreen',
-            min.segment.length = 0,
-            na.rm = TRUE
-        )
-    }
-    return(p)
 }

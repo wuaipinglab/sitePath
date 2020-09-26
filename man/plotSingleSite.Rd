@@ -4,40 +4,33 @@
 \alias{plotSingleSite}
 \alias{plotSingleSite.lineagePath}
 \alias{plotSingleSite.parallelSites}
-\alias{plot.sitePath}
 \alias{plotSingleSite.fixationSites}
 \title{Color the tree by a single site}
 \usage{
+plotSingleSite(x, site, ...)
+
 \method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
 
 \method{plotSingleSite}{parallelSites}(x, site, showPath = TRUE, ...)
 
-\method{plot}{sitePath}(x, y = NULL, showTips = FALSE, ...)
-
 \method{plotSingleSite}{fixationSites}(x, site, select = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{fixationSites} object from \code{\link{fixationSites}} or
-the return from \code{\link{lineagePath}} function.}
+\item{x}{The object to plot.}
 
 \item{site}{For \code{lineagePath}, it can be any site within sequence
 length. For \code{fixationSites} and \code{parallelSites}, it is restrained
-to a predicted fixation site. The numbering is consistent with
-the reference defined by \code{\link{setSiteNumbering}}.}
-
-\item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.
-The default is \code{TRUE}.}
-
-\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
+to a predicted fixation site. The numbering is consistent with the
+reference defined by \code{\link{setSiteNumbering}}.}
 
 \item{...}{Other arguments. Since 1.5.4, the function uses
 \code{\link{ggtree}} as the base function to make plots so the arguments in
 \code{plot.phylo} will no longer work.}
 
-\item{y}{For a \code{sitePath} object, it can have more than one fixation
-path. This is to select which path to plot. The default is \code{NULL}
-which will plot all the paths. It is the same as \code{select} in
-\code{plotSingleSite}}
+\item{showPath}{If plot the lineage result from \code{\link{lineagePath}}.
+The default is \code{TRUE}.}
+
+\item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
 
 \item{select}{Select which fixation path in to plot. The default is NULL
 which will plot all the fixations.}
@@ -47,16 +40,16 @@ Since 1.5.4, the function returns a ggplot object so on longer
   behaviors like the generic \code{\link{plot}} function.
 }
 \description{
+Plot and color the tree according to amino acid/nucleotide of
+  the selected site. The color scheme depends on the \code{seqType} set in
+  \code{\link{addMSA}} function.
+
 For \code{\link{lineagePath}}, the tree will be colored
   according to the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
 
 For \code{\link{parallelSites}}, the tree will be colored
   according to the amino acid of the site if the mutation is not fixed.
-
-Visualize the \code{sitePath} object which can be extracted by
-  using \code{\link{extractSite}} on the return of
-  \code{\link{fixationSites}}.
 
 For \code{\link{fixationSites}}, it will color the ancestral
   tips in red, descendant tips in blue and excluded tips in grey.
@@ -68,10 +61,8 @@ tree <- addMSA(zikv_tree, alignment = zikv_align)
 paths <- lineagePath(tree)
 plotSingleSite(paths, 139)
 fixations <- fixationSites(paths)
-sp <- extractSite(fixations, 139)
-plot(sp)
 plotSingleSite(fixations, 139)
 }
 \seealso{
-\code{\link{plotSingleSite}}, \code{\link{extractSite}}
+\code{\link{plot.sitePath}}
 }

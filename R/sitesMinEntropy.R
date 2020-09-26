@@ -1,5 +1,6 @@
+#' @importFrom utils tail
+
 #' @rdname sitesMinEntropy
-#' @name sitesMinEntropy
 #' @title Fixation sites prediction
 #' @description After finding the \code{\link{lineagePath}} of a phylogenetic
 #'   tree, \code{sitesMinEntropy} perform entropy minimization on every site of
@@ -21,6 +22,10 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' sitesMinEntropy(lineagePath(tree))
+sitesMinEntropy <- function(x, ...)
+    UseMethod("sitesMinEntropy")
+
+#' @rdname sitesMinEntropy
 #' @export
 sitesMinEntropy.lineagePath <- function(x,
                                         minEffectiveSize = NULL,
@@ -31,15 +36,19 @@ sitesMinEntropy.lineagePath <- function(x,
     tree <- attr(paths, "tree")
     # Set the minimal size of the group during the search
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <-
-            length(tree[["tip.label"]]) / length(unique(unlist(paths)))
-    } else if (!is.numeric(minEffectiveSize)) {
-        stop("\"minEffectiveSize\" only accepts numeric")
+        tipNum <- length(tree[["tip.label"]])
+        minEffectiveSize <- ceiling(tipNum * attr(x, "similarity"))
+    } else if (!is.numeric(minEffectiveSize) ||
+               minEffectiveSize < 0) {
+        stop("'minEffectiveSize' (",
+             minEffectiveSize,
+             ") is not positive numeric")
+    } else {
+        minEffectiveSize <- ceiling(minEffectiveSize)
     }
-    minEffectiveSize <- ceiling(minEffectiveSize)
     # Set the search depth for heuristic search
     if (searchDepth < 1) {
-        stop("\"searchDepth\" should be at least 1")
+        stop("'searchDepth' (", searchDepth, ")  is less than 1")
     } else {
         searchDepth <- ceiling(searchDepth)
     }
@@ -53,21 +62,17 @@ sitesMinEntropy.lineagePath <- function(x,
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching
-    nodeAlign <- .tipSeqsAlongPathNodes(paths = paths,
-                                        divNodes = divNodes)
-    # Get the MSA numbering
-    reference <- attr(paths, "msaNumbering")
-    # Exclude the invariant sites
-    loci <- attr(x, "loci")
-    # In case root node does not have any tips (because itself is a divergent
-    # node)
+    nodeAlign <- .tipSeqsAlongPathNodes(paths, divNodes)
+    # In case root node does not have any tips
     excludedNodes <- divNodes
     rootNode <- attr(paths, "rootNode")
     if (!rootNode %in% names(nodeAlign)) {
         excludedNodes <- c(rootNode, excludedNodes)
     }
+    # Exclude the invariant sites
+    loci <- attr(x, "loci")
     # Turn the site number into index for C++ code
-    siteIndices <- reference[loci] - 1
+    siteIndices <- attr(paths, "msaNumbering")[loci] - 1
     names(siteIndices) <- as.character(loci)
     # Group the result by path for all loci
     res <- lapply(paths, function(path) {
@@ -83,67 +88,31 @@ sitesMinEntropy.lineagePath <- function(x,
             searchDepth = searchDepth
         )
     })
+    # res <- .unifyEntropyGrouping(res, names(siteIndices))
     # Cluster tips according to fixation sites
-    clustersByPath <- .clustersByPath(res)
+    clustersByPath <- lapply(res, function(segs) {
+        # Set the site and amino acid/nucleotide info for each group of tips
+        group <- lapply(names(segs), function(site) {
+            lapply(segs[[site]], function(tips) {
+                siteChar <- attr(tips, "AA")
+                names(siteChar) <- site
+                node <- attr(tips, "node")
+                # Purge the attributes and keep only the node and amino
+                # acid/nucleotide info
+                attributes(tips) <- NULL
+                attr(tips, "AA") <- siteChar
+                attr(tips, "node") <- node
+                return(tips)
+            })
+        })
+        .clusterByFixation(group)
+    })
     clustersByPath <- .mergeClusters(clustersByPath)
     attr(res, "clustersByPath") <-
         .assignClusterNames(clustersByPath)
     attr(res, "paths") <- paths
     class(res) <- "sitesMinEntropy"
     return(res)
-}
-
-.tipSeqsAlongPathNodes <- function(paths, divNodes) {
-    tree <- attr(paths, "tree")
-    align <- attr(paths, "align")
-    allNodes <- unlist(paths)
-    terminalNodes <- vapply(
-        X = paths,
-        FUN = function(p) {
-            p[length(p)]
-        },
-        FUN.VALUE = integer(1)
-    )
-    # Get all the nodes that are not at divergent point
-    nodes <- setdiff(allNodes, divNodes)
-    # Get the sequence of the children tips that are descendant of
-    # the nodes. Assign the tip index to the sequences for
-    # retrieving the tip name
-    nodeAlign <- lapply(nodes, function(n) {
-        isTerminal <- FALSE
-        if (n %in% terminalNodes) {
-            childrenNode <- n
-            isTerminal <- TRUE
-        } else {
-            childrenNode <- tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
-            # Keep the node that is not on the path.
-            childrenNode <- setdiff(childrenNode, allNodes)
-        }
-        tips <- .childrenTips(tree, childrenNode)
-        res <- align[tips]
-        attr(res, "isTerminal") <- isTerminal
-        names(res) <- tips
-        return(res)
-    })
-    # Assign the node names to the 'nodeAlign' list
-    names(nodeAlign) <- nodes
-    return(nodeAlign)
-}
-
-.childrenTips <- function(tree, node) {
-    maxTip <- length(tree[["tip.label"]])
-    children <- integer()
-    getChildren <- function(edges, parent) {
-        children <<- c(children, parent[which(parent <= maxTip)])
-        i <- which(edges[, 1] %in% parent)
-        if (length(i) == 0L) {
-            return(children)
-        } else {
-            parent <- edges[i, 2]
-            return(getChildren(edges, parent))
-        }
-    }
-    return(getChildren(tree[["edge"]], node))
 }
 
 .runEntropyMinimization <- function(siteIndex,
@@ -200,112 +169,161 @@ sitesMinEntropy.lineagePath <- function(x,
         seg <- minimizeEntropy(nodeSummaries,
                                minEffectiveSize,
                                searchDepth)
+        names(seg) <- vapply(seg, attr, character(1), "node")
     } else {
         seg <- nodeSummaries
         attr(seg[[1]], "AA") <-
             names(attr(nodeSummaries[[1]], "aaSummary"))
+        attr(seg[[1]], "node") <- names(seg)
     }
     return(seg)
 }
 
-.clustersByPath <- function(fixations) {
-    # Find the clustering for each lineage path
-    res <- lapply(fixations, function(sp) {
-        # Remove the site purely conserved on the lineage
-        group <- list()
-        for (site in names(sp)) {
-            mp <- sp[[site]]
-            if (length(mp) >= 2) {
-                toAdd <- lapply(mp, function(tips) {
-                    siteChar <- attr(tips, "AA")
-                    attributes(tips) <- NULL
-                    attr(tips, "site") <- siteChar
-                    names(attr(tips, "site")) <- site
-                    tips
-                })
-                group <- c(group, list(toAdd))
+.unifyEntropyGrouping <- function(res, lociNames) {
+    pathNum <- length(res)
+    # Iterate each locus
+    for (locus in lociNames) {
+        # Get the merged group of each loci
+        mergedGroupings <- .mergeClusters(lapply(res, "[[", locus))
+        # Find the index pathing of the group in each lineage path
+        mergePathing <- list()
+        for (i in seq_len(pathNum)) {
+            # The index pathing for the current group. The index of an
+            # irrelevant grouping will hold a NA value while the index of a
+            # relevant grouping will hold a number indicating the divergent
+            # point
+            indexPathing <- rep(NA_integer_, pathNum)
+            # Iterate the merged grouping of each path to find the 'toMerge'
+            # index
+            for (pIndex in seq_along(mergePathing)) {
+                # The group with the merging index
+                mGrouping <- mergedGroupings[[pIndex]]
+                isFound <- FALSE
+                # Iterate each group in the merged grouping of the path
+                for (j in seq_along(mGrouping)) {
+                    toMergeIndex <- as.integer(names(attr(
+                        mGrouping[[j]],
+                        "toMerge"
+                    )))
+                    # Trace back to the root when the current grouping if found
+                    # as 'toMerge' for the 'pIndex'
+                    if (i %in% toMergeIndex) {
+                        # The index pathing to trace back
+                        indexPathing <- mergePathing[[pIndex]]
+                        # The extra pathing index to link to the current
+                        indexPathing[pIndex] <- j
+                        isFound <- TRUE
+                    }
+                    break
+                }
+                if (isFound) {
+                    break
+                }
             }
+            # Attach the index pathing for back tracing of the groups in the
+            # remaining path
+            mergePathing <- c(mergePathing, list(indexPathing))
+            # Reconstruct the grouping for the current path
+            indexPathing[i] <- 1
+            reconstructed <- list()
+            for (pIndex in seq_along(indexPathing)) {
+                j <- indexPathing[pIndex]
+                if (!is.na(j)) {
+                    newGroup <- list()
+                    reconstructed <- c(reconstructed, newGroup)
+                }
+            }
+            # Re-assign the merged result to the original
+            names(reconstructed) <- names(res[[i]][[locus]])
+            res[[i]][[locus]] <- reconstructed
         }
-        if (length(group) == 0) {
-            return(group)
-        }
-        # Group tips according to fixation points
-        res <- group[[1]]
-        for (p in group[-1]) {
-            for (tips in p) {
-                site <- attr(tips, "site")
-                # Update grouping for each tips by growing a new list
-                newGrouping <- list()
-                for (i in seq_along(res)) {
-                    gp <- res[[i]]
-                    common <- sort(intersect(tips, gp))
-                    # No new cluster when the coming tips have no overlap or are
-                    # identical to tips in an existing cluster
-                    if (length(common) == 0) {
-                        newGrouping <- res[seq_len(i)]
-                    } else if (identical(sort(gp), sort(tips))) {
-                        attr(gp, "site") <- c(attr(gp, "site"), site)
-                        if (i + 1 <= length(res)) {
-                            trailing <- res[(i + 1):length(res)]
-                        } else {
-                            trailing <- list()
-                        }
-                        newGrouping <-
-                            c(newGrouping, list(gp), trailing)
+    }
+    return(res)
+}
+
+.clusterByFixation <- function(group) {
+    # Group tips according to fixation points
+    res <- group[[1]]
+    for (seg in group[-1]) {
+        # the node name for each group of tips
+        nodeNames <- names(seg)
+        # Iterate each group of tips to contribute to grouping
+        for (n in seq_along(seg)) {
+            tips <- seg[[n]]
+            # The site number and its amino acid/nucleotide
+            site <- attr(tips, "AA")
+            # Update grouping for each tips by growing a new list
+            newGrouping <- list()
+            # Compare with each group of the current grouping
+            for (i in seq_along(res)) {
+                gp <- res[[i]]
+                common <- sort(intersect(tips, gp))
+                # No new cluster when the coming tips have no overlap or are
+                # identical to tips in an existing cluster
+                if (length(common) == 0) {
+                    # Keep the current grouping if the coming group has no
+                    # overlap yet
+                    newGrouping <- res[seq_len(i)]
+                } else if (identical(sort(gp), sort(tips))) {
+                    # The only effect here is to add the new 'AA' info to
+                    # the group
+                    attr(gp, "AA") <- c(attr(gp, "AA"), site)
+                    # The groups after the current group to be added
+                    newGrouping <- c(newGrouping,
+                                     list(gp),
+                                     tail(res, length(res) - i))
+                    break
+                } else {
+                    # A new cluster formed when there is overlapped between new
+                    # coming tips and existing tips in a cluster
+                    if (identical(sort(gp), common)) {
+                        # The new coming tips includes the current group. The
+                        # extra tips stay for the next loop just in case it has
+                        # impact on the grouping
+                        tips <- setdiff(tips, gp)
+                        # Update the SNP site info for the current group
+                        attr(gp, "AA") <- c(attr(gp, "AA"), site)
+                        newGrouping <- c(newGrouping, list(gp))
+                    } else if (identical(sort(tips), common)) {
+                        # The new coming tips are included in the group (they
+                        # are used up at this point) and they split the original
+                        # grouping
+                        separate <- setdiff(gp, tips)
+                        attributes(separate) <- attributes(gp)
+                        attr(separate, "node") <- nodeNames[n + 1]
+                        # 'tips' is the common part and inherit the attributes
+                        # of the to-be-split original group
+                        attr(tips, "AA") <- c(attr(gp, "AA"), site)
+                        attr(tips, "node") <- attr(gp, "node")
+                        newGrouping <- c(
+                            newGrouping,
+                            list(tips),
+                            list(separate),
+                            tail(res, length(res) - i)
+                        )
+                        # Go for the next new coming tips
                         break
                     } else {
-                        # A new cluster formed when there is overlapped between
-                        # new coming tips and existing tips in a cluster
-                        if (identical(sort(gp), common)) {
-                            # The new coming tips includes the current group.
-                            # The extra tips stay for the next loop
-                            tips <- setdiff(tips, gp)
-                            # Update the SNP site info for the current group
-                            attr(gp, "site") <-
-                                c(attr(gp, "site"), site)
-                            newGrouping <- c(newGrouping, list(gp))
-                        } else if (identical(sort(tips), common)) {
-                            # The new coming tips are included in the group
-                            # (they are used up at this point)
-                            separate <- setdiff(gp, tips)
-                            attributes(separate) <- attributes(gp)
-                            attr(tips, "site") <-
-                                c(attr(gp, "site"), site)
-                            if (i + 1 <= length(res)) {
-                                trailing <- res[(i + 1):length(res)]
-                            } else {
-                                trailing <- list()
-                            }
-                            newGrouping <- c(newGrouping,
-                                             list(tips),
-                                             list(separate),
-                                             trailing)
-                            # Go for the next new coming tips
-                            break
-                        } else {
-                            stop("Something's not right")
-                        }
+                        stop("Something's not right")
                     }
                 }
-                # The new coming tips are used up and update the grouping
-                res <- newGrouping
             }
+            # The new coming tips are used up and update the grouping
+            res <- newGrouping
         }
-        return(res)
-    })
-    res <- res[which(lengths(res) != 0)]
+    }
     return(res)
 }
 
 .mergeClusters <- function(clustersByPath) {
-    # Find the divergent point and remove the overlapped part
-    res <- list(clustersByPath[[1]])
     # 'res' stores all the non-overlapped parts which means all the clusters are
-    # unique
+    # unique but it still splits into each path
+    res <- list(clustersByPath[[1]])
+    # Find the divergent point and remove the overlapped part
     for (gpIndex in seq_along(clustersByPath)[-1]) {
         # 'gp' is the complete path with overlapped parts
         gp <- clustersByPath[[gpIndex]]
-        # Reset the variables to NULL for in case of no overlap
+        # Assume there is no overlapped tips
         t <- integer()
         # The index of 'res' which to merge with 'gp'
         toMergeIndex <- NULL
@@ -315,7 +333,8 @@ sitesMinEntropy.lineagePath <- function(x,
         # The number of shared tips at divergent point will be used to decide if
         # the two clusters are completely diverged or not
         sharedAtDiv <- integer()
-        # Loop through 'res' to find the most related group
+        # Loop through 'res' to find the most related group ('res' is changed
+        # after each iteration)
         for (i in seq_along(res)) {
             # All existing tips in another 'gp' to see if overlapped with tips
             # in the 'gp' to be merged
@@ -326,7 +345,7 @@ sitesMinEntropy.lineagePath <- function(x,
             for (j in seq_along(gp)) {
                 # Once a potential divergent point having being found, safeguard
                 # the truncated 'gp' (in 'res') to merge with have actual
-                # overlap with the 'gp'
+                # overlap with the current non-truncated 'gp'
                 if (any(!gp[[j]] %in% allTips) &&
                     any(unlist(gp) %in% unlist(res[[i]]))) {
                     t <- intersect(gp[[j]], allTips)
@@ -346,11 +365,12 @@ sitesMinEntropy.lineagePath <- function(x,
         }
         # Find the tips when diverged
         divergedTips <- gp[[divergedIndex]]
-        refSites <- attr(divergedTips, "site")
+        tempAttrs <- attributes(divergedTips)
         # The non-shared part of the 'divergedTips'. This part will not be empty
         divergedTips <- setdiff(divergedTips,
                                 unlist(clustersByPath[[toMergeIndex]]))
-        attr(divergedTips, "site") <- refSites
+        attributes(divergedTips) <- tempAttrs
+        refSites <- attr(divergedTips, "AA")
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
             # No more trailing tips besides the non-shared part
@@ -386,10 +406,10 @@ sitesMinEntropy.lineagePath <- function(x,
                           attr(toMerge[[i - 1]], "toMerge"))
                     sharedTips <- list()
                 } else {
-                    # When 'sharedTips' is not empty, the fixation site should
+                    # When 'sharedTips' is not empty, the site and node should
                     # be the only info to give back to
-                    attr(sharedTips, "site") <-
-                        attr(toMerge[[i]], "site")
+                    attributes(sharedTips) <-
+                        attributes(toMerge[[i]])
                     attr(sharedTips, "toMerge") <-
                         c(toMergeRefSites,
                           attr(sharedTips, "toMerge"))
@@ -439,16 +459,11 @@ sitesMinEntropy.lineagePath <- function(x,
             currMini <- currMini + 1
             toMerge <- attr(grouping[[i]][[j]], "toMerge")
             if (!is.null(toMerge)) {
-                if (identical(attr(grouping[[i]][[j]], "site"),
-                              attr(grouping[[i]][[j + 1]], "site"))) {
-                    nextMajor <- currMajor + 1
-                } else {
-                    # Create a new major number when encounter a divergent point
-                    currMajor <- currMajor + 1L
-                    # Reset mini number
-                    currMini <- 1L
-                    nextMajor <- currMajor
-                }
+                # Create a new major number when encounter a divergent point
+                currMajor <- currMajor + 1L
+                # Reset mini number
+                currMini <- 1L
+                nextMajor <- currMajor
                 # Assign the starting major number for the 'gp' to be merged
                 toMergeIndex <- as.integer(names(toMerge))
                 startingMajors[toMergeIndex] <-
@@ -459,13 +474,4 @@ sitesMinEntropy.lineagePath <- function(x,
         }
     }
     return(grouping)
-}
-
-#' @export
-sitesMinEntropy <- function(x, ...)
-    UseMethod("sitesMinEntropy")
-
-#' @export
-print.sitesMinEntropy <- function(x, ...) {
-    cat("This is a 'sitesMinEntropy' object.", "\n")
 }

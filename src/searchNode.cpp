@@ -1,5 +1,7 @@
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <vector>
+
 #include "minEntropy.h"
 
 // Empty constructor for derived class
@@ -45,8 +47,8 @@ float MinEntropy::TreeSearchNode::totalEntropy(
         aaSummary values;
         // Iterate throught the tree nodes between the segment points
         for (unsigned int i = start; i < *m_used_itr; ++i) {
-            // Get the tree node and its summary on amino acid of tips
-            // And combine them into a segment
+            // Get the tree node and its summary on amino acid of tips. And
+            // combine them into a segment
             const aaSummary toBeCombined = aaSummaries.at(i);
             for (
                     aaSummary::const_iterator it = toBeCombined.begin();
@@ -56,8 +58,8 @@ float MinEntropy::TreeSearchNode::totalEntropy(
                 tipNum += it->second;
             }
         }
-        // The search node will be disqualified if the number of tips
-        // in the segment is lower than the constrain
+        // The search node will be disqualified if the number of tips in the
+        // segment is lower than the constrain
         if (tipNum < minEffectiveSize) { m_qualified = false; }
         // TODO: tipNum can be used as total in calculating entropy
         res += shannonEntropy(values, tipNum);

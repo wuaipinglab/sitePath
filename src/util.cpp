@@ -1,7 +1,21 @@
-#include <set>
+/*
+ * Here are all the functions exported to the R interface. This is all made
+ * possible by the excellent Rcpp package. The cpp11 package has come out and as
+ * one of the depending package ggplot2 uses cpp11, migrating from Rcpp to cpp11
+ * might be considered in the future.
+ */
+
 #include <algorithm>
-#include "treemer.h"
+#include <map>
+#include <set>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include <Rcpp.h>
+
+#include "lumpyCluster.h"
 #include "minEntropy.h"
+#include "treemer.h"
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
@@ -23,32 +37,19 @@ Rcpp::NumericMatrix getSimilarityMatrix(
 }
 
 // [[Rcpp::export]]
-Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > runTreemerBySite(
-        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
-        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::IntegerVector &loci
-) {
-    std::map< int, std::map< int, std::vector<int> > > res;
-for (
-        Rcpp::IntegerVector::const_iterator it = loci.begin();
-        it != loci.end(); it++
-) {
-    Treemer::BySite match(tipPaths, alignedSeqs, *it);
-    res[*it] = match.getTips();
-}
-    return Rcpp::wrap(res);
-}
-
-// [[Rcpp::export]]
-Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > majorSNPtips(
         const Rcpp::CharacterVector &alignedSeqs,
+        const Rcpp::IntegerVector &siteIndices,
         const int minSNPnum
 ) {
     const int totalTipNum = alignedSeqs.size();
-
-    std::vector< std::vector<int> > res;
+    std::map<int, std::map<std::string, std::vector<int> > > res;
     // Select the major SNPs for each site (aa/nt)
-    for (int siteIndex = 0; siteIndex < alignedSeqs[0].size(); ++siteIndex) {
+    for (
+            Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
+            it != siteIndices.end(); it++
+    ) {
+        int siteIndex = *it;
         std::map<char, int> snpSummary;
         for (int i = 0; i < totalTipNum; ++i) {
             snpSummary[alignedSeqs[i][siteIndex]]++;
@@ -58,15 +59,13 @@ Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
                 std::map<char, int>::iterator it = snpSummary.begin();
                 it != snpSummary.end(); it++
         ) {
-            if (it->second > minSNPnum && it->second != totalTipNum) {
-                std::vector<int> tips;
+            if (it->second > minSNPnum && it->second < totalTipNum/2) {
                 // Find the tips with the SNP and record the site
                 for (int i = 0; i < totalTipNum; ++i) {
                     if (alignedSeqs[i][siteIndex] == it->first) {
-                        tips.push_back(i+1);
+                        res[siteIndex+1][std::string(1, it->first)].push_back(i+1);
                     }
                 }
-                res.push_back(tips);
             }
         }
     }
@@ -74,21 +73,68 @@ Rcpp::ListOf<Rcpp::IntegerVector> majorSNPtips(
 }
 
 // [[Rcpp::export]]
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::NumericMatrix &metricMatrix,
+        const Rcpp::IntegerVector &siteIndices,
+        const int zValue
+) {
+    using namespace LumpyCluster;
+    std::map<int, tipNodes> res = terminalTips<BySimMatrix>(
+        tipPaths,
+        alignedSeqs,
+        metricMatrix,
+        siteIndices,
+        zValue
+    );
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
+Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(
+        const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
+        const Rcpp::NumericMatrix &metricMatrix,
+        const Rcpp::IntegerVector &siteIndices,
+        const int zValue
+) {
+    using namespace LumpyCluster;
+    std::map<int, tipNodes> res = terminalTips<ByDistMatrix>(
+        tipPaths,
+        alignedSeqs,
+        metricMatrix,
+        siteIndices,
+        zValue
+    );
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::IntegerVector> mergePaths(
         const Rcpp::ListOf<Rcpp::IntegerVector> &paths
 ) {
+    // The list of path node to be output
     std::vector<Rcpp::IntegerVector> res;
+    // The first path node is assumed to be added
     res.push_back(paths[0]);
+    // Iterate the list to remove path node that is subset to other path node
     for (int i = 1; i < paths.size(); ++i) {
+        // Assume the coming path node is not a subset to any
         bool toAddNew = true;
+        // Iterate each existing path node and compare with the coming path node
         Rcpp::IntegerVector::const_iterator q, s;
         for (
                 std::vector<Rcpp::IntegerVector>::iterator it = res.begin();
                 it != res.end(); ++it
         ) {
+            // Assume the current existing path node is subset to the coming
+            // path node
             bool toRemoveOld = false;
             q = paths[i].begin(), s = it->begin();
             while (*q == *s) {
+                // The path node is considered subset when the part beside the
+                // terminal node has overlap with other
                 ++q, ++s;
                 if (s == it->end()) {
                     toRemoveOld = true;

@@ -1,10 +1,12 @@
 #' @rdname as.data.frame
 #' @title Convert results to Data Frame
 #' @description Convert return of functions in \code{sitePath} package to a
-#'   \code{\link{data.frame}} so can be better worked with.
-#' @param x A \code{\link{fixationSites}} object.
-#' @param row.names NULL or a character vector giving the row names for the data
-#'   frame. Missing values are not allowed.
+#'   \code{\link{data.frame}} so can be better worked with. The group name for
+#'   each tip is the same as \code{\link{groupTips}}.
+#' @description A \code{\link{fixationSites}} object will output the mutation
+#'   name of the fixation and the cluster name before and after the mutation.
+#' @param x The object to be converted to \code{data.frame}.
+#' @param row.names Unimplemented.
 #' @param optional Unimplemented.
 #' @param ... Other arguments.
 #' @return A \code{\link{data.frame}} object.
@@ -19,34 +21,38 @@ as.data.frame.fixationSites <- function(x,
                                         row.names = NULL,
                                         optional = FALSE,
                                         ...) {
-    tree <- as.phylo.fixationSites(x)
-    grp <- fixationPath.fixationSites(x = x, minEffectiveSize = 0)
-    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
-    res <- .mutationTable(x, tree, grp)
+    res <- .mutationTable(x)
     res <- res[, c("mutation", "from", "to")]
     return(res)
 }
 
-.mutationTable <- function(fixations, tree, grp) {
+.mutationTable <- function(fixations) {
+    # The original tree
+    tree <- as.phylo.fixationSites(fixations)
+    # The clusters sorted by path
+    clustersByPath <- attr(fixations, "clustersByPath")
     # The cluster each tip belongs to
     clusterInfo <- character()
     # Extract the node path for each tip cluster
     clusterPaths <- list()
     rootNode <- getMRCA(tree, tree[["tip.label"]])
-    # Iterate the cluster and grow the two above
-    for (cluster in names(grp)) {
-        tips <- grp[[cluster]]
-        # The cluster named by the tips
-        clsNames <- rep(cluster, length(tips))
-        names(clsNames) <- as.character(tips)
-        clusterInfo <- c(clusterInfo, clsNames)
-        # The node path towards the cluster
-        ancestral <- getMRCA(tree, tips)
-        if (is.null(ancestral)) {
-            np <- nodepath(tree, rootNode, tips)
-            clusterPaths[[cluster]] <- np[seq_len(length(np) - 1)]
-        } else {
-            clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+    # The cluster name and node of each group
+    for (gp in clustersByPath) {
+        for (tips in gp) {
+            cluster <- attr(tips, "clsName")
+            # The cluster named by the tips
+            clsNames <- rep(cluster, length(tips))
+            names(clsNames) <- as.character(tips)
+            clusterInfo <- c(clusterInfo, clsNames)
+            # The node path towards the cluster
+            ancestral <- as.integer(attr(tips, "node"))
+            if (is.null(ancestral)) {
+                np <- nodepath(tree, rootNode, tips)
+                clusterPaths[[cluster]] <-
+                    np[seq_len(length(np) - 1)]
+            } else {
+                clusterPaths[[cluster]] <- nodepath(tree, rootNode, ancestral)
+            }
         }
     }
     # Info for the transition mutation
@@ -57,12 +63,14 @@ as.data.frame.fixationSites <- function(x,
     for (sp in fixations) {
         site <- attr(sp, "site")
         for (mp in sp) {
+            nodeNames <- names(mp)
             for (i in seq_along(mp)[-1]) {
                 prevTips <- mp[[i - 1]]
                 currTips <- mp[[i]]
                 mutation <- paste0(attr(prevTips, "AA"),
                                    site,
                                    attr(currTips, "AA"))
+                trans <- nodeNames[i]
                 prev <- unique(clusterInfo[as.character(prevTips)])
                 names(prev) <- prev
                 # Choose the most recent cluster to stay un-mutated
@@ -82,9 +90,6 @@ as.data.frame.fixationSites <- function(x,
                         length(clusterPaths[[cluster]])
                     }
                 )))
-                # Find the transition node
-                currPath <- clusterPaths[[curr]]
-                trans <- currPath[length(currPath)]
                 # Add the new transition mutation
                 prevCls <- c(prevCls, prev)
                 currCls <- c(currCls, curr)
@@ -103,6 +108,9 @@ as.data.frame.fixationSites <- function(x,
     return(res)
 }
 
+#' @rdname as.data.frame
+#' @description An \code{\link{SNPsites}} object will output the tip name with
+#'   the SNP and its position.
 #' @export
 as.data.frame.SNPsites <- function(x,
                                    row.names = NULL,
@@ -112,6 +120,9 @@ as.data.frame.SNPsites <- function(x,
     return(res)
 }
 
+#' @rdname as.data.frame
+#' @description An \code{\link{parallelSites}} object will output the tip name
+#'   with the group name and mutation info.
 #' @export
 as.data.frame.parallelSites <- function(x,
                                         row.names = NULL,
@@ -156,60 +167,5 @@ as.data.frame.parallelSites <- function(x,
         "mutTo" = mutTo,
         "fixation" = isFixed
     )
-    return(res)
-}
-
-#' @importFrom tidytree as.treedata
-#' @export
-tidytree::as.treedata
-
-#' @export
-as.treedata.fixationSites <- function(tree, ...) {
-    x <- tree
-    tree <- as.phylo.fixationSites(x)
-    grp <- fixationPath.fixationSites(x, minEffectiveSize = 0)
-    grp <- groupTips.fixationPath(grp, tipnames = FALSE)
-    mutTable <- .mutationTable(x, tree, grp)
-    transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
-                       FUN = "[[",
-                       i = "mutation")
-    tree <- .annotateSNPonTree(tree, transMut)
-    tree <- groupOTU(tree, grp, group_name = "Groups")
-    return(tree)
-}
-
-#' @export
-as.treedata.fixationPath <- function(tree, ...) {
-    res <- attr(tree, "SNPtracing")
-    return(res)
-}
-
-#' @importFrom ape as.phylo
-#' @export
-ape::as.phylo
-
-#' @export
-as.phylo.phyMSAmatched <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitePath <- function(x, ...) {
-    res <- attr(x, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.sitesMinEntropy <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
-    return(res)
-}
-
-#' @export
-as.phylo.fixationSites <- function(x, ...) {
-    paths <- attr(x, "paths")
-    res <- attr(paths, "tree")
     return(res)
 }

@@ -21,6 +21,3 @@ data(zikv_align)
 tree <- addMSA(zikv_tree, alignment = zikv_align)
 simMatrix <- similarityMatrix(tree)
 }
-\seealso{
-\code{\link{lineagePath}}
-}

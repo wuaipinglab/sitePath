@@ -7,6 +7,8 @@
 \alias{lineagePath.sneakPeekedPaths}
 \title{Resolving lineage paths using SNP}
 \usage{
+lineagePath(tree, similarity, ...)
+
 \method{lineagePath}{phyMSAmatched}(
   tree,
   similarity = NULL,
@@ -29,11 +31,11 @@ times \code{similariy}. If provided as integer greater than 1, the minimum
 number will be \code{similariy}. The default \code{similariy} is 0.05 for
 \code{lineagePath}.}
 
+\item{...}{Other arguments.}
+
 \item{simMatrix}{Deprecated and will not have effect.}
 
 \item{forbidTrivial}{Does not allow trivial trimming.}
-
-\item{...}{Other arguments.}
 
 \item{step}{the 'similarity' window for calculating and ploting. To better
 see the impact of threshold on path number. The default is 10.}

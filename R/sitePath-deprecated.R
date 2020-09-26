@@ -1,3 +1,7 @@
+#' @importFrom utils flush.console
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
+
 #' @rdname sitePath-deprecated
 #' @name sitePath-deprecated
 #' @aliases multiFixationSites
@@ -8,10 +12,11 @@
 #' @details The following functions are deprecated and will be made defunct; use
 #'   the replacement indicated below: \itemize{ \item{multiFixationSites:
 #'   \code{\link{fixationSites}}} }
-#' @importFrom utils flush.console
-#' @importFrom utils txtProgressBar
-#' @importFrom utils setTxtProgressBar
 NULL
+
+#' @export
+multiFixationSites <- function(paths, ...)
+    UseMethod("multiFixationSites")
 
 #' @export
 multiFixationSites.lineagePath <- function(paths,
@@ -31,7 +36,3 @@ multiFixationSites.lineagePath <- function(paths,
     )
     return(res)
 }
-
-#' @export
-multiFixationSites <- function(paths, ...)
-    UseMethod("multiFixationSites")

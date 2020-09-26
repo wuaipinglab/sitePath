@@ -2,33 +2,35 @@
 % Please edit documentation in R/extractTips.R
 \name{extractTips}
 \alias{extractTips}
-\alias{extractTips.sitePath}
-\alias{extractTips.fixationSites}
 \alias{extractTips.lineagePath}
-\alias{extractTips.sitePara}
+\alias{extractTips.fixationSites}
+\alias{extractTips.sitePath}
 \alias{extractTips.parallelSites}
+\alias{extractTips.sitePara}
 \title{Extract grouped tips for a single site}
 \usage{
-\method{extractTips}{sitePath}(x, select = 1, ...)
-
-\method{extractTips}{fixationSites}(x, site, select = 1, ...)
+extractTips(x, ...)
 
 \method{extractTips}{lineagePath}(x, site, ...)
 
-\method{extractTips}{sitePara}(x, ...)
+\method{extractTips}{fixationSites}(x, site, select = 1, ...)
+
+\method{extractTips}{sitePath}(x, select = 1, ...)
 
 \method{extractTips}{parallelSites}(x, site, ...)
+
+\method{extractTips}{sitePara}(x, ...)
 }
 \arguments{
 \item{x}{A \code{fixationSites} or a \code{sitePath} object.}
 
-\item{select}{For a site, there theoretically might be more than one fixation
-on different lineages. You may use this argument to extract for a specific
-fixation of a site. The default is the first fixation of the site.}
-
 \item{...}{Other arguments}
 
 \item{site}{A site predicted to experience fixation.}
+
+\item{select}{For a site, there theoretically might be more than one fixation
+on different lineages. You may use this argument to extract for a specific
+fixation of a site. The default is the first fixation of the site.}
 }
 \value{
 Tree tips grouped as \code{\link{list}}
