@@ -80,12 +80,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -122,7 +116,9 @@
   lineages are each gathered as group.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+    <pre class="usage"><span class='fu'>groupTips</span>(<span class='kw'>tree</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for phyMSAmatched</span>
 <span class='fu'>groupTips</span>(
   <span class='kw'>tree</span>,
   similarity = <span class='kw'>NULL</span>,
@@ -153,6 +149,10 @@
 <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code> or other functions.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>Other arguments.</p></td>
+    </tr>
+    <tr>
       <th>similarity</th>
       <td><p>This decides how minor SNPs are to remove. If provided as
 fraction between 0 and 1, then the minimum number of SNP will be total tips
@@ -172,10 +172,6 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
       <th>tipnames</th>
       <td><p>If return tips as integer or tip names.</p></td>
     </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments.</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -188,33 +184,38 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
 <span class='fu'>groupTips</span>(<span class='kw'>tree</span>)
 </div><div class='output co'>#&gt; $`363`
-#&gt;   [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
-#&gt;   [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
-#&gt;  [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
-#&gt;  [19] "ATL14618" "AUF35021" "AOL02459" "APG56499" "ASW34302" "APH11552"
-#&gt;  [25] "APH11574" "APH11550" "APH11586" "APH11535" "APH11544" "AWK27349"
-#&gt;  [31] "APH11545" "APH11554" "APH11553" "APH11509" "APH11584" "APH11567"
-#&gt;  [37] "APH11548" "APH11558" "APH11564" "APH11537" "APH11521" "APH11572"
-#&gt;  [43] "APH11575" "APH11555" "APH11577" "APH11525" "APH11568" "APH11561"
-#&gt;  [49] "APH11533" "APH11523" "APH11570" "APH11565" "APH11541" "APH11583"
-#&gt;  [55] "APH11501" "APH11546" "APH11524" "APH11505" "APH11582" "APH11585"
-#&gt;  [61] "APH11542" "APH11557" "APH11563" "APH11504" "APH11587" "APH11579"
-#&gt;  [67] "APH11540" "APH11495" "AOO19565" "APH11511" "APH11547" "APH11569"
-#&gt;  [73] "AVG19202" "APH11530" "APH11580" "APH11500" "APH11502" "APH11539"
-#&gt;  [79] "APH11534" "APH11576" "APH11503" "APH11578" "APH11590" "APH11559"
-#&gt;  [85] "APH11531" "APH11499" "APH11498" "APH11506" "APH11592" "APH11594"
-#&gt;  [91] "APH11532" "APH11593" "APH11507" "APH11497" "APH11517" "APH11527"
-#&gt;  [97] "APH11518" "APH11549" "APH11512" "APH11538" "APH11514" "APH11515"
-#&gt; [103] "APH11551" "APH11571" "APH11581" "APH11566" "APH11529" "APH11508"
-#&gt; [109] "APH11516" "APH11543" "APH11573" "APH11560" "APH11536" "APH11493"
-#&gt; [115] "APH11528" "APH11562" "APH11595" "AVV62004" "BAX00477" "BAV89190"
-#&gt; [121] "AOI20067" "AMM43325" "AMM43326" "ANC90425" "AUI42329" "AUI42330"
-#&gt; [127] "AMR68932" "ANF16414" "AMT75536" "AMV49165" "AMO03410" "ANA12599"
-#&gt; [133] "AMM39806" "AMR39830" "ANO46307" "AVG19275" "ANN44857" "ANO46306"
-#&gt; [139] "ANO46309" "ANO46305" "ANO46303" "ANO46302" "ANO46301" "ARB08102"
-#&gt; [145] "AHZ13508" "ANO46304" "ANO46308" "AMD16557" "AMK49165" "ARB07976"
-#&gt; [151] "APB03018" "AMC13911" "APB03019" "ASU55416" "ANK57897" "AWH65849"
-#&gt; [157] "ASU55417" "ANW07476" "AMZ03556"
+#&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
+#&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
+#&gt; [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
+#&gt; [19] "ATL14618" "AUF35021"
+#&gt; 
+#&gt; $`513`
+#&gt;  [1] "APG56499" "ASW34302" "AOL02459" "APH11552" "APH11574" "APH11550"
+#&gt;  [7] "APH11586" "APH11535" "APH11544" "AWK27349" "APH11545" "APH11554"
+#&gt; [13] "APH11553" "APH11509" "APH11584" "APH11567" "APH11548" "APH11558"
+#&gt; [19] "APH11564" "APH11537" "APH11521" "APH11572" "APH11575" "APH11555"
+#&gt; [25] "APH11577" "APH11525" "APH11568" "APH11561" "APH11533" "APH11523"
+#&gt; [31] "APH11570" "APH11565" "APH11541" "APH11583" "APH11501" "APH11546"
+#&gt; [37] "APH11524" "APH11505" "APH11582" "APH11585" "APH11542" "APH11557"
+#&gt; [43] "APH11563" "APH11504" "APH11587" "APH11579" "APH11540" "APH11495"
+#&gt; [49] "AOO19565" "APH11511" "APH11547" "APH11569" "AVG19202" "APH11530"
+#&gt; [55] "APH11580" "APH11500" "APH11502" "APH11539" "APH11534" "APH11576"
+#&gt; [61] "APH11503" "APH11578" "APH11590" "APH11559" "APH11531" "APH11499"
+#&gt; [67] "APH11498" "APH11506" "APH11592" "APH11594" "APH11532" "APH11593"
+#&gt; [73] "APH11507" "APH11497" "APH11517" "APH11527" "APH11518" "APH11549"
+#&gt; [79] "APH11512" "APH11538" "APH11514" "APH11515" "APH11551" "APH11571"
+#&gt; [85] "APH11581" "APH11566" "APH11529" "APH11508" "APH11516" "APH11543"
+#&gt; [91] "APH11573" "APH11560" "APH11536" "APH11493" "APH11528" "APH11562"
+#&gt; [97] "APH11595"
+#&gt; 
+#&gt; $`493`
+#&gt;  [1] "AVV62004" "BAX00477" "BAV89190" "AOI20067" "AMM43325" "AMM43326"
+#&gt;  [7] "ANC90425" "AUI42329" "AUI42330" "AMR68932" "ANF16414" "AMT75536"
+#&gt; [13] "AMV49165" "AMO03410" "ANA12599" "AMM39806" "AMR39830" "ANO46307"
+#&gt; [19] "AVG19275" "ANN44857" "ANO46306" "ANO46309" "ANO46305" "ANO46303"
+#&gt; [25] "ANO46302" "ANO46301" "ARB08102" "AHZ13508" "ANO46304" "ANO46308"
+#&gt; [31] "AMD16557" "AMK49165" "ARB07976" "APB03018" "AMC13911" "APB03019"
+#&gt; [37] "ASU55416" "ANK57897" "AWH65849" "ASU55417" "ANW07476" "AMZ03556"
 #&gt; 
 #&gt; $`402`
 #&gt; [1] "ALX35659" "APY24198" "APO36913" "ANQ92019" "AOX49264" "AOX49265"
@@ -276,7 +277,7 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

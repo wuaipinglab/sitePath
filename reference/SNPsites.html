@@ -82,12 +82,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -126,7 +120,9 @@
   specified to number the site.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+    <pre class="usage"><span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for phyMSAmatched</span>
 <span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, minSNP = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -137,13 +133,13 @@
       <td><p>A <code><a href='phyMSAmatched.html'>phyMSAmatched</a></code> object.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>Other arguments</p></td>
+    </tr>
+    <tr>
       <th>minSNP</th>
       <td><p>Minimum number of a mutation to be a SNP. The default is 10th
 of the total tree tips.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments</p></td>
     </tr>
     </table>
 
@@ -172,7 +168,7 @@ of the total tree tips.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

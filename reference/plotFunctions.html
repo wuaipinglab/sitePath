@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize the results — plot.fixationPath • sitePath</title>
+<title>Visualize the results — plot.lineagePath • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,24 @@
 
 
 
-<meta property="og:title" content="Visualize the results — plot.fixationPath" />
+<meta property="og:title" content="Visualize the results — plot.lineagePath" />
 <meta property="og:description" content="The plot function to visualize the return of functions in the
-  package. Though the function name plot is used, the plot functions
-  here do not behave like the generic plot function. The
-  underlying function applies ggplot2." />
+  package. The underlying function applies ggplot2. The
+  function name plot is used to keep the compatibility with previous
+  versions, but they do not behave like the generic plot
+  function since 1.5.4.
+A lineagePath object will be plotted as a tree
+  diagram and paths are black solid line while the trimmed nodes and tips
+  will use gray dashed line.
+A fixationSites object will be plotted as original
+  phylogenetic tree marked with fixation substitutions.
+A sitePath object can be extracted by using
+  extractSite on the return of fixationSites.
+A fixationPath object will be plotted as a
+  phylo object. The tips are clustered according to the fixation
+  sites. The transition of fixation sites will be plotted as a phylogenetic
+  tree. The length of each branch represents the number of fixation mutation
+  between two clusters." />
 
 
 
@@ -82,12 +95,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -115,40 +122,58 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Visualize the results</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/fixationPath.R'><code>R/fixationPath.R</code></a>, <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/fixationSites.R'><code>R/fixationSites.R</code></a>, <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/lineagePath.R'><code>R/lineagePath.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/plotFunctions.R'><code>R/plotFunctions.R</code></a></small>
     <div class="hidden name"><code>plotFunctions.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>The plot function to visualize the return of functions in the
-  package. Though the function name <code>plot</code> is used, the plot functions
-  here do not behave like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function. The
-  underlying function applies <code>ggplot2</code>.</p>
+  package. The underlying function applies <code>ggplot2</code>. The
+  function name <code>plot</code> is used to keep the compatibility with previous
+  versions, but they do not behave like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>
+  function since 1.5.4.</p>
+<p>A <code><a href='lineagePath.html'>lineagePath</a></code> object will be plotted as a tree
+  diagram and paths are black solid line while the trimmed nodes and tips
+  will use gray dashed line.</p>
+<p>A <code><a href='fixationSites.html'>fixationSites</a></code> object will be plotted as original
+  phylogenetic tree marked with fixation substitutions.</p>
+<p>A <code>sitePath</code> object can be extracted by using
+  <code><a href='extractSite.html'>extractSite</a></code> on the return of <code><a href='fixationSites.html'>fixationSites</a></code>.</p>
+<p>A <code><a href='fixationPath.html'>fixationPath</a></code> object will be plotted as a
+  <code>phylo</code> object. The tips are clustered according to the fixation
+  sites. The transition of fixation sites will be plotted as a phylogenetic
+  tree. The length of each branch represents the number of fixation mutation
+  between two clusters.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for fixationPath</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for fixationSites</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
-<span class='co'># S3 method for lineagePath</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
+<span class='co'># S3 method for sitePath</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='kw'>NULL</span>, select = <span class='kw'>NULL</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for fixationPath</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>Could be a <code><a href='lineagePath.html'>lineagePath</a></code> object,
-<code><a href='fixationSites.html'>fixationSites</a></code> object or <code><a href='fixationPath.html'>fixationPath</a></code> object.</p></td>
+      <td><p>The object to plot.</p></td>
     </tr>
     <tr>
       <th>y</th>
-      <td><p>For <code><a href='lineagePath.html'>lineagePath</a></code> object, it is deprecated and no longer
-have effect since 1.5.4. For a <code><a href='fixationSites.html'>fixationSites</a></code> or a
-<code><a href='fixationPath.html'>fixationPath</a></code> object, it is whether to show the fixation
-mutation between clusters.</p></td>
+      <td><p>Whether to show the fixation mutation between clusters. For
+<code>lineagePath</code> object and <code>sitePath</code> object, it is deprecated and
+no longer have effect since 1.5.4.</p></td>
+    </tr>
+    <tr>
+      <th>showTips</th>
+      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -157,23 +182,17 @@ mutation between clusters.</p></td>
 <code>plot.phylo</code> will no longer work.</p></td>
     </tr>
     <tr>
-      <th>showTips</th>
-      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
+      <th>select</th>
+      <td><p>For a <code>sitePath</code> object, it can have result on more than
+one evolution pathway. This is to select which path to plot. The default is
+<code>NULL</code> which will plot all the paths. It is the same as <code>select</code>
+in <code><a href='plotSingleSite.html'>plotSingleSite</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot object to make the plot. A <code><a href='lineagePath.html'>lineagePath</a></code> object
-  will be plotted as a tree diagram will be plotted and paths are black solid
-  line while the trimmed nodes and tips will use grey dashed line. A
-  <code><a href='fixationSites.html'>fixationSites</a></code> object will be plotted as original phylogenetic
-  tree marked with fixation substitutions. A <code><a href='fixationPath.html'>fixationPath</a></code>
-  object will be plotted as a <code>phylo</code> object. The tips are clustered
-  according to the fixation sites. The transition of fixation sites will be
-  plotted as a phylogenetic tree. The length of each branch represents the
-  number of fixation mutation between two clusters. The name of the tree tips
-  indicate the number of sequences in the cluster.</p>
+    <p>A ggplot object to make the plot.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
@@ -183,9 +202,11 @@ mutation between clusters.</p></td>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>paths</span>)
 </div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>fixations</span>)
-</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span>(<span class='kw'>fixations</span>)
+</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)
+</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span>(<span class='kw'>fixations</span>)
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>)
-</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div></pre>
+</div><div class='img'><img src='plotFunctions-4.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -201,7 +222,7 @@ mutation between clusters.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

@@ -41,7 +41,14 @@
 
 <meta property="og:title" content="Convert results to Data Frame — as.data.frame.fixationSites" />
 <meta property="og:description" content="Convert return of functions in sitePath package to a
-  data.frame so can be better worked with." />
+  data.frame so can be better worked with. The group name for
+  each tip is the same as groupTips.
+A fixationSites object will output the mutation
+  name of the fixation and the cluster name before and after the mutation.
+An SNPsites object will output the tip name with
+  the SNP and its position.
+An parallelSites object will output the tip name
+  with the group name and mutation info." />
 
 
 
@@ -80,12 +87,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -113,16 +114,29 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert results to Data Frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/typeConversion.R'><code>R/typeConversion.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/as.data.frame.R'><code>R/as.data.frame.R</code></a></small>
     <div class="hidden name"><code>as.data.frame.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Convert return of functions in <code>sitePath</code> package to a
-  <code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> so can be better worked with.</p>
+  <code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> so can be better worked with. The group name for
+  each tip is the same as <code><a href='groupTips.html'>groupTips</a></code>.</p>
+<p>A <code><a href='fixationSites.html'>fixationSites</a></code> object will output the mutation
+  name of the fixation and the cluster name before and after the mutation.</p>
+<p>An <code><a href='SNPsites.html'>SNPsites</a></code> object will output the tip name with
+  the SNP and its position.</p>
+<p>An <code><a href='parallelSites.html'>parallelSites</a></code> object will output the tip name
+  with the group name and mutation info.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for fixationSites</span>
+<span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='kw'>x</span>, row.names = <span class='kw'>NULL</span>, optional = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for SNPsites</span>
+<span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='kw'>x</span>, row.names = <span class='kw'>NULL</span>, optional = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for parallelSites</span>
 <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='kw'>x</span>, row.names = <span class='kw'>NULL</span>, optional = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -130,12 +144,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code><a href='fixationSites.html'>fixationSites</a></code> object.</p></td>
+      <td><p>The object to be converted to <code>data.frame</code>.</p></td>
     </tr>
     <tr>
       <th>row.names</th>
-      <td><p>NULL or a character vector giving the row names for the data
-frame. Missing values are not allowed.</p></td>
+      <td><p>Unimplemented.</p></td>
     </tr>
     <tr>
       <th>optional</th>
@@ -157,23 +170,16 @@ frame. Missing values are not allowed.</p></td>
 <span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
 <span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>))
 <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='kw'>fixations</span>)
-</div><div class='output co'>#&gt; <span class='warning'>Warning: `mutate_()` is deprecated as of dplyr 0.7.0.</span>
-#&gt; <span class='warning'>Please use `mutate()` instead.</span>
-#&gt; <span class='warning'>See vignette('programming') for more help</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt;    mutation  from    to
-#&gt; 1     V123A 1.1.1 1.1.2
-#&gt; 2     T196A 2.1.3 2.1.4
-#&gt; 3     V763M 1.1.1 1.1.2
-#&gt; 4     V988A 1.1.2 2.1.1
-#&gt; 5    P1949S 2.1.2 2.1.3
-#&gt; 6    S1949P 2.1.3 2.1.4
-#&gt; 7     V784L 3.2.1 3.2.2
-#&gt; 8     S139N 1.1.2 2.2.1
-#&gt; 9     G894A 2.2.2 2.2.3
-#&gt; 10   M2074L 2.2.2 2.2.3
-#&gt; 11   M2634V 2.2.1 2.2.2
-#&gt; 12   R3045C 2.2.3 2.2.4</div></span></pre>
+</div><div class='output co'>#&gt;   mutation  from    to
+#&gt; 1    T196A 2.1.1 3.1.2
+#&gt; 2    V988A 1.1.1 2.1.1
+#&gt; 3    V784L 2.1.1 3.2.2
+#&gt; 4    S139N 1.1.1 2.2.1
+#&gt; 5    G894A 2.2.2 2.2.3
+#&gt; 6   V1542I 2.2.4 2.2.5
+#&gt; 7   M2074L 2.2.2 2.2.3
+#&gt; 8   M2634V 2.2.1 2.2.2
+#&gt; 9   R3045C 2.2.3 2.2.4</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -189,7 +195,7 @@ frame. Missing values are not allowed.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

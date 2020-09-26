@@ -85,12 +85,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -132,7 +126,9 @@
   least one fixation mutation to be reported.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
+    <pre class="usage"><span class='fu'>fixationSites</span>(<span class='kw'>paths</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for lineagePath</span>
 <span class='fu'>fixationSites</span>(
   <span class='kw'>paths</span>,
   minEffectiveSize = <span class='kw'>NULL</span>,
@@ -153,6 +149,10 @@
 <code><a href='lineagePath.html'>lineagePath</a></code> function.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>further arguments passed to or from other methods.</p></td>
+    </tr>
+    <tr>
       <th>minEffectiveSize</th>
       <td><p>The minimum number of tips in a group.</p></td>
     </tr>
@@ -167,10 +167,6 @@ tell the search when to stop.</p></td>
       <td><p>The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>further arguments passed to or from other methods.</p></td>
     </tr>
     </table>
 
@@ -190,7 +186,7 @@ point, or by comparing the two.</p></td>
 #&gt; 
 #&gt; Result for 3 paths:
 #&gt; 
-#&gt; 123 196 763 988 1949 784 139 894 2074 2634 3045 
+#&gt; 196 988 784 139 894 1542 2074 2634 3045 
 #&gt; No reference sequence specified. Using alignment numbering</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -207,7 +203,7 @@ point, or by comparing the two.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

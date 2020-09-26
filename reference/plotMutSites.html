@@ -80,12 +80,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -113,7 +107,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot tree and mutation sites</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/SNPsites.R'><code>R/SNPsites.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/plotMutSites.R'><code>R/plotMutSites.R</code></a></small>
     <div class="hidden name"><code>plotMutSites.Rd</code></div>
     </div>
 
@@ -122,7 +116,9 @@
   represented as colored dots positioned by their site number.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for SNPsites</span>
+    <pre class="usage"><span class='fu'>plotMutSites</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for SNPsites</span>
 <span class='fu'>plotMutSites</span>(<span class='kw'>x</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -133,12 +129,12 @@
       <td><p>An <code><a href='SNPsites.html'>SNPsites</a></code> object.</p></td>
     </tr>
     <tr>
-      <th>showTips</th>
-      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Other arguments</p></td>
+    </tr>
+    <tr>
+      <th>showTips</th>
+      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 
@@ -167,7 +163,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

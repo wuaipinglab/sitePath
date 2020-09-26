@@ -83,12 +83,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -128,7 +122,9 @@
   numbering.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+    <pre class="usage"><span class='fu'>setSiteNumbering</span>(<span class='kw'>x</span>, <span class='kw'>reference</span>, <span class='kw'>gapChar</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for phyMSAmatched</span>
 <span class='fu'>setSiteNumbering</span>(<span class='kw'>x</span>, reference = <span class='kw'>NULL</span>, gapChar = <span class='st'>"-"</span>, minSkipSize = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -150,14 +146,14 @@ of the sequences' name. The default uses the intrinsic alignment numbering</p></
 <code>gapChar</code> for the reference sequence.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>Further arguments passed to or from other methods.</p></td>
+    </tr>
+    <tr>
       <th>minSkipSize</th>
       <td><p>The minimum number of tips to have gap or ambiguous amino
 acid/nucleotide for a site to be ignored in other analysis. This will not
 affect the numbering. The default is 0.8.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Further arguments passed to or from other methods.</p></td>
     </tr>
     </table>
 
@@ -186,7 +182,7 @@ affect the numbering. The default is 0.8.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

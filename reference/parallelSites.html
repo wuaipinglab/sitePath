@@ -85,12 +85,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -132,7 +126,9 @@
   considered.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
+    <pre class="usage"><span class='fu'>parallelSites</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for lineagePath</span>
 <span class='fu'>parallelSites</span>(
   <span class='kw'>x</span>,
   minSNP = <span class='kw'>NULL</span>,
@@ -157,6 +153,10 @@
 object.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>The arguments in <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>minSNP</th>
       <td><p>The minimum number of mutations to be qualified as parallel on
 at least two lineages. The default is 1.</p></td>
@@ -168,10 +168,6 @@ is to consider any mutation regardless of the amino acid/nucleotide before
 and after mutation; Or <code>exact</code> to force mutation to be the same; Or
 <code>pre</code>/<code>post</code> to select the site having amino acid/nucleotide
 before/after mutation.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>The arguments in <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code>.</p></td>
     </tr>
     </table>
 
@@ -207,7 +203,7 @@ before/after mutation.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

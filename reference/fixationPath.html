@@ -83,12 +83,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -128,7 +122,9 @@
   the cluster.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for sitesMinEntropy</span>
+    <pre class="usage"><span class='fu'>fixationPath</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for sitesMinEntropy</span>
 <span class='fu'>fixationPath</span>(<span class='kw'>x</span>, minEffectiveSize = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for fixationSites</span>
@@ -142,12 +138,12 @@
       <td><p>The return from <code><a href='fixationSites.html'>fixationSites</a></code> function.</p></td>
     </tr>
     <tr>
-      <th>minEffectiveSize</th>
-      <td><p>The minimum size for a tip cluster.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Further arguments passed to or from other methods.</p></td>
+    </tr>
+    <tr>
+      <th>minEffectiveSize</th>
+      <td><p>The minimum size for a tip cluster.</p></td>
     </tr>
     </table>
 
@@ -162,7 +158,11 @@
 <span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>)
 <span class='kw'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
 <span class='fu'>fixationPath</span>(<span class='kw'>mutations</span>)
-</div><div class='output co'>#&gt; [1] "1.1.2" "2.1.1" "2.2.2" "2.2.4"</div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: `mutate_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `mutate()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; [1] "1.1.1" "2.1.1" "2.2.2" "2.2.4"</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -178,7 +178,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

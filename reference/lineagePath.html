@@ -92,12 +92,6 @@ When used on the return of sneakPeek, a
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -146,7 +140,9 @@ When used on the return of sneakPeek, a
   the returned value.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+    <pre class="usage"><span class='fu'>lineagePath</span>(<span class='kw'>tree</span>, <span class='kw'>similarity</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for phyMSAmatched</span>
 <span class='fu'>lineagePath</span>(
   <span class='kw'>tree</span>,
   similarity = <span class='kw'>NULL</span>,
@@ -177,16 +173,16 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
 <code>lineagePath</code>.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>Other arguments.</p></td>
+    </tr>
+    <tr>
       <th>simMatrix</th>
       <td><p>Deprecated and will not have effect.</p></td>
     </tr>
     <tr>
       <th>forbidTrivial</th>
       <td><p>Does not allow trivial trimming.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments.</p></td>
     </tr>
     <tr>
       <th>step</th>
@@ -225,15 +221,15 @@ see the impact of threshold on path number. The default is 1.</p></td>
 <span class='fu'>lineagePath</span>(<span class='kw'>tree</span>)
 </div><div class='output co'>#&gt; This is a 'lineagePath' object.
 #&gt; 
-#&gt; 3 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
+#&gt; 4 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
 </div><div class='output co'>#&gt;   similarity pathNum
-#&gt; 1       0.05       3
+#&gt; 1       0.05       4
 #&gt; 2       0.03       5
-#&gt; 3       0.01      12</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
+#&gt; 3       0.01      15</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span>(<span class='kw'>tree</span>, step = <span class='fl'>3</span>)
 <span class='fu'>lineagePath</span>(<span class='kw'>x</span>, similarity = <span class='fl'>0.05</span>)
 </div><div class='output co'>#&gt; This is a 'lineagePath' object.
 #&gt; 
-#&gt; 3 lineage paths using 5% as "major SNP" threshold </div></pre>
+#&gt; 4 lineage paths using 5% as "major SNP" threshold </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -249,7 +245,7 @@ see the impact of threshold on path number. The default is 1.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

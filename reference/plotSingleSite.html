@@ -40,14 +40,14 @@
 
 
 <meta property="og:title" content="Color the tree by a single site — plotSingleSite" />
-<meta property="og:description" content="For lineagePath, the tree will be colored
+<meta property="og:description" content="Plot and color the tree according to amino acid/nucleotide of
+  the selected site. The color scheme depends on the seqType set in
+  addMSA function.
+For lineagePath, the tree will be colored
   according to the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.
 For parallelSites, the tree will be colored
   according to the amino acid of the site if the mutation is not fixed.
-Visualize the sitePath object which can be extracted by
-  using extractSite on the return of
-  fixationSites.
 For fixationSites, it will color the ancestral
   tips in red, descendant tips in blue and excluded tips in grey." />
 
@@ -88,12 +88,6 @@ For fixationSites, it will color the ancestral
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -126,26 +120,25 @@ For fixationSites, it will color the ancestral
     </div>
 
     <div class="ref-description">
-    <p>For <code><a href='lineagePath.html'>lineagePath</a></code>, the tree will be colored
+    <p>Plot and color the tree according to amino acid/nucleotide of
+  the selected site. The color scheme depends on the <code>seqType</code> set in
+  <code><a href='phyMSAmatched.html'>addMSA</a></code> function.</p>
+<p>For <code><a href='lineagePath.html'>lineagePath</a></code>, the tree will be colored
   according to the amino acid of the site. The color scheme tries to assign
   distinguishable color for each amino acid.</p>
 <p>For <code><a href='parallelSites.html'>parallelSites</a></code>, the tree will be colored
   according to the amino acid of the site if the mutation is not fixed.</p>
-<p>Visualize the <code>sitePath</code> object which can be extracted by
-  using <code><a href='extractSite.html'>extractSite</a></code> on the return of
-  <code><a href='fixationSites.html'>fixationSites</a></code>.</p>
 <p>For <code><a href='fixationSites.html'>fixationSites</a></code>, it will color the ancestral
   tips in red, descendant tips in blue and excluded tips in grey.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
+    <pre class="usage"><span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for lineagePath</span>
 <span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>TRUE</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for parallelSites</span>
 <span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, showPath = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
-
-<span class='co'># S3 method for sitePath</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>x</span>, y = <span class='kw'>NULL</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for fixationSites</span>
 <span class='fu'>plotSingleSite</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
@@ -155,15 +148,20 @@ For fixationSites, it will color the ancestral
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code>fixationSites</code> object from <code><a href='fixationSites.html'>fixationSites</a></code> or
-the return from <code><a href='lineagePath.html'>lineagePath</a></code> function.</p></td>
+      <td><p>The object to plot.</p></td>
     </tr>
     <tr>
       <th>site</th>
       <td><p>For <code>lineagePath</code>, it can be any site within sequence
 length. For <code>fixationSites</code> and <code>parallelSites</code>, it is restrained
-to a predicted fixation site. The numbering is consistent with
-the reference defined by <code><a href='setSiteNumbering.html'>setSiteNumbering</a></code>.</p></td>
+to a predicted fixation site. The numbering is consistent with the
+reference defined by <code><a href='setSiteNumbering.html'>setSiteNumbering</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments. Since 1.5.4, the function uses
+<code>ggtree</code> as the base function to make plots so the arguments in
+<code>plot.phylo</code> will no longer work.</p></td>
     </tr>
     <tr>
       <th>showPath</th>
@@ -173,19 +171,6 @@ The default is <code>TRUE</code>.</p></td>
     <tr>
       <th>showTips</th>
       <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments. Since 1.5.4, the function uses
-<code>ggtree</code> as the base function to make plots so the arguments in
-<code>plot.phylo</code> will no longer work.</p></td>
-    </tr>
-    <tr>
-      <th>y</th>
-      <td><p>For a <code>sitePath</code> object, it can have more than one fixation
-path. This is to select which path to plot. The default is <code>NULL</code>
-which will plot all the paths. It is the same as <code>select</code> in
-<code>plotSingleSite</code></p></td>
     </tr>
     <tr>
       <th>select</th>
@@ -200,7 +185,7 @@ which will plot all the fixations.</p></td>
   behaviors like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> function.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>plotSingleSite</code>, <code><a href='extractSite.html'>extractSite</a></code></p></div>
+    <div class='dont-index'><p><code><a href='plot.lineagePath.html'>plot.sitePath</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
@@ -213,10 +198,8 @@ which will plot all the fixations.</p></td>
 #&gt; <span class='warning'>See vignette('programming') for more help</span>
 #&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
 #&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='img'><img src='plotSingleSite-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span>(<span class='kw'>paths</span>)
-<span class='kw'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>sp</span>)
-</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>plotSingleSite</span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
-</div><div class='img'><img src='plotSingleSite-3.png' alt='' width='700' height='433' /></div></span></pre>
+<span class='fu'>plotSingleSite</span>(<span class='kw'>fixations</span>, <span class='fl'>139</span>)
+</div><div class='img'><img src='plotSingleSite-2.png' alt='' width='700' height='433' /></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -232,7 +215,7 @@ which will plot all the fixations.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

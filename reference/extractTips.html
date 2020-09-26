@@ -86,12 +86,6 @@ For parallelSites and sitePara object, the
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -134,20 +128,22 @@ For parallelSites and sitePara object, the
   function <code>extractTips</code> retrieve all the tips with parallel mutation.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for sitePath</span>
-<span class='fu'>extractTips</span>(<span class='kw'>x</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
-
-<span class='co'># S3 method for fixationSites</span>
-<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for lineagePath</span>
 <span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)
 
-<span class='co'># S3 method for sitePara</span>
-<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
+<span class='co'># S3 method for fixationSites</span>
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for sitePath</span>
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, select = <span class='fl'>1</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for parallelSites</span>
-<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>site</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for sitePara</span>
+<span class='fu'>extractTips</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -157,18 +153,18 @@ For parallelSites and sitePara object, the
       <td><p>A <code>fixationSites</code> or a <code>sitePath</code> object.</p></td>
     </tr>
     <tr>
-      <th>select</th>
-      <td><p>For a site, there theoretically might be more than one fixation
-on different lineages. You may use this argument to extract for a specific
-fixation of a site. The default is the first fixation of the site.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Other arguments</p></td>
     </tr>
     <tr>
       <th>site</th>
       <td><p>A site predicted to experience fixation.</p></td>
+    </tr>
+    <tr>
+      <th>select</th>
+      <td><p>For a site, there theoretically might be more than one fixation
+on different lineages. You may use this argument to extract for a specific
+fixation of a site. The default is the first fixation of the site.</p></td>
     </tr>
     </table>
 
@@ -197,12 +193,12 @@ fixation of a site. The default is the first fixation of the site.</p></td>
 #&gt; [19] "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087" "AMA12084"
 #&gt; [25] "AOY08538" "AOG18295" "AOY08517" "AOY08541" "AMM39805" "ARX97119"
 #&gt; [31] "AMK79468" "AML82110" "AMR39831" "AMX81918" "APY24200" "AOO19564"
-#&gt; [37] "AUI42194" "AOG18296" "ART29828" "AQZ41954" "AOY08533" "ATI21641"
-#&gt; [43] "ATG29291" "ATG29301" "AWF93617" "APC60215" "APO08503" "ATG29306"
-#&gt; [49] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"
-#&gt; [55] "AOW32303" "AMC13913" "AMC13912" "AOC50654" "ATG29292" "ATG29295"
-#&gt; [61] "AOY08536" "ASL68974" "AMQ48986" "ATG29315" "ATG29307" "ATG29270"
-#&gt; [67] "AQZ41952" "AQZ41955" "ARI68105" "ASU55505" "AQM74762" "AUD54964"
+#&gt; [37] "AUI42194" "AOG18296" "AQZ41954" "AOY08533" "ATI21641" "ATG29291"
+#&gt; [43] "ATG29301" "APO08503" "AOW32303" "AMC13913" "AMC13912" "AOC50654"
+#&gt; [49] "ATG29292" "ATG29295" "AOY08536" "ASL68974" "AMQ48986" "ATG29315"
+#&gt; [55] "ATG29307" "ATG29270" "AQZ41952" "AQZ41955" "ARI68105" "ASU55505"
+#&gt; [61] "AQM74762" "AUD54964" "ART29828" "AWF93617" "APC60215" "ATG29306"
+#&gt; [67] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"
 #&gt; attr(,"AA")
 #&gt; [1] "N"
 #&gt; </div></pre>
@@ -221,7 +217,7 @@ fixation of a site. The default is the first fixation of the site.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

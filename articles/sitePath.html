@@ -38,12 +38,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/sitePath.html">Get started</a>
 </li>
 <li>
@@ -145,7 +139,7 @@
 <span class="kw">paths</span>
 <span class="co">#&gt; This is a 'lineagePath' object.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; 3 lineage paths using 5% as "major SNP" threshold</span>
+<span class="co">#&gt; 4 lineage paths using 5% as "major SNP" threshold</span>
 </pre></div>
 <p>You can visualize the result.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
@@ -167,9 +161,9 @@
 <span class="kw">fixations</span>
 <span class="co">#&gt; This is a 'fixationSites' object.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Result for 3 paths:</span>
+<span class="co">#&gt; Result for 4 paths:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 </span>
+<span class="co">#&gt; 988 139 894 2074 2634 3045 107 1118 3353 1143 2842 3398 </span>
 <span class="co">#&gt; No reference sequence specified. Using alignment numbering</span>
 </pre></div>
 <p>If you want to retrieve the result of a single site, you can pass the result of <code>fixationSites</code> and the site index to <code>extractSite</code> function. The output is a <code>sitePath</code> object which stores the tip names.</p>
@@ -180,26 +174,10 @@
 <div class="sourceCode" id="cb8"><pre class="downlit">
 <span class="fu"><a href="../reference/extractTips.html">extractTips</a></span>(<span class="kw">fixations</span>, <span class="fl">139</span>)
 <span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt;   [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"</span>
-<span class="co">#&gt;   [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"</span>
-<span class="co">#&gt;  [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"</span>
-<span class="co">#&gt;  [19] "ATL14618" "AUF35021" "AVG19202" "APG56499" "ASW34302" "APH11523"</span>
-<span class="co">#&gt;  [25] "APH11495" "APH11549" "APH11505" "APH11535" "APH11565" "APH11550"</span>
-<span class="co">#&gt;  [31] "APH11501" "APH11583" "APH11584" "APH11524" "APH11544" "APH11504"</span>
-<span class="co">#&gt;  [37] "APH11587" "APH11527" "APH11533" "APH11558" "APH11586" "APH11576"</span>
-<span class="co">#&gt;  [43] "APH11542" "APH11564" "APH11555" "APH11585" "APH11582" "APH11521"</span>
-<span class="co">#&gt;  [49] "APH11567" "APH11577" "APH11547" "APH11531" "APH11517" "APH11548"</span>
-<span class="co">#&gt;  [55] "APH11561" "APH11553" "APH11515" "APH11554" "APH11540" "APH11532"</span>
-<span class="co">#&gt;  [61] "APH11537" "APH11509" "APH11514" "APH11568" "APH11574" "APH11575"</span>
-<span class="co">#&gt;  [67] "APH11572" "APH11545" "APH11516" "APH11552" "AOL02459" "APH11569"</span>
-<span class="co">#&gt;  [73] "APH11541" "APH11511" "AOO19565" "APH11518" "APH11512" "APH11593"</span>
-<span class="co">#&gt;  [79] "APH11546" "APH11539" "APH11534" "APH11508" "APH11581" "APH11525"</span>
-<span class="co">#&gt;  [85] "AWK27349" "APH11570" "APH11563" "APH11530" "APH11580" "APH11579"</span>
-<span class="co">#&gt;  [91] "APH11557" "APH11594" "APH11559" "APH11592" "APH11590" "APH11538"</span>
-<span class="co">#&gt;  [97] "APH11502" "APH11499" "APH11507" "APH11573" "APH11543" "APH11529"</span>
-<span class="co">#&gt; [103] "APH11528" "APH11497" "APH11503" "APH11500" "APH11536" "APH11493"</span>
-<span class="co">#&gt; [109] "APH11566" "APH11560" "APH11551" "APH11571" "APH11562" "APH11595"</span>
-<span class="co">#&gt; [115] "APH11498" "APH11506" "APH11578" "AVV62004" "BAX00477"</span>
+<span class="co">#&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"</span>
+<span class="co">#&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"</span>
+<span class="co">#&gt; [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"</span>
+<span class="co">#&gt; [19] "ATL14618" "AUF35021" "AVV62004" "BAX00477"</span>
 <span class="co">#&gt; attr(,"AA")</span>
 <span class="co">#&gt; [1] "S"</span>
 <span class="co">#&gt; </span>
@@ -267,16 +245,16 @@
 <p><img src="sitePath_files/figure-html/plot_sitePath-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span>(<span class="kw">fixations</span>, <span class="fl">139</span>)
-</pre></div>
-<p><img src="sitePath_files/figure-html/plot_sitePath-2.png" width="700"></p>
-<p>To have an overall view of the transition of fixation mutation, use <code>plot</code> on an <code>fixationSites</code> object.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">fixations</span>)
 <span class="co">#&gt; Warning: `mutate_()` is deprecated as of dplyr 0.7.0.</span>
 <span class="co">#&gt; Please use `mutate()` instead.</span>
 <span class="co">#&gt; See vignette('programming') for more help</span>
 <span class="co">#&gt; This warning is displayed once every 8 hours.</span>
 <span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
+</pre></div>
+<p><img src="sitePath_files/figure-html/plot_sitePath-2.png" width="700"></p>
+<p>To have an overall view of the transition of fixation mutation, use <code>plot</code> on an <code>fixationSites</code> object.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">fixations</span>)
 </pre></div>
 <p><img src="sitePath_files/figure-html/plot_fixations-1.png" width="700"></p>
 <p>To have a simplified view of mutation accumulations. It might help to use <code>fixationPath</code> function and visualize it.</p>
@@ -333,12 +311,12 @@
 <a href="#session-info" class="anchor"></a>Session info</h1>
 <div class="sourceCode" id="cb18"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()
-<span class="co">#&gt; R version 4.0.2 Patched (2020-08-27 r79088)</span>
+<span class="co">#&gt; R version 4.0.2 Patched (2020-09-24 r79253)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.1 LTS</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Matrix products: default</span>
-<span class="co">#&gt; BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-openmp/libopenblasp-r0.3.8.so</span>
+<span class="co">#&gt; BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; locale:</span>
 <span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span>
@@ -352,31 +330,31 @@
 <span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt; [1] sitePath_1.5.23  ape_5.4-1        BiocStyle_2.17.0</span>
+<span class="co">#&gt; [1] sitePath_1.5.23  ape_5.4-1        BiocStyle_2.17.1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] treeio_1.13.1       tidyselect_1.1.0    xfun_0.16          </span>
+<span class="co">#&gt;  [1] treeio_1.13.1       tidyselect_1.1.0    xfun_0.17          </span>
 <span class="co">#&gt;  [4] purrr_0.3.4         lattice_0.20-41     colorspace_1.4-1   </span>
-<span class="co">#&gt;  [7] vctrs_0.3.2         generics_0.0.2      htmltools_0.5.0    </span>
-<span class="co">#&gt; [10] yaml_2.2.1          rlang_0.4.7         pkgdown_1.5.1.9000 </span>
-<span class="co">#&gt; [13] pillar_1.4.6        glue_1.4.1          RColorBrewer_1.1-2 </span>
+<span class="co">#&gt;  [7] vctrs_0.3.4         generics_0.0.2      htmltools_0.5.0    </span>
+<span class="co">#&gt; [10] yaml_2.2.1          rlang_0.4.7         pkgdown_1.6.1.9000 </span>
+<span class="co">#&gt; [13] pillar_1.4.6        glue_1.4.2          RColorBrewer_1.1-2 </span>
 <span class="co">#&gt; [16] rvcheck_0.1.8       lifecycle_0.2.0     stringr_1.4.0      </span>
 <span class="co">#&gt; [19] munsell_0.5.0       gtable_0.3.0        ragg_0.3.1         </span>
 <span class="co">#&gt; [22] memoise_1.1.0       evaluate_0.14       labeling_0.3       </span>
-<span class="co">#&gt; [25] knitr_1.29          parallel_4.0.2      Rcpp_1.0.5         </span>
-<span class="co">#&gt; [28] scales_1.1.1        backports_1.1.9     BiocManager_1.30.10</span>
-<span class="co">#&gt; [31] desc_1.2.0          jsonlite_1.7.0      farver_2.0.3       </span>
-<span class="co">#&gt; [34] systemfonts_0.2.3   fs_1.5.0            gridExtra_2.3      </span>
-<span class="co">#&gt; [37] ggplot2_3.3.2       aplot_0.0.5         digest_0.6.25      </span>
-<span class="co">#&gt; [40] stringi_1.4.6       bookdown_0.20       dplyr_1.0.2        </span>
-<span class="co">#&gt; [43] ggrepel_0.8.2       ade4_1.7-15         grid_4.0.2         </span>
-<span class="co">#&gt; [46] rprojroot_1.3-2     ggtree_2.3.4        tools_4.0.2        </span>
-<span class="co">#&gt; [49] magrittr_1.5        lazyeval_0.2.2      patchwork_1.0.1    </span>
-<span class="co">#&gt; [52] tibble_3.0.3        seqinr_3.6-1        crayon_1.3.4       </span>
-<span class="co">#&gt; [55] tidyr_1.1.1         pkgconfig_2.0.3     MASS_7.3-52        </span>
-<span class="co">#&gt; [58] ellipsis_0.3.1      tidytree_0.3.3      assertthat_0.2.1   </span>
-<span class="co">#&gt; [61] rmarkdown_2.3       R6_2.4.1            nlme_3.1-149       </span>
-<span class="co">#&gt; [64] compiler_4.0.2</span>
+<span class="co">#&gt; [25] knitr_1.30          parallel_4.0.2      Rcpp_1.0.5         </span>
+<span class="co">#&gt; [28] scales_1.1.1        backports_1.1.10    BiocManager_1.30.10</span>
+<span class="co">#&gt; [31] desc_1.2.0          cpp11_0.2.1         jsonlite_1.7.1     </span>
+<span class="co">#&gt; [34] farver_2.0.3        systemfonts_0.3.1   fs_1.5.0           </span>
+<span class="co">#&gt; [37] gridExtra_2.3       ggplot2_3.3.2       aplot_0.0.6        </span>
+<span class="co">#&gt; [40] digest_0.6.25       stringi_1.5.3       bookdown_0.20      </span>
+<span class="co">#&gt; [43] dplyr_1.0.2         ggrepel_0.8.2       ade4_1.7-15        </span>
+<span class="co">#&gt; [46] grid_4.0.2          rprojroot_1.3-2     ggtree_2.3.5       </span>
+<span class="co">#&gt; [49] tools_4.0.2         magrittr_1.5        lazyeval_0.2.2     </span>
+<span class="co">#&gt; [52] patchwork_1.0.1     tibble_3.0.3        seqinr_3.6-1       </span>
+<span class="co">#&gt; [55] crayon_1.3.4        tidyr_1.1.2         pkgconfig_2.0.3    </span>
+<span class="co">#&gt; [58] MASS_7.3-53         ellipsis_0.3.1      tidytree_0.3.3     </span>
+<span class="co">#&gt; [61] assertthat_0.2.1    rmarkdown_2.3       R6_2.4.1           </span>
+<span class="co">#&gt; [64] nlme_3.1-149        compiler_4.0.2</span>
 </pre></div>
 </div>
   </div>
@@ -396,7 +374,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
