@@ -1,4 +1,5 @@
 #' @importFrom utils tail
+#' @importFrom ape getMRCA
 
 #' @rdname sitesMinEntropy
 #' @title Fixation sites prediction
@@ -89,9 +90,7 @@ sitesMinEntropy.lineagePath <- function(x,
             searchDepth = searchDepth
         )
     })
-    # res <- .unifyEntropyGrouping(res,
-    #                              attr(paths, "tree"),
-    #                              attr(paths, "align"))
+    res <- .unifyEntropyGrouping(res, paths)
     # Cluster tips according to fixation sites
     clustersByPath <- lapply(res, function(segs) {
         # Set the site and amino acid/nucleotide info for each group of tips
@@ -184,7 +183,9 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.unifyEntropyGrouping <- function(res, tree, align) {
+.unifyEntropyGrouping <- function(res, paths) {
+    align <- attr(paths, "align")
+    tree <- attr(paths, "tree")
     # Iterate each locus
     for (locus in names(res[[1]])) {
         # The index for C++
@@ -432,9 +433,10 @@ sitesMinEntropy.lineagePath <- function(x,
             # in 'gp' containing tips that cannot be found is the divergent
             # point
             for (j in seq_along(gp)) {
-                # Once a potential divergent point having being found, safeguard
-                # the truncated 'gp' (in 'res') to merge with have actual
-                # overlap with the current non-truncated 'gp'
+                # Once a potential divergent point having being found (the tip
+                # cluster in 'gp' containing cannot-be-found tips), safeguard
+                # the current 'gp' have actual overlap with all tips in 'res'
+                # with index 'j'
                 if (any(!gp[[j]] %in% allTips) &&
                     any(unlist(gp) %in% unlist(res[[i]]))) {
                     t <- intersect(gp[[j]], allTips)
@@ -499,9 +501,9 @@ sitesMinEntropy.lineagePath <- function(x,
                     # be the only info to give back to
                     attributes(sharedTips) <-
                         attributes(toMerge[[i]])
-                    attr(sharedTips, "toMerge") <-
-                        c(toMergeRefSites,
-                          attr(sharedTips, "toMerge"))
+                    # The original 'toMerge' info should be taken by the
+                    # 'divergedTips'
+                    attr(sharedTips, "toMerge") <- toMergeRefSites
                     sharedTips <- list(sharedTips)
                 }
                 # The divergent part

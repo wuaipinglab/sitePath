@@ -9,15 +9,17 @@ test_that("The return value contains correct extra info", {
     expect_true(length(p) == length(minEntropy))
     for (segs in minEntropy) {
         for (seg in segs) {
-            expect_true(all(sapply(names(seg), function(node) {
+            for (node in names(seg)) {
                 tips <- seg[[node]]
                 # The major amino acid/nucleotide should be same as the fixed
                 # and the node names should be the same
                 dominantAA <-
                     names(which.max(attr(tips, "aaSummary")))
-                dominantAA == attr(tips, "AA") &&
-                node == attr(tips, "node")
-            })))
+                if (is.null(attr(tips, "toMerge"))) {
+                    expect_true(dominantAA == attr(tips, "AA"))
+                }
+                expect_true(node == attr(tips, "node"))
+            }
         }
     }
 })
