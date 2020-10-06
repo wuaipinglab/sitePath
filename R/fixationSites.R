@@ -25,8 +25,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' fixationSites(lineagePath(tree))
-fixationSites <- function(paths, ...)
+fixationSites <- function(paths, ...) {
     UseMethod("fixationSites")
+}
 
 #' @rdname fixationSites
 #' @export
@@ -51,12 +52,7 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
     tree <- attr(paths, "tree")
     align <- attr(paths, "align")
     seqType <- attr(paths, "seqType")
-    gapChar <- attr(paths, "gapChar")
-    if (seqType == "AA") {
-        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
-    } else {
-        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
-    }
+    unambiguous <- .unambiguousChars(paths)
     # 'res' is going to be the return of this function. Each entry in the list
     # is the 'sitePath' for a site. Each site ('sitePath') consists of 'mutPath'
     # that is named by the starting node name. The fixed AA and number of

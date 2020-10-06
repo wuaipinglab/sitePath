@@ -20,8 +20,9 @@
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' groupTips(tree)
-groupTips <- function(tree, ...)
+groupTips <- function(tree, ...) {
     UseMethod("groupTips")
+}
 
 #' @rdname groupTips
 #' @export

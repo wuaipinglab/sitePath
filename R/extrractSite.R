@@ -15,8 +15,9 @@
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractSite(mutations, 139)
-extractSite <- function(x, site, ...)
+extractSite <- function(x, site, ...) {
     UseMethod("extractSite")
+}
 
 #' @rdname extractSite
 #' @export

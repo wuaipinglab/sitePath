@@ -23,8 +23,9 @@
 #' data('zikv_align')
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' lineagePath(tree)
-lineagePath <- function(tree, similarity, ...)
+lineagePath <- function(tree, similarity, ...) {
     UseMethod("lineagePath")
+}
 
 #' @rdname lineagePath
 #' @export

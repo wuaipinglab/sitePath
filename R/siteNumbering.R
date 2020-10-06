@@ -22,8 +22,9 @@
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' setSiteNumbering(tree)
-setSiteNumbering <- function(x, reference, gapChar, ...)
+setSiteNumbering <- function(x, reference, gapChar, ...) {
     UseMethod("setSiteNumbering")
+}
 
 #' @rdname setSiteNumbering
 #' @export
@@ -56,11 +57,7 @@ setSiteNumbering.phyMSAmatched <- function(x,
     } else if (minSkipSize < 1 && minSkipSize > 0) {
         minSkipSize <- minSkipSize * length(align)
     }
-    if (attr(x, "seqType") == "AA") {
-        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
-    } else {
-        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
-    }
+    unambiguous <- .unambiguousChars(x)
     attr(x, "loci") <- which(vapply(
         X = attr(x, "msaNumbering") - 1,
         FUN = function(s) {
@@ -86,6 +83,16 @@ setSiteNumbering.phyMSAmatched <- function(x,
         FUN.VALUE = logical(1)
     ))
     return(x)
+}
+
+.unambiguousChars <- function(x) {
+    gapChar <- attr(x, "gapChar")
+    if (attr(x, "seqType") == "AA") {
+        res <- setdiff(AA_UNAMBIGUOUS, gapChar)
+    } else {
+        res <- setdiff(NT_UNAMBIGUOUS, gapChar)
+    }
+    return(res)
 }
 
 .phyMSAmatch <- function(x) {

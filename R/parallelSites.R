@@ -26,8 +26,9 @@
 #' paths <- lineagePath(tree)
 #' x <- sitesMinEntropy(paths)
 #' parallelSites(x)
-parallelSites <- function(x, ...)
+parallelSites <- function(x, ...) {
     UseMethod("parallelSites")
+}
 
 #' @rdname parallelSites
 #' @export
@@ -53,12 +54,7 @@ parallelSites.sitesMinEntropy <- function(x,
     paths <- attr(x, "paths")
     align <- attr(paths, "align")
     reference <- attr(paths, "msaNumbering")
-    gapChar <- attr(paths, "gapChar")
-    if (attr(paths, "seqType") == "AA") {
-        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
-    } else {
-        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
-    }
+    unambiguous <- .unambiguousChars(paths)
     # There must be at least two lineages to have mutations and one of the fixed
     # amino acids/nucleotides should be unambiguous
     hasParallelMut <- Reduce("+", lapply(x, function(segs) {

@@ -20,8 +20,9 @@
 #' paths <- lineagePath(tree)
 #' mutations <- fixationSites(paths)
 #' fixationPath(mutations)
-fixationPath <- function(x, ...)
+fixationPath <- function(x, ...) {
     UseMethod("fixationPath")
+}
 
 #' @rdname fixationPath
 #' @export

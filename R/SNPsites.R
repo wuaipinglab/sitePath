@@ -17,8 +17,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' SNPsites(tree)
-SNPsites <- function(tree, ...)
+SNPsites <- function(tree, ...) {
     UseMethod("SNPsites")
+}
 
 #' @rdname SNPsites
 #' @export
@@ -39,12 +40,7 @@ SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
     refSeqName <- attr(x, "reference")
-    gapChar <- attr(x, "gapChar")
-    if (attr(x, "seqType") == "AA") {
-        unambiguous <- setdiff(AA_UNAMBIGUOUS, gapChar)
-    } else {
-        unambiguous <- setdiff(NT_UNAMBIGUOUS, gapChar)
-    }
+    unambiguous <- .unambiguousChars(x)
     # Find SNP for each tree tip by comparing with the consensus sequence or the
     # reference sequence if specified
     if (is.null(refSeqName)) {

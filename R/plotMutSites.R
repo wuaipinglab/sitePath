@@ -16,8 +16,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' plotMutSites(SNPsites(tree))
-plotMutSites <- function(x, ...)
+plotMutSites <- function(x, ...) {
     UseMethod("plotMutSites")
+}
 
 #' @rdname plotMutSites
 #' @export

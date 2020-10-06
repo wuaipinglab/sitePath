@@ -1,4 +1,5 @@
 #' @importFrom utils tail
+#' @importFrom ape getMRCA
 
 #' @rdname sitesMinEntropy
 #' @title Fixation sites prediction
@@ -22,8 +23,9 @@
 #' data(zikv_align_reduced)
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' sitesMinEntropy(lineagePath(tree))
-sitesMinEntropy <- function(x, ...)
+sitesMinEntropy <- function(x, ...) {
     UseMethod("sitesMinEntropy")
+}
 
 #' @rdname sitesMinEntropy
 #' @export
@@ -88,7 +90,7 @@ sitesMinEntropy.lineagePath <- function(x,
             searchDepth = searchDepth
         )
     })
-    # res <- .unifyEntropyGrouping(res, names(siteIndices))
+    res <- .unifyEntropyGrouping(res, paths)
     # Cluster tips according to fixation sites
     clustersByPath <- lapply(res, function(segs) {
         # Set the site and amino acid/nucleotide info for each group of tips
@@ -105,6 +107,8 @@ sitesMinEntropy.lineagePath <- function(x,
                 return(tips)
             })
         })
+        # This will group the tips of the lineage path and the adjacent groups
+        # will have at least one fixed site different
         .clusterByFixation(group)
     })
     clustersByPath <- .mergeClusters(clustersByPath)
@@ -179,66 +183,152 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.unifyEntropyGrouping <- function(res, lociNames) {
-    pathNum <- length(res)
+.unifyEntropyGrouping <- function(res, paths) {
+    align <- attr(paths, "align")
+    tree <- attr(paths, "tree")
     # Iterate each locus
-    for (locus in lociNames) {
-        # Get the merged group of each loci
+    for (locus in names(res[[1]])) {
+        # The index for C++
+        locusIndex <- as.integer(locus) - 1
+        # Get the merged groupings of each path for the locus
         mergedGroupings <- .mergeClusters(lapply(res, "[[", locus))
-        # Find the index pathing of the group in each lineage path
-        mergePathing <- list()
-        for (i in seq_len(pathNum)) {
-            # The index pathing for the current group. The index of an
-            # irrelevant grouping will hold a NA value while the index of a
-            # relevant grouping will hold a number indicating the divergent
-            # point
-            indexPathing <- rep(NA_integer_, pathNum)
-            # Iterate the merged grouping of each path to find the 'toMerge'
-            # index
-            for (pIndex in seq_along(mergePathing)) {
-                # The group with the merging index
-                mGrouping <- mergedGroupings[[pIndex]]
-                isFound <- FALSE
-                # Iterate each group in the merged grouping of the path
-                for (j in seq_along(mGrouping)) {
-                    toMergeIndex <- as.integer(names(attr(
-                        mGrouping[[j]],
-                        "toMerge"
-                    )))
-                    # Trace back to the root when the current grouping if found
-                    # as 'toMerge' for the 'pIndex'
-                    if (i %in% toMergeIndex) {
-                        # The index pathing to trace back
-                        indexPathing <- mergePathing[[pIndex]]
-                        # The extra pathing index to link to the current
-                        indexPathing[pIndex] <- j
-                        isFound <- TRUE
-                    }
-                    break
-                }
-                if (isFound) {
-                    break
-                }
-            }
-            # Attach the index pathing for back tracing of the groups in the
-            # remaining path
-            mergePathing <- c(mergePathing, list(indexPathing))
-            # Reconstruct the grouping for the current path
-            indexPathing[i] <- 1
+        # Link the merged groupings for each lineage path to calibrate and
+        # recover the full groupings. The linked merged groupings are stored for
+        # the remaining paths.
+        linkedMerged <- list()
+        for (pathIndex in seq_along(mergedGroupings)) {
+            currLinked <- .findGroupingLinkage(
+                fixations = res,
+                pathIndex = pathIndex,
+                mergedGroupings = mergedGroupings,
+                linkedMerged = linkedMerged,
+                locus = locus,
+                align = align
+            )
+            # Store the linked groupings back tracing to the root for the
+            # remaining groupings
+            linkedMerged <- c(linkedMerged, list(currLinked))
+            # The merged result for the current grouping needs to be included
+            # for reconstructing but not needed for other groupings
+            currLinked[[pathIndex]] <- mergedGroupings[[pathIndex]]
+            # Make the tips clusters into one list
+            currLinked <- currLinked[which(lengths(currLinked) > 0)]
+            currLinked <- unlist(currLinked, recursive = FALSE)
+            # Reconstruct the grouping of the path
             reconstructed <- list()
-            for (pIndex in seq_along(indexPathing)) {
-                j <- indexPathing[pIndex]
-                if (!is.na(j)) {
-                    newGroup <- list()
-                    reconstructed <- c(reconstructed, newGroup)
+            clusterNodes <- character()
+            prevGP <- currLinked[[1]]
+            for (gpIndex in seq_along(currLinked)[-1]) {
+                currGP <- currLinked[[gpIndex]]
+                if (attr(prevGP, "AA") == attr(currGP, "AA")) {
+                    currGP <- c(prevGP, currGP)
+                    attr(currGP, "aaSummary") <-
+                        tableAA(align[currGP], locusIndex)
+                    attr(currGP, "AA") <- attr(prevGP, "AA")
+                    attr(currGP, "node") <- attr(prevGP, "node")
+                } else {
+                    if (attr(prevGP, "node") == attr(currGP, "node")) {
+                        attr(prevGP, "aaSummary") <-
+                            tableAA(align[prevGP], locusIndex)
+                        attr(currGP, "aaSummary") <-
+                            tableAA(align[currGP], locusIndex)
+                        # Re-find the ancestral node if the original group is
+                        # split
+                        allChildrenTips <-
+                            unlist(currLinked[-seq_len(gpIndex - 1)])
+                        attr(currGP, "node") <-
+                            as.character(getMRCA(tree, allChildrenTips))
+                    }
+                    # Add a new tip cluster only when there is a change of fixed
+                    # amino acid/nucleotide
+                    reconstructed <- c(reconstructed, list(prevGP))
+                    clusterNodes <-
+                        c(clusterNodes, attr(prevGP, "node"))
                 }
+                prevGP <- currGP
             }
+            reconstructed <- c(reconstructed, list(prevGP))
+            clusterNodes <- c(clusterNodes, attr(prevGP, "node"))
             # Re-assign the merged result to the original
-            names(reconstructed) <- names(res[[i]][[locus]])
-            res[[i]][[locus]] <- reconstructed
+            names(reconstructed) <- clusterNodes
+            res[[pathIndex]][[locus]] <- reconstructed
         }
     }
     return(res)
+}
+
+.findGroupingLinkage <- function(fixations,
+                                 pathIndex,
+                                 mergedGroupings,
+                                 linkedMerged,
+                                 locus,
+                                 align) {
+    locusIndex <- as.integer(locus) - 1
+    # The linked groupings for the current path The index of an irrelevant path
+    # will hold a NULL while the index of a relevant path will hold the grouping
+    # up till the tip cluster with the 'toMerge' index indicating the divergent
+    # point.
+    currLinked <- rep(list(), len = pathIndex)
+    # Iterate the merged grouping of each path to find the 'toMerge' index same
+    # as the current path index
+    for (mergedIndex in seq_along(linkedMerged)) {
+        # The merged grouping that has no overlap
+        mGrouping <- mergedGroupings[[mergedIndex]]
+        # Iterate each tip cluster in the merged grouping
+        for (gIndex in seq_along(mGrouping)) {
+            tips <- mGrouping[[gIndex]]
+            toMergeIndex <- as.integer(names(attr(tips, "toMerge")))
+            # Trace back to the root when the path index of current grouping
+            # is found in 'toMergeIndex'
+            if (pathIndex %in% toMergeIndex) {
+                # The linked merged groupings trace back to the root
+                currLinked <- linkedMerged[[mergedIndex]]
+                # The fixed amino acid/nucleotide at the divergent point
+                fixedAA <- lapply(
+                    X = c(mergedIndex, toMergeIndex),
+                    FUN = function(n) {
+                        res <- character()
+                        remaining <- tips
+                        # To find the fixed amino acid/nucleotide from the
+                        # entropy minimum result for each path
+                        for (original in fixations[[n]][[locus]]) {
+                            involved <- which(remaining %in% original)
+                            if (length(involved) != 0) {
+                                res <- c(res, attr(original, "AA"))
+                                remaining <- remaining[-involved]
+                                if (length(remaining) == 0) {
+                                    break
+                                }
+                            }
+                        }
+                        return(res)
+                    }
+                )
+                fixedAA <- unique(unlist(fixedAA))
+                # The amino acid/nucleotide summary of the tips
+                aaSummary <- tableAA(align[tips], locusIndex)
+                # The intersection between the fixed and the real amino
+                # acid/nucleotide summary will be used as the reference
+                refAA <- intersect(fixedAA, names(aaSummary))
+                if (length(refAA) == 0) {
+                    # Select one of the fixed if none intersected
+                    refAA <- fixedAA[1]
+                } else if (length(refAA) > 1) {
+                    # Select the most frequent if more than one intersected
+                    aaSummary <- aaSummary[refAA]
+                    refAA <- names(which.max(aaSummary))
+                }
+                # Attach the index that directly links to the current grouping
+                attr(mGrouping[[gIndex]], "AA") <- refAA
+                currLinked[[mergedIndex]] <-
+                    mGrouping[seq_len(gIndex)]
+                # The result of the groups and grouping will be ignored as there
+                # could only be one relevant divergent point
+                return(currLinked)
+            }
+        }
+    }
+    return(currLinked)
 }
 
 .clusterByFixation <- function(group) {
@@ -343,9 +433,10 @@ sitesMinEntropy.lineagePath <- function(x,
             # in 'gp' containing tips that cannot be found is the divergent
             # point
             for (j in seq_along(gp)) {
-                # Once a potential divergent point having being found, safeguard
-                # the truncated 'gp' (in 'res') to merge with have actual
-                # overlap with the current non-truncated 'gp'
+                # Once a potential divergent point having being found (the tip
+                # cluster in 'gp' containing cannot-be-found tips), safeguard
+                # the current 'gp' have actual overlap with all tips in 'res'
+                # with index 'j'
                 if (any(!gp[[j]] %in% allTips) &&
                     any(unlist(gp) %in% unlist(res[[i]]))) {
                     t <- intersect(gp[[j]], allTips)
@@ -410,9 +501,9 @@ sitesMinEntropy.lineagePath <- function(x,
                     # be the only info to give back to
                     attributes(sharedTips) <-
                         attributes(toMerge[[i]])
-                    attr(sharedTips, "toMerge") <-
-                        c(toMergeRefSites,
-                          attr(sharedTips, "toMerge"))
+                    # The original 'toMerge' info should be taken by the
+                    # 'divergedTips'
+                    attr(sharedTips, "toMerge") <- toMergeRefSites
                     sharedTips <- list(sharedTips)
                 }
                 # The divergent part

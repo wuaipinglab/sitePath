@@ -17,8 +17,9 @@
 #' tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
 #' mutations <- fixationSites(lineagePath(tree))
 #' extractTips(mutations, 139)
-extractTips <- function(x, ...)
+extractTips <- function(x, ...) {
     UseMethod("extractTips")
+}
 
 #' @rdname extractTips
 #' @description For \code{\link{lineagePath}}, the function \code{extractTips}
