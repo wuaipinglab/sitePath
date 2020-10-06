@@ -126,19 +126,19 @@
   least one fixation mutation to be reported.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fixationSites</span>(<span class='kw'>paths</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>fixationSites</span><span class='op'>(</span><span class='va'>paths</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for lineagePath</span>
-<span class='fu'>fixationSites</span>(
-  <span class='kw'>paths</span>,
-  minEffectiveSize = <span class='kw'>NULL</span>,
-  searchDepth = <span class='fl'>1</span>,
-  method = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span>),
-  <span class='kw'>...</span>
-)
+<span class='fu'>fixationSites</span><span class='op'>(</span>
+  <span class='va'>paths</span>,
+  minEffectiveSize <span class='op'>=</span> <span class='cn'>NULL</span>,
+  searchDepth <span class='op'>=</span> <span class='fl'>1</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for sitesMinEntropy</span>
-<span class='fu'>fixationSites</span>(<span class='kw'>paths</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>fixationSites</span><span class='op'>(</span><span class='va'>paths</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,15 +178,15 @@ point, or by comparing the two.</p></td>
     <div class='dont-index'><p><code><a href='as.data.frame.fixationSites.html'>as.data.frame.fixationSites</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
-<span class='fu'>fixationSites</span>(<span class='fu'><a href='lineagePath.html'>lineagePath</a></span>(<span class='kw'>tree</span>))
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='fu'>fixationSites</span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; This is a 'fixationSites' object.
 #&gt; 
 #&gt; Result for 3 paths:
 #&gt; 
-#&gt; 196 988 784 139 894 1542 2074 2634 3045 
+#&gt; 196 988 784 139 894 1542 2074 2086 2634 3045 
 #&gt; No reference sequence specified. Using alignment numbering</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

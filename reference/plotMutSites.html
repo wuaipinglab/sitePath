@@ -116,10 +116,10 @@
   represented as colored dots positioned by their site number.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotMutSites</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>plotMutSites</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for SNPsites</span>
-<span class='fu'>plotMutSites</span>(<span class='kw'>x</span>, showTips = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>plotMutSites</span><span class='op'>(</span><span class='va'>x</span>, showTips <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,10 +143,10 @@
     <p>A tree plot with SNP as dots for each tip.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
-<span class='fu'>plotMutSites</span>(<span class='fu'><a href='SNPsites.html'>SNPsites</a></span>(<span class='kw'>tree</span>))
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='fu'>plotMutSites</span><span class='op'>(</span><span class='fu'><a href='SNPsites.html'>SNPsites</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='plotMutSites-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

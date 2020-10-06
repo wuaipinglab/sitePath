@@ -120,10 +120,10 @@
   specified to number the site.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>SNPsites</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for phyMSAmatched</span>
-<span class='fu'>SNPsites</span>(<span class='kw'>tree</span>, minSNP = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>SNPsites</span><span class='op'>(</span><span class='va'>tree</span>, minSNP <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -148,10 +148,10 @@ of the total tree tips.</p></td>
     <p>A <code>SNPsites</code> object.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree_reduced</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align_reduced</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree_reduced</span>, alignment = <span class='kw'>zikv_align_reduced</span>)
-<span class='fu'>SNPsites</span>(<span class='kw'>tree</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
+<span class='fu'>SNPsites</span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1]  139  894  988 2074 2086 2634 3045</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

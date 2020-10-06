@@ -126,13 +126,13 @@
   function will use the sequence in the alignment file.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>addMSA</span>(
-  <span class='kw'>tree</span>,
-  msaPath = <span class='st'>""</span>,
-  msaFormat = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"fasta"</span>, <span class='st'>"clustal"</span>, <span class='st'>"phylip"</span>, <span class='st'>"mase"</span>, <span class='st'>"msf"</span>),
-  alignment = <span class='kw'>NULL</span>,
-  seqType = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"AA"</span>, <span class='st'>"DNA"</span>, <span class='st'>"RNA"</span>)
-)</pre>
+    <pre class="usage"><span class='fu'>addMSA</span><span class='op'>(</span>
+  <span class='va'>tree</span>,
+  msaPath <span class='op'>=</span> <span class='st'>""</span>,
+  msaFormat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"fasta"</span>, <span class='st'>"clustal"</span>, <span class='st'>"phylip"</span>, <span class='st'>"mase"</span>, <span class='st'>"msf"</span><span class='op'>)</span>,
+  alignment <span class='op'>=</span> <span class='cn'>NULL</span>,
+  seqType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"AA"</span>, <span class='st'>"DNA"</span>, <span class='st'>"RNA"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,9 +178,9 @@ names in the alignment should include all <code>tip.label</code> in the tree</p>
     <div class='dont-index'><p><code>read.alignment</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
-<span class='kw'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package = <span class='st'>'sitePath'</span>)
-<span class='fu'>addMSA</span>(<span class='kw'>zikv_tree</span>, msaPath = <span class='kw'>msaPath</span>, msaFormat = <span class='st'>'fasta'</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
+<span class='va'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package <span class='op'>=</span> <span class='st'>'sitePath'</span><span class='op'>)</span>
+<span class='fu'>addMSA</span><span class='op'>(</span><span class='va'>zikv_tree</span>, msaPath <span class='op'>=</span> <span class='va'>msaPath</span>, msaFormat <span class='op'>=</span> <span class='st'>'fasta'</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; This is a 'phyMSAmatched' object. </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

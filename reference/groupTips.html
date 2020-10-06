@@ -116,29 +116,29 @@
   lineages are each gathered as group.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>groupTips</span>(<span class='kw'>tree</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for phyMSAmatched</span>
-<span class='fu'>groupTips</span>(
-  <span class='kw'>tree</span>,
-  similarity = <span class='kw'>NULL</span>,
-  simMatrix = <span class='kw'>NULL</span>,
-  forbidTrivial = <span class='fl'>TRUE</span>,
-  tipnames = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'>groupTips</span><span class='op'>(</span>
+  <span class='va'>tree</span>,
+  similarity <span class='op'>=</span> <span class='cn'>NULL</span>,
+  simMatrix <span class='op'>=</span> <span class='cn'>NULL</span>,
+  forbidTrivial <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for lineagePath</span>
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sitesMinEntropy</span>
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for fixationSites</span>
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for fixationPath</span>
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>, tipnames = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -179,10 +179,10 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
     <p><code>groupTips</code> returns grouping of tips.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_tree</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>zikv_align</span>)
-<span class='kw'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span>(<span class='kw'>zikv_tree</span>, alignment = <span class='kw'>zikv_align</span>)
-<span class='fu'>groupTips</span>(<span class='kw'>tree</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span>
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $`363`
 #&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
 #&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
