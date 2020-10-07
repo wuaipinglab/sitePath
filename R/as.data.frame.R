@@ -1,3 +1,5 @@
+#' @importFrom ape getMRCA nodepath
+
 #' @rdname as.data.frame
 #' @title Convert results to Data Frame
 #' @description Convert return of functions in \code{sitePath} package to a
@@ -105,6 +107,8 @@ as.data.frame.fixationSites <- function(x,
         "to" = currCls,
         "node" = transNode
     )
+    res <- unique(res)
+    rownames(res) <- NULL
     return(res)
 }
 
