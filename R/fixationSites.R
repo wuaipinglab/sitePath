@@ -86,14 +86,11 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
                     # The index to extract the terminal tips of the 'mutPath'
                     endIndex <- length(seg)
                     finalAA <- attr(seg[[endIndex]], "AA")
-                    # The following is to decide if any 'mutPath' can be
-                    # combined
-                    existPaths <- res[[site]]
                     # Combine the two 'mutPath' when the fixation tips before
                     # the terminal tips are identical and the final fixation
                     # mutation are the same
                     toCombine <- vapply(
-                        X = existPaths,
+                        X = res[[site]],
                         FUN = function(ep) {
                             identical(lapply(seg, c)[-endIndex],
                                       lapply(ep, c)[-endIndex]) &&
@@ -110,22 +107,12 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
                             FUN = "[[",
                             i = endIndex
                         )))
-                        # The all descendant tips of the node where 'mutPath's
-                        # are combined
-                        allTips <-
-                            .childrenTips(tree, getMRCA(tree, toCombine))
-                        if (all(allTips %in% toCombine)) {
-                            # Create the newly combined 'mutPath'
-                            seg[[endIndex]] <- toCombine
-                            attr(seg[[endIndex]], "AA") <- finalAA
-                            # Remove the combined 'mutPath'
-                            res[[site]] <- res[[site]][-existIndex]
-                            targetIndex <- length(res[[site]]) + 1
-                        } else {
-                            # Add new fixation for the site if no existing
-                            # mutation path can be combined with
-                            targetIndex <- length(existPaths) + 1
-                        }
+                        # Create the newly combined 'mutPath'
+                        seg[[endIndex]] <- toCombine
+                        attr(seg[[endIndex]], "AA") <- finalAA
+                        # Remove the combined 'mutPath'
+                        res[[site]] <- res[[site]][-existIndex]
+                        targetIndex <- length(res[[site]]) + 1
                     }
                     seg <- lapply(seg, function(tips) {
                         attr(tips, "tipsAA") <- substr(
