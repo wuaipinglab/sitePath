@@ -61,7 +61,7 @@ print(fixations)
 
     ## This is a 'fixationSites' object.
     ## 
-    ## Result for 3 paths:
+    ## Result for 4 paths:
     ## 
-    ## 109 139 894 988 2074 2086 2634 3045 3144 107 1118 3353 1143 2842 3398 
+    ## 988 139 894 2074 2086 2634 3045 107 1118 3353 1143 2842 3398 
     ## No reference sequence specified. Using alignment numbering

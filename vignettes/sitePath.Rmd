@@ -38,7 +38,7 @@ The S3 phylo class is a common data structure for phylogenetic analysis in R. Th
 
 
 ```{r import_tree, message=FALSE}
-library(ape)
+library(sitePath)
 
 tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
 tree <- read.tree(tree_file)
@@ -51,8 +51,6 @@ It is highly recommended that the file stores a rooted tree as R would consider 
 Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper function for parsing and adding the sequence alignment.
 
 ```{r add_alignment, message=FALSE}
-library(sitePath)
-
 alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 tree <- addMSA(tree, alignment_file, "fasta")
 ```
@@ -84,16 +82,25 @@ You can visualize the result.
 plot(paths)
 ```
 
-# Fixation sites
+# Detecting fixation and parallel mutations
 
-Now you're ready to find fixation events.
+Now you're ready to find fixation and parallel mutations.
+
+## Entropy minimization
+
+The `sitesMinEntropy` function perform entropy minimization on every site for each lineage. The fixation and parallel mutations can be derived from the function's return value.
+
+```{r min_entropy}
+minEntropy <- sitesMinEntropy(paths)
+```
+
 
 ## Fixation mutations
 
 The hierarchical search is done by `fixationSites` function. The function detects the site with fixation mutation.
 
 ```{r find_fixations}
-fixations <- fixationSites(paths)
+fixations <- fixationSites(minEntropy)
 fixations
 ```
 
@@ -109,8 +116,6 @@ It is also possible to retrieve the tips involved in the fixation of the site.
 extractTips(fixations, 139)
 ```
 
-## Visualize the result
-
 Use `plot` on a `sitePath` object to visualize the fixation mutation of a single site. Alternatively, use `plotSingleSite` on an `fixationSites` object with the site specified.
 
 ```{r plot_sitePath}
@@ -124,11 +129,19 @@ To have an overall view of the transition of fixation mutation, use `plot` on an
 plot(fixations)
 ```
 
-To have a simplified view of mutation accumulations. It might help to use `fixationPath` function and visualize it.
+## Parallel mutation
+
+Parallel mutation can be found by the `parallelSites` function. There are four ways of defining the parallel mutation: `all`, `exact`, `pre` and `post`. Here `exact` is used as an example.
 
 ```{r}
-x <- fixationPath(fixations)
-plot(x)
+paraSites <- parallelSites(minEntropy, mutMode = "exact")
+paraSites
+```
+
+The result of a single site can be visualized by `plotSingleSite` function.
+
+```{r}
+plotSingleSite(paraSites, 105)
 ```
 
 # Additional functions
