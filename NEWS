@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.5.25
+-------------------------
+    o Bug fix: use 'geom_point2' instead of 'geom_tippoint' to avoid error.
+
 CHANGES IN VERSION 1.5.24
 -------------------------
     o Add sequence type option for for DNA and amino acid.
