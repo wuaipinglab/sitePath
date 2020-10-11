@@ -3,7 +3,7 @@
 #' @importFrom ggplot2 GeomSegment GeomText GeomPoint
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom tidytree groupOTU
-#' @importFrom ggtree ggtree geom_tippoint geom_tiplab
+#' @importFrom ggtree ggtree geom_point2 geom_tiplab
 
 #' @rdname plotSingleSite
 #' @title Color the tree by a single site
@@ -144,8 +144,8 @@ plotSingleSite.parallelSites <- function(x,
         )
     }
     if (any(sporadicTip)) {
-        p <- p + geom_tippoint(aes(subset = sporadicTip,
-                                   size = GeomPoint[["default_aes"]][["size"]]))
+        p <- p + geom_point2(aes(subset = sporadicTip,
+                                 size = GeomPoint[["default_aes"]][["size"]]))
     }
     return(p)
 }
@@ -165,5 +165,6 @@ plotSingleSite.fixationSites <- function(x,
                                          ...) {
     plot.sitePath(x = .actualExtractSite(x, site),
                   y = TRUE,
-                  select = select, ...)
+                  select = select,
+                  ...)
 }
