@@ -119,16 +119,58 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
+.mergeDivergedPaths <- function(endTips,
+                                tree,
+                                align,
+                                rootNode,
+                                minSNP,
+                                siteIndex) {
+    endTips <- endTips[which(lengths(endTips) > minSNP)]
+    res <- lapply(
+        X = endTips,
+        FUN = function(tips) {
+            terminalNode <- getMRCA(tree, tips)
+            nodepath(tree, from = rootNode, to = terminalNode)
+        }
+    )
+    i <- 1
+    while (i < length(res)) {
+        # The target lineage path excluding the terminal node
+        refPath <- res[i]
+        # Compare with rest of the paths to decide if to keep
+        toKeep <- all(vapply(
+            X = res[-i],
+            FUN = function(p) {
+                # The diverged part of the current path compared with the other
+                # path
+                cNodes <- vapply(setdiff(refPath, p), function(n) {
+                    tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
+                }, integer(1))
+                cNodes <- setdiff(cNodes, refPath)
+                tips <- .childrenTips(tree, cNodes)
+                siteChar <- tableAA(align[tips], siteIndex)
+            },
+            FUN.VALUE = logical(1)
+        ))
+        if (toKeep) {
+            res <- res[-i]
+        } else {
+            i <- i + 1
+        }
+    }
+    return(res[toKeep])
+}
+
 #' @rdname lineagePath
 #' @description \code{sneakPeek} is intended to plot 'similarity' (actually the
 #'   least percentage of 'major SNP') as a threshold against number of output
-#'   lineagePath. This plot is intended to give user a rought view about how
-#'   many lineages they could expect from the 'similarity' threshold in the
-#'   function \code{\link{lineagePath}}. The number of lineagePath is preferably
-#'   not be too many or too few. The result excludes where the number of
-#'   lineagePath is greater than number of tips divided by 20 or user-defined
-#'   maxPath. The zero lineagePath result will also be excluded.
-#' @param step the 'similarity' window for calculating and ploting. To better
+#'   lineagePath. This plot is intended to give user a rough view about how many
+#'   lineages they could expect from the 'similarity' threshold in the function
+#'   \code{\link{lineagePath}}. The number of lineagePath is preferably not be
+#'   too many or too few. The result excludes where the number of lineagePath is
+#'   greater than number of tips divided by 20 or user-defined maxPath. The zero
+#'   lineagePath result will also be excluded.
+#' @param step the 'similarity' window for calculating and plotting. To better
 #'   see the impact of threshold on path number. The default is 10.
 #' @param maxPath maximum number of path to return show in the plot. The number
 #'   of path in the raw tree can be far greater than trimmed tree. To better see
