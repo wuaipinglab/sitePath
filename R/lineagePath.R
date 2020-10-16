@@ -1,4 +1,5 @@
-#' @importFrom ape nodepath getMRCA
+#' @importFrom stats sd
+#' @importFrom ape nodepath getMRCA node.depth.edgelength
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
 #' @rdname lineagePath
@@ -97,19 +98,24 @@ lineagePath.phyMSAmatched <- function(tree,
         siteIndices = siteIndices,
         zValue = zValue
     )
-    terminalTips <- unlist(x = terminalTips,
-                           recursive = FALSE,
-                           use.names = FALSE)
-    terminalTips <-
-        terminalTips[which(lengths(terminalTips) > minSNP)]
-    candidatePaths <- lapply(
-        X = terminalTips,
-        FUN = function(tips) {
-            terminalNode <- getMRCA(tree, tips)
-            nodepath(tree, from = rootNode, to = terminalNode)
+    paths <- lapply(
+        X = names(terminalTips),
+        FUN = function(siteName) {
+            endTips <- terminalTips[[siteName]]
+            candidatePaths <- lapply(
+                X = endTips[which(lengths(endTips) > minSNP)],
+                FUN = function(tips) {
+                    terminalNode <- getMRCA(tree, tips)
+                    nodepath(phy = tree,
+                             from = rootNode,
+                             to = terminalNode)
+                }
+            )
+            return(candidatePaths)
         }
     )
-    paths <- mergePaths(candidatePaths)
+    paths <- unlist(x = paths, recursive = FALSE)
+    paths <- mergePaths(paths)
     # Transfer attributes
     attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'rootNode'
@@ -119,46 +125,68 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
-.mergeDivergedPaths <- function(endTips,
-                                tree,
-                                align,
-                                rootNode,
-                                minSNP,
-                                siteIndex) {
-    endTips <- endTips[which(lengths(endTips) > minSNP)]
-    res <- lapply(
-        X = endTips,
-        FUN = function(tips) {
-            terminalNode <- getMRCA(tree, tips)
-            nodepath(tree, from = rootNode, to = terminalNode)
-        }
-    )
+.mergeDivergedPaths <- function(tree, zValue, rootNode) {
+    edgeLength <- node.depth.edgelength(tree)
+    res <- nodepath(tree)
+    # Iterate each path to see if diverged from all other paths
     i <- 1
-    while (i < length(res)) {
+    while (i <= length(res)) {
         # The target lineage path excluding the terminal node
-        refPath <- res[i]
+        refPath <- res[[i]]
+        endNode <- refPath[length(refPath)]
+        # Assume the current terminal tips are to keep
+        toDrop <- FALSE
         # Compare with rest of the paths to decide if to keep
-        toKeep <- all(vapply(
-            X = res[-i],
-            FUN = function(p) {
-                # The diverged part of the current path compared with the other
-                # path
-                cNodes <- vapply(setdiff(refPath, p), function(n) {
-                    tree[["edge"]][which(tree[["edge"]][, 1] == n), 2]
-                }, integer(1))
-                cNodes <- setdiff(cNodes, refPath)
-                tips <- .childrenTips(tree, cNodes)
-                siteChar <- tableAA(align[tips], siteIndex)
-            },
-            FUN.VALUE = logical(1)
-        ))
-        if (toKeep) {
+        for (p in res[-i]) {
+            if (edgeLength[endNode] > edgeLength[p[length(p)]]) {
+                # Always keep the longer path
+                next
+            }
+            # Pair up the two paths for comparison
+            pathPair <- list(refPath, p)
+            # The intersection of the two paths
+            commonNodes <- intersect(refPath, p)
+            if (length(commonNodes) == 1 &&
+                commonNodes == rootNode) {
+                # The two paths diverged at the root
+                divNodes <- rootNode
+            } else {
+                divNodes <- divergentNode(pathPair)
+            }
+            attr(pathPair, "tree") <- tree
+            # Fake the 'align' attribute, so the function will work even without
+            # the actual sequence
+            attr(pathPair, "align") <- tree[["tip.label"]]
+            # The tips and the corresponding ancestral node. Because the tree
+            # was forced to be bifurcated, there won't be any tips on the
+            # divergent node
+            nodeTips <- .tipSeqsAlongPathNodes(pathPair, divNodes)
+            # The genetic distance of all tips to the path
+            allDist <- vapply(
+                X = names(nodeTips),
+                FUN = function(n) {
+                    an <- as.integer(n)
+                    tips <- as.integer(names(nodeTips[[n]]))
+                    tipsDist <- edgeLength[tips] - edgeLength[an]
+                    mean(tipsDist)
+                },
+                FUN.VALUE = numeric(1)
+            )
+            divThreshold <- mean(allDist) + sd(allDist) * zValue
+            # The diverged part of the current path compared with the other path
+            divDist <- edgeLength[endNode] - edgeLength[divNodes]
+            if (divDist < divThreshold) {
+                toDrop <- TRUE
+                break
+            }
+        }
+        if (toDrop) {
             res <- res[-i]
         } else {
             i <- i + 1
         }
     }
-    return(res[toKeep])
+    return(res)
 }
 
 #' @rdname lineagePath

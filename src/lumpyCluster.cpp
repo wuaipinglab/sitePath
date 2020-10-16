@@ -266,7 +266,7 @@ std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
                     cls_itr != mergedCls.end(); ++cls_itr
             ) {
                 if (cls_itr->size() > 1) {
-                    res[*it+1].push_back(*cls_itr);
+                    res[*it].push_back(*cls_itr);
                 }
             }
         }

@@ -37,7 +37,7 @@ number will be \code{similariy}. The default \code{similariy} is 0.05 for
 
 \item{forbidTrivial}{Does not allow trivial trimming.}
 
-\item{step}{the 'similarity' window for calculating and ploting. To better
+\item{step}{the 'similarity' window for calculating and plotting. To better
 see the impact of threshold on path number. The default is 10.}
 
 \item{maxPath}{maximum number of path to return show in the plot. The number
@@ -64,12 +64,12 @@ Lineage path represent by node number.
 
 \code{sneakPeek} is intended to plot 'similarity' (actually the
   least percentage of 'major SNP') as a threshold against number of output
-  lineagePath. This plot is intended to give user a rought view about how
-  many lineages they could expect from the 'similarity' threshold in the
-  function \code{\link{lineagePath}}. The number of lineagePath is preferably
-  not be too many or too few. The result excludes where the number of
-  lineagePath is greater than number of tips divided by 20 or user-defined
-  maxPath. The zero lineagePath result will also be excluded.
+  lineagePath. This plot is intended to give user a rough view about how many
+  lineages they could expect from the 'similarity' threshold in the function
+  \code{\link{lineagePath}}. The number of lineagePath is preferably not be
+  too many or too few. The result excludes where the number of lineagePath is
+  greater than number of tips divided by 20 or user-defined maxPath. The zero
+  lineagePath result will also be excluded.
 
 When used on the return of \code{sneakPeek}, a
   \code{lineagePath} with the closest \code{similarity} will be retrived from
