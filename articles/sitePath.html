@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.25</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.26</span>
       </span>
     </div>
 
@@ -125,12 +125,12 @@
 <span class="va">preassessment</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">sneakPeek</a></span><span class="op">(</span><span class="va">tree</span>, makePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
 <p><img src="sitePath_files/figure-html/sneakPeek_plot-1.png" width="700"></p>
 </div>
-<div id="choose-a-threshold-by-yourself" class="section level2">
+<div id="choose-a-threshold" class="section level2">
 <h2 class="hasAnchor">
-<a href="#choose-a-threshold-by-yourself" class="anchor"></a>Choose a threshold by yourself</h2>
-<p>Use the return of the function <code>lineagePath</code> for downstream analysis. The choice of the threshold really depends. You can use the result from <code>sneakPeak</code> as a reference for threhold choosing. Here the default value is used.</p>
+<a href="#choose-a-threshold" class="anchor"></a>Choose a threshold</h2>
+<p>Use the return of the function <code>lineagePath</code> for downstream analysis. The choice of the threshold really depends. You can use the result from <code>sneakPeak</code> as a reference for threhold choosing. Here 0.05 is used as an example.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span>
+<span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">preassessment</span>, similarity <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
 <span class="va">paths</span>
 <span class="co">#&gt; This is a 'lineagePath' object.</span>
 <span class="co">#&gt; </span>
@@ -141,9 +141,9 @@
 <p><img src="sitePath_files/figure-html/plot_paths-1.png" width="700"></p>
 </div>
 </div>
-<div id="detecting-fixation-and-parallel-mutations" class="section level1">
+<div id="mutation-detection" class="section level1">
 <h1 class="hasAnchor">
-<a href="#detecting-fixation-and-parallel-mutations" class="anchor"></a>Detecting fixation and parallel mutations</h1>
+<a href="#mutation-detection" class="anchor"></a>Mutation detection</h1>
 <p>Now you’re ready to find fixation and parallel mutations.</p>
 <div id="entropy-minimization" class="section level2">
 <h2 class="hasAnchor">
@@ -308,7 +308,7 @@
 <a href="#session-info" class="anchor"></a>Session info</h1>
 <div class="sourceCode" id="cb20"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; R version 4.0.2 (2020-06-22)</span>
+<span class="co">#&gt; R version 4.0.3 Patched (2020-10-13 r79342)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.1 LTS</span>
 <span class="co">#&gt; </span>
@@ -327,7 +327,7 @@
 <span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt; [1] sitePath_1.5.25  BiocStyle_2.17.1</span>
+<span class="co">#&gt; [1] sitePath_1.5.26  BiocStyle_2.17.1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] treeio_1.13.1       tidyselect_1.1.0    xfun_0.18          </span>
@@ -336,22 +336,22 @@
 <span class="co">#&gt; [10] yaml_2.2.1          rlang_0.4.8         pkgdown_1.6.1.9000 </span>
 <span class="co">#&gt; [13] pillar_1.4.6        glue_1.4.2          RColorBrewer_1.1-2 </span>
 <span class="co">#&gt; [16] rvcheck_0.1.8       lifecycle_0.2.0     stringr_1.4.0      </span>
-<span class="co">#&gt; [19] munsell_0.5.0       gtable_0.3.0        ragg_0.3.1         </span>
+<span class="co">#&gt; [19] munsell_0.5.0       gtable_0.3.0        ragg_0.4.0         </span>
 <span class="co">#&gt; [22] memoise_1.1.0       evaluate_0.14       labeling_0.3       </span>
-<span class="co">#&gt; [25] knitr_1.30          parallel_4.0.2      Rcpp_1.0.5         </span>
+<span class="co">#&gt; [25] knitr_1.30          parallel_4.0.3      Rcpp_1.0.5         </span>
 <span class="co">#&gt; [28] scales_1.1.1        backports_1.1.10    BiocManager_1.30.10</span>
 <span class="co">#&gt; [31] desc_1.2.0          jsonlite_1.7.1      farver_2.0.3       </span>
 <span class="co">#&gt; [34] systemfonts_0.3.2   fs_1.5.0            gridExtra_2.3      </span>
-<span class="co">#&gt; [37] ggplot2_3.3.2       aplot_0.0.6         digest_0.6.25      </span>
-<span class="co">#&gt; [40] stringi_1.5.3       bookdown_0.20       dplyr_1.0.2        </span>
-<span class="co">#&gt; [43] ggrepel_0.8.2       ade4_1.7-15         grid_4.0.2         </span>
-<span class="co">#&gt; [46] rprojroot_1.3-2     ggtree_2.3.6        tools_4.0.2        </span>
-<span class="co">#&gt; [49] magrittr_1.5        lazyeval_0.2.2      patchwork_1.0.1    </span>
-<span class="co">#&gt; [52] tibble_3.0.3        seqinr_3.6-1        crayon_1.3.4       </span>
-<span class="co">#&gt; [55] ape_5.4-1           tidyr_1.1.2         pkgconfig_2.0.3    </span>
-<span class="co">#&gt; [58] MASS_7.3-51.6       ellipsis_0.3.1      tidytree_0.3.3     </span>
-<span class="co">#&gt; [61] assertthat_0.2.1    rmarkdown_2.4       R6_2.4.1           </span>
-<span class="co">#&gt; [64] nlme_3.1-148        compiler_4.0.2</span></pre></div>
+<span class="co">#&gt; [37] textshaping_0.1.2   ggplot2_3.3.2       aplot_0.0.6        </span>
+<span class="co">#&gt; [40] digest_0.6.25       stringi_1.5.3       bookdown_0.20      </span>
+<span class="co">#&gt; [43] dplyr_1.0.2         ggrepel_0.8.2       ade4_1.7-15        </span>
+<span class="co">#&gt; [46] grid_4.0.3          rprojroot_1.3-2     ggtree_2.3.7       </span>
+<span class="co">#&gt; [49] tools_4.0.3         magrittr_1.5        lazyeval_0.2.2     </span>
+<span class="co">#&gt; [52] patchwork_1.0.1     tibble_3.0.4        seqinr_4.2-4       </span>
+<span class="co">#&gt; [55] crayon_1.3.4        ape_5.4-1           tidyr_1.1.2        </span>
+<span class="co">#&gt; [58] pkgconfig_2.0.3     MASS_7.3-53         ellipsis_0.3.1     </span>
+<span class="co">#&gt; [61] tidytree_0.3.3      assertthat_0.2.1    rmarkdown_2.4      </span>
+<span class="co">#&gt; [64] R6_2.4.1            nlme_3.1-149        compiler_4.0.3</span></pre></div>
 </div>
   </div>
 
