@@ -4,7 +4,7 @@ author: "Chengyang Ji"
 package: sitePath
 output: 
     BiocStyle::html_document:
-        toc_float: true
+        toc_float: false
 abstract: >
     Detection of site fixation in molecular evolution.
 vignette: >
@@ -67,12 +67,12 @@ In the current version, the resolving function only takes sequence similarity as
 preassessment <- sneakPeek(tree, makePlot = TRUE)
 ```
 
-## Choose a threshold by yourself
+## Choose a threshold
 
-Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here the default value is used.
+Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here 0.05 is used as an example.
 
 ```{r get_lineagePath}
-paths <- lineagePath(tree)
+paths <- lineagePath(preassessment, similarity = 0.05)
 paths
 ```
 
@@ -82,7 +82,7 @@ You can visualize the result.
 plot(paths)
 ```
 
-# Detecting fixation and parallel mutations
+# Mutation detection
 
 Now you're ready to find fixation and parallel mutations.
 
