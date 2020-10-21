@@ -125,6 +125,30 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
+.dropLessDiverged <- function(paths, tree) {
+    allTipsNum <- length(tree[["tip.label"]])
+    toKeep <- vapply(
+        X = seq_along(paths),
+        FUN = function(i) {
+            refPath <- paths[[i]]
+            # All tips at the terminal
+            endTipsNum <-
+                length(.childrenTips(tree, tail(refPath, 1)))
+            # The diverged part from all other lineage
+            divPath <- setdiff(refPath, unlist(paths[-i]))
+            divTipsNum <- length(.childrenTips(tree, divPath[1]))
+            # If the diverged part (terminal tips excluded) has larger
+            # proportion
+            div <- (divTipsNum - endTipsNum) / divTipsNum
+            all <- endTipsNum / allTipsNum
+            div > all
+        },
+        FUN.VALUE = logical(1)
+    )
+    paths <- paths[which(toKeep)]
+    return(paths)
+}
+
 .mergeDivergedPaths <- function(tree, zValue, rootNode) {
     edgeLength <- node.depth.edgelength(tree)
     res <- nodepath(tree)
