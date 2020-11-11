@@ -81,7 +81,7 @@ Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(
         const int zValue
 ) {
     using namespace LumpyCluster;
-    std::map<int, tipNodes> res = terminalTips<BySimMatrix>(
+    std::map<int, tipGrouping> res = terminalTips<BySimMatrix>(
         tipPaths,
         alignedSeqs,
         metricMatrix,
@@ -100,7 +100,7 @@ Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(
         const int zValue
 ) {
     using namespace LumpyCluster;
-    std::map<int, tipNodes> res = terminalTips<ByDistMatrix>(
+    std::map<int, tipGrouping> res = terminalTips<ByDistMatrix>(
         tipPaths,
         alignedSeqs,
         metricMatrix,

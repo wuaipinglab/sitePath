@@ -1,7 +1,3 @@
-#' @importFrom utils flush.console
-#' @importFrom utils txtProgressBar
-#' @importFrom utils setTxtProgressBar
-
 #' @rdname sitePath-deprecated
 #' @name sitePath-deprecated
 #' @aliases multiFixationSites

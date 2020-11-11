@@ -75,7 +75,7 @@ int Treemer::TipSeqLinker::getSeqLen() const {
 
 Rcpp::IntegerVector Treemer::TipSeqLinker::getPath() const {
     // The path from current clade towards root node
-    return m_path[Rcpp::Range(0, m_cIndex)];
+    return m_path;
 }
 
 std::string Treemer::TipSeqLinker::getSeq() const {
@@ -109,16 +109,6 @@ std::map< int, std::vector<int> > Treemer::Base::getTips() const {
     }
     return res;
 }
-
-std::vector<Rcpp::IntegerVector> Treemer::Base::getPaths() const {
-    std::vector<Rcpp::IntegerVector> res;
-    // Get path from root to trimming-node from each TipSeqLinker in the list
-    for (tips::const_iterator it = m_tips.begin(); it != m_tips.end(); ++it) {
-        res.push_back((*it)->getPath());
-    }
-    return res;
-}
-
 
 void Treemer::Base::pruneTree() {
     while (true) {

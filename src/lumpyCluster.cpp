@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <map>
 #include <string>
@@ -13,22 +14,51 @@ LumpyCluster::Base::Base(
     m_metricMatrix(metricMatrix),
     m_maxSNPnum(maxSNPnum) {}
 
-std::vector< std::vector<int> > LumpyCluster::Base::finalClusters() const {
-    std::vector< std::vector<int> > res;
+LumpyCluster::tipGrouping LumpyCluster::Base::finalClusters() const {
+    typedef std::vector<Rcpp::IntegerVector> pathList;
+    // The clustering is already known. Need to extract the tip node so can be
+    // used in R
+    tipGrouping res;
     res.reserve(m_merged.size());
+    // Iterate each cluster
     for (
             lumpingTips::const_iterator it = m_merged.begin();
             it != m_merged.end(); ++it
     ) {
         std::vector<int> tipNodes;
         tipNodes.reserve(it->size());
+        // The node path for each tip needs to be collected to infer the lineage
+        // path of the tip cluster
+        pathList nodepaths;
+        // Iterate each tip to get its node
         for (
                 Treemer::tips::const_iterator tips_itr = it->begin();
                 tips_itr != it->end(); ++tips_itr
         ) {
             tipNodes.push_back((**tips_itr).getTip());
+            nodepaths.push_back((**tips_itr).getPath());
         }
-        res.push_back(tipNodes);
+        // Turn into R object so node path can be set as attribute
+        Rcpp::IntegerVector toAdd = Rcpp::wrap(tipNodes);
+        if (tipNodes.size() == 1) {
+            toAdd.attr("nodepath") = nodepaths[0];
+        } else {
+            int an = 0;
+            while (true) {
+                // The node path of the first tip as reference
+                pathList::iterator np_itr = nodepaths.begin();
+                int refNode = np_itr->at(an);
+                // Iterate node path of every tip to find the divergent point
+                for (++np_itr; np_itr != nodepaths.end(); ++np_itr) {
+                    if (np_itr->at(an) != refNode) {
+                        toAdd.attr("nodepath") = (*np_itr)[Rcpp::Range(0, an-1)];
+                        goto NODEPATH_FOUND;
+                    }
+                }
+                an++;
+            }
+        }
+        NODEPATH_FOUND: res.push_back(toAdd);
     }
     return res;
 }
@@ -66,9 +96,8 @@ void LumpyCluster::Base::mergeClusters(
     if (allTips.size() >= m_maxSNPnum) {
         return;
     }
-    int count = 0;
-    float metricSum = 0.0;
-    float squareSum = 0.0;
+    // Collect sequence similarity between all pairs of tips
+    std::vector<float> allMetric;
     for (
             Treemer::tips::iterator it1 = allTips.begin();
             it1 != allTips.end()-1; ++it1
@@ -77,18 +106,20 @@ void LumpyCluster::Base::mergeClusters(
                 Treemer::tips::iterator it2 = it1 + 1;
                 it2 != allTips.end(); ++it2
         ) {
-            count++;
             float pairMetric = m_metricMatrix(
                 (**it1).getTip()-1,
                 (**it2).getTip()-1
             );
-            metricSum += pairMetric;
-            squareSum += pairMetric*pairMetric;
+            allMetric.push_back(pairMetric);
         }
     }
-    m_metricThreshold = metricSum/count;
-    float variance = (count*squareSum-metricSum*metricSum)/(count*count);
-    thresholdOffset(std::sqrt(variance), zValue);
+    // Find the median as the threshold
+    std::nth_element(
+        allMetric.begin(),
+        allMetric.begin()+allMetric.size()/2,
+        allMetric.end()
+    );
+    m_metricThreshold = allMetric[allMetric.size()/2];
     // Iterate the raw clusters from treemerBySite as the candidate for merging
     // or adding
     for (
@@ -214,7 +245,7 @@ bool LumpyCluster::ByDistMatrix::qualifiedMetric(const float metric) const {
 }
 
 template<class T>
-std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
+std::map<int, LumpyCluster::tipGrouping> LumpyCluster::terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
@@ -240,7 +271,7 @@ std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
             throw std::invalid_argument("Sequence length not equal");
         }
     }
-    std::map<int, tipNodes> res;
+    std::map<int, tipGrouping> res;
     const int maxSNPnum = totalNum/2;
     for (
             Rcpp::IntegerVector::const_iterator it = siteIndices.begin();
@@ -258,11 +289,11 @@ std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
                     metricMatrix,
                     clusters_itr->second,
                     maxSNPnum,
-                    zValue
+                    0
             );
-            tipNodes mergedCls = merger.finalClusters();
+            tipGrouping mergedCls = merger.finalClusters();
             for (
-                    tipNodes::iterator cls_itr = mergedCls.begin();
+                    tipGrouping::iterator cls_itr = mergedCls.begin();
                     cls_itr != mergedCls.end(); ++cls_itr
             ) {
                 if (cls_itr->size() > 1) {
@@ -278,7 +309,7 @@ std::map<int, LumpyCluster::tipNodes> LumpyCluster::terminalTips(
     return res;
 }
 
-template std::map<int, LumpyCluster::tipNodes>
+template std::map<int, LumpyCluster::tipGrouping>
     LumpyCluster::terminalTips<LumpyCluster::BySimMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
@@ -287,7 +318,7 @@ template std::map<int, LumpyCluster::tipNodes>
         const int zValue
     );
 
-template std::map<int, LumpyCluster::tipNodes>
+template std::map<int, LumpyCluster::tipGrouping>
     LumpyCluster::terminalTips<LumpyCluster::ByDistMatrix>(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,

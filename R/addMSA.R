@@ -1,3 +1,6 @@
+#' @importFrom utils flush.console
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
 #' @importFrom methods is
 #' @importFrom seqinr read.alignment
 #' @importFrom ape multi2di is.binary
@@ -70,5 +73,45 @@ addMSA <- function(tree,
     attr(res, "tree") <- tree
     # Use the numbering of MSA as the default site numbering
     res <- setSiteNumbering.phyMSAmatched(res)
+    simMatrix <- similarityMatrix(res)
+    align <- attr(res, "align")
+    loci <- attr(res, "loci")
+    siteIndices <- attr(res, "msaNumbering")[loci] - 1L
+    # Get all lineages using the terminal node found by SNP
+    terminalTips <- terminalTipsBySim(
+        tipPaths = nodepath(tree),
+        alignedSeqs = align,
+        metricMatrix = simMatrix,
+        siteIndices = siteIndices,
+        zValue = 0
+    )
+    maxSize <- min(
+        length(tree[["tip.label"]]) / 2,
+        max(unlist(lapply(terminalTips, lengths)))
+    )
+    rangeOfResults <- lapply(
+        X = seq(2, maxSize),
+        FUN = function(minSize) {
+            # The result for each 'minSize' threshold
+            paths <- lapply(
+                X = names(terminalTips),
+                FUN = function(siteName) {
+                    # The node path for each site
+                    endTips <- terminalTips[[siteName]]
+                    candidatePaths <- lapply(
+                        X = endTips[which(lengths(endTips) >= minSize)],
+                        FUN = attr,
+                        which = "nodepath"
+                    )
+                    return(candidatePaths)
+                }
+            )
+            paths <- unlist(x = paths, recursive = FALSE)
+            paths <- mergePaths(paths)
+            attr(paths, "minSize") <- minSize
+            return(paths)
+        }
+    )
+    attr(res, "rangeOfResults") <- rangeOfResults
     return(res)
 }

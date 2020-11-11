@@ -33,7 +33,6 @@ test_ambiguousIgnored <- function(fixSites,
                 nodeTips <- mp[[i]]
                 # Tips should be unique and more than 'minEffectiveSize'
                 expect_equal(sort(nodeTips), sort(unique(nodeTips)))
-                expect_gte(length(nodeTips), minEffectiveSize)
                 # The dominant AA/NT should be the fixed one
                 aaD <- toupper(names(which.max(aa[[i]])))
                 fixedAA <- attr(nodeTips, "AA")
@@ -41,7 +40,10 @@ test_ambiguousIgnored <- function(fixSites,
                 if (fixedAA %in% unambiguous) {
                     unambiguousNum <- unambiguousNum + 1
                 }
-                expect_equal(fixedAA, aaD)
+                if (is.null(attr(nodeTips, "toMerge"))) {
+                    expect_gte(length(nodeTips), minEffectiveSize)
+                    expect_equal(fixedAA, aaD)
+                }
             }
             expect_gte(unambiguousNum, 2)
         }

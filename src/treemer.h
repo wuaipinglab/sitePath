@@ -67,9 +67,6 @@ public:
     virtual ~Base();
     // Cluster of tree tips after trimming
     std::map< int, std::vector<int> > getTips() const;
-    // Paths from root to trimming-node for all tips. Tips in the same cluster
-    // will have the same path
-    std::vector<Rcpp::IntegerVector> getPaths() const;
 protected:
     // The actual trimming process happens here
     void pruneTree();

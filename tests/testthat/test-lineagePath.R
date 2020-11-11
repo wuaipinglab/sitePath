@@ -12,7 +12,11 @@ test_that("Using SNP to get phylogenetic lineages", {
     # Test the input of 'similarity'
     expect_error(lineagePath(tree = tr, similarity = "0.96"))
     expect_error(lineagePath(tree = tr, similarity = -0.1))
-    expect_error(lineagePath(tree = tr, similarity = 1))
+    expect_error(lineagePath(
+        tree = tr,
+        similarity = 1,
+        forbidTrivial = FALSE
+    ))
     # Use 0.1 as the input for 'similarity'
     similarity <- nTips * 0.1
     paths <- lineagePath(tree = tr,
@@ -53,11 +57,14 @@ test_that("The sneakPeek function works", {
     data(zikv_tree_reduced)
     tr <- addMSA(zikv_tree_reduced,
                  alignment = zikv_align_reduced)
-    paths <- sneakPeek(tr)
+    rangeOfResults <- sneakPeek(tr)
     expect_error(sneakPeek(tr), NA)
-    pathRight <- apply(paths, 1, function(i) {
-        p <- lineagePath(paths, similarity = i[["similarity"]])
-        is(p, "lineagePath") && length(p) == i[["pathNum"]]
-    })
-    expect_true(all(pathRight))
+    for (i in seq_len(nrow(rangeOfResults))) {
+        similarity <- rangeOfResults[i, "similarity"]
+        pathNum <- rangeOfResults[i, "pathNum"]
+        p <- lineagePath(rangeOfResults, similarity = similarity)
+        expect_true(is(p, "lineagePath"))
+        expect_true(length(p) == pathNum,
+                    label = paste("Simialrity:", similarity))
+    }
 })

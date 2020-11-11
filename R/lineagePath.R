@@ -1,4 +1,4 @@
-#' @importFrom stats sd
+#' @importFrom stats sd quantile
 #' @importFrom ape nodepath getMRCA node.depth.edgelength
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
@@ -39,87 +39,52 @@ lineagePath.phyMSAmatched <- function(tree,
     tree <- attr(x, "tree")
     # Find total number of tree tips
     nTips <- length(tree[["tip.label"]])
-    # Set 'minSNP' with 'nTips' and 'similarity'
+    # The range of results using different 'minSize'
+    rangeOfResults <- attr(x, "rangeOfResults")
+    maxSize <-
+        max(vapply(rangeOfResults, attr, integer(1), "minSize"))
+    # Set the number of lineage paths
     if (is.null(similarity)) {
-        minSNP <- nTips * 0.05
-        similarity <- 0.05
-    } else if (!is.numeric(similarity) || similarity <= 0) {
-        stop("\"similarity\" only accepts positive numeric")
-    } else if (similarity > 0 && similarity < 0.5) {
-        minSNP <- nTips * similarity
-    } else if (similarity >= 0.5 && similarity < 1) {
-        # The reminder of using major SNP to find lineages
-        if (forbidTrivial) {
-            similarity <- 1 - similarity
-        }
-        minSNP <- nTips * similarity
-    } else if (similarity > 1 && similarity < nTips) {
-        minSNP <- ceiling(similarity)
+        pathNums <- lengths(rangeOfResults)
+        pathNums <- pathNums[which(pathNums != 1)]
+        fourthQuantile <- quantile(pathNums)[[4]]
+        paths <-
+            rangeOfResults[[which.min(abs(pathNums - fourthQuantile))]]
+        minSNP <- attr(paths, "minSize")
         similarity <- minSNP / nTips
     } else {
-        stop(
-            "\"similarity\" cannot be greater than total tips. ",
-            "And better not be equal to 1."
-        )
-    }
-    if (is.null(simMatrix)) {
-        simMatrix <- similarityMatrix(x)
-    } else if (!isSymmetric.matrix(simMatrix) ||
-               !is.numeric(simMatrix)) {
-        stop("The 'simMatrix' is not a symmetric numeric matrix")
-    } else if (anyNA(simMatrix)) {
-        stop("Missing value in 'simMatrix'")
-    }
-    # The extra arguments
-    dotsArgs <- list(...)
-    # To calculate the threshold for clustering
-    zValue <- dotsArgs[["zValue"]]
-    if (is.null(zValue)) {
-        zValue <- 0
-    }
-    # Use diagonal values to guess if it's distance or similarity matrix
-    diagValue <- diag(simMatrix)
-    if (all(diagValue == 1)) {
-        lineageTerminalTips <- terminalTipsBySim
-    } else if (all(diagValue == 0)) {
-        lineageTerminalTips <- terminalTipsByDist
-    } else {
-        stop("The diagonal value of 'simMatrix' are not all 1 or 0.")
-    }
-    align <- attr(x, "align")
-    loci <- attr(x, "loci")
-    siteIndices <- attr(x, "msaNumbering")[loci] - 1L
-    rootNode <- getMRCA(tree, tree[["tip.label"]])
-    # Get all lineages using the terminal node found by SNP
-    terminalTips <- lineageTerminalTips(
-        tipPaths = nodepath(tree),
-        alignedSeqs = align,
-        metricMatrix = simMatrix,
-        siteIndices = siteIndices,
-        zValue = zValue
-    )
-    paths <- lapply(
-        X = names(terminalTips),
-        FUN = function(siteName) {
-            endTips <- terminalTips[[siteName]]
-            candidatePaths <- lapply(
-                X = endTips[which(lengths(endTips) > minSNP)],
-                FUN = function(tips) {
-                    terminalNode <- getMRCA(tree, tips)
-                    nodepath(phy = tree,
-                             from = rootNode,
-                             to = terminalNode)
-                }
-            )
-            return(candidatePaths)
+        if (!is.numeric(similarity) || similarity <= 0) {
+            stop("\"similarity\" only accepts positive numeric")
+        } else if (similarity > 1) {
+            minSNP <- ceiling(similarity)
+        } else {
+            minSNP <- nTips * similarity
         }
-    )
-    paths <- unlist(x = paths, recursive = FALSE)
-    paths <- mergePaths(paths)
+        if (minSNP >= maxSize) {
+            if (forbidTrivial) {
+                minSNP <- maxSize
+            } else {
+                stop(
+                    "\"similarity\" cannot be greater than total tips. ",
+                    "And better not be equal to 1."
+                )
+            }
+        }
+        similarity <- minSNP / nTips
+        paths <- rangeOfResults[[which.min(vapply(
+            X = rangeOfResults,
+            FUN = function(ps) {
+                abs(attr(ps, "minSize") - minSNP)
+            },
+            FUN.VALUE = numeric(1)
+        ))]]
+    }
+    rootNode <- getMRCA(tree, tree[["tip.label"]])
     # Transfer attributes
     attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'rootNode'
     attr(paths, "similarity") <- similarity
+    attr(paths, "minSize") <- minSNP
     attr(paths, "rootNode") <- rootNode
     class(paths) <- c("lineagePath", class(paths))
     return(paths)
@@ -244,9 +209,10 @@ sneakPeek <- function(tree,
                       makePlot = FALSE) {
     x <- .phyMSAmatch(tree)
     tree <- attr(x, "tree")
+    nTips <- length(tree[["tip.label"]])
     # Check 'maxPath'
     if (is.null(maxPath)) {
-        maxPath <- length(tree[["tip.label"]]) / 20
+        maxPath <- nTips / 20
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
@@ -277,8 +243,15 @@ sneakPeek <- function(tree,
         pathNum <- c(pathNum, length(paths))
         allPaths[[as.character(s)]] <- paths
     }
-    res <- data.frame(similarity, pathNum)
-    attr(res, "allPaths") <- allPaths
+    res <- as.data.frame(t(vapply(
+        X = attr(x, "rangeOfResults"),
+        FUN = function(i) {
+            c("similarity" = attr(i, "minSize") / nTips,
+              "pathNum" = length(i))
+        },
+        FUN.VALUE = numeric(2)
+    )))
+    attr(res, "phyMSAmatched") <- x
     class(res) <- c(class(res), "sneakPeekedPaths")
     # Combine all plots of the lineages
     if (makePlot) {
@@ -299,6 +272,6 @@ sneakPeek <- function(tree,
 #' x <- sneakPeek(tree, step = 3)
 #' lineagePath(x, similarity = 0.05)
 lineagePath.sneakPeekedPaths <- function(tree, similarity, ...) {
-    allPaths <- attr(tree, "allPaths")
-    allPaths[[which.min(abs(as.numeric(names(allPaths)) - similarity))]]
+    tr <- attr(tree, "phyMSAmatched")
+    lineagePath.phyMSAmatched(tr, similarity, ...)
 }

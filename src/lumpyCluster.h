@@ -19,6 +19,7 @@
 namespace LumpyCluster {
 
 typedef std::vector<Treemer::tips> lumpingTips;
+typedef std::vector<Rcpp::IntegerVector> tipGrouping;
 
 class Base {
 public:
@@ -26,7 +27,7 @@ public:
         const Rcpp::NumericMatrix &metricMatrix,
         const int maxSNPnum
     );
-    std::vector< std::vector<int> > finalClusters() const;
+    tipGrouping finalClusters() const;
 protected:
     void mergeClusters(
             const Treemer::clusters &clusters,
@@ -105,10 +106,8 @@ protected:
     bool qualifiedMetric(const float metric) const;
 };
 
-typedef std::vector< std::vector<int> > tipNodes;
-
 template<class T>
-std::map<int, tipNodes> terminalTips(
+std::map<int, tipGrouping> terminalTips(
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
         const Rcpp::NumericMatrix &metricMatrix,
