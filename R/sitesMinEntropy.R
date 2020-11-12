@@ -191,19 +191,16 @@ sitesMinEntropy.lineagePath <- function(x,
         # The index for C++
         locusIndex <- as.integer(locus) - 1
         # Get the merged groupings of each path for the locus
-        mergedGroupings <- .mergeClusters(lapply(res, "[[", locus))
+        mergedGroupings <- .calibrateFixedAA(res, align, locus)
         # Link the merged groupings for each lineage path to calibrate and
         # recover the full groupings. The linked merged groupings are stored for
         # the remaining paths.
         linkedMerged <- list()
         for (pathIndex in seq_along(mergedGroupings)) {
             currLinked <- .findGroupingLinkage(
-                fixations = res,
                 pathIndex = pathIndex,
                 mergedGroupings = mergedGroupings,
-                linkedMerged = linkedMerged,
-                locus = locus,
-                align = align
+                linkedMerged = linkedMerged
             )
             # Store the linked groupings back tracing to the root for the
             # remaining groupings
@@ -257,40 +254,25 @@ sitesMinEntropy.lineagePath <- function(x,
     return(res)
 }
 
-.findGroupingLinkage <- function(fixations,
-                                 pathIndex,
-                                 mergedGroupings,
-                                 linkedMerged,
-                                 locus,
-                                 align) {
+.calibrateFixedAA <- function(fixations, align, locus) {
+    unMergedGroupings <- lapply(fixations, "[[", locus)
+    # The original entropy minimization result for the locus
+    res <- .mergeClusters(unMergedGroupings)
     locusIndex <- as.integer(locus) - 1
-    # The linked groupings for the current path The index of an irrelevant path
-    # will hold a NULL while the index of a relevant path will hold the grouping
-    # up till the tip cluster with the 'toMerge' index indicating the divergent
-    # point.
-    currLinked <- rep(list(), len = pathIndex)
-    # Iterate the merged grouping of each path to find the 'toMerge' index same
-    # as the current path index
-    for (mergedIndex in seq_along(linkedMerged)) {
-        # The merged grouping that has no overlap
-        mGrouping <- mergedGroupings[[mergedIndex]]
-        # Iterate each tip cluster in the merged grouping
+    for (pathIndex in seq_along(res)) {
+        mGrouping <- res[[pathIndex]]
         for (gIndex in seq_along(mGrouping)) {
             tips <- mGrouping[[gIndex]]
-            toMergeIndex <- as.integer(names(attr(tips, "toMerge")))
-            # Trace back to the root when the path index of current grouping
-            # is found in 'toMergeIndex'
-            if (pathIndex %in% toMergeIndex) {
-                # The linked merged groupings trace back to the root
-                currLinked <- linkedMerged[[mergedIndex]]
-                # The fixed amino acid/nucleotide at the divergent point
+            if (!is.null(attr(tips, "toMerge"))) {
+                # Calibrate the fixed amino acid/nucleotide at the divergent
+                # point after merging
                 fixedAA <- lapply(
-                    X = fixations,
-                    FUN = function(n) {
+                    X = unMergedGroupings,
+                    FUN = function(seg) {
                         res <- character()
                         # To find the fixed amino acid/nucleotide from the
-                        # entropy minimum result for each path
-                        for (original in n[[locus]]) {
+                        # original entropy minimum result for each path
+                        for (original in seg) {
                             if (any(tips %in% original)) {
                                 res <- c(res, attr(original, "AA"))
                             }
@@ -312,8 +294,36 @@ sitesMinEntropy.lineagePath <- function(x,
                     aaSummary <- aaSummary[refAA]
                     refAA <- names(which.max(aaSummary))
                 }
+                attr(res[[pathIndex]][[gIndex]], "AA") <- refAA
+            }
+        }
+    }
+    return(res)
+}
+
+.findGroupingLinkage <- function(pathIndex,
+                                 mergedGroupings,
+                                 linkedMerged) {
+    # The linked groupings for the current path The index of an irrelevant path
+    # will hold a NULL while the index of a relevant path will hold the grouping
+    # up till the tip cluster with the 'toMerge' index indicating the divergent
+    # point.
+    currLinked <- rep(list(), len = pathIndex)
+    # Iterate the merged grouping of each path to find the 'toMerge' index same
+    # as the current path index
+    for (mergedIndex in seq_along(linkedMerged)) {
+        # The merged grouping that has no overlap
+        mGrouping <- mergedGroupings[[mergedIndex]]
+        # Iterate each tip cluster in the merged grouping
+        for (gIndex in seq_along(mGrouping)) {
+            tips <- mGrouping[[gIndex]]
+            toMergeIndex <- as.integer(names(attr(tips, "toMerge")))
+            # Trace back to the root when the path index of current grouping
+            # is found in 'toMergeIndex'
+            if (pathIndex %in% toMergeIndex) {
+                # The linked merged groupings trace back to the root
+                currLinked <- linkedMerged[[mergedIndex]]
                 # Attach the index that directly links to the current grouping
-                attr(mGrouping[[gIndex]], "AA") <- refAA
                 currLinked[[mergedIndex]] <-
                     mGrouping[seq_len(gIndex)]
                 # The result of the groups and grouping will be ignored as there
