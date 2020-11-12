@@ -285,20 +285,14 @@ sitesMinEntropy.lineagePath <- function(x,
                 currLinked <- linkedMerged[[mergedIndex]]
                 # The fixed amino acid/nucleotide at the divergent point
                 fixedAA <- lapply(
-                    X = c(mergedIndex, toMergeIndex),
+                    X = fixations,
                     FUN = function(n) {
                         res <- character()
-                        remaining <- tips
                         # To find the fixed amino acid/nucleotide from the
                         # entropy minimum result for each path
-                        for (original in fixations[[n]][[locus]]) {
-                            involved <- which(remaining %in% original)
-                            if (length(involved) != 0) {
+                        for (original in n[[locus]]) {
+                            if (any(tips %in% original)) {
                                 res <- c(res, attr(original, "AA"))
-                                remaining <- remaining[-involved]
-                                if (length(remaining) == 0) {
-                                    break
-                                }
                             }
                         }
                         return(res)
