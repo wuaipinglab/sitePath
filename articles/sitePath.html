@@ -97,20 +97,20 @@
 <h2 class="hasAnchor">
 <a href="#parse-phylogenetic-tree" class="anchor"></a>Parse phylogenetic tree</h2>
 <p>The S3 phylo class is a common data structure for phylogenetic analysis in R. The CRAN package <a href="https://cran.r-project.org/web/packages/ape/index.html">ape</a> provides basic parsing function for reading tree files. The Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/ggtree.html">ggtree</a> provides more comprehensive parsing utilities.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wuaipinglab.github.io/sitePath/">sitePath</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wuaipinglab.github.io/sitePath/">sitePath</a></span><span class="op">)</span>
 
 <span class="va">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
-<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span></pre></div>
+<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span></code></pre></div>
 <p>It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.</p>
 </div>
 <div id="parse-and-match-sequence-alignment" class="section level2">
 <h2 class="hasAnchor">
 <a href="#parse-and-match-sequence-alignment" class="anchor"></a>Parse and match sequence alignment</h2>
 <p>Most multiple sequence alignment format can be parsed by <a href="https://cran.r-project.org/web/packages/seqinr/index.html">seqinr</a>. sitePath has a wrapper function for parsing and adding the sequence alignment.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
-<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/phyMSAmatched.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">alignment_file</span>, <span class="st">"fasta"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
+<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/phyMSAmatched.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">alignment_file</span>, <span class="st">"fasta"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="phylogenetic-lineages" class="section level1">
@@ -121,23 +121,23 @@
 <h2 class="hasAnchor">
 <a href="#the-impact-of-threshold-on-resolving-lineages" class="anchor"></a>The impact of threshold on resolving lineages</h2>
 <p>In the current version, the resolving function only takes sequence similarity as one single threshold. The impact of threshold depends on the tree topology hence there is no universal choice. The function <code>sneakPeak</code> samples thresholds and calculates the resulting number of paths. <em>The use of this function can be of great help in choosing the threshold.</em></p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">preassessment</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">sneakPeek</a></span><span class="op">(</span><span class="va">tree</span>, makePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">preassessment</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">sneakPeek</a></span><span class="op">(</span><span class="va">tree</span>, makePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/sneakPeek_plot-1.png" width="700"></p>
 </div>
 <div id="choose-a-threshold" class="section level2">
 <h2 class="hasAnchor">
 <a href="#choose-a-threshold" class="anchor"></a>Choose a threshold</h2>
 <p>Use the return of the function <code>lineagePath</code> for downstream analysis. The choice of the threshold really depends. You can use the result from <code>sneakPeak</code> as a reference for threhold choosing. Here 0.05 is used as an example.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">preassessment</span>, similarity <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">preassessment</span>, similarity <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
 <span class="va">paths</span>
 <span class="co">#&gt; This is a 'lineagePath' object.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; 4 lineage paths using 5% as "major SNP" threshold</span></pre></div>
+<span class="co">#&gt; 4 lineage paths using 5% as "major SNP" threshold</span></code></pre></div>
 <p>You can visualize the result.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">paths</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">paths</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_paths-1.png" width="700"></p>
 </div>
 </div>
@@ -149,28 +149,28 @@
 <h2 class="hasAnchor">
 <a href="#entropy-minimization" class="anchor"></a>Entropy minimization</h2>
 <p>The <code>sitesMinEntropy</code> function perform entropy minimization on every site for each lineage. The fixation and parallel mutations can be derived from the function’s return value.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">minEntropy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sitesMinEntropy.html">sitesMinEntropy</a></span><span class="op">(</span><span class="va">paths</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">minEntropy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sitesMinEntropy.html">sitesMinEntropy</a></span><span class="op">(</span><span class="va">paths</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="fixation-mutations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fixation-mutations" class="anchor"></a>Fixation mutations</h2>
 <p>The hierarchical search is done by <code>fixationSites</code> function. The function detects the site with fixation mutation.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">fixations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixationSites.html">fixationSites</a></span><span class="op">(</span><span class="va">minEntropy</span><span class="op">)</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fixations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixationSites.html">fixationSites</a></span><span class="op">(</span><span class="va">minEntropy</span><span class="op">)</span>
 <span class="va">fixations</span>
 <span class="co">#&gt; This is a 'fixationSites' object.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Result for 4 paths:</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; 988 139 894 2074 2086 2634 3045 107 1118 3353 1143 2842 3398 </span>
-<span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></pre></div>
+<span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
 <p>If you want to retrieve the result of a single site, you can pass the result of <code>fixationSites</code> and the site index to <code>extractSite</code> function. The output is a <code>sitePath</code> object which stores the tip names.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="va">sp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractSite.html">extractSite</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractSite.html">extractSite</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span></code></pre></div>
 <p>It is also possible to retrieve the tips involved in the fixation of the site.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="../reference/extractTips.html">extractTips</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/extractTips.html">extractTips</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span>
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"</span>
 <span class="co">#&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"</span>
@@ -230,45 +230,45 @@
 <span class="co">#&gt; [236] "AOY08546"     "AOY08516"     "APO39233"     "AOS90222"     "AOO53981"    </span>
 <span class="co">#&gt; [241] "AOY08521"     "AOO85388"     "APO39228"    </span>
 <span class="co">#&gt; attr(,"AA")</span>
-<span class="co">#&gt; [1] "N"</span></pre></div>
+<span class="co">#&gt; [1] "N"</span></code></pre></div>
 <p>Use <code>plot</code> on a <code>sitePath</code> object to visualize the fixation mutation of a single site. Alternatively, use <code>plotSingleSite</code> on an <code>fixationSites</code> object with the site specified.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">sp</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">sp</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_sitePath-1.png" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">fixations</span>, <span class="fl">139</span><span class="op">)</span>
 <span class="co">#&gt; Warning: `mutate_()` is deprecated as of dplyr 0.7.0.</span>
 <span class="co">#&gt; Please use `mutate()` instead.</span>
 <span class="co">#&gt; See vignette('programming') for more help</span>
 <span class="co">#&gt; This warning is displayed once every 8 hours.</span>
-<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span></pre></div>
+<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_sitePath-2.png" width="700"></p>
 <p>To have an overall view of the transition of fixation mutation, use <code>plot</code> on an <code>fixationSites</code> object.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fixations</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fixations</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_fixations-1.png" width="700"></p>
 </div>
 <div id="parallel-mutation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#parallel-mutation" class="anchor"></a>Parallel mutation</h2>
 <p>Parallel mutation can be found by the <code>parallelSites</code> function. There are four ways of defining the parallel mutation: <code>all</code>, <code>exact</code>, <code>pre</code> and <code>post</code>. Here <code>exact</code> is used as an example.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="va">paraSites</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parallelSites.html">parallelSites</a></span><span class="op">(</span><span class="va">minEntropy</span>, mutMode <span class="op">=</span> <span class="st">"exact"</span><span class="op">)</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">paraSites</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parallelSites.html">parallelSites</a></span><span class="op">(</span><span class="va">minEntropy</span>, mutMode <span class="op">=</span> <span class="st">"exact"</span><span class="op">)</span>
 <span class="va">paraSites</span>
 <span class="co">#&gt; This is a 'parallelSites' object.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Result for 4 paths:</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; 105 1717 988 1264 1226 3076 106 573 2611 2787 2749 3162 1857 1016 1171 2634 2357 1327 3046 3328 940 1404 1180 </span>
-<span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></pre></div>
+<span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
 <p>The result of a single site can be visualized by <code>plotSingleSite</code> function.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paraSites</span>, <span class="fl">105</span><span class="op">)</span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paraSites</span>, <span class="fl">105</span><span class="op">)</span>
 <span class="co">#&gt; Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
 <span class="co">#&gt; Please use `filter()` instead.</span>
 <span class="co">#&gt; See vignette('programming') for more help</span>
 <span class="co">#&gt; This warning is displayed once every 8 hours.</span>
-<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span></pre></div>
+<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 </div>
 </div>
@@ -280,35 +280,35 @@
 <h2 class="hasAnchor">
 <a href="#inspect-one-site" class="anchor"></a>Inspect one site</h2>
 <p>The <code>plotSingleSite</code> function will color the tree according to amino acids if you use the output of <code>lineagePath</code> function.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="fl">139</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="fl">139</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_sites-1.png" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="fl">763</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="fl">763</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/plot_sites-2.png" width="700"></p>
 </div>
 <div id="snp-sites" class="section level2">
 <h2 class="hasAnchor">
 <a href="#snp-sites" class="anchor"></a>SNP sites</h2>
 <p>An SNP site could potentially undergo fixation event. The <code>SNPsites</code> function predicts possible SNP sites and the result could be what you’ll expect to be fixation mutation. Also, a tree plot with mutation could be visualized with <code>plotMutSites</code> function.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit">
-<span class="va">snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plotMutSites.html">plotMutSites</a></span><span class="op">(</span><span class="va">snps</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plotMutSites.html">plotMutSites</a></span><span class="op">(</span><span class="va">snps</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/find_SNP-1.png" width="700"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="va">snps</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="va">snps</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/find_SNP-2.png" width="700"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit">
-<span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="va">snps</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plotSingleSite.html">plotSingleSite</a></span><span class="op">(</span><span class="va">paths</span>, <span class="va">snps</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <p><img src="sitePath_files/figure-html/find_SNP-3.png" width="700"></p>
 </div>
 </div>
 <div id="session-info" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session info</h1>
-<div class="sourceCode" id="cb20"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; R version 4.0.3 Patched (2020-10-21 r79360)</span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; R Under development (unstable) (2020-11-05 r79401)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.1 LTS</span>
 <span class="co">#&gt; </span>
@@ -327,31 +327,32 @@
 <span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt; [1] sitePath_1.7.0   BiocStyle_2.18.0</span>
+<span class="co">#&gt; [1] sitePath_1.7.0   BiocStyle_2.19.0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] treeio_1.14.0       tidyselect_1.1.0    xfun_0.18          </span>
-<span class="co">#&gt;  [4] purrr_0.3.4         lattice_0.20-41     colorspace_1.4-1   </span>
-<span class="co">#&gt;  [7] vctrs_0.3.4         generics_0.0.2      htmltools_0.5.0    </span>
-<span class="co">#&gt; [10] yaml_2.2.1          rlang_0.4.8         pkgdown_1.6.1.9000 </span>
-<span class="co">#&gt; [13] pillar_1.4.6        glue_1.4.2          RColorBrewer_1.1-2 </span>
-<span class="co">#&gt; [16] rvcheck_0.1.8       lifecycle_0.2.0     stringr_1.4.0      </span>
-<span class="co">#&gt; [19] munsell_0.5.0       gtable_0.3.0        ragg_0.4.0         </span>
-<span class="co">#&gt; [22] memoise_1.1.0       evaluate_0.14       labeling_0.3       </span>
-<span class="co">#&gt; [25] knitr_1.30          parallel_4.0.3      Rcpp_1.0.5         </span>
-<span class="co">#&gt; [28] scales_1.1.1        backports_1.1.10    BiocManager_1.30.10</span>
-<span class="co">#&gt; [31] desc_1.2.0          jsonlite_1.7.1      farver_2.0.3       </span>
-<span class="co">#&gt; [34] systemfonts_0.3.2   fs_1.5.0            gridExtra_2.3      </span>
-<span class="co">#&gt; [37] textshaping_0.1.2   ggplot2_3.3.2       aplot_0.0.6        </span>
-<span class="co">#&gt; [40] digest_0.6.25       stringi_1.5.3       bookdown_0.20      </span>
-<span class="co">#&gt; [43] dplyr_1.0.2         ggrepel_0.8.2       ade4_1.7-15        </span>
-<span class="co">#&gt; [46] grid_4.0.3          rprojroot_1.3-2     ggtree_2.4.0       </span>
-<span class="co">#&gt; [49] tools_4.0.3         magrittr_1.5        lazyeval_0.2.2     </span>
-<span class="co">#&gt; [52] patchwork_1.0.1     tibble_3.0.4        seqinr_4.2-4       </span>
-<span class="co">#&gt; [55] crayon_1.3.4        ape_5.4-1           tidyr_1.1.2        </span>
-<span class="co">#&gt; [58] pkgconfig_2.0.3     MASS_7.3-53         ellipsis_0.3.1     </span>
-<span class="co">#&gt; [61] tidytree_0.3.3      assertthat_0.2.1    rmarkdown_2.4      </span>
-<span class="co">#&gt; [64] R6_2.4.1            nlme_3.1-149        compiler_4.0.3</span></pre></div>
+<span class="co">#&gt;  [1] progress_1.2.2      treeio_1.15.0       tidyselect_1.1.0   </span>
+<span class="co">#&gt;  [4] xfun_0.19           purrr_0.3.4         lattice_0.20-41    </span>
+<span class="co">#&gt;  [7] colorspace_2.0-0    vctrs_0.3.4         generics_0.1.0     </span>
+<span class="co">#&gt; [10] htmltools_0.5.0     yaml_2.2.1          rlang_0.4.8        </span>
+<span class="co">#&gt; [13] pkgdown_1.6.1.9000  pillar_1.4.6        glue_1.4.2         </span>
+<span class="co">#&gt; [16] RColorBrewer_1.1-2  rvcheck_0.1.8       lifecycle_0.2.0    </span>
+<span class="co">#&gt; [19] stringr_1.4.0       munsell_0.5.0       gtable_0.3.0       </span>
+<span class="co">#&gt; [22] ragg_0.4.0          memoise_1.1.0       evaluate_0.14      </span>
+<span class="co">#&gt; [25] labeling_0.4.2      knitr_1.30          parallel_4.1.0     </span>
+<span class="co">#&gt; [28] Rcpp_1.0.5          scales_1.1.1        backports_1.2.0    </span>
+<span class="co">#&gt; [31] BiocManager_1.30.10 desc_1.2.0          jsonlite_1.7.1     </span>
+<span class="co">#&gt; [34] farver_2.0.3        systemfonts_0.3.2   fs_1.5.0           </span>
+<span class="co">#&gt; [37] gridExtra_2.3       textshaping_0.2.0   hms_0.5.3          </span>
+<span class="co">#&gt; [40] ggplot2_3.3.2       aplot_0.0.6         digest_0.6.27      </span>
+<span class="co">#&gt; [43] stringi_1.5.3       bookdown_0.21       dplyr_1.0.2        </span>
+<span class="co">#&gt; [46] ggrepel_0.8.2       ade4_1.7-16         grid_4.1.0         </span>
+<span class="co">#&gt; [49] rprojroot_1.3-2     ggtree_2.5.0        tools_4.1.0        </span>
+<span class="co">#&gt; [52] magrittr_1.5        lazyeval_0.2.2      patchwork_1.1.0    </span>
+<span class="co">#&gt; [55] tibble_3.0.4        seqinr_4.2-4        crayon_1.3.4       </span>
+<span class="co">#&gt; [58] ape_5.4-1           tidyr_1.1.2         pkgconfig_2.0.3    </span>
+<span class="co">#&gt; [61] MASS_7.3-53         ellipsis_0.3.1      tidytree_0.3.3     </span>
+<span class="co">#&gt; [64] prettyunits_1.1.1   assertthat_0.2.1    rmarkdown_2.5      </span>
+<span class="co">#&gt; [67] R6_2.5.0            nlme_3.1-150        compiler_4.1.0</span></code></pre></div>
 </div>
   </div>
 
