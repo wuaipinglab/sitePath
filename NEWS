@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.6.1
+-------------------------
+    o Fix: Super slow 'lineagePath' computation improved and traded to 'addMSA'.
+    o Fix: 'lumpyCluster' applies median to avoid outlier.
+    o Bug fix: catch missing fixed mutation by going trough all paths.
+
 CHANGES IN VERSION 1.5.25
 -------------------------
     o Bug fix: use 'geom_point2' instead of 'geom_tippoint' to avoid error.
