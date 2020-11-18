@@ -110,7 +110,9 @@ sitesMinEntropy.lineagePath <- function(x,
         })
         # This will group the tips of the lineage path and the adjacent groups
         # will have at least one fixed site different
-        .clusterByFixation(group)
+        group <- .clusterByFixation(group)
+        attr(group, "pathNodeTips") <- attr(segs, "pathNodeTips")
+        return(group)
     })
     clustersByPath <- .mergeClusters(clustersByPath)
     attr(res, "clustersByPath") <-
@@ -223,18 +225,6 @@ sitesMinEntropy.lineagePath <- function(x,
                     attr(currGP, "AA") <- attr(prevGP, "AA")
                     attr(currGP, "node") <- attr(prevGP, "node")
                 } else {
-                    if (attr(prevGP, "node") == attr(currGP, "node")) {
-                        attr(prevGP, "aaSummary") <-
-                            tableAA(align[prevGP], locusIndex)
-                        attr(currGP, "aaSummary") <-
-                            tableAA(align[currGP], locusIndex)
-                        # Re-find the ancestral node if the original group is
-                        # split
-                        allChildrenTips <-
-                            unlist(currLinked[-seq_len(gpIndex - 1)])
-                        attr(currGP, "node") <-
-                            as.character(getMRCA(tree, allChildrenTips))
-                    }
                     # Add a new tip cluster only when there is a change of fixed
                     # amino acid/nucleotide
                     reconstructed <- c(reconstructed, list(prevGP))
@@ -254,8 +244,13 @@ sitesMinEntropy.lineagePath <- function(x,
 }
 
 .calibrateFixedAA <- function(fixations, align, locus) {
-    unMergedGroupings <- lapply(fixations, "[[", locus)
     # The original entropy minimization result for the locus
+    unMergedGroupings <- lapply(fixations, function(segs) {
+        res <- segs[[locus]]
+        attr(res, "pathNodeTips") <- attr(segs, "pathNodeTips")
+        return(res)
+    })
+    # Calibrate the tip grouping result from all result
     res <- .mergeClusters(unMergedGroupings)
     locusIndex <- as.integer(locus) - 1
     for (pathIndex in seq_along(res)) {
@@ -492,6 +487,10 @@ sitesMinEntropy.lineagePath <- function(x,
         divergedTips <- setdiff(divergedTips,
                                 unlist(clustersByPath[[toMergeIndex]]))
         attributes(divergedTips) <- tempAttrs
+        # Re-assign the ancestral node since the tip group is split
+        pathNodeTips <- attr(gp, "pathNodeTips")
+        attr(divergedTips, "node") <- .calibrateNode(divergedTips,
+                                                     pathNodeTips)
         refSites <- attr(divergedTips, "AA")
         # Add the truncated 'gp' (no overlap) to 'res'
         if (divergedIndex == length(gp)) {
@@ -517,6 +516,11 @@ sitesMinEntropy.lineagePath <- function(x,
                 # Give back the attributes, including fixation site and possible
                 # merging info
                 attributes(divergedTips) <- attributes(toMerge[[i]])
+                # Re-assign the ancestral node since the tip group is split
+                pathNodeTips <- attr(clustersByPath[[toMergeIndex]],
+                                     "pathNodeTips")
+                attr(divergedTips, "node") <-
+                    .calibrateNode(divergedTips, pathNodeTips)
                 # The shared part
                 sharedTips <- setdiff(toMerge[[i]], divergedTips)
                 toMergeRefSites <- list()
@@ -556,6 +560,20 @@ sitesMinEntropy.lineagePath <- function(x,
         }
     }
     return(res)
+}
+
+.calibrateNode <- function(divergedTips, pathNodeTips) {
+    # Just in case the ancestral node is not found
+    node <- NULL
+    for (node in names(pathNodeTips)) {
+        if (all(pathNodeTips[[node]] %in% divergedTips)) {
+            break
+        }
+    }
+    if (is.null(node)) {
+        stop("Something is wrong finding the ancestral node")
+    }
+    return(node)
 }
 
 .assignClusterNames <- function(grouping) {
