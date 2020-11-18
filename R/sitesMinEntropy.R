@@ -35,11 +35,9 @@ sitesMinEntropy.lineagePath <- function(x,
                                         method = c("compare", "insert", "delete"),
                                         ...) {
     paths <- .phyMSAmatch(x)
-    tree <- attr(paths, "tree")
     # Set the minimal size of the group during the search
     if (is.null(minEffectiveSize)) {
-        tipNum <- length(tree[["tip.label"]])
-        minEffectiveSize <- ceiling(tipNum * attr(x, "similarity"))
+        minEffectiveSize <- attr(x, "minSize")
     } else if (!is.numeric(minEffectiveSize) ||
                minEffectiveSize < 0) {
         stop("'minEffectiveSize' (",
@@ -64,11 +62,11 @@ sitesMinEntropy.lineagePath <- function(x,
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and matching
-    nodeAlign <- .tipSeqsAlongPathNodes(paths, divNodes)
+    pathNodeTips <- .tipSeqsAlongPathNodes(paths, divNodes)
     # In case root node does not have any tips
     excludedNodes <- divNodes
     rootNode <- attr(paths, "rootNode")
-    if (!rootNode %in% names(nodeAlign)) {
+    if (!rootNode %in% names(pathNodeTips)) {
         excludedNodes <- c(rootNode, excludedNodes)
     }
     # Exclude the invariant sites
@@ -79,16 +77,19 @@ sitesMinEntropy.lineagePath <- function(x,
     # Group the result by path for all loci
     res <- lapply(paths, function(path) {
         path <- as.character(setdiff(path, excludedNodes))
+        names(path) <- path
+        pathNodeAlign <- pathNodeTips[path]
         # Entropy minimization result for every locus
-        lapply(
+        segs <- lapply(
             X = siteIndices,
             FUN = .runEntropyMinimization,
-            path = path,
-            nodeAlign = nodeAlign,
+            pathNodeAlign = pathNodeAlign,
             minimizeEntropy = minimizeEntropy,
             minEffectiveSize = minEffectiveSize,
             searchDepth = searchDepth
         )
+        attr(segs, "pathNodeTips") <- pathNodeAlign
+        return(segs)
     })
     res <- .unifyEntropyGrouping(res, paths)
     # Cluster tips according to fixation sites
@@ -120,8 +121,7 @@ sitesMinEntropy.lineagePath <- function(x,
 }
 
 .runEntropyMinimization <- function(siteIndex,
-                                    path,
-                                    nodeAlign,
+                                    pathNodeAlign,
                                     minimizeEntropy,
                                     minEffectiveSize,
                                     searchDepth) {
@@ -134,11 +134,11 @@ sitesMinEntropy.lineagePath <- function(x,
     # The input for entropy minimization calculation
     nodeSummaries <- list()
     # Divergent nodes are not included anywhere in the result
-    for (node in path) {
+    for (node in names(pathNodeAlign)) {
         # Get the related descendant tips and related sequences
-        nodeTips <- as.integer(names(nodeAlign[[node]]))
+        nodeTips <- pathNodeAlign[[node]]
         # Frequency of the amino acids at the locus
-        aaSummary <- tableAA(nodeAlign[[node]], siteIndex)
+        aaSummary <- tableAA(attr(nodeTips, "align"), siteIndex)
         # Associate the amino acid frequency with the tip names
         attr(nodeTips, "aaSummary") <- aaSummary
         # Decide the current fixed amino acid
@@ -176,8 +176,7 @@ sitesMinEntropy.lineagePath <- function(x,
         names(seg) <- vapply(seg, attr, character(1), "node")
     } else {
         seg <- nodeSummaries
-        attr(seg[[1]], "AA") <-
-            names(attr(nodeSummaries[[1]], "aaSummary"))
+        attr(seg[[1]], "AA") <- names(attr(seg[[1]], "aaSummary"))
         attr(seg[[1]], "node") <- names(seg)
     }
     return(seg)
@@ -264,6 +263,34 @@ sitesMinEntropy.lineagePath <- function(x,
         for (gIndex in seq_along(mGrouping)) {
             tips <- mGrouping[[gIndex]]
             if (!is.null(attr(tips, "toMerge"))) {
+            # toMerge <- attr(tips, "toMerge")
+            # if (!is.null(toMerge)) {
+            #     # Reset the reference amino acid/nucleotide
+            #     refAA <- character()
+            #     # The remaining tips of the group split at the divergent point
+            #     # on the current path
+            #     nextIndex <- gIndex + 1
+            #     nextTips <- mGrouping[[nextIndex]]
+            #     if (length(nextTips) > minEffectiveSize) {
+            #         # Re-calibration if the group is from the splitting and
+            #         # having enough tips
+            #         aaSummary <-
+            #             tableAA(align[nextTips], locusIndex)
+            #         dominantAA <- names(which.max(aaSummary))
+            #         attr(res[[pathIndex]][[nextIndex]],
+            #              "AA") <- dominantAA
+            #     }
+            #     # The remaining tips of the group split at the divergent point
+            #     # on other paths
+            #     for (toMergeIndex in as.integer(names(toMerge))) {
+            #         otherTips <- res[[toMergeIndex]][[1]]
+            #         if (length(otherTips) > minEffectiveSize) {
+            #             aaSummary <- tableAA(align[otherTips], locusIndex)
+            #             dominantAA <- names(which.max(aaSummary))
+            #             attr(res[[toMergeIndex]][[1]],
+            #                  "AA") <- dominantAA
+            #         }
+            #     }
                 # Calibrate the fixed amino acid/nucleotide at the divergent
                 # point after merging
                 fixedAA <- lapply(

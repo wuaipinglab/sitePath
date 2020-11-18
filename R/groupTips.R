@@ -51,10 +51,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
     # Get the divergent nodes
     divNodes <- divergentNode(paths)
     # The tips and the corresponding ancestral node
-    nodeAlign <- .tipSeqsAlongPathNodes(paths, divNodes)
-    nodeTips <- lapply(nodeAlign, function(i) {
-        as.integer(names(i))
-    })
+    pathNodeTips <- .tipSeqsAlongPathNodes(paths, divNodes)
     # To group the tips by the node right after the divergent point
     res <- list()
     # Iterate through each lineage path
@@ -67,7 +64,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
             currNode <- p[[i]]
             nextNode <- p[[i + 1]]
             # Add the tips of the current node to the group
-            tips <- c(tips, nodeTips[[as.character(currNode)]])
+            tips <- c(tips, pathNodeTips[[as.character(currNode)]])
             # Stop adding the tips to the group and take the group out
             if (nextNode %in% divNodes) {
                 res[[aNode]] <- tips
@@ -79,7 +76,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
         # Add the tips of the final node to the group and take the final group
         # out
         res[[aNode]] <- c(tips,
-                          nodeTips[[as.character(p[[pathLen]])]])
+                          pathNodeTips[[as.character(p[[pathLen]])]])
     }
     if (tipnames) {
         res <- lapply(res, function(tips) {
@@ -102,9 +99,8 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
     )
     # Get all the nodes that are not at divergent point
     nodes <- setdiff(allNodes, divNodes)
-    # Get the sequence of the children tips that are descendant of
-    # the nodes. Assign the tip index to the sequences for
-    # retrieving the tip name
+    # Get the sequence of the children tips that are descendant of the nodes.
+    # Assign the tip index to the sequences for retrieving the tip name
     nodeAlign <- lapply(nodes, function(n) {
         isTerminal <- FALSE
         if (n %in% terminalNodes) {
@@ -115,10 +111,9 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
             # Keep the node that is not on the path.
             childrenNode <- setdiff(childrenNode, allNodes)
         }
-        tips <- .childrenTips(tree, childrenNode)
-        res <- align[tips]
+        res <- .childrenTips(tree, childrenNode)
+        attr(res, "align") <- align[res]
         attr(res, "isTerminal") <- isTerminal
-        names(res) <- tips
         return(res)
     })
     # Assign the node names to the 'nodeAlign' list

@@ -149,13 +149,13 @@ lineagePath.phyMSAmatched <- function(tree,
             # The tips and the corresponding ancestral node. Because the tree
             # was forced to be bifurcated, there won't be any tips on the
             # divergent node
-            nodeTips <- .tipSeqsAlongPathNodes(pathPair, divNodes)
+            pathNodeTips <- .tipSeqsAlongPathNodes(pathPair, divNodes)
             # The genetic distance of all tips to the path
             allDist <- vapply(
-                X = names(nodeTips),
+                X = names(pathNodeTips),
                 FUN = function(n) {
                     an <- as.integer(n)
-                    tips <- as.integer(names(nodeTips[[n]]))
+                    tips <- pathNodeTips[[n]]
                     tipsDist <- edgeLength[tips] - edgeLength[an]
                     mean(tipsDist)
                 },
