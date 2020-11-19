@@ -1,3 +1,5 @@
+#' @importFrom ape Ntip
+
 #' @rdname groupTips
 #' @title The grouping of tree tips
 #' @description The tips between divergent nodes or fixation mutations on the
@@ -122,7 +124,7 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
 }
 
 .childrenTips <- function(tree, node) {
-    maxTip <- length(tree[["tip.label"]])
+    maxTip <- Ntip(tree)
     children <- integer()
     getChildren <- function(edges, parent) {
         children <<- c(children, parent[which(parent <= maxTip)])

@@ -1,4 +1,5 @@
 #' @importFrom stats complete.cases
+#' @importFrom ape Ntip
 
 #' @rdname SNPsites
 #' @title Finding sites with variation
@@ -25,7 +26,7 @@ SNPsites <- function(tree, ...) {
 #' @export
 SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     x <- .phyMSAmatch(tree)
-    nTips <- length(attr(x, "tree")[["tip.label"]])
+    nTips <- Ntip(attr(x, "tree"))
     # Set default 'minSNP' value
     if (is.null(minSNP)) {
         minSNP <-  nTips / 10

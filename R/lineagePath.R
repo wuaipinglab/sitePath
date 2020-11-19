@@ -1,5 +1,5 @@
 #' @importFrom stats sd quantile
-#' @importFrom ape nodepath getMRCA node.depth.edgelength
+#' @importFrom ape nodepath getMRCA node.depth.edgelength Ntip
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
 #' @rdname lineagePath
@@ -38,7 +38,7 @@ lineagePath.phyMSAmatched <- function(tree,
     x <- .phyMSAmatch(tree)
     tree <- attr(x, "tree")
     # Find total number of tree tips
-    nTips <- length(tree[["tip.label"]])
+    nTips <- Ntip(tree)
     # The range of results using different 'minSize'
     rangeOfResults <- attr(x, "rangeOfResults")
     maxSize <-
@@ -91,7 +91,7 @@ lineagePath.phyMSAmatched <- function(tree,
 }
 
 .dropLessDiverged <- function(paths, tree) {
-    allTipsNum <- length(tree[["tip.label"]])
+    allTipsNum <- Ntip(tree)
     toKeep <- vapply(
         X = seq_along(paths),
         FUN = function(i) {
@@ -209,7 +209,7 @@ sneakPeek <- function(tree,
                       makePlot = FALSE) {
     x <- .phyMSAmatch(tree)
     tree <- attr(x, "tree")
-    nTips <- length(tree[["tip.label"]])
+    nTips <- Ntip(tree)
     # Check 'maxPath'
     if (is.null(maxPath)) {
         maxPath <- nTips / 20

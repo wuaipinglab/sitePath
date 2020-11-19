@@ -3,7 +3,7 @@
 #' @importFrom utils setTxtProgressBar
 #' @importFrom methods is
 #' @importFrom seqinr read.alignment
-#' @importFrom ape multi2di is.binary
+#' @importFrom ape multi2di is.binary Ntip
 
 #' @rdname addMSA
 #' @name phyMSAmatched
@@ -86,10 +86,10 @@ addMSA <- function(tree,
         zValue = 0
     )
     maxSize <- min(
-        length(tree[["tip.label"]]) / 2,
+        Ntip(tree) / 2,
         max(unlist(lapply(terminalTips, lengths)))
     )
-    rangeOfResults <- lapply(
+    attr(res, "rangeOfResults") <- lapply(
         X = seq(2, maxSize),
         FUN = function(minSize) {
             # The result for each 'minSize' threshold
@@ -100,8 +100,12 @@ addMSA <- function(tree,
                     endTips <- terminalTips[[siteName]]
                     candidatePaths <- lapply(
                         X = endTips[which(lengths(endTips) >= minSize)],
-                        FUN = attr,
-                        which = "nodepath"
+                        FUN = function(tips) {
+                            res <- attr(tips, "nodepath")
+                            attributes(tips) <- NULL
+                            attr(res, "tips") <- tips
+                            return(res)
+                        }
                     )
                     return(candidatePaths)
                 }
@@ -112,6 +116,5 @@ addMSA <- function(tree,
             return(paths)
         }
     )
-    attr(res, "rangeOfResults") <- rangeOfResults
     return(res)
 }

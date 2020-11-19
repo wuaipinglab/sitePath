@@ -4,6 +4,7 @@
 #' @importFrom ggplot2 aes guides theme ggtitle guide_legend
 #' @importFrom ggplot2 scale_size scale_color_manual
 #' @importFrom ggplot2 GeomText
+#' @importFrom ape Nnode
 #' @importFrom tidytree groupOTU
 #' @importFrom ggtree ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
@@ -45,7 +46,7 @@ plot.lineagePath <- function(x,
                              ...) {
     tree <- attr(x, "tree")
     # Get number of ancestral nodes plus tip nodes
-    nNodes <- length(tree[["tip.label"]]) + tree[["Nnode"]]
+    nNodes <- Nnode(tree, internal.only = FALSE)
     # Set lineage nodes and non-lineage nodes as separate group
     group <- rep(1, times = nNodes)
     group[unique(unlist(x))] <- 0
