@@ -91,7 +91,8 @@ sitesMinEntropy.lineagePath <- function(x,
         attr(segs, "pathNodeTips") <- pathNodeAlign
         return(segs)
     })
-    res <- .unifyEntropyGrouping(res, paths)
+    # Calibrate the result from all paths
+    res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
     # Cluster tips according to fixation sites
     clustersByPath <- lapply(res, function(segs) {
         # Set the site and amino acid/nucleotide info for each group of tips
@@ -184,15 +185,17 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.unifyEntropyGrouping <- function(res, paths) {
+.unifyEntropyGrouping <- function(res, paths, minEffectiveSize) {
     align <- attr(paths, "align")
-    tree <- attr(paths, "tree")
     # Iterate each locus
     for (locus in names(res[[1]])) {
         # The index for C++
         locusIndex <- as.integer(locus) - 1
         # Get the merged groupings of each path for the locus
-        mergedGroupings <- .calibrateFixedAA(res, align, locus)
+        mergedGroupings <- .calibrateFixedAA(res,
+                                             align,
+                                             locus,
+                                             minEffectiveSize)
         # Link the merged groupings for each lineage path to calibrate and
         # recover the full groupings. The linked merged groupings are stored for
         # the remaining paths.
@@ -243,7 +246,10 @@ sitesMinEntropy.lineagePath <- function(x,
     return(res)
 }
 
-.calibrateFixedAA <- function(fixations, align, locus) {
+.calibrateFixedAA <- function(fixations,
+                              align,
+                              locus,
+                              minEffectiveSize) {
     # The original entropy minimization result for the locus
     unMergedGroupings <- lapply(fixations, function(segs) {
         res <- segs[[locus]]
@@ -257,38 +263,11 @@ sitesMinEntropy.lineagePath <- function(x,
         mGrouping <- res[[pathIndex]]
         for (gIndex in seq_along(mGrouping)) {
             tips <- mGrouping[[gIndex]]
-            if (!is.null(attr(tips, "toMerge"))) {
-            # toMerge <- attr(tips, "toMerge")
-            # if (!is.null(toMerge)) {
-            #     # Reset the reference amino acid/nucleotide
-            #     refAA <- character()
-            #     # The remaining tips of the group split at the divergent point
-            #     # on the current path
-            #     nextIndex <- gIndex + 1
-            #     nextTips <- mGrouping[[nextIndex]]
-            #     if (length(nextTips) > minEffectiveSize) {
-            #         # Re-calibration if the group is from the splitting and
-            #         # having enough tips
-            #         aaSummary <-
-            #             tableAA(align[nextTips], locusIndex)
-            #         dominantAA <- names(which.max(aaSummary))
-            #         attr(res[[pathIndex]][[nextIndex]],
-            #              "AA") <- dominantAA
-            #     }
-            #     # The remaining tips of the group split at the divergent point
-            #     # on other paths
-            #     for (toMergeIndex in as.integer(names(toMerge))) {
-            #         otherTips <- res[[toMergeIndex]][[1]]
-            #         if (length(otherTips) > minEffectiveSize) {
-            #             aaSummary <- tableAA(align[otherTips], locusIndex)
-            #             dominantAA <- names(which.max(aaSummary))
-            #             attr(res[[toMergeIndex]][[1]],
-            #                  "AA") <- dominantAA
-            #         }
-            #     }
+            toMerge <- attr(tips, "toMerge")
+            if (!is.null(toMerge)) {
                 # Calibrate the fixed amino acid/nucleotide at the divergent
                 # point after merging
-                fixedAA <- lapply(
+                originalAA <- lapply(
                     X = unMergedGroupings,
                     FUN = function(seg) {
                         res <- character()
@@ -302,7 +281,7 @@ sitesMinEntropy.lineagePath <- function(x,
                         return(res)
                     }
                 )
-                fixedAA <- unique(unlist(fixedAA))
+                fixedAA <- unique(unlist(originalAA))
                 # The amino acid/nucleotide summary of the tips
                 aaSummary <- tableAA(align[tips], locusIndex)
                 # The intersection between the fixed and the real amino
@@ -315,6 +294,36 @@ sitesMinEntropy.lineagePath <- function(x,
                     # Select the most frequent if more than one intersected
                     aaSummary <- aaSummary[refAA]
                     refAA <- names(which.max(aaSummary))
+                }
+                # Reset the 'aaSummary' since it's split
+                attr(res[[pathIndex]][[gIndex]],
+                     "aaSummary") <- aaSummary
+                if (refAA != attr(tips, "AA")) {
+                    # The remaining tips of the group split at the divergent
+                    # point on the current path
+                    nextIndex <- gIndex + 1
+                    nextTips <- mGrouping[[nextIndex]]
+                    if (length(nextTips) > minEffectiveSize) {
+                        # Re-calibration if the group is from the splitting and
+                        # having enough tips
+                        aaSummary <-
+                            tableAA(align[nextTips], locusIndex)
+                        dominantAA <- names(which.max(aaSummary))
+                        attr(res[[pathIndex]][[nextIndex]],
+                             "AA") <- dominantAA
+                    }
+                    # The remaining tips of the group split at the divergent
+                    # point on other paths
+                    for (toMergeIndex in as.integer(names(toMerge))) {
+                        otherTips <- res[[toMergeIndex]][[1]]
+                        if (length(otherTips) > minEffectiveSize) {
+                            aaSummary <- tableAA(align[otherTips], locusIndex)
+                            dominantAA <-
+                                names(which.max(aaSummary))
+                            attr(res[[toMergeIndex]][[1]],
+                                 "AA") <- dominantAA
+                        }
+                    }
                 }
                 attr(res[[pathIndex]][[gIndex]], "AA") <- refAA
             }
