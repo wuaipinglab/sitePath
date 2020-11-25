@@ -258,71 +258,70 @@ sitesMinEntropy.lineagePath <- function(x,
     })
     # Calibrate the tip grouping result from all result
     res <- .mergeClusters(unMergedGroupings)
-    locusIndex <- as.integer(locus) - 1
+    toMergePrevAA <- character()
     for (pathIndex in seq_along(res)) {
         mGrouping <- res[[pathIndex]]
+        # Iterate to find the tip groups at divergent point and find the most
+        # fitting amino acid/nucleotide
         for (gIndex in seq_along(mGrouping)) {
             tips <- mGrouping[[gIndex]]
             toMerge <- attr(tips, "toMerge")
             if (!is.null(toMerge)) {
+                otherIndex <- as.integer(names(toMerge))
+                toMergePrevAA[otherIndex] <- attr(tips, "AA")
                 # Calibrate the fixed amino acid/nucleotide at the divergent
                 # point after merging
-                originalAA <- lapply(
-                    X = unMergedGroupings,
+                originalAA <- vapply(
+                    X = unMergedGroupings[otherIndex],
                     FUN = function(seg) {
                         res <- character()
                         # To find the fixed amino acid/nucleotide from the
                         # original entropy minimum result for each path
                         for (original in seg) {
                             if (any(tips %in% original)) {
-                                res <- c(res, attr(original, "AA"))
+                                return(attr(original, "AA"))
                             }
                         }
-                        return(res)
-                    }
+                        return("")
+                    },
+                    FUN.VALUE = character(1)
                 )
-                fixedAA <- unique(unlist(originalAA))
-                # The amino acid/nucleotide summary of the tips
-                aaSummary <- tableAA(align[tips], locusIndex)
-                # The intersection between the fixed and the real amino
-                # acid/nucleotide summary will be used as the reference
-                refAA <- intersect(fixedAA, names(aaSummary))
-                if (length(refAA) == 0) {
-                    # Select one of the fixed if none intersected
-                    refAA <- fixedAA[1]
-                } else if (length(refAA) > 1) {
-                    # Select the most frequent if more than one intersected
-                    aaSummary <- aaSummary[refAA]
-                    refAA <- names(which.max(aaSummary))
-                }
-                # Reset the 'aaSummary' since it's split
-                attr(res[[pathIndex]][[gIndex]],
-                     "aaSummary") <- aaSummary
-                if (refAA != attr(tips, "AA")) {
+                # All originally assigned 'AA' for the current tip group
+                refAA <- unique(c(attr(tips, "AA"), originalAA))
+                # In case there is a disagreement between the paths
+                if (length(refAA) > 1) {
                     # The remaining tips of the group split at the divergent
-                    # point on the current path
-                    nextIndex <- gIndex + 1
-                    nextTips <- mGrouping[[nextIndex]]
-                    if (length(nextTips) > minEffectiveSize) {
-                        # Re-calibration if the group is from the splitting and
-                        # having enough tips
-                        aaSummary <-
-                            tableAA(align[nextTips], locusIndex)
-                        dominantAA <- names(which.max(aaSummary))
-                        attr(res[[pathIndex]][[nextIndex]],
-                             "AA") <- dominantAA
-                    }
-                    # The remaining tips of the group split at the divergent
-                    # point on other paths
-                    for (toMergeIndex in as.integer(names(toMerge))) {
+                    # point on the current and other paths
+                    nextTips <- mGrouping[[gIndex + 1]]
+                    nextFixedAA <- attr(nextTips, "AA")
+                    for (toMergeIndex in otherIndex) {
                         otherTips <- res[[toMergeIndex]][[1]]
-                        if (length(otherTips) > minEffectiveSize) {
-                            aaSummary <- tableAA(align[otherTips], locusIndex)
-                            dominantAA <-
-                                names(which.max(aaSummary))
-                            attr(res[[toMergeIndex]][[1]],
-                                 "AA") <- dominantAA
+                        nextFixedAA <- c(nextFixedAA,
+                                         attr(otherTips, "AA"))
+                    }
+                    # The fixed amino acid/nucleotide in the divergent point
+                    # that does not come from the splitting of the following tip
+                    # groups but is rather related to the previous tip group
+                    extraFixedAA <- setdiff(refAA, nextFixedAA)
+                    if (length(extraFixedAA) > 1) {
+                        # This might be quite impossible but just in case
+                        refAA <- extraFixedAA[1]
+                    } else if (length(extraFixedAA) == 0) {
+                        if (gIndex == 1) {
+                            # The previous 'AA' of the first group (after
+                            # merging) is a little tricky to find
+                            if (pathIndex == 1) {
+                                # The root group has no previous 'AA'
+                                refAA <- refAA[1]
+                            } else {
+                                refAA <- toMergePrevAA[pathIndex]
+                            }
+                        } else {
+                            # The previous 'AA'
+                            refAA <- attr(mGrouping[[gIndex - 1]], "AA")
                         }
+                    } else {
+                        refAA <- extraFixedAA
                     }
                 }
                 attr(res[[pathIndex]][[gIndex]], "AA") <- refAA
