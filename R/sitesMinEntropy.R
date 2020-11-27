@@ -79,6 +79,15 @@ sitesMinEntropy.lineagePath <- function(x,
         path <- as.character(setdiff(path, excludedNodes))
         names(path) <- path
         pathNodeAlign <- pathNodeTips[path]
+        # The node changed to the previous node if the previous node is the
+        # divergent node. This is for the mutation labeling
+        for (currIndex in seq_along(pathNodeAlign)[-1]) {
+            prevIndex <- currIndex - 1
+            prevNode <- names(pathNodeAlign)[prevIndex]
+            if (prevNode %in% divNodes) {
+                names(pathNodeAlign)[currIndex] <- prevNode
+            }
+        }
         # Entropy minimization result for every locus
         segs <- lapply(
             X = siteIndices,
@@ -258,7 +267,20 @@ sitesMinEntropy.lineagePath <- function(x,
     })
     # Calibrate the tip grouping result from all result
     res <- .mergeClusters(unMergedGroupings)
+    locusIndex <- as.integer(locus) - 1
     toMergePrevAA <- character()
+    # Special case when the root group is the divergent point
+    tips <- res[[1]][[1]]
+    toMerge <- attr(tips, "toMerge")
+    # The dominant 'AA' of all direct descendant tip groups
+    if (!is.null(toMerge)) {
+        otherIndex <- as.integer(names(toMerge))
+        nextTips <- res[[1]][[2]]
+        otherTips <- lapply(res[otherIndex], "[[", 1)
+        aaSummary <-
+            tableAA(align[c(nextTips, unlist(otherTips))], locusIndex)
+        toMergePrevAA[1] <- names(which.max(aaSummary))
+    }
     for (pathIndex in seq_along(res)) {
         mGrouping <- res[[pathIndex]]
         # Iterate to find the tip groups at divergent point and find the most
@@ -310,15 +332,22 @@ sitesMinEntropy.lineagePath <- function(x,
                         if (gIndex == 1) {
                             # The previous 'AA' of the first group (after
                             # merging) is a little tricky to find
-                            if (pathIndex == 1) {
-                                # The root group has no previous 'AA'
-                                refAA <- refAA[1]
-                            } else {
-                                refAA <- toMergePrevAA[pathIndex]
-                            }
+                            refAA <- toMergePrevAA[pathIndex]
                         } else {
-                            # The previous 'AA'
-                            refAA <- attr(mGrouping[[gIndex - 1]], "AA")
+                            prevTips <- mGrouping[[gIndex - 1]]
+                            aaSummary <-
+                                tableAA(align[c(tips, prevTips)], locusIndex)
+                            consistentAA <-
+                                intersect(refAA, names(aaSummary))
+                            if (length(consistentAA) == 0) {
+                                # The previous fixed amino acid/nucleotide
+                                refAA <- attr(prevTips, "AA")
+                            } else if (length(consistentAA) > 1) {
+                                # The dominant amino acid/nucleotide
+                                refAA <- names(which.max(aaSummary[refAA]))
+                            } else {
+                                refAA <- consistentAA
+                            }
                         }
                     } else {
                         refAA <- extraFixedAA
