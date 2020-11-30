@@ -601,16 +601,15 @@ sitesMinEntropy.lineagePath <- function(x,
 
 .calibrateNode <- function(divergedTips, pathNodeTips) {
     # Just in case the ancestral node is not found
-    node <- NULL
+    notFound <- TRUE
     for (node in names(pathNodeTips)) {
         if (all(pathNodeTips[[node]] %in% divergedTips)) {
-            break
+            return(node)
         }
     }
-    if (is.null(node)) {
+    if (notFound) {
         stop("Something is wrong finding the ancestral node")
     }
-    return(node)
 }
 
 .assignClusterNames <- function(grouping) {
