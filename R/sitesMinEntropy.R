@@ -271,15 +271,17 @@ sitesMinEntropy.lineagePath <- function(x,
     toMergePrevAA <- character()
     # Special case when the root group is the divergent point
     tips <- res[[1]][[1]]
-    toMerge <- attr(tips, "toMerge")
     # The dominant 'AA' of all direct descendant tip groups
-    if (!is.null(toMerge)) {
-        otherIndex <- as.integer(names(toMerge))
-        nextTips <- res[[1]][[2]]
-        otherTips <- lapply(res[otherIndex], "[[", 1)
-        aaSummary <-
-            tableAA(align[c(nextTips, unlist(otherTips))], locusIndex)
-        toMergePrevAA[1] <- names(which.max(aaSummary))
+    if (!is.null(attr(tips, "toMerge"))) {
+        refAA <- unique(vapply(unMergedGroupings, function(seg) {
+            return(attr(seg[[1]], "AA"))
+        }, character(1)))
+        aaSummary <- tableAA(align[tips], locusIndex)
+        toMergePrevAA[1] <- refAA[1]
+        if (any(names(aaSummary) %in% refAA)) {
+            toMergePrevAA[1] <- names(which.max(aaSummary[refAA]))
+        }
+        attr(res[[1]][[1]], "AA") <- toMergePrevAA[1]
     }
     for (pathIndex in seq_along(res)) {
         mGrouping <- res[[pathIndex]]
@@ -296,15 +298,18 @@ sitesMinEntropy.lineagePath <- function(x,
                 originalAA <- vapply(
                     X = unMergedGroupings[otherIndex],
                     FUN = function(seg) {
-                        res <- character()
+                        majorFixedAA <- character()
+                        maxOverlapNum <- 0
                         # To find the fixed amino acid/nucleotide from the
                         # original entropy minimum result for each path
                         for (original in seg) {
-                            if (any(tips %in% original)) {
-                                return(attr(original, "AA"))
+                            overlapNum <- intersect(tips, original)
+                            if (length(overlapNum) > maxOverlapNum) {
+                                majorFixedAA <- attr(original, "AA")
+                                maxOverlapNum <- length(overlapNum)
                             }
                         }
-                        return("")
+                        return(majorFixedAA)
                     },
                     FUN.VALUE = character(1)
                 )
@@ -344,7 +349,8 @@ sitesMinEntropy.lineagePath <- function(x,
                                 refAA <- attr(prevTips, "AA")
                             } else if (length(consistentAA) > 1) {
                                 # The dominant amino acid/nucleotide
-                                refAA <- names(which.max(aaSummary[refAA]))
+                                refAA <-
+                                    names(which.max(aaSummary[refAA]))
                             } else {
                                 refAA <- consistentAA
                             }
