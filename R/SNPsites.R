@@ -29,7 +29,7 @@ SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     nTips <- Ntip(attr(x, "tree"))
     # Set default 'minSNP' value
     if (is.null(minSNP)) {
-        minSNP <-  nTips / 10
+        minSNP <-  nTips * 0.01
     } else if (!is.numeric(minSNP)) {
         stop("\"minSNP\" only accepts numeric")
     } else if (minSNP >= nTips / 2) {
