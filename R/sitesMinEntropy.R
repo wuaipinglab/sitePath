@@ -75,7 +75,7 @@ sitesMinEntropy.lineagePath <- function(x,
     siteIndices <- attr(paths, "msaNumbering")[loci] - 1
     names(siteIndices) <- as.character(loci)
     # Group the result by path for all loci
-    res <- lapply(paths, function(path) {
+    pathsWithSeqs <- lapply(paths, function(path) {
         path <- as.character(setdiff(path, excludedNodes))
         names(path) <- path
         pathNodeAlign <- pathNodeTips[path]
@@ -88,18 +88,34 @@ sitesMinEntropy.lineagePath <- function(x,
                 names(pathNodeAlign)[currIndex] <- prevNode
             }
         }
-        # Entropy minimization result for every locus
-        segs <- lapply(
-            X = siteIndices,
-            FUN = .runEntropyMinimization,
-            pathNodeAlign = pathNodeAlign,
-            minimizeEntropy = minimizeEntropy,
-            minEffectiveSize = minEffectiveSize,
-            searchDepth = searchDepth
-        )
-        attr(segs, "pathNodeTips") <- pathNodeAlign
-        return(segs)
+        attr(pathNodeAlign, "pathTipNum") <-
+            sum(lengths(pathNodeAlign))
+        return(pathNodeAlign)
     })
+    pathTipNums <-
+        vapply(pathsWithSeqs, attr, integer(1), "pathTipNum")
+    # Use the number of tips to order the paths
+    tipNumRank <- order(pathTipNums)
+    # The max number of tips a path has
+    maxPathTipNum <- tail(pathTipNums[tipNumRank], 1)
+    res <- lapply(
+        X = pathsWithSeqs[tipNumRank],
+        FUN = function(pathNodeAlign) {
+            scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
+            scaledSize <- ceiling(minEffectiveSize * scaledSize)
+            # Entropy minimization result for every locus
+            segs <- lapply(
+                X = siteIndices,
+                FUN = .runEntropyMinimization,
+                pathNodeAlign = pathNodeAlign,
+                minimizeEntropy = minimizeEntropy,
+                minEffectiveSize = scaledSize,
+                searchDepth = searchDepth
+            )
+            attr(segs, "pathNodeTips") <- pathNodeAlign
+            return(segs)
+        }
+    )
     # Calibrate the result from all paths
     res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
     # Cluster tips according to fixation sites

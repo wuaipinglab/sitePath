@@ -3,12 +3,36 @@ test_ambiguousIgnored <- function(fixSites,
                                   alignment,
                                   gapChar,
                                   minEffectiveSize) {
+    paths <- attr(fixSites, "paths")
     tipNames <- tree[["tip.label"]]
     nTips <- length(tipNames)
     p <- attr(fixSites, "paths")
     if (is.null(minEffectiveSize)) {
-        minEffectiveSize <- nTips / length(unique(unlist(p)))
+        minEffectiveSize <- attr(paths, "minSize")
     }
+    # Get the divergent nodes
+    divNodes <- sitePath:::divergentNode(paths)
+    # The tips and matching
+    pathNodeTips <-
+        sitePath:::.tipSeqsAlongPathNodes(paths, divNodes)
+    # In case root node does not have any tips
+    excludedNodes <- divNodes
+    rootNode <- attr(paths, "rootNode")
+    if (!rootNode %in% names(pathNodeTips)) {
+        excludedNodes <- c(rootNode, excludedNodes)
+    }
+    pathsWithSeqs <- lapply(paths, function(path) {
+        path <- as.character(setdiff(path, excludedNodes))
+        names(path) <- path
+        pathNodeAlign <- pathNodeTips[path]
+        attr(pathNodeAlign, "pathTipNum") <-
+            sum(lengths(pathNodeAlign))
+        return(pathNodeAlign)
+    })
+    pathTipNums <-
+        vapply(pathsWithSeqs, attr, integer(1), "pathTipNum")
+    minEffectiveSize <-
+        ceiling(minEffectiveSize * (min(pathTipNums) / max(pathTipNums)))
     # Get all the unambiguous character
     if (attr(p, "seqType") == "AA") {
         unambiguous <- setdiff(sitePath:::AA_UNAMBIGUOUS, gapChar)
