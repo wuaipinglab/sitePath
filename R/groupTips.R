@@ -201,9 +201,6 @@ groupTips.fixationPath <- function(tree, tipnames = TRUE, ...) {
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
 #' simMatrix <- similarityMatrix(tree)
 similarityMatrix <- function(tree) {
-    x <- .phyMSAmatch(tree)
-    sim <- getSimilarityMatrix(attr(x, "align"))
-    tree <- attr(x, "tree")
-    dimnames(sim) <- list(tree[["tip.label"]], tree[["tip.label"]])
+    sim <- attr(tree, "simMatrix")
     return(sim)
 }

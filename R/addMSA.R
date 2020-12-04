@@ -73,10 +73,14 @@ addMSA <- function(tree,
     attr(res, "tree") <- tree
     # Use the numbering of MSA as the default site numbering
     res <- setSiteNumbering.phyMSAmatched(res)
-    simMatrix <- similarityMatrix(res)
     align <- attr(res, "align")
     loci <- attr(res, "loci")
     siteIndices <- attr(res, "msaNumbering")[loci] - 1L
+    # Sequence similarity matrix
+    simMatrix <- getSimilarityMatrix(align)
+    dimnames(simMatrix) <-
+        list(tree[["tip.label"]], tree[["tip.label"]])
+    attr(res, "simMatrix") <- simMatrix
     # Get all lineages using the terminal node found by SNP
     terminalTips <- terminalTipsBySim(
         tipPaths = nodepath(tree),
@@ -85,10 +89,10 @@ addMSA <- function(tree,
         siteIndices = siteIndices,
         zValue = 0
     )
-    maxSize <- min(
-        Ntip(tree) / 2,
-        max(unlist(lapply(terminalTips, lengths)))
-    )
+    maxSize <- min(Ntip(tree) / 2,
+                   max(unlist(lapply(
+                       terminalTips, lengths
+                   ))))
     attr(res, "rangeOfResults") <- lapply(
         X = seq(2, maxSize),
         FUN = function(minSize) {
