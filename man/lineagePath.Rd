@@ -17,7 +17,7 @@ lineagePath(tree, similarity, ...)
   ...
 )
 
-sneakPeek(tree, step = 9, maxPath = NULL, minPath = 1, makePlot = FALSE)
+sneakPeek(tree, step = 9, maxPath = NULL, minPath = 0, makePlot = TRUE)
 
 \method{lineagePath}{sneakPeekedPaths}(tree, similarity, ...)
 }
@@ -72,8 +72,8 @@ Lineage path represent by node number.
   lineagePath result will also be excluded.
 
 When used on the return of \code{sneakPeek}, a
-  \code{lineagePath} with the closest \code{similarity} will be retrived from
-  the returned value.
+  \code{lineagePath} with the closest \code{similarity} will be retrieved
+  from the returned value.
 }
 \examples{
 data('zikv_tree')

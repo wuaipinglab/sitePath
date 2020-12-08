@@ -60,7 +60,7 @@ lineagePath.phyMSAmatched <- function(tree,
         } else {
             minSNP <- nTips * similarity
         }
-        if (minSNP >= maxSize) {
+        if (minSNP > maxSize) {
             if (forbidTrivial) {
                 minSNP <- maxSize
             } else {
@@ -149,7 +149,8 @@ lineagePath.phyMSAmatched <- function(tree,
             # The tips and the corresponding ancestral node. Because the tree
             # was forced to be bifurcated, there won't be any tips on the
             # divergent node
-            pathNodeTips <- .tipSeqsAlongPathNodes(pathPair, divNodes)
+            pathNodeTips <-
+                .tipSeqsAlongPathNodes(pathPair, divNodes)
             # The genetic distance of all tips to the path
             allDist <- vapply(
                 X = names(pathNodeTips),
@@ -205,14 +206,14 @@ lineagePath.phyMSAmatched <- function(tree,
 sneakPeek <- function(tree,
                       step = 9,
                       maxPath = NULL,
-                      minPath = 1,
-                      makePlot = FALSE) {
+                      minPath = 0,
+                      makePlot = TRUE) {
     x <- .phyMSAmatch(tree)
     tree <- attr(x, "tree")
     nTips <- Ntip(tree)
     # Check 'maxPath'
     if (is.null(maxPath)) {
-        maxPath <- nTips / 20
+        maxPath <- nTips
     } else if (maxPath <= 0) {
         stop("Invalid \"maxPath\": less than or equal to zero")
     }
@@ -222,12 +223,18 @@ sneakPeek <- function(tree,
     } else if (minPath < 0) {
         stop("Invalid \"minPath\": less than zero")
     }
+    # The range of results using different 'minSize'
+    rangeOfResults <- attr(x, "rangeOfResults")
+    rangeOfResults <-
+        rangeOfResults[which(lengths(rangeOfResults) != 1)]
+    sizeRange <-
+        range(vapply(rangeOfResults, attr, integer(1), "minSize"))
     # Try every 'similarity'
     similarity <- numeric()
     pathNum <- integer()
     allPaths <- list()
-    for (s in seq(from = 0.05,
-                  to = 0.01,
+    for (s in seq(from = sizeRange[1],
+                  to = sizeRange[2],
                   length.out = step)) {
         paths <- lineagePath(x,
                              similarity = s,
@@ -256,7 +263,15 @@ sneakPeek <- function(tree,
     # Combine all plots of the lineages
     if (makePlot) {
         g <- lapply(allPaths, function(path) {
-            plot(path) + ggtitle(attr(path, "similarity"))
+            plot(path) + ggtitle(
+                label = paste0(
+                    attr(path, "minSize"),
+                    " (",
+                    round(attr(path, "similarity") * 100, 2),
+                    "%)"
+                ),
+                subtitle = paste0(length(path), " path(s)")
+            )
         })
         grid.arrange(arrangeGrob(grobs = g))
     }
@@ -265,8 +280,8 @@ sneakPeek <- function(tree,
 
 #' @rdname lineagePath
 #' @description When used on the return of \code{sneakPeek}, a
-#'   \code{lineagePath} with the closest \code{similarity} will be retrived from
-#'   the returned value.
+#'   \code{lineagePath} with the closest \code{similarity} will be retrieved
+#'   from the returned value.
 #' @export
 #' @examples
 #' x <- sneakPeek(tree, step = 3)

@@ -57,8 +57,8 @@ test_that("The sneakPeek function works", {
     data(zikv_tree_reduced)
     tr <- addMSA(zikv_tree_reduced,
                  alignment = zikv_align_reduced)
-    rangeOfResults <- sneakPeek(tr)
-    expect_error(sneakPeek(tr), NA)
+    rangeOfResults <- sneakPeek(tr, makePlot = FALSE)
+    expect_error(sneakPeek(tr, makePlot = FALSE), NA)
     for (i in seq_len(nrow(rangeOfResults))) {
         similarity <- rangeOfResults[i, "similarity"]
         pathNum <- rangeOfResults[i, "pathNum"]
