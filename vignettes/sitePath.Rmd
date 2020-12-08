@@ -26,7 +26,7 @@ The `sitePath` package does hierarchical search for fixation events given multip
 
 1. Import tree and sequence alignment
 2. Resolve phylogenetic lineages
-3. Hierarchical search for lineage-dependent fixation events
+3. Hierarchical search for fixation and parallel mutations
 
 # Import data
 
@@ -44,11 +44,20 @@ tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
 tree <- read.tree(tree_file)
 ```
 
-It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.
+It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult. 
+
+Also, we expect the tree to have no super long branches. A bad example is shown below:
+
+```{r bad_tree_example, echo=FALSE}
+bad_tree <- read.tree(system.file("extdata", "WNV.newick", package = "sitePath"))
+
+ggtree::ggtree(bad_tree)
+```
+
 
 ## Parse and match sequence alignment
 
-Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). sitePath has a wrapper function for parsing and adding the sequence alignment.
+Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). There is a wrapper function for parsing and adding the sequence alignment.
 
 ```{r add_alignment, message=FALSE}
 alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
@@ -57,7 +66,7 @@ tree <- addMSA(tree, alignment_file, "fasta")
 
 # Phylogenetic lineages
 
-The names in tree and aligment must be matched. We use a **tip-to-root** algorithm to trim tree leaves/tips to expose the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evalute the impact of threshold on result.
+The names in tree and alignment must be matched. We exploit polymorphism of each site to find the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evaluate the impact of threshold on result.
 
 ## The impact of threshold on resolving lineages
 
@@ -69,7 +78,7 @@ preassessment <- sneakPeek(tree, makePlot = TRUE)
 
 ## Choose a threshold
 
-Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threhold choosing. Here 0.05 is used as an example.
+Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threshold choosing. Here 0.05 is used as an example.
 
 ```{r get_lineagePath}
 paths <- lineagePath(preassessment, similarity = 0.05)
