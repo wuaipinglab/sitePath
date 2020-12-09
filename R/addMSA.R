@@ -61,6 +61,19 @@ addMSA <- function(tree,
     names(align) <- alignment[["nam"]]
     attr(res, "align") <- align
     # Set the sequence type
+    if (missing(seqType)) {
+        letterSum <- table(strsplit(align[[1]], "")[[1]])
+        gapSum <- 0
+        if ("-" %in% names(letterSum)) {
+            gapSum <- letterSum[["-"]]
+        }
+        atcgSum <- sum(letterSum[c("A", "T", "C", "G")], na.rm = TRUE)
+        if (atcgSum / (sum(letterSum) - gapSum) > 0.8) {
+            seqType <- "DNA"
+        } else {
+            seqType <- "AA"
+        }
+    }
     attr(res, "seqType") <- match.arg(seqType)
     # Set 'tree' attribute
     if (!is.binary(tree)) {
