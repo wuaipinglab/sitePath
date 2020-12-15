@@ -12,7 +12,7 @@ Post on Bioconductor [support site](https://support.bioconductor.org/) if having
 
 ## Installation
 
-[R programming language](https://cran.r-project.org/) >= 3.6.0 is required to use `sitePath`.
+[R programming language](https://cran.r-project.org/) >= 4.0.0 is required to use `sitePath`.
 
 The stable release is available on [Bioconductor](https://bioconductor.org/packages/release/bioc/html/sitePath.html).
 ```r

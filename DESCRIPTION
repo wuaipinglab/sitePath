@@ -15,7 +15,7 @@ Description: The package does hierarchical search for fixation mutations given
     The package also provides visualization of these mutations on the tree.
 License: MIT + file LICENSE
 Depends:
-    R (>= 3.6.0)
+    R (>= 4.1)
 Imports:
     methods,
     graphics,
@@ -35,7 +35,6 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    rmarkdown,
     BiocStyle
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1

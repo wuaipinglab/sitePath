@@ -9,7 +9,7 @@ if a bug is found.
 
 ## Installation
 
-[R programming language](https://cran.r-project.org/) \>= 3.6.0 is
+[R programming language](https://cran.r-project.org/) \>= 4.0.0 is
 required to use `sitePath`.
 
 The stable release is available on
@@ -63,5 +63,5 @@ print(fixations)
     ## 
     ## Result for 4 paths:
     ## 
-    ## 988 139 894 2074 2086 2634 3045 107 1118 3353 1143 2842 3398 
+    ## 109 139 894 2074 2086 2634 3045 3144 988 1143 2842 3328 3398 107 1118 3353 
     ## No reference sequence specified. Using alignment numbering
