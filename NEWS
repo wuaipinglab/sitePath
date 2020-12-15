@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.7.1
+-------------------------
+    o Guess sequence type based on ATCG proportion for 'addMSA'.
+
 CHANGES IN VERSION 1.6.2
 -------------------------
     o Fix: Wrong ancestral node at divergent point (labeling issue).
