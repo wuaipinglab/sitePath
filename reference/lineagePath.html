@@ -52,8 +52,8 @@ sneakPeek is intended to plot 'similarity' (actually the
   greater than number of tips divided by 20 or user-defined maxPath. The zero
   lineagePath result will also be excluded.
 When used on the return of sneakPeek, a
-  lineagePath with the closest similarity will be retrived from
-  the returned value." />
+  lineagePath with the closest similarity will be retrieved
+  from the returned value." />
 
 
 
@@ -85,7 +85,7 @@ When used on the return of sneakPeek, a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.1</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@ When used on the return of sneakPeek, a
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/wuaipinglab/sitePath/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -136,8 +136,8 @@ When used on the return of sneakPeek, a
   greater than number of tips divided by 20 or user-defined maxPath. The zero
   lineagePath result will also be excluded.</p>
 <p>When used on the return of <code>sneakPeek</code>, a
-  <code>lineagePath</code> with the closest <code>similarity</code> will be retrived from
-  the returned value.</p>
+  <code>lineagePath</code> with the closest <code>similarity</code> will be retrieved
+  from the returned value.</p>
     </div>
 
     <pre class="usage"><span class='fu'>lineagePath</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>similarity</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -151,7 +151,7 @@ When used on the return of sneakPeek, a
   <span class='va'>...</span>
 <span class='op'>)</span>
 
-<span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>9</span>, maxPath <span class='op'>=</span> <span class='cn'>NULL</span>, minPath <span class='op'>=</span> <span class='fl'>1</span>, makePlot <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>9</span>, maxPath <span class='op'>=</span> <span class='cn'>NULL</span>, minPath <span class='op'>=</span> <span class='fl'>0</span>, makePlot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sneakPeekedPaths</span>
 <span class='fu'>lineagePath</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>similarity</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -221,12 +221,189 @@ see the impact of threshold on path number. The default is 1.</p></td>
 <span class='fu'>lineagePath</span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; This is a 'lineagePath' object.
 #&gt; 
-#&gt; 4 lineage paths using 5% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   similarity pathNum
-#&gt; 1       0.05       4
-#&gt; 2       0.03       5
-#&gt; 3       0.01      15</div><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-<span class='fu'>lineagePath</span><span class='op'>(</span><span class='va'>x</span>, similarity <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span>
+#&gt; 4 lineage paths using 4.41989% as "major SNP" threshold </div><div class='input'><span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+</div><div class='img'><img src='lineagePath-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;      similarity pathNum
+#&gt; 1   0.005524862      46
+#&gt; 2   0.008287293      26
+#&gt; 3   0.011049724      15
+#&gt; 4   0.013812155      11
+#&gt; 5   0.016574586       9
+#&gt; 6   0.019337017       8
+#&gt; 7   0.022099448       7
+#&gt; 8   0.024861878       7
+#&gt; 9   0.027624309       6
+#&gt; 10  0.030386740       5
+#&gt; 11  0.033149171       5
+#&gt; 12  0.035911602       5
+#&gt; 13  0.038674033       5
+#&gt; 14  0.041436464       5
+#&gt; 15  0.044198895       4
+#&gt; 16  0.046961326       4
+#&gt; 17  0.049723757       4
+#&gt; 18  0.052486188       4
+#&gt; 19  0.055248619       4
+#&gt; 20  0.058011050       4
+#&gt; 21  0.060773481       4
+#&gt; 22  0.063535912       4
+#&gt; 23  0.066298343       4
+#&gt; 24  0.069060773       4
+#&gt; 25  0.071823204       4
+#&gt; 26  0.074585635       4
+#&gt; 27  0.077348066       4
+#&gt; 28  0.080110497       4
+#&gt; 29  0.082872928       4
+#&gt; 30  0.085635359       4
+#&gt; 31  0.088397790       4
+#&gt; 32  0.091160221       4
+#&gt; 33  0.093922652       4
+#&gt; 34  0.096685083       4
+#&gt; 35  0.099447514       4
+#&gt; 36  0.102209945       4
+#&gt; 37  0.104972376       4
+#&gt; 38  0.107734807       4
+#&gt; 39  0.110497238       4
+#&gt; 40  0.113259669       4
+#&gt; 41  0.116022099       4
+#&gt; 42  0.118784530       4
+#&gt; 43  0.121546961       4
+#&gt; 44  0.124309392       4
+#&gt; 45  0.127071823       4
+#&gt; 46  0.129834254       4
+#&gt; 47  0.132596685       4
+#&gt; 48  0.135359116       4
+#&gt; 49  0.138121547       4
+#&gt; 50  0.140883978       3
+#&gt; 51  0.143646409       3
+#&gt; 52  0.146408840       3
+#&gt; 53  0.149171271       3
+#&gt; 54  0.151933702       3
+#&gt; 55  0.154696133       3
+#&gt; 56  0.157458564       3
+#&gt; 57  0.160220994       2
+#&gt; 58  0.162983425       2
+#&gt; 59  0.165745856       2
+#&gt; 60  0.168508287       2
+#&gt; 61  0.171270718       2
+#&gt; 62  0.174033149       2
+#&gt; 63  0.176795580       2
+#&gt; 64  0.179558011       2
+#&gt; 65  0.182320442       2
+#&gt; 66  0.185082873       2
+#&gt; 67  0.187845304       2
+#&gt; 68  0.190607735       2
+#&gt; 69  0.193370166       2
+#&gt; 70  0.196132597       2
+#&gt; 71  0.198895028       2
+#&gt; 72  0.201657459       2
+#&gt; 73  0.204419890       2
+#&gt; 74  0.207182320       2
+#&gt; 75  0.209944751       2
+#&gt; 76  0.212707182       2
+#&gt; 77  0.215469613       2
+#&gt; 78  0.218232044       2
+#&gt; 79  0.220994475       2
+#&gt; 80  0.223756906       2
+#&gt; 81  0.226519337       2
+#&gt; 82  0.229281768       2
+#&gt; 83  0.232044199       2
+#&gt; 84  0.234806630       2
+#&gt; 85  0.237569061       2
+#&gt; 86  0.240331492       2
+#&gt; 87  0.243093923       2
+#&gt; 88  0.245856354       2
+#&gt; 89  0.248618785       2
+#&gt; 90  0.251381215       2
+#&gt; 91  0.254143646       2
+#&gt; 92  0.256906077       2
+#&gt; 93  0.259668508       2
+#&gt; 94  0.262430939       2
+#&gt; 95  0.265193370       2
+#&gt; 96  0.267955801       2
+#&gt; 97  0.270718232       1
+#&gt; 98  0.273480663       1
+#&gt; 99  0.276243094       1
+#&gt; 100 0.279005525       1
+#&gt; 101 0.281767956       1
+#&gt; 102 0.284530387       1
+#&gt; 103 0.287292818       1
+#&gt; 104 0.290055249       1
+#&gt; 105 0.292817680       1
+#&gt; 106 0.295580110       1
+#&gt; 107 0.298342541       1
+#&gt; 108 0.301104972       1
+#&gt; 109 0.303867403       1
+#&gt; 110 0.306629834       1
+#&gt; 111 0.309392265       1
+#&gt; 112 0.312154696       1
+#&gt; 113 0.314917127       1
+#&gt; 114 0.317679558       1
+#&gt; 115 0.320441989       1
+#&gt; 116 0.323204420       1
+#&gt; 117 0.325966851       1
+#&gt; 118 0.328729282       1
+#&gt; 119 0.331491713       1
+#&gt; 120 0.334254144       1
+#&gt; 121 0.337016575       1
+#&gt; 122 0.339779006       1
+#&gt; 123 0.342541436       1
+#&gt; 124 0.345303867       1
+#&gt; 125 0.348066298       1
+#&gt; 126 0.350828729       1
+#&gt; 127 0.353591160       1
+#&gt; 128 0.356353591       1
+#&gt; 129 0.359116022       1
+#&gt; 130 0.361878453       1
+#&gt; 131 0.364640884       1
+#&gt; 132 0.367403315       1
+#&gt; 133 0.370165746       1
+#&gt; 134 0.372928177       1
+#&gt; 135 0.375690608       1
+#&gt; 136 0.378453039       1
+#&gt; 137 0.381215470       1
+#&gt; 138 0.383977901       1
+#&gt; 139 0.386740331       1
+#&gt; 140 0.389502762       1
+#&gt; 141 0.392265193       1
+#&gt; 142 0.395027624       1
+#&gt; 143 0.397790055       1
+#&gt; 144 0.400552486       1
+#&gt; 145 0.403314917       1
+#&gt; 146 0.406077348       1
+#&gt; 147 0.408839779       1
+#&gt; 148 0.411602210       1
+#&gt; 149 0.414364641       1
+#&gt; 150 0.417127072       1
+#&gt; 151 0.419889503       1
+#&gt; 152 0.422651934       1
+#&gt; 153 0.425414365       1
+#&gt; 154 0.428176796       1
+#&gt; 155 0.430939227       1
+#&gt; 156 0.433701657       1
+#&gt; 157 0.436464088       1
+#&gt; 158 0.439226519       1
+#&gt; 159 0.441988950       1
+#&gt; 160 0.444751381       1
+#&gt; 161 0.447513812       1
+#&gt; 162 0.450276243       1
+#&gt; 163 0.453038674       1
+#&gt; 164 0.455801105       1
+#&gt; 165 0.458563536       1
+#&gt; 166 0.461325967       1
+#&gt; 167 0.464088398       1
+#&gt; 168 0.466850829       1
+#&gt; 169 0.469613260       1
+#&gt; 170 0.472375691       1
+#&gt; 171 0.475138122       1
+#&gt; 172 0.477900552       1
+#&gt; 173 0.480662983       1
+#&gt; 174 0.483425414       1
+#&gt; 175 0.486187845       1
+#&gt; 176 0.488950276       1
+#&gt; 177 0.491712707       1
+#&gt; 178 0.494475138       1
+#&gt; 179 0.497237569       1
+#&gt; 180 0.500000000       1</div><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sneakPeek</span><span class='op'>(</span><span class='va'>tree</span>, step <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+</div><div class='img'><img src='lineagePath-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>lineagePath</span><span class='op'>(</span><span class='va'>x</span>, similarity <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; This is a 'lineagePath' object.
 #&gt; 
 #&gt; 4 lineage paths using 5% as "major SNP" threshold </div></pre>

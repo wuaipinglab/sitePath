@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.1</span>
       </span>
     </div>
 
@@ -47,7 +47,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/wuaipinglab/sitePath/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -86,7 +86,7 @@
 <ol style="list-style-type: decimal">
 <li>Import tree and sequence alignment</li>
 <li>Resolve phylogenetic lineages</li>
-<li>Hierarchical search for lineage-dependent fixation events</li>
+<li>Hierarchical search for fixation and parallel mutations</li>
 </ol>
 </div>
 <div id="import-data" class="section level1">
@@ -103,11 +103,13 @@
 <span class="va">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
 <span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span></code></pre></div>
 <p>It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult.</p>
+<p>Also, we expect the tree to have no super long branches. A bad example is shown below:</p>
+<p><img src="sitePath_files/figure-html/bad_tree_example-1.png" width="700"></p>
 </div>
 <div id="parse-and-match-sequence-alignment" class="section level2">
 <h2 class="hasAnchor">
 <a href="#parse-and-match-sequence-alignment" class="anchor"></a>Parse and match sequence alignment</h2>
-<p>Most multiple sequence alignment format can be parsed by <a href="https://cran.r-project.org/web/packages/seqinr/index.html">seqinr</a>. sitePath has a wrapper function for parsing and adding the sequence alignment.</p>
+<p>Most multiple sequence alignment format can be parsed by <a href="https://cran.r-project.org/web/packages/seqinr/index.html">seqinr</a>. There is a wrapper function for parsing and adding the sequence alignment.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
 <span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/phyMSAmatched.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">alignment_file</span>, <span class="st">"fasta"</span><span class="op">)</span></code></pre></div>
@@ -116,7 +118,7 @@
 <div id="phylogenetic-lineages" class="section level1">
 <h1 class="hasAnchor">
 <a href="#phylogenetic-lineages" class="anchor"></a>Phylogenetic lineages</h1>
-<p>The names in tree and aligment must be matched. We use a <strong>tip-to-root</strong> algorithm to trim tree leaves/tips to expose the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evalute the impact of threshold on result.</p>
+<p>The names in tree and alignment must be matched. We exploit polymorphism of each site to find the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evaluate the impact of threshold on result.</p>
 <div id="the-impact-of-threshold-on-resolving-lineages" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-impact-of-threshold-on-resolving-lineages" class="anchor"></a>The impact of threshold on resolving lineages</h2>
@@ -128,7 +130,7 @@
 <div id="choose-a-threshold" class="section level2">
 <h2 class="hasAnchor">
 <a href="#choose-a-threshold" class="anchor"></a>Choose a threshold</h2>
-<p>Use the return of the function <code>lineagePath</code> for downstream analysis. The choice of the threshold really depends. You can use the result from <code>sneakPeak</code> as a reference for threhold choosing. Here 0.05 is used as an example.</p>
+<p>Use the return of the function <code>lineagePath</code> for downstream analysis. The choice of the threshold really depends. You can use the result from <code>sneakPeak</code> as a reference for threshold choosing. Here 0.05 is used as an example.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">preassessment</span>, similarity <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
 <span class="va">paths</span>
@@ -163,7 +165,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Result for 4 paths:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; 988 139 894 2074 2086 2634 3045 107 1118 3353 1143 2842 3398 </span>
+<span class="co">#&gt; 109 139 894 2074 2086 2634 3045 3144 988 1143 2842 3398 107 1118 3353 </span>
 <span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
 <p>If you want to retrieve the result of a single site, you can pass the result of <code>fixationSites</code> and the site index to <code>extractSite</code> function. The output is a <code>sitePath</code> object which stores the tip names.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -207,28 +209,28 @@
 <span class="co">#&gt; [121] "ANC90426"     "ALU33341"     "ASB32509"     "AMA12085"     "AMU04506"    </span>
 <span class="co">#&gt; [126] "AMA12087"     "AMA12084"     "AQU12485"     "AMS00611"     "AMQ48981"    </span>
 <span class="co">#&gt; [131] "AOY08538"     "APH11492"     "AOY08517"     "AOY08541"     "AOO54270"    </span>
-<span class="co">#&gt; [136] "AND01116"     "ARB07967"     "ANF04752"     "AOE22997"     "APQ41782"    </span>
-<span class="co">#&gt; [141] "APQ41786"     "ASU55393"     "ASU55404"     "ASU55423"     "ANB66182"    </span>
-<span class="co">#&gt; [146] "ASU55425"     "ASU55420"     "AQX32986"     "ASU55422"     "APQ41784"    </span>
-<span class="co">#&gt; [151] "ANC90428"     "ASU55415"     "ASU55418"     "ARM59239"     "ASU55408"    </span>
-<span class="co">#&gt; [156] "ASU55424"     "ASU55390"     "ASU55419"     "ASU55391"     "AMM39804"    </span>
-<span class="co">#&gt; [161] "ASU55411"     "ANB66183"     "ASU55421"     "AMZ03557"     "ASU55392"    </span>
-<span class="co">#&gt; [166] "AQX32987"     "ASU55403"     "ASU55399"     "APQ41783"     "ANS60026"    </span>
-<span class="co">#&gt; [171] "ANB66184"     "ASU55426"     "ASU55412"     "ASU55413"     "ASU55410"    </span>
-<span class="co">#&gt; [176] "ASU55397"     "ASU55400"     "ASU55409"     "APB03017"     "ASU55395"    </span>
-<span class="co">#&gt; [181] "ASU55396"     "AOY08524"     "ASU55394"     "ASU55414"     "ASU55405"    </span>
-<span class="co">#&gt; [186] "AMC33116"     "ASU55406"     "ASU55398"     "ASU55407"     "AMQ34003"    </span>
-<span class="co">#&gt; [191] "AMQ34004"     "ASU55401"     "ASU55402"     "ARU07076"     "AMK49164"    </span>
-<span class="co">#&gt; [196] "APG56457"     "AOR82892"     "ATB53752"     "ANH10698"     "AOR82893"    </span>
-<span class="co">#&gt; [201] "ARU07075"     "AMB18850"     "YP_009428568" "AMQ48982"     "ART29823"    </span>
-<span class="co">#&gt; [206] "APW84876"     "ASK51714"     "ARB07953"     "APW84872"     "AOY08525"    </span>
-<span class="co">#&gt; [211] "APW84873"     "AOY08535"     "AVZ25035"     "ARB07932"     "AOY08523"    </span>
-<span class="co">#&gt; [216] "AOY08542"     "ASW34087"     "AOY08537"     "APB03020"     "ART29826"    </span>
-<span class="co">#&gt; [221] "ART29825"     "AOS90220"     "AMN14620"     "APW84874"     "APW84875"    </span>
-<span class="co">#&gt; [226] "BAV82373"     "AOS90221"     "AOS90224"     "APB03021"     "APO39232"    </span>
-<span class="co">#&gt; [231] "AOS90223"     "APO39237"     "ANH22038"     "APW84877"     "APO39236"    </span>
-<span class="co">#&gt; [236] "AOY08546"     "AOY08516"     "APO39233"     "AOS90222"     "AOO53981"    </span>
-<span class="co">#&gt; [241] "AOY08521"     "AOO85388"     "APO39228"    </span>
+<span class="co">#&gt; [136] "AND01116"     "ARU07076"     "AMK49164"     "APG56457"     "AOR82892"    </span>
+<span class="co">#&gt; [141] "ATB53752"     "ANH10698"     "AOR82893"     "ARU07075"     "AMB18850"    </span>
+<span class="co">#&gt; [146] "YP_009428568" "AMQ48982"     "ART29823"     "APW84876"     "ASK51714"    </span>
+<span class="co">#&gt; [151] "ARB07953"     "APW84872"     "AOY08525"     "APW84873"     "AOY08535"    </span>
+<span class="co">#&gt; [156] "AVZ25035"     "ARB07932"     "AOY08523"     "AOY08542"     "ASW34087"    </span>
+<span class="co">#&gt; [161] "AOY08537"     "APB03020"     "ART29826"     "ART29825"     "AOS90220"    </span>
+<span class="co">#&gt; [166] "AMN14620"     "APW84874"     "APW84875"     "BAV82373"     "AOS90221"    </span>
+<span class="co">#&gt; [171] "AOS90224"     "APB03021"     "APO39232"     "AOS90223"     "APO39237"    </span>
+<span class="co">#&gt; [176] "ANH22038"     "APW84877"     "APO39236"     "AOY08546"     "AOY08516"    </span>
+<span class="co">#&gt; [181] "APO39233"     "AOS90222"     "AOO53981"     "AOY08521"     "AOO85388"    </span>
+<span class="co">#&gt; [186] "APO39228"     "ARB07967"     "ANF04752"     "AOE22997"     "APQ41782"    </span>
+<span class="co">#&gt; [191] "APQ41786"     "ASU55393"     "ASU55404"     "ASU55423"     "ANB66182"    </span>
+<span class="co">#&gt; [196] "ASU55425"     "ASU55420"     "AQX32986"     "ASU55422"     "APQ41784"    </span>
+<span class="co">#&gt; [201] "ANC90428"     "ASU55415"     "ASU55418"     "ARM59239"     "ASU55408"    </span>
+<span class="co">#&gt; [206] "ASU55424"     "ASU55390"     "ASU55419"     "ASU55391"     "AMM39804"    </span>
+<span class="co">#&gt; [211] "ASU55411"     "ANB66183"     "ASU55421"     "AMZ03557"     "ASU55392"    </span>
+<span class="co">#&gt; [216] "AQX32987"     "ASU55403"     "ASU55399"     "APQ41783"     "ANS60026"    </span>
+<span class="co">#&gt; [221] "ANB66184"     "ASU55426"     "ASU55412"     "ASU55413"     "ASU55410"    </span>
+<span class="co">#&gt; [226] "ASU55397"     "ASU55400"     "ASU55409"     "APB03017"     "ASU55395"    </span>
+<span class="co">#&gt; [231] "ASU55396"     "AOY08524"     "ASU55394"     "ASU55414"     "ASU55405"    </span>
+<span class="co">#&gt; [236] "AMC33116"     "ASU55406"     "ASU55398"     "ASU55407"     "AMQ34003"    </span>
+<span class="co">#&gt; [241] "AMQ34004"     "ASU55401"     "ASU55402"    </span>
 <span class="co">#&gt; attr(,"AA")</span>
 <span class="co">#&gt; [1] "N"</span></code></pre></div>
 <p>Use <code>plot</code> on a <code>sitePath</code> object to visualize the fixation mutation of a single site. Alternatively, use <code>plotSingleSite</code> on an <code>fixationSites</code> object with the site specified.</p>
@@ -259,7 +261,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Result for 4 paths:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; 105 1717 988 1264 1226 3076 106 573 2611 2787 2749 3162 1857 1016 1171 2634 2357 1327 3046 3328 940 1404 1180 </span>
+<span class="co">#&gt; 105 1226 1264 1717 988 2611 2787 2749 3162 1857 1016 1171 1327 3046 3328 2634 3076 106 2357 573 940 1180 1404 </span>
 <span class="co">#&gt; No reference sequence specified. Using alignment numbering</span></code></pre></div>
 <p>The result of a single site can be visualized by <code>plotSingleSite</code> function.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -308,7 +310,7 @@
 <a href="#session-info" class="anchor"></a>Session info</h1>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; R Under development (unstable) (2020-11-05 r79401)</span>
+<span class="co">#&gt; R Under development (unstable) (2020-11-02 r79396)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.1 LTS</span>
 <span class="co">#&gt; </span>
@@ -327,32 +329,32 @@
 <span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt; [1] sitePath_1.7.0   BiocStyle_2.19.0</span>
+<span class="co">#&gt; [1] sitePath_1.7.1   BiocStyle_2.19.1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] progress_1.2.2      treeio_1.15.0       tidyselect_1.1.0   </span>
+<span class="co">#&gt;  [1] progress_1.2.2      treeio_1.15.1       tidyselect_1.1.0   </span>
 <span class="co">#&gt;  [4] xfun_0.19           purrr_0.3.4         lattice_0.20-41    </span>
-<span class="co">#&gt;  [7] colorspace_2.0-0    vctrs_0.3.4         generics_0.1.0     </span>
-<span class="co">#&gt; [10] htmltools_0.5.0     yaml_2.2.1          rlang_0.4.8        </span>
-<span class="co">#&gt; [13] pkgdown_1.6.1.9000  pillar_1.4.6        glue_1.4.2         </span>
+<span class="co">#&gt;  [7] colorspace_2.0-0    vctrs_0.3.5         generics_0.1.0     </span>
+<span class="co">#&gt; [10] htmltools_0.5.0     yaml_2.2.1          rlang_0.4.9        </span>
+<span class="co">#&gt; [13] pkgdown_1.6.1.9000  pillar_1.4.7        glue_1.4.2         </span>
 <span class="co">#&gt; [16] RColorBrewer_1.1-2  rvcheck_0.1.8       lifecycle_0.2.0    </span>
 <span class="co">#&gt; [19] stringr_1.4.0       munsell_0.5.0       gtable_0.3.0       </span>
 <span class="co">#&gt; [22] ragg_0.4.0          memoise_1.1.0       evaluate_0.14      </span>
 <span class="co">#&gt; [25] labeling_0.4.2      knitr_1.30          parallel_4.1.0     </span>
-<span class="co">#&gt; [28] Rcpp_1.0.5          scales_1.1.1        backports_1.2.0    </span>
-<span class="co">#&gt; [31] BiocManager_1.30.10 desc_1.2.0          jsonlite_1.7.1     </span>
-<span class="co">#&gt; [34] farver_2.0.3        systemfonts_0.3.2   fs_1.5.0           </span>
-<span class="co">#&gt; [37] gridExtra_2.3       textshaping_0.2.0   hms_0.5.3          </span>
-<span class="co">#&gt; [40] ggplot2_3.3.2       aplot_0.0.6         digest_0.6.27      </span>
-<span class="co">#&gt; [43] stringi_1.5.3       bookdown_0.21       dplyr_1.0.2        </span>
-<span class="co">#&gt; [46] ggrepel_0.8.2       ade4_1.7-16         grid_4.1.0         </span>
-<span class="co">#&gt; [49] rprojroot_1.3-2     ggtree_2.5.0        tools_4.1.0        </span>
-<span class="co">#&gt; [52] magrittr_1.5        lazyeval_0.2.2      patchwork_1.1.0    </span>
-<span class="co">#&gt; [55] tibble_3.0.4        seqinr_4.2-4        crayon_1.3.4       </span>
-<span class="co">#&gt; [58] ape_5.4-1           tidyr_1.1.2         pkgconfig_2.0.3    </span>
-<span class="co">#&gt; [61] MASS_7.3-53         ellipsis_0.3.1      tidytree_0.3.3     </span>
-<span class="co">#&gt; [64] prettyunits_1.1.1   assertthat_0.2.1    rmarkdown_2.5      </span>
-<span class="co">#&gt; [67] R6_2.5.0            nlme_3.1-150        compiler_4.1.0</span></code></pre></div>
+<span class="co">#&gt; [28] Rcpp_1.0.5          scales_1.1.1        BiocManager_1.30.10</span>
+<span class="co">#&gt; [31] desc_1.2.0          jsonlite_1.7.2      farver_2.0.3       </span>
+<span class="co">#&gt; [34] systemfonts_0.3.2   fs_1.5.0            gridExtra_2.3      </span>
+<span class="co">#&gt; [37] textshaping_0.2.1   hms_0.5.3           ggplot2_3.3.2      </span>
+<span class="co">#&gt; [40] aplot_0.0.6         digest_0.6.27       stringi_1.5.3      </span>
+<span class="co">#&gt; [43] bookdown_0.21       dplyr_1.0.2         ggrepel_0.8.2      </span>
+<span class="co">#&gt; [46] ade4_1.7-16         grid_4.1.0          rprojroot_2.0.2    </span>
+<span class="co">#&gt; [49] ggtree_2.5.0        tools_4.1.0         magrittr_2.0.1     </span>
+<span class="co">#&gt; [52] lazyeval_0.2.2      patchwork_1.1.0     tibble_3.0.4       </span>
+<span class="co">#&gt; [55] seqinr_4.2-4        crayon_1.3.4        ape_5.4-1          </span>
+<span class="co">#&gt; [58] tidyr_1.1.2         pkgconfig_2.0.3     MASS_7.3-53        </span>
+<span class="co">#&gt; [61] ellipsis_0.3.1      tidytree_0.3.3      prettyunits_1.1.1  </span>
+<span class="co">#&gt; [64] assertthat_0.2.1    rmarkdown_2.6       R6_2.5.0           </span>
+<span class="co">#&gt; [67] nlme_3.1-151        compiler_4.1.0</span></code></pre></div>
 </div>
   </div>
 

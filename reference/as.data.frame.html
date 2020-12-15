@@ -80,7 +80,7 @@ An parallelSites object will output the tip name
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.1</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@ An parallelSites object will output the tip name
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/wuaipinglab/sitePath/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -170,17 +170,16 @@ An parallelSites object will output the tip name
 <span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
 <span class='va'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>fixations</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    mutation  from    to
-#&gt; 1     T196A 2.1.1 3.1.2
-#&gt; 2     V988A 1.1.1 2.1.1
-#&gt; 3     V784L 2.1.1 3.2.2
-#&gt; 4     S139N 1.1.1 2.2.1
-#&gt; 5     G894A 2.2.2 2.2.3
-#&gt; 6    V1542I 2.2.4 2.2.5
-#&gt; 7    M2074L 2.2.2 2.2.3
-#&gt; 8    Y2086H 1.1.1 2.2.1
-#&gt; 9    M2634V 2.2.1 2.2.2
-#&gt; 10   R3045C 2.2.3 2.2.4</div></pre>
+</div><div class='output co'>#&gt;   mutation  from    to
+#&gt; 1    T196A 2.1.1 2.1.2
+#&gt; 2    V988A 1.1.1 2.1.1
+#&gt; 3    S139N 1.1.1 2.2.1
+#&gt; 4    G894A 2.2.2 2.2.3
+#&gt; 5   V1542I 2.2.4 2.2.5
+#&gt; 6   M2074L 2.2.2 2.2.3
+#&gt; 7   Y2086H 1.1.1 2.2.1
+#&gt; 8   M2634V 2.2.1 2.2.2
+#&gt; 9   R3045C 2.2.3 2.2.4</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
