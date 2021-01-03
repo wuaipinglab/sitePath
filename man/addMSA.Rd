@@ -3,22 +3,31 @@
 \name{phyMSAmatched}
 \alias{phyMSAmatched}
 \alias{addMSA}
-\title{Prepare data for sitePath analysis}
+\alias{addMSA.phylo}
+\alias{addMSA.treedata}
+\title{Add matching sequence alignment to the tree}
 \usage{
-addMSA(
+addMSA(tree, ...)
+
+\method{addMSA}{phylo}(
   tree,
   msaPath = "",
   msaFormat = c("fasta", "clustal", "phylip", "mase", "msf"),
   alignment = NULL,
-  seqType = c("AA", "DNA", "RNA")
+  seqType = c("AA", "DNA", "RNA"),
+  ...
 )
+
+\method{addMSA}{treedata}(tree, ...)
 }
 \arguments{
 \item{tree}{A \code{\link{phylo}} object. This commonly can be from tree
 parsing function in \code{\link{ape}} or \code{\link{ggtree}}. All the
 \code{tip.label} should be found in the sequence alignment. The tree is
-supposed to fully resolved (bifurcated) and will be resolved by
+supposed to be fully resolved (bifurcated) and will be resolved by
 \code{\link{multi2di}} if \code{\link{is.binary}} gives \code{FALSE}.}
+
+\item{...}{Other arguments.}
 
 \item{msaPath}{The file path to the multiple sequence alignment file.}
 
@@ -39,8 +48,7 @@ Since 1.5.12, the function returns a \code{phyMSAmatched} object to
   avoid S3 methods used on \code{phylo} (better encapsulation).
 }
 \description{
-sitePath requires both tree and sequence alignment to do the
-  analysis. \code{addMSA} wraps \code{\link{read.alignment}} function in
+\code{addMSA} wraps \code{\link{read.alignment}} function in
   \code{\link{seqinr}} package and helps match names in tree and sequence
   alignment. Either provide the file path to an alignment file and its format
   or an alignment object from the return of \code{\link{read.alignment}}
