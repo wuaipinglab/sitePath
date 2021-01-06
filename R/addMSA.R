@@ -1,7 +1,8 @@
-#' @importFrom utils flush.console
-#' @importFrom utils txtProgressBar
-#' @importFrom utils setTxtProgressBar
 #' @importFrom methods is
+#' @importFrom utils flush.console setTxtProgressBar txtProgressBar
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom parallel clusterExport parLapply
 #' @importFrom seqinr read.alignment
 #' @importFrom ape multi2di is.binary Ntip as.phylo
 
@@ -99,49 +100,74 @@ addMSA.phylo <- function(tree,
     siteIndices <- attr(res, "msaNumbering")[loci] - 1L
     # Sequence similarity matrix
     simMatrix <- getSimilarityMatrix(align)
-    dimnames(simMatrix) <-
-        list(tree[["tip.label"]], tree[["tip.label"]])
+    dimnames(simMatrix) <- list(tree[["tip.label"]],
+                                tree[["tip.label"]])
     attr(res, "simMatrix") <- simMatrix
-    # Get all lineages using the terminal node found by SNP
-    terminalTips <- terminalTipsBySim(
-        tipPaths = nodepath(tree),
-        alignedSeqs = align,
-        metricMatrix = simMatrix,
-        siteIndices = siteIndices,
-        zValue = 0
+    # The tip to root path made of nodes
+    tipPaths <- nodepath(tree)
+    # Prep for multi-processing run
+    coreNum <- detectCores()
+    cl <- makeCluster(coreNum)
+    clusterExport(
+        cl = cl,
+        varlist = c("tipPaths", "align", "simMatrix"),
+        envir = environment()
     )
-    maxSize <- min(Ntip(tree) / 2,
-                   max(unlist(lapply(
-                       terminalTips, lengths
-                   ))))
-    attr(res, "rangeOfResults") <- lapply(
-        X = seq(2, maxSize),
-        FUN = function(minSize) {
-            # The result for each 'minSize' threshold
-            paths <- lapply(
-                X = names(terminalTips),
-                FUN = function(siteName) {
-                    # The node path for each site
-                    endTips <- terminalTips[[siteName]]
-                    candidatePaths <- lapply(
-                        X = endTips[which(lengths(endTips) >= minSize)],
-                        FUN = function(tips) {
-                            res <- attr(tips, "nodepath")
-                            attributes(tips) <- NULL
-                            attr(res, "tips") <- tips
-                            return(res)
-                        }
-                    )
-                    return(candidatePaths)
-                }
+    # Split sites into even groups for each CPU core
+    siteSplit <- 1
+    if (coreNum - 1) {
+        siteSplit <- as.integer(cut(seq_along(siteIndices), coreNum))
+    }
+    terminalTips <- parLapply(
+        cl = cl,
+        X = split(siteIndices, siteSplit),
+        fun = function(indices) {
+            # Get all lineages using the terminal node found by SNP
+            res <- terminalTipsBySim(
+                tipPaths = tipPaths,
+                alignedSeqs = align,
+                metricMatrix = simMatrix,
+                siteIndices = indices,
+                zValue = 0
             )
-            paths <- unlist(x = paths, recursive = FALSE)
-            paths <- mergePaths(paths)
-            attr(paths, "minSize") <- minSize
-            return(paths)
+            return(res)
         }
     )
+    stopCluster(cl)
+    terminalTips <- Reduce("c", terminalTips)
+    # The threshold better not exceed half of total tip number
+    maxSize <- min(length(tipPaths) / 2, max(unlist(lapply(
+        terminalTips, lengths
+    ))))
+    attr(res, "rangeOfResults") <- lapply(X = seq(2, maxSize),
+                                          FUN = .pathsUnderThreshold,
+                                          terminalTips = terminalTips)
     return(res)
+}
+
+.pathsUnderThreshold <- function(minSize, terminalTips) {
+    # The result for each 'minSize' threshold
+    paths <- lapply(
+        X = names(terminalTips),
+        FUN = function(siteName) {
+            # The node path for each site
+            endTips <- terminalTips[[siteName]]
+            candidatePaths <- lapply(
+                X = endTips[which(lengths(endTips) >= minSize)],
+                FUN = function(tips) {
+                    res <- attr(tips, "nodepath")
+                    attributes(tips) <- NULL
+                    attr(res, "tips") <- tips
+                    return(res)
+                }
+            )
+            return(candidatePaths)
+        }
+    )
+    paths <- unlist(x = paths, recursive = FALSE)
+    paths <- mergePaths(paths)
+    attr(paths, "minSize") <- minSize
+    return(paths)
 }
 
 #' @rdname addMSA
