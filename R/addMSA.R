@@ -112,20 +112,14 @@ addMSA.phylo <- function(tree,
         varlist = c("tipPaths", "align", "simMatrix"),
         envir = environment()
     )
+    # Get all lineages using the terminal node found by SNP
     terminalTips <- parLapply(
         cl = cl,
         X = clusterSplit(cl, siteIndices),
-        fun = function(indices) {
-            # Get all lineages using the terminal node found by SNP
-            res <- terminalTipsBySim(
-                tipPaths = tipPaths,
-                alignedSeqs = align,
-                metricMatrix = simMatrix,
-                siteIndices = indices,
-                zValue = 0
-            )
-            return(res)
-        }
+        fun = terminalTipsBySim,
+        tipPaths = tipPaths,
+        alignedSeqs = align,
+        metricMatrix = simMatrix
     )
     stopCluster(cl)
     terminalTips <- Reduce("c", terminalTips)

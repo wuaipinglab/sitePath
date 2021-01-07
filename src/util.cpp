@@ -74,11 +74,10 @@ Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > majorSNPtips(
 
 // [[Rcpp::export]]
 Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(
+        const Rcpp::IntegerVector &siteIndices,
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &metricMatrix,
-        const Rcpp::IntegerVector &siteIndices,
-        const int zValue
+        const Rcpp::NumericMatrix &metricMatrix
 ) {
     using namespace LumpyCluster;
     std::map<int, tipGrouping> res = terminalTips<BySimMatrix>(
@@ -86,18 +85,17 @@ Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(
         alignedSeqs,
         metricMatrix,
         siteIndices,
-        zValue
+        0
     );
     return Rcpp::wrap(res);
 }
 
 // [[Rcpp::export]]
 Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(
+        const Rcpp::IntegerVector &siteIndices,
         const Rcpp::ListOf<Rcpp::IntegerVector> &tipPaths,
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs,
-        const Rcpp::NumericMatrix &metricMatrix,
-        const Rcpp::IntegerVector &siteIndices,
-        const int zValue
+        const Rcpp::NumericMatrix &metricMatrix
 ) {
     using namespace LumpyCluster;
     std::map<int, tipGrouping> res = terminalTips<ByDistMatrix>(
@@ -105,7 +103,7 @@ Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(
         alignedSeqs,
         metricMatrix,
         siteIndices,
-        zValue
+        0
     );
     return Rcpp::wrap(res);
 }
