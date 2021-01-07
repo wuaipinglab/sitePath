@@ -2,7 +2,7 @@
 #' @importFrom utils flush.console setTxtProgressBar txtProgressBar
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster stopCluster
-#' @importFrom parallel clusterExport parLapply
+#' @importFrom parallel clusterExport clusterSplit parLapply
 #' @importFrom seqinr read.alignment
 #' @importFrom ape multi2di is.binary Ntip as.phylo
 
@@ -106,21 +106,15 @@ addMSA.phylo <- function(tree,
     # The tip to root path made of nodes
     tipPaths <- nodepath(tree)
     # Prep for multi-processing run
-    coreNum <- detectCores()
-    cl <- makeCluster(coreNum)
+    cl <- makeCluster(detectCores())
     clusterExport(
         cl = cl,
         varlist = c("tipPaths", "align", "simMatrix"),
         envir = environment()
     )
-    # Split sites into even groups for each CPU core
-    siteSplit <- 1
-    if (coreNum - 1) {
-        siteSplit <- as.integer(cut(seq_along(siteIndices), coreNum))
-    }
     terminalTips <- parLapply(
         cl = cl,
-        X = split(siteIndices, siteSplit),
+        X = clusterSplit(cl, siteIndices),
         fun = function(indices) {
             # Get all lineages using the terminal node found by SNP
             res <- terminalTipsBySim(
