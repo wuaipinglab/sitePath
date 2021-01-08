@@ -51,7 +51,7 @@ Also, we expect the tree to have no super long branches. A bad example is shown 
 ```{r bad_tree_example, echo=FALSE}
 bad_tree <- read.tree(system.file("extdata", "WNV.newick", package = "sitePath"))
 
-ggtree::ggtree(bad_tree)
+ggtree::ggtree(bad_tree) + ggplot2::ggtitle("Do not use a tree like this")
 ```
 
 

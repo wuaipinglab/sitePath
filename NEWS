@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.7.2
+-------------------------
+    o Fix: missing export for 'plot.phyMSAmatched' function
+    o Fix: 'addMSA' function unable to handle 'treedata' object
+    o Multiprocess for 'addMSA' and 'sitesMinEntropy' function
+
 CHANGES IN VERSION 1.7.1
 -------------------------
     o Guess sequence type based on ATCG proportion for 'addMSA'.
