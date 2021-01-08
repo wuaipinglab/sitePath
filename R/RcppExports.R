@@ -9,12 +9,12 @@ majorSNPtips <- function(alignedSeqs, siteIndices, minSNPnum) {
     .Call('_sitePath_majorSNPtips', PACKAGE = 'sitePath', alignedSeqs, siteIndices, minSNPnum)
 }
 
-terminalTipsBySim <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue) {
-    .Call('_sitePath_terminalTipsBySim', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue)
+terminalTipsBySim <- function(siteIndices, tipPaths, alignedSeqs, metricMatrix) {
+    .Call('_sitePath_terminalTipsBySim', PACKAGE = 'sitePath', siteIndices, tipPaths, alignedSeqs, metricMatrix)
 }
 
-terminalTipsByDist <- function(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue) {
-    .Call('_sitePath_terminalTipsByDist', PACKAGE = 'sitePath', tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue)
+terminalTipsByDist <- function(siteIndices, tipPaths, alignedSeqs, metricMatrix) {
+    .Call('_sitePath_terminalTipsByDist', PACKAGE = 'sitePath', siteIndices, tipPaths, alignedSeqs, metricMatrix)
 }
 
 mergePaths <- function(paths) {

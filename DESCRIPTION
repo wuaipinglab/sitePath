@@ -17,25 +17,26 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.1)
 Imports:
-    methods,
-    graphics,
-    utils,
-    stats,
-    grDevices,
-    ape,
-    seqinr,
-    Rcpp,
-    gridExtra,
     RColorBrewer,
+    Rcpp,
+    ape,
+    aplot,
     ggplot2,
     ggrepel,
-    aplot,
+    ggtree,
+    graphics,
+    grDevices,
+    gridExtra,
+    methods,
+    parallel,
+    seqinr,
+    stats,
     tidytree,
-    ggtree
+    utils
 Suggests:
-    testthat,
+    BiocStyle,
     knitr,
-    BiocStyle
+    testthat
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
 Encoding: UTF-8

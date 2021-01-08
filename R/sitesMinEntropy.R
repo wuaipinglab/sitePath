@@ -1,4 +1,7 @@
 #' @importFrom utils tail
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom parallel clusterExport parLapply
 #' @importFrom ape getMRCA
 
 #' @rdname sitesMinEntropy
@@ -94,28 +97,40 @@ sitesMinEntropy.lineagePath <- function(x,
     })
     pathTipNums <-
         vapply(pathsWithSeqs, attr, integer(1), "pathTipNum")
-    # Use the number of tips to order the paths
+    # Use the number of tips to order the paths. The path with fewer number of
+    # tips come first so its result will be prioritize when merging
     tipNumRank <- order(pathTipNums)
     # The max number of tips a path has
     maxPathTipNum <- tail(pathTipNums[tipNumRank], 1)
+    # Prep for multi-processing run
+    cl <- makeCluster(detectCores())
+    clusterExport(
+        cl = cl,
+        varlist = c("minimizeEntropy", "searchDepth"),
+        envir = environment()
+    )
     res <- lapply(
         X = pathsWithSeqs[tipNumRank],
         FUN = function(pathNodeAlign) {
+            # The path with fewer tips will use smaller threshold
             scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
             scaledSize <- ceiling(minEffectiveSize * scaledSize)
+            attr(pathNodeAlign, "scaledSize") <- scaledSize
+            clusterExport(cl, "pathNodeAlign", environment())
             # Entropy minimization result for every locus
-            segs <- lapply(
+            segs <- parLapply(
+                cl = cl,
                 X = siteIndices,
-                FUN = .runEntropyMinimization,
+                fun = .runEntropyMinimization,
                 pathNodeAlign = pathNodeAlign,
                 minimizeEntropy = minimizeEntropy,
-                minEffectiveSize = scaledSize,
                 searchDepth = searchDepth
             )
             attr(segs, "pathNodeTips") <- pathNodeAlign
             return(segs)
         }
     )
+    stopCluster(cl)
     # Calibrate the result from all paths
     res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
     # Cluster tips according to fixation sites
@@ -151,8 +166,8 @@ sitesMinEntropy.lineagePath <- function(x,
 .runEntropyMinimization <- function(siteIndex,
                                     pathNodeAlign,
                                     minimizeEntropy,
-                                    minEffectiveSize,
                                     searchDepth) {
+    minEffectiveSize <- attr(pathNodeAlign, "scaledSize")
     # Assign a variable to store the tip names and their info on amino acids.
     # They are the potential fixation segment
     nodeTips <- integer()

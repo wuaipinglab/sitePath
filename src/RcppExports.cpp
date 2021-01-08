@@ -30,32 +30,30 @@ BEGIN_RCPP
 END_RCPP
 }
 // terminalTipsBySim
-Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix, const Rcpp::IntegerVector& siteIndices, const int zValue);
-RcppExport SEXP _sitePath_terminalTipsBySim(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP, SEXP siteIndicesSEXP, SEXP zValueSEXP) {
+Rcpp::ListOf< Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsBySim(const Rcpp::IntegerVector& siteIndices, const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix);
+RcppExport SEXP _sitePath_terminalTipsBySim(SEXP siteIndicesSEXP, SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type metricMatrix(metricMatrixSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
-    Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
-    rcpp_result_gen = Rcpp::wrap(terminalTipsBySim(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue));
+    rcpp_result_gen = Rcpp::wrap(terminalTipsBySim(siteIndices, tipPaths, alignedSeqs, metricMatrix));
     return rcpp_result_gen;
 END_RCPP
 }
 // terminalTipsByDist
-Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix, const Rcpp::IntegerVector& siteIndices, const int zValue);
-RcppExport SEXP _sitePath_terminalTipsByDist(SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP, SEXP siteIndicesSEXP, SEXP zValueSEXP) {
+Rcpp::ListOf<Rcpp::ListOf<Rcpp::IntegerVector> > terminalTipsByDist(const Rcpp::IntegerVector& siteIndices, const Rcpp::ListOf<Rcpp::IntegerVector>& tipPaths, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs, const Rcpp::NumericMatrix& metricMatrix);
+RcppExport SEXP _sitePath_terminalTipsByDist(SEXP siteIndicesSEXP, SEXP tipPathsSEXP, SEXP alignedSeqsSEXP, SEXP metricMatrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::IntegerVector>& >::type tipPaths(tipPathsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type metricMatrix(metricMatrixSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type siteIndices(siteIndicesSEXP);
-    Rcpp::traits::input_parameter< const int >::type zValue(zValueSEXP);
-    rcpp_result_gen = Rcpp::wrap(terminalTipsByDist(tipPaths, alignedSeqs, metricMatrix, siteIndices, zValue));
+    rcpp_result_gen = Rcpp::wrap(terminalTipsByDist(siteIndices, tipPaths, alignedSeqs, metricMatrix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -148,8 +146,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
     {"_sitePath_majorSNPtips", (DL_FUNC) &_sitePath_majorSNPtips, 3},
-    {"_sitePath_terminalTipsBySim", (DL_FUNC) &_sitePath_terminalTipsBySim, 5},
-    {"_sitePath_terminalTipsByDist", (DL_FUNC) &_sitePath_terminalTipsByDist, 5},
+    {"_sitePath_terminalTipsBySim", (DL_FUNC) &_sitePath_terminalTipsBySim, 4},
+    {"_sitePath_terminalTipsByDist", (DL_FUNC) &_sitePath_terminalTipsByDist, 4},
     {"_sitePath_mergePaths", (DL_FUNC) &_sitePath_mergePaths, 1},
     {"_sitePath_divergentNode", (DL_FUNC) &_sitePath_divergentNode, 1},
     {"_sitePath_getReference", (DL_FUNC) &_sitePath_getReference, 2},

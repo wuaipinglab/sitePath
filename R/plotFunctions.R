@@ -9,11 +9,6 @@
 #' @importFrom ggtree ggtree geom_tiplab theme_tree2
 #' @importFrom ggrepel geom_label_repel
 
-plot.phyMSAmatched <- function(x, y = TRUE) {
-    p <- ggtree(as.phylo.phyMSAmatched(x))
-    return(p)
-}
-
 #' @rdname plotFunctions
 #' @title Visualize the results
 #' @description The plot function to visualize the return of functions in the
@@ -21,9 +16,8 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #'   function name \code{plot} is used to keep the compatibility with previous
 #'   versions, but they do not behave like the generic \code{\link{plot}}
 #'   function since 1.5.4.
-#' @description A \code{\link{lineagePath}} object will be plotted as a tree
-#'   diagram and paths are black solid line while the trimmed nodes and tips
-#'   will use gray dashed line.
+#' @description A \code{\link{phyMSAmatched}} object will be plotted as a tree
+#'   diagram.
 #' @param x The object to plot.
 #' @param y Whether to show the fixation mutation between clusters. For
 #'   \code{lineagePath} object and \code{sitePath} object, it is deprecated and
@@ -38,8 +32,20 @@ plot.phyMSAmatched <- function(x, y = TRUE) {
 #' data(zikv_tree)
 #' data(zikv_align)
 #' tree <- addMSA(zikv_tree, alignment = zikv_align)
+#' plot(tree)
+plot.phyMSAmatched <- function(x, y = TRUE, ...) {
+    p <- ggtree(as.phylo.phyMSAmatched(x))
+    return(p)
+}
+
+#' @rdname plotFunctions
+#' @description A \code{\link{lineagePath}} object will be plotted as a tree
+#'   diagram and paths are black solid line while the trimmed nodes and tips
+#'   will use gray dashed line.
+#' @examples
 #' paths <- lineagePath(tree)
 #' plot(paths)
+#' @export
 plot.lineagePath <- function(x,
                              y = TRUE,
                              showTips = FALSE,
