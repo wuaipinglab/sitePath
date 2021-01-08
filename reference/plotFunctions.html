@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize the results — plot.lineagePath • sitePath</title>
+<title>Visualize the results — plot.phyMSAmatched • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,14 @@
 
 
 
-<meta property="og:title" content="Visualize the results — plot.lineagePath" />
+<meta property="og:title" content="Visualize the results — plot.phyMSAmatched" />
 <meta property="og:description" content="The plot function to visualize the return of functions in the
   package. The underlying function applies ggplot2. The
   function name plot is used to keep the compatibility with previous
   versions, but they do not behave like the generic plot
   function since 1.5.4.
+A phyMSAmatched object will be plotted as a tree
+  diagram.
 A lineagePath object will be plotted as a tree
   diagram and paths are black solid line while the trimmed nodes and tips
   will use gray dashed line.
@@ -132,6 +134,8 @@ A fixationPath object will be plotted as a
   function name <code>plot</code> is used to keep the compatibility with previous
   versions, but they do not behave like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>
   function since 1.5.4.</p>
+<p>A <code><a href='phyMSAmatched.html'>phyMSAmatched</a></code> object will be plotted as a tree
+  diagram.</p>
 <p>A <code><a href='lineagePath.html'>lineagePath</a></code> object will be plotted as a tree
   diagram and paths are black solid line while the trimmed nodes and tips
   will use gray dashed line.</p>
@@ -146,7 +150,10 @@ A fixationPath object will be plotted as a
   between two clusters.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for lineagePath</span>
+    <pre class="usage"><span class='co'># S3 method for phyMSAmatched</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for lineagePath</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, y <span class='op'>=</span> <span class='cn'>TRUE</span>, showTips <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for fixationSites</span>
@@ -172,14 +179,14 @@ A fixationPath object will be plotted as a
 no longer have effect since 1.5.4.</p></td>
     </tr>
     <tr>
-      <th>showTips</th>
-      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Other arguments. Since 1.5.4, the function uses
 <code>ggtree</code> as the base function to make plots so the arguments in
 <code>plot.phylo</code> will no longer work.</p></td>
+    </tr>
+    <tr>
+      <th>showTips</th>
+      <td><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>select</th>
@@ -198,15 +205,16 @@ in <code><a href='plotSingleSite.html'>plotSingleSite</a></code>.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align</span><span class='op'>)</span>
 <span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span>
-<span class='va'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
+</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>paths</span><span class='op'>)</span>
-</div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span><span class='op'>(</span><span class='va'>paths</span><span class='op'>)</span>
+</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>fixations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span><span class='op'>(</span><span class='va'>paths</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>fixations</span><span class='op'>)</span>
-</div><div class='img'><img src='plotFunctions-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span><span class='op'>(</span><span class='va'>fixations</span>, <span class='fl'>139</span><span class='op'>)</span>
+</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>sp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extractSite.html'>extractSite</a></span><span class='op'>(</span><span class='va'>fixations</span>, <span class='fl'>139</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>sp</span><span class='op'>)</span>
-</div><div class='img'><img src='plotFunctions-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span><span class='op'>(</span><span class='va'>fixations</span><span class='op'>)</span>
+</div><div class='img'><img src='plotFunctions-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationPath.html'>fixationPath</a></span><span class='op'>(</span><span class='va'>fixations</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='img'><img src='plotFunctions-4.png' alt='' width='700' height='433' /></div></pre>
+</div><div class='img'><img src='plotFunctions-5.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
