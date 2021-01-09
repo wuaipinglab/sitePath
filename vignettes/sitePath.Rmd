@@ -113,6 +113,13 @@ fixations <- fixationSites(minEntropy)
 fixations
 ```
 
+To get the position of all the resulting sites, `allSitesPos` can be used on the return of `fixationSites` and also other functions like `SNPsites` and `parallelSites`. 
+
+```{r}
+allSites <- allSitesPos(fixations)
+allSites
+```
+
 If you want to retrieve the result of a single site, you can pass the result of `fixationSites` and the site index to `extractSite` function. The output is a `sitePath` object which stores the tip names.
 
 ```{r get_sitePath}
