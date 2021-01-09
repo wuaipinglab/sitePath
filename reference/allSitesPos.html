@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fixation sites prediction — sitesMinEntropy • sitePath</title>
+<title>Retrieve position of all the sites — allSitesPos • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,11 @@
 
 
 
-<meta property="og:title" content="Fixation sites prediction — sitesMinEntropy" />
-<meta property="og:description" content="After finding the lineagePath of a phylogenetic
-  tree, sitesMinEntropy perform entropy minimization on every site of
-  the sequence to group the tips according to amino acid/nucleotide." />
+<meta property="og:title" content="Retrieve position of all the sites — allSitesPos" />
+<meta property="og:description" content="The function is a way to get position of the resulting sites
+  from SNPsites, fixationSites and
+  parallelSites. The numbering is consistent with what's being
+  set by setSiteNumbering" />
 
 
 
@@ -109,68 +110,56 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fixation sites prediction</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/sitesMinEntropy.R'><code>R/sitesMinEntropy.R</code></a></small>
-    <div class="hidden name"><code>sitesMinEntropy.Rd</code></div>
+    <h1>Retrieve position of all the sites</h1>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/allSitesPos.R'><code>R/allSitesPos.R</code></a></small>
+    <div class="hidden name"><code>allSitesPos.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>After finding the <code><a href='lineagePath.html'>lineagePath</a></code> of a phylogenetic
-  tree, <code>sitesMinEntropy</code> perform entropy minimization on every site of
-  the sequence to group the tips according to amino acid/nucleotide.</p>
+    <p>The function is a way to get position of the resulting sites
+  from <code><a href='SNPsites.html'>SNPsites</a></code>, <code><a href='fixationSites.html'>fixationSites</a></code> and
+  <code><a href='parallelSites.html'>parallelSites</a></code>. The numbering is consistent with what's being
+  set by <code><a href='setSiteNumbering.html'>setSiteNumbering</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>sitesMinEntropy</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>allSitesPos</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='co'># S3 method for lineagePath</span>
-<span class='fu'>sitesMinEntropy</span><span class='op'>(</span>
-  <span class='va'>x</span>,
-  minEffectiveSize <span class='op'>=</span> <span class='cn'>NULL</span>,
-  searchDepth <span class='op'>=</span> <span class='fl'>1</span>,
-  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span><span class='op'>)</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='co'># S3 method for SNPsites</span>
+<span class='fu'>allSitesPos</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for fixationSites</span>
+<span class='fu'>allSitesPos</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for parallelSites</span>
+<span class='fu'>allSitesPos</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code>lineagePath</code> object returned from <code><a href='lineagePath.html'>lineagePath</a></code>
-function.</p></td>
+      <td><p>The object containing the sites from analysis</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>further arguments passed to or from other methods.</p></td>
-    </tr>
-    <tr>
-      <th>minEffectiveSize</th>
-      <td><p>The minimum number of tips in a group.</p></td>
-    </tr>
-    <tr>
-      <th>searchDepth</th>
-      <td><p>The function uses heuristic search but the termination of
-the search cannot be intrinsically decided. <code>searchDepth</code> is needed to
-tell the search when to stop.</p></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>The strategy for predicting the fixation. The basic approach is
-entropy minimization and can be achieved by adding or removing fixation
-point, or by comparing the two.</p></td>
+      <td><p>Other arguments</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>sitesMinEntropy</code> object.</p>
+    <p>An integer vector for sites position</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
-<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
-<span class='fu'>sitesMinEntropy</span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; This is a 'sitesMinEntropy' object. </div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
+<span class='va'>msaPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>'extdata'</span>, <span class='st'>'ZIKV.fasta'</span>, package <span class='op'>=</span> <span class='st'>'sitePath'</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, msaPath <span class='op'>=</span> <span class='va'>msaPath</span>, msaFormat <span class='op'>=</span> <span class='st'>'fasta'</span><span class='op'>)</span>
+<span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='SNPsites.html'>SNPsites</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
+<span class='fu'>allSitesPos</span><span class='op'>(</span><span class='va'>snp</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1]   80  106  107  109  123  139  143  196  273  620  709  763  777  784  894
+#&gt; [16]  916  940  982  988 1118 1143 1204 1285 1289 1303 1404 1439 1477 1542 1717
+#&gt; [31] 1857 1902 1949 2039 2068 2074 2086 2197 2295 2367 2445 2594 2611 2634 2749
+#&gt; [46] 2787 2842 3035 3045 3046 3144 3162 3190 3328 3353 3392 3398</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
