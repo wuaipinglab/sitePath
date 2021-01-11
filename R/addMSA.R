@@ -103,19 +103,29 @@ addMSA.phylo <- function(tree,
     dimnames(simMatrix) <- list(tree[["tip.label"]],
                                 tree[["tip.label"]])
     attr(res, "simMatrix") <- simMatrix
-    # Prep for multi-processing run
-    cl <- makeCluster(spec = detectCores(), methods = FALSE)
-    # Get all lineages using the terminal node found by SNP
-    terminalTips <- parLapply(
-        cl = cl,
-        X = clusterSplit(cl, siteIndices),
-        fun = terminalTipsBySim,
-        tipPaths = nodepath(tree),
-        alignedSeqs = align,
-        metricMatrix = simMatrix
-    )
-    stopCluster(cl)
-    terminalTips <- Reduce("c", terminalTips)
+    # Test if multiprocessing is turned on
+    mc <- getOption("cl.cores")
+    if (is.null(mc)) {
+        terminalTips <- terminalTipsBySim(
+            siteIndices = siteIndices,
+            tipPaths = nodepath(tree),
+            alignedSeqs = align,
+            metricMatrix = simMatrix
+        )
+    } else {
+        cl <- .createCluster(mc, method = FALSE)
+        # Get all lineages using the terminal node found by SNP
+        terminalTips <- parLapply(
+            cl = cl,
+            X = clusterSplit(cl, siteIndices),
+            fun = terminalTipsBySim,
+            tipPaths = nodepath(tree),
+            alignedSeqs = align,
+            metricMatrix = simMatrix
+        )
+        stopCluster(cl)
+        terminalTips <- Reduce("c", terminalTips)
+    }
     # The threshold better not exceed half of total tip number
     maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
         terminalTips, lengths
@@ -124,6 +134,16 @@ addMSA.phylo <- function(tree,
                                           FUN = .pathsUnderThreshold,
                                           terminalTips = terminalTips)
     return(res)
+}
+
+.createCluster <- function(mc, ...) {
+    if (is.numeric(mc)) {
+        mc <- as.integer(mc)
+    } else {
+        mc <- detectCores()
+    }
+    cl <- makeCluster(spec = mc, ...)
+    return(cl)
 }
 
 .pathsUnderThreshold <- function(minSize, terminalTips) {

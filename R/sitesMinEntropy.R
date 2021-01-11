@@ -102,29 +102,51 @@ sitesMinEntropy.lineagePath <- function(x,
     tipNumRank <- order(pathTipNums)
     # The max number of tips a path has
     maxPathTipNum <- tail(pathTipNums[tipNumRank], 1)
-    # Prep for multi-processing run
-    cl <- makeCluster(spec = detectCores(), methods = FALSE)
-    res <- lapply(
-        X = pathsWithSeqs[tipNumRank],
-        FUN = function(pathNodeAlign) {
-            # The path with fewer tips will use smaller threshold
-            scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
-            scaledSize <- ceiling(minEffectiveSize * scaledSize)
-            attr(pathNodeAlign, "scaledSize") <- scaledSize
-            # Entropy minimization result for every locus
-            segs <- parLapply(
-                cl = cl,
-                X = siteIndices,
-                fun = .runEntropyMinimization,
-                pathNodeAlign = pathNodeAlign,
-                minimizeEntropy = minimizeEntropy,
-                searchDepth = searchDepth
-            )
-            attr(segs, "pathNodeTips") <- pathNodeAlign
-            return(segs)
-        }
-    )
-    stopCluster(cl)
+    # Test if multiprocessing is turned on
+    mc <- getOption("cl.cores")
+    if (is.null(mc)) {
+        res <- lapply(
+            X = pathsWithSeqs[tipNumRank],
+            FUN = function(pathNodeAlign) {
+                scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
+                # The path with fewer tips will use smaller threshold
+                scaledSize <- ceiling(minEffectiveSize * scaledSize)
+                attr(pathNodeAlign, "scaledSize") <- scaledSize
+                segs <- lapply(
+                    X = siteIndices,
+                    FUN = .runEntropyMinimization,
+                    pathNodeAlign = pathNodeAlign,
+                    minimizeEntropy = minimizeEntropy,
+                    searchDepth = searchDepth
+                )
+                attr(segs, "pathNodeTips") <- pathNodeAlign
+                return(segs)
+            }
+        )
+    } else {
+        cl <- .createCluster(mc, method = FALSE)
+        res <- lapply(
+            X = pathsWithSeqs[tipNumRank],
+            FUN = function(pathNodeAlign) {
+                scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
+                # The path with fewer tips will use smaller threshold
+                scaledSize <- ceiling(minEffectiveSize * scaledSize)
+                attr(pathNodeAlign, "scaledSize") <- scaledSize
+                # Entropy minimization result for every locus
+                segs <- parLapply(
+                    cl = cl,
+                    X = siteIndices,
+                    fun = .runEntropyMinimization,
+                    pathNodeAlign = pathNodeAlign,
+                    minimizeEntropy = minimizeEntropy,
+                    searchDepth = searchDepth
+                )
+                attr(segs, "pathNodeTips") <- pathNodeAlign
+                return(segs)
+            }
+        )
+        stopCluster(cl)
+    }
     # Calibrate the result from all paths
     res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
     # Cluster tips according to fixation sites
