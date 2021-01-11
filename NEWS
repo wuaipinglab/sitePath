@@ -1,12 +1,16 @@
+CHANGES IN VERSION 1.7.4
+-------------------------
+    o 'cl.cores' option for turning multiprocessing on and off.
+
 CHANGES IN VERSION 1.7.3
 -------------------------
-    o Fix: inability to get position of all the sites
+    o Fix: inability to get position of all the sites.
 
 CHANGES IN VERSION 1.7.2
 -------------------------
-    o Fix: missing export for 'plot.phyMSAmatched' function
-    o Fix: 'addMSA' function unable to handle 'treedata' object
-    o Multiprocess for 'addMSA' and 'sitesMinEntropy' function
+    o Fix: missing export for 'plot.phyMSAmatched' function.
+    o Fix: 'addMSA' function unable to handle 'treedata' object.
+    o Multiprocess for 'addMSA' and 'sitesMinEntropy' function.
 
 CHANGES IN VERSION 1.7.1
 -------------------------
