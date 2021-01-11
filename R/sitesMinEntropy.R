@@ -1,7 +1,7 @@
 #' @importFrom utils tail
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster stopCluster
-#' @importFrom parallel clusterExport parLapply
+#' @importFrom parallel parLapply
 #' @importFrom ape getMRCA
 
 #' @rdname sitesMinEntropy
@@ -103,12 +103,7 @@ sitesMinEntropy.lineagePath <- function(x,
     # The max number of tips a path has
     maxPathTipNum <- tail(pathTipNums[tipNumRank], 1)
     # Prep for multi-processing run
-    cl <- makeCluster(detectCores())
-    clusterExport(
-        cl = cl,
-        varlist = c("minimizeEntropy", "searchDepth"),
-        envir = environment()
-    )
+    cl <- makeCluster(spec = detectCores(), methods = FALSE)
     res <- lapply(
         X = pathsWithSeqs[tipNumRank],
         FUN = function(pathNodeAlign) {
@@ -116,7 +111,6 @@ sitesMinEntropy.lineagePath <- function(x,
             scaledSize <- attr(pathNodeAlign, "pathTipNum") / maxPathTipNum
             scaledSize <- ceiling(minEffectiveSize * scaledSize)
             attr(pathNodeAlign, "scaledSize") <- scaledSize
-            clusterExport(cl, "pathNodeAlign", environment())
             # Entropy minimization result for every locus
             segs <- parLapply(
                 cl = cl,

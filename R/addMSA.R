@@ -2,7 +2,7 @@
 #' @importFrom utils flush.console setTxtProgressBar txtProgressBar
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster stopCluster
-#' @importFrom parallel clusterExport clusterSplit parLapply
+#' @importFrom parallel clusterSplit parLapply
 #' @importFrom seqinr read.alignment
 #' @importFrom ape multi2di is.binary Ntip as.phylo
 
@@ -51,8 +51,8 @@ addMSA.phylo <- function(tree,
                          alignment = NULL,
                          seqType = c("AA", "DNA", "RNA"),
                          ...) {
-    # String as the placeholder for the 'phyMSAmatched' object
-    # Might be using S4 class in the later version
+    # String as the placeholder for the 'phyMSAmatched' object Might be using S4
+    # class in the later version
     res <- "This is a 'phyMSAmatched' object."
     class(res) <- "phyMSAmatched"
     # Read alignment from the file or check the class of 'alignment'
@@ -103,28 +103,21 @@ addMSA.phylo <- function(tree,
     dimnames(simMatrix) <- list(tree[["tip.label"]],
                                 tree[["tip.label"]])
     attr(res, "simMatrix") <- simMatrix
-    # The tip to root path made of nodes
-    tipPaths <- nodepath(tree)
     # Prep for multi-processing run
-    cl <- makeCluster(detectCores())
-    clusterExport(
-        cl = cl,
-        varlist = c("tipPaths", "align", "simMatrix"),
-        envir = environment()
-    )
+    cl <- makeCluster(spec = detectCores(), methods = FALSE)
     # Get all lineages using the terminal node found by SNP
     terminalTips <- parLapply(
         cl = cl,
         X = clusterSplit(cl, siteIndices),
         fun = terminalTipsBySim,
-        tipPaths = tipPaths,
+        tipPaths = nodepath(tree),
         alignedSeqs = align,
         metricMatrix = simMatrix
     )
     stopCluster(cl)
     terminalTips <- Reduce("c", terminalTips)
     # The threshold better not exceed half of total tip number
-    maxSize <- min(length(tipPaths) / 2, max(unlist(lapply(
+    maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
         terminalTips, lengths
     ))))
     attr(res, "rangeOfResults") <- lapply(X = seq(2, maxSize),
