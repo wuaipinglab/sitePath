@@ -1,6 +1,6 @@
 #' @export
 print.phyMSAmatched <- function(x, ...) {
-    cat(x, "\n")
+    cat("This is a 'phyMSAmatched' object.\n")
 }
 
 #' @export
@@ -9,7 +9,7 @@ print.lineagePath <- function(x, ...) {
         "This is a 'lineagePath' object.\n\n",
         length(x),
         " lineage paths using ",
-        attr(x, "similarity") * 100,
+        attr(x, "minSize"),
         "% as \"major SNP\" threshold \n",
         sep = ""
     )

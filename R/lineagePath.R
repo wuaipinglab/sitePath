@@ -79,14 +79,12 @@ lineagePath.phyMSAmatched <- function(tree,
             FUN.VALUE = numeric(1)
         ))]]
     }
-    rootNode <- getMRCA(tree, tree[["tip.label"]])
     # Transfer attributes
     attributes(paths) <- attributes(x)
-    # Set attributes 'similarity' and 'rootNode'
+    # Set attributes 'similarity' and 'minSNP'
     attr(paths, "similarity") <- similarity
     attr(paths, "minSize") <- minSNP
-    attr(paths, "rootNode") <- rootNode
-    class(paths) <- c("lineagePath", class(paths))
+    class(paths) <- c("lineagePath", "phyMSAmatched")
     return(paths)
 }
 

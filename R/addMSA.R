@@ -53,7 +53,7 @@ addMSA.phylo <- function(tree,
                          ...) {
     # String as the placeholder for the 'phyMSAmatched' object Might be using S4
     # class in the later version
-    res <- "This is a 'phyMSAmatched' object."
+    res <- "phyMSAmatched"
     class(res) <- "phyMSAmatched"
     # Read alignment from the file or check the class of 'alignment'
     if (file.exists(msaPath)) {
@@ -130,9 +130,12 @@ addMSA.phylo <- function(tree,
     maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
         terminalTips, lengths
     ))))
+    # Set the attributes
     attr(res, "rangeOfResults") <- lapply(X = seq(2, maxSize),
                                           FUN = .pathsUnderThreshold,
                                           terminalTips = terminalTips)
+    attr(res, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
+    res <- lineagePath.phyMSAmatched(res)
     return(res)
 }
 
