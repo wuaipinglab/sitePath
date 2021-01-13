@@ -123,6 +123,31 @@ sitesMinEntropy.lineagePath <- function(x,
                 return(segs)
             }
         )
+        # Calibrate the result from all paths
+        res <- .unifyEntropyGrouping(res, paths, NULL)
+        # Cluster tips according to fixation sites
+        clustersByPath <- lapply(res, function(segs) {
+            # Set the site and amino acid/nucleotide info for each group of tips
+            group <- lapply(names(segs), function(site) {
+                lapply(segs[[site]], function(tips) {
+                    siteChar <- attr(tips, "AA")
+                    names(siteChar) <- site
+                    node <- attr(tips, "node")
+                    # Purge the attributes and keep only the node and amino
+                    # acid/nucleotide info
+                    attributes(tips) <- NULL
+                    attr(tips, "AA") <- siteChar
+                    attr(tips, "node") <- node
+                    return(tips)
+                })
+            })
+            # This will group the tips of the lineage path and the adjacent
+            # groups will have at least one fixed site different
+            group <- .clusterByFixation(group)
+            attr(group, "pathNodeTips") <-
+                attr(segs, "pathNodeTips")
+            return(group)
+        })
     } else {
         cl <- .createCluster(mc, method = FALSE)
         res <- lapply(
@@ -145,33 +170,39 @@ sitesMinEntropy.lineagePath <- function(x,
                 return(segs)
             }
         )
+        # Calibrate the result from all paths
+        res <- .unifyEntropyGrouping(res, paths, cl)
+        # Cluster tips according to fixation sites
+        clustersByPath <- parLapply(
+            cl = cl,
+            X = res,
+            fun = function(segs) {
+                # Set the site and amino acid/nucleotide info for each group of
+                # tips
+                group <- lapply(names(segs), function(site) {
+                    lapply(segs[[site]], function(tips) {
+                        siteChar <- attr(tips, "AA")
+                        names(siteChar) <- site
+                        node <- attr(tips, "node")
+                        # Purge the attributes and keep only the node and amino
+                        # acid/nucleotide info
+                        attributes(tips) <- NULL
+                        attr(tips, "AA") <- siteChar
+                        attr(tips, "node") <- node
+                        return(tips)
+                    })
+                })
+                # This will group the tips of the lineage path and the adjacent
+                # groups will have at least one fixed site different
+                group <- .clusterByFixation(group)
+                attr(group, "pathNodeTips") <-
+                    attr(segs, "pathNodeTips")
+                return(group)
+            }
+        )
         stopCluster(cl)
         cat(paste("Multiprocessing ended.\n"))
     }
-    # Calibrate the result from all paths
-    res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
-    # Cluster tips according to fixation sites
-    clustersByPath <- lapply(res, function(segs) {
-        # Set the site and amino acid/nucleotide info for each group of tips
-        group <- lapply(names(segs), function(site) {
-            lapply(segs[[site]], function(tips) {
-                siteChar <- attr(tips, "AA")
-                names(siteChar) <- site
-                node <- attr(tips, "node")
-                # Purge the attributes and keep only the node and amino
-                # acid/nucleotide info
-                attributes(tips) <- NULL
-                attr(tips, "AA") <- siteChar
-                attr(tips, "node") <- node
-                return(tips)
-            })
-        })
-        # This will group the tips of the lineage path and the adjacent groups
-        # will have at least one fixed site different
-        group <- .clusterByFixation(group)
-        attr(group, "pathNodeTips") <- attr(segs, "pathNodeTips")
-        return(group)
-    })
     clustersByPath <- .mergeClusters(clustersByPath)
     attr(res, "clustersByPath") <-
         .assignClusterNames(clustersByPath)
@@ -242,17 +273,31 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.unifyEntropyGrouping <- function(res, paths, minEffectiveSize) {
+.unifyEntropyGrouping <- function(res, paths, cl) {
     align <- attr(paths, "align")
+    if (is.null(cl)) {
+        allMergedGroupings <- lapply(
+            X = names(res[[1]]),
+            FUN = .calibrateFixedAA,
+            fixations = res,
+            align = align
+        )
+    } else {
+        allMergedGroupings <- parLapply(
+            cl = cl,
+            X = names(res[[1]]),
+            fun = .calibrateFixedAA,
+            fixations = res,
+            align = align
+        )
+    }
+    names(allMergedGroupings) <- names(res[[1]])
     # Iterate each locus
     for (locus in names(res[[1]])) {
         # The index for C++
         locusIndex <- as.integer(locus) - 1
         # Get the merged groupings of each path for the locus
-        mergedGroupings <- .calibrateFixedAA(res,
-                                             align,
-                                             locus,
-                                             minEffectiveSize)
+        mergedGroupings <- allMergedGroupings[[locus]]
         # Link the merged groupings for each lineage path to calibrate and
         # recover the full groupings. The linked merged groupings are stored for
         # the remaining paths.
@@ -303,10 +348,7 @@ sitesMinEntropy.lineagePath <- function(x,
     return(res)
 }
 
-.calibrateFixedAA <- function(fixations,
-                              align,
-                              locus,
-                              minEffectiveSize) {
+.calibrateFixedAA <- function(locus, fixations, align) {
     # The original entropy minimization result for the locus
     unMergedGroupings <- lapply(fixations, function(segs) {
         res <- segs[[locus]]
