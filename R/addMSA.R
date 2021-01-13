@@ -98,22 +98,43 @@ addMSA.phylo <- function(tree,
     align <- attr(res, "align")
     loci <- attr(res, "loci")
     siteIndices <- attr(res, "msaNumbering")[loci] - 1L
-    # Sequence similarity matrix
-    simMatrix <- getSimilarityMatrix(align)
-    dimnames(simMatrix) <- list(tree[["tip.label"]],
-                                tree[["tip.label"]])
-    attr(res, "simMatrix") <- simMatrix
     # Test if multiprocessing is turned on
     mc <- getOption("cl.cores")
     if (is.null(mc)) {
+        # Sequence similarity matrix
+        simMatrix <- getSimilarityMatrix(align)
+        dimnames(simMatrix) <- list(tree[["tip.label"]],
+                                    tree[["tip.label"]])
+        attr(res, "simMatrix") <- simMatrix
         terminalTips <- terminalTipsBySim(
             siteIndices = siteIndices,
             tipPaths = nodepath(tree),
             alignedSeqs = align,
             metricMatrix = simMatrix
         )
+        # The threshold better not exceed half of total tip number
+        maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
+            terminalTips, lengths
+        ))))
+        # Set the attributes
+        attr(res, "rangeOfResults") <- lapply(
+            X = seq(2, maxSize),
+            FUN = .pathsUnderThreshold,
+            terminalTips = terminalTips
+        )
     } else {
         cl <- .createCluster(mc, method = FALSE)
+        # Sequence similarity matrix
+        simMatrix <- parLapply(
+            cl = cl,
+            X = seq_along(align) - 1,
+            fun = pairSimilarity,
+            align = align
+        )
+        simMatrix <- do.call("rbind", simMatrix)
+        dimnames(simMatrix) <- list(tree[["tip.label"]],
+                                    tree[["tip.label"]])
+        attr(res, "simMatrix") <- simMatrix
         # Get all lineages using the terminal node found by SNP
         terminalTips <- parLapply(
             cl = cl,
@@ -123,17 +144,21 @@ addMSA.phylo <- function(tree,
             alignedSeqs = align,
             metricMatrix = simMatrix
         )
-        stopCluster(cl)
         terminalTips <- Reduce("c", terminalTips)
+        # The threshold better not exceed half of total tip number
+        maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
+            terminalTips, lengths
+        ))))
+        # Set the attributes
+        attr(res, "rangeOfResults") <- parLapply(
+            cl = cl,
+            X = seq(2, maxSize),
+            fun = .pathsUnderThreshold,
+            terminalTips = terminalTips
+        )
+        stopCluster(cl)
+        cat(paste("Multiprocessing ended.\n"))
     }
-    # The threshold better not exceed half of total tip number
-    maxSize <- min(Ntip(tree) / 2, max(unlist(lapply(
-        terminalTips, lengths
-    ))))
-    # Set the attributes
-    attr(res, "rangeOfResults") <- lapply(X = seq(2, maxSize),
-                                          FUN = .pathsUnderThreshold,
-                                          terminalTips = terminalTips)
     attr(res, "rootNode") <- getMRCA(tree, tree[["tip.label"]])
     res <- lineagePath.phyMSAmatched(res)
     return(res)
@@ -146,6 +171,7 @@ addMSA.phylo <- function(tree,
         mc <- detectCores()
     }
     cl <- makeCluster(spec = mc, ...)
+    cat(paste("Using", length(cl), "cores..\n"))
     return(cl)
 }
 

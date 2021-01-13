@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// pairSimilarity
+Rcpp::NumericVector pairSimilarity(const int seqIndex, const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs);
+RcppExport SEXP _sitePath_pairSimilarity(SEXP seqIndexSEXP, SEXP alignedSeqsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type seqIndex(seqIndexSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::ListOf<Rcpp::CharacterVector>& >::type alignedSeqs(alignedSeqsSEXP);
+    rcpp_result_gen = Rcpp::wrap(pairSimilarity(seqIndex, alignedSeqs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimilarityMatrix
 Rcpp::NumericMatrix getSimilarityMatrix(const Rcpp::ListOf<Rcpp::CharacterVector>& alignedSeqs);
 RcppExport SEXP _sitePath_getSimilarityMatrix(SEXP alignedSeqsSEXP) {
@@ -144,6 +156,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_sitePath_pairSimilarity", (DL_FUNC) &_sitePath_pairSimilarity, 2},
     {"_sitePath_getSimilarityMatrix", (DL_FUNC) &_sitePath_getSimilarityMatrix, 1},
     {"_sitePath_majorSNPtips", (DL_FUNC) &_sitePath_majorSNPtips, 3},
     {"_sitePath_terminalTipsBySim", (DL_FUNC) &_sitePath_terminalTipsBySim, 4},

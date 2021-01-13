@@ -18,6 +18,22 @@
 #include "treemer.h"
 
 // [[Rcpp::export]]
+Rcpp::NumericVector pairSimilarity(
+        const int seqIndex,
+        const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
+) {
+    std::vector<float> res;
+    std::string query = Rcpp::as<std::string>(alignedSeqs[seqIndex]);
+    for (int i = 0; i < alignedSeqs.size(); i++) {
+        res.push_back(Treemer::compare(
+                query,
+                Rcpp::as<std::string>(alignedSeqs[i])
+        ));
+    }
+    return Rcpp::wrap(res);
+}
+
+// [[Rcpp::export]]
 Rcpp::NumericMatrix getSimilarityMatrix(
         const Rcpp::ListOf<Rcpp::CharacterVector> &alignedSeqs
 ) {

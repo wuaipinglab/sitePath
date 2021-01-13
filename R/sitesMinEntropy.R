@@ -146,6 +146,7 @@ sitesMinEntropy.lineagePath <- function(x,
             }
         )
         stopCluster(cl)
+        cat(paste("Multiprocessing ended.\n"))
     }
     # Calibrate the result from all paths
     res <- .unifyEntropyGrouping(res, paths, minEffectiveSize)
