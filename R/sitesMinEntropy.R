@@ -126,28 +126,7 @@ sitesMinEntropy.lineagePath <- function(x,
         # Calibrate the result from all paths
         res <- .unifyEntropyGrouping(res, paths, NULL)
         # Cluster tips according to fixation sites
-        clustersByPath <- lapply(res, function(segs) {
-            # Set the site and amino acid/nucleotide info for each group of tips
-            group <- lapply(names(segs), function(site) {
-                lapply(segs[[site]], function(tips) {
-                    siteChar <- attr(tips, "AA")
-                    names(siteChar) <- site
-                    node <- attr(tips, "node")
-                    # Purge the attributes and keep only the node and amino
-                    # acid/nucleotide info
-                    attributes(tips) <- NULL
-                    attr(tips, "AA") <- siteChar
-                    attr(tips, "node") <- node
-                    return(tips)
-                })
-            })
-            # This will group the tips of the lineage path and the adjacent
-            # groups will have at least one fixed site different
-            group <- .clusterByFixation(group)
-            attr(group, "pathNodeTips") <-
-                attr(segs, "pathNodeTips")
-            return(group)
-        })
+        clustersByPath <- lapply(res, .clusterByFixation)
     } else {
         cl <- .createCluster(mc, method = FALSE)
         res <- lapply(
@@ -173,33 +152,7 @@ sitesMinEntropy.lineagePath <- function(x,
         # Calibrate the result from all paths
         res <- .unifyEntropyGrouping(res, paths, cl)
         # Cluster tips according to fixation sites
-        clustersByPath <- parLapply(
-            cl = cl,
-            X = res,
-            fun = function(segs) {
-                # Set the site and amino acid/nucleotide info for each group of
-                # tips
-                group <- lapply(names(segs), function(site) {
-                    lapply(segs[[site]], function(tips) {
-                        siteChar <- attr(tips, "AA")
-                        names(siteChar) <- site
-                        node <- attr(tips, "node")
-                        # Purge the attributes and keep only the node and amino
-                        # acid/nucleotide info
-                        attributes(tips) <- NULL
-                        attr(tips, "AA") <- siteChar
-                        attr(tips, "node") <- node
-                        return(tips)
-                    })
-                })
-                # This will group the tips of the lineage path and the adjacent
-                # groups will have at least one fixed site different
-                group <- .clusterByFixation(group)
-                attr(group, "pathNodeTips") <-
-                    attr(segs, "pathNodeTips")
-                return(group)
-            }
-        )
+        clustersByPath <- parLapply(cl, res, .clusterByFixation)
         stopCluster(cl)
         cat(paste("Multiprocessing ended.\n"))
     }
@@ -490,8 +443,24 @@ sitesMinEntropy.lineagePath <- function(x,
     return(currLinked)
 }
 
-.clusterByFixation <- function(group) {
-    # Group tips according to fixation points
+.clusterByFixation <- function(segs) {
+    # Set the site and amino acid/nucleotide info for each group of tips
+    group <- lapply(names(segs), function(site) {
+        lapply(segs[[site]], function(tips) {
+            siteChar <- attr(tips, "AA")
+            names(siteChar) <- site
+            node <- attr(tips, "node")
+            # Purge the attributes and keep only the node and amino
+            # acid/nucleotide info
+            attributes(tips) <- NULL
+            attr(tips, "AA") <- siteChar
+            attr(tips, "node") <- node
+            return(tips)
+        })
+    })
+    # This will group the tips of the lineage path and the adjacent groups will
+    # have at least one fixed site different Group tips according to fixation
+    # points
     res <- group[[1]]
     for (seg in group[-1]) {
         # the node name for each group of tips
@@ -506,16 +475,16 @@ sitesMinEntropy.lineagePath <- function(x,
             # Compare with each group of the current grouping
             for (i in seq_along(res)) {
                 gp <- res[[i]]
-                common <- sort(intersect(tips, gp))
+                common <- sort.default(intersect(tips, gp))
                 # No new cluster when the coming tips have no overlap or are
                 # identical to tips in an existing cluster
                 if (length(common) == 0) {
                     # Keep the current grouping if the coming group has no
                     # overlap yet
                     newGrouping <- res[seq_len(i)]
-                } else if (identical(sort(gp), sort(tips))) {
-                    # The only effect here is to add the new 'AA' info to
-                    # the group
+                } else if (identical(sort.default(gp), sort.default(tips))) {
+                    # The only effect here is to add the new 'AA' info to the
+                    # group
                     attr(gp, "AA") <- c(attr(gp, "AA"), site)
                     # The groups after the current group to be added
                     newGrouping <- c(newGrouping,
@@ -523,9 +492,10 @@ sitesMinEntropy.lineagePath <- function(x,
                                      tail(res, length(res) - i))
                     break
                 } else {
+                    common <- sort.default(common)
                     # A new cluster formed when there is overlapped between new
                     # coming tips and existing tips in a cluster
-                    if (identical(sort(gp), common)) {
+                    if (identical(sort.default(gp), common)) {
                         # The new coming tips includes the current group. The
                         # extra tips stay for the next loop just in case it has
                         # impact on the grouping
@@ -533,7 +503,7 @@ sitesMinEntropy.lineagePath <- function(x,
                         # Update the SNP site info for the current group
                         attr(gp, "AA") <- c(attr(gp, "AA"), site)
                         newGrouping <- c(newGrouping, list(gp))
-                    } else if (identical(sort(tips), common)) {
+                    } else if (identical(sort.default(tips), common)) {
                         # The new coming tips are included in the group (they
                         # are used up at this point) and they split the original
                         # grouping
@@ -561,6 +531,7 @@ sitesMinEntropy.lineagePath <- function(x,
             res <- newGrouping
         }
     }
+    attr(res, "pathNodeTips") <- attr(segs, "pathNodeTips")
     return(res)
 }
 
