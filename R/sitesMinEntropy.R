@@ -680,7 +680,8 @@ sitesMinEntropy.lineagePath <- function(x,
 }
 
 .assignClusterNames <- function(grouping) {
-    # The starting major numbers of all 'gp' in 'grouping'
+    # The starting major numbers of all 'gp' in 'grouping' (becasue they were
+    # grouped according to lineage path to deal with the shared lineage)
     startingMajors <- rep(NA_integer_, length(grouping))
     startingMajors[1] <- 1L
     # The maximum minor number for each major number (so can be continued on a
@@ -709,10 +710,14 @@ sitesMinEntropy.lineagePath <- function(x,
                 nextMajor <- currMajor
                 # Assign the starting major number for the 'gp' to be merged
                 toMergeIndex <- as.integer(names(toMerge))
-                startingMajors[toMergeIndex] <-
-                    rep(nextMajor, length(toMergeIndex))
+                startingMajors[toMergeIndex] <- rep(nextMajor,
+                                                    length(toMergeIndex))
                 # Initiate minor number for the new major number
-                maxMinors[nextMajor] <- 1L
+                if (is.na(maxMinors[nextMajor])) {
+                    maxMinors[nextMajor] <- 1L
+                } else {
+                    maxMinors[nextMajor] <- maxMinors[nextMajor] + 1L
+                }
             }
         }
     }
