@@ -64,12 +64,24 @@ as.data.frame.fixationSites <- function(x,
     transNode <- integer()
     for (sp in fixations) {
         site <- attr(sp, "site")
+        prefix <- ""
+        if (is.character(site)) {
+            nameSplit <- rev(strsplit(site, " ")[[1]])
+            site <- nameSplit[1]
+            prefix <- nameSplit[2]
+            if (is.na(prefix)) {
+                prefix <- ""
+            } else {
+                prefix <- paste0(prefix, " ")
+            }
+        }
         for (mp in sp) {
             nodeNames <- names(mp)
             for (i in seq_along(mp)[-1]) {
                 prevTips <- mp[[i - 1]]
                 currTips <- mp[[i]]
-                mutation <- paste0(attr(prevTips, "AA"),
+                mutation <- paste0(prefix,
+                                   attr(prevTips, "AA"),
                                    site,
                                    attr(currTips, "AA"))
                 trans <- nodeNames[i]

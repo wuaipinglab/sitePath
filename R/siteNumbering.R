@@ -127,24 +127,24 @@ setSiteNumbering.fixationSites <- function(x,
                                            reference = NULL,
                                            gapChar = '-',
                                            ...) {
-    site2newRef <- NULL
+    siteMapping <- list(...)[["siteMapping"]]
     names(x) <- vapply(
         X = names(x),
         FUN = function(n) {
-            site2newRef[[n]]
+            as.character(siteMapping[[n]])
         },
-        FUN.VALUE = integer(1)
+        FUN.VALUE = character(1)
     )
     # Update the 'site' attr in each 'sitePath'
     for (n in names(x)) {
-        attr(x[[n]], "site") <- as.integer(n)
+        attr(x[[n]], "site") <- n
     }
     for (gpIndex in seq_along(attr(x, "clustersByPath"))) {
         for (i in seq_along(attr(x, "clustersByPath")[[gpIndex]])) {
             oldSiteName <-
                 names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA"))
             names(attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "AA")) <-
-                site2newRef[oldSiteName]
+                siteMapping[oldSiteName]
             toMerge <-
                 attr(attr(x, "clustersByPath")[[gpIndex]][[i]], "toMerge")
             if (!is.null(toMerge)) {
@@ -153,7 +153,7 @@ setSiteNumbering.fixationSites <- function(x,
                         X = toMerge,
                         FUN = function(sites) {
                             oldSiteName <- names(sites)
-                            names(sites) <- site2newRef[oldSiteName]
+                            names(sites) <- siteMapping[oldSiteName]
                             return(sites)
                         }
                     )
@@ -167,7 +167,7 @@ setSiteNumbering.fixationPath <- function(x,
                                           reference = NULL,
                                           gapChar = '-',
                                           ...) {
-    site2newRef <- NULL
+    siteMapping <- list(...)[["siteMapping"]]
     attr(x, "SNPtracing")@data[["SNPs"]] <- vapply(
         X = strsplit(attr(x, "SNPtracing")@data[["SNPs"]], ", "),
         FUN = function(allSNPs) {
@@ -181,7 +181,7 @@ setSiteNumbering.fixationPath <- function(x,
                         preMut <- substr(snp, 1, 1)
                         postMut <- substr(snp, charLen, charLen)
                         site <-
-                            site2newRef[[substr(snp, 2, charLen - 1)]]
+                            siteMapping[[substr(snp, 2, charLen - 1)]]
                         return(paste0(preMut, site, postMut))
                     },
                     FUN.VALUE = character(1)
