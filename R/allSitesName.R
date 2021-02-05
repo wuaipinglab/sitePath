@@ -1,4 +1,4 @@
-#' @rdname allSitesPos
+#' @rdname allSitesName
 #' @title Retrieve position of all the sites
 #' @description The function is a way to get position of the resulting sites
 #'   from \code{\link{SNPsites}}, \code{\link{fixationSites}} and
@@ -13,25 +13,25 @@
 #' msaPath <- system.file('extdata', 'ZIKV.fasta', package = 'sitePath')
 #' tree <- addMSA(zikv_tree, msaPath = msaPath, msaFormat = 'fasta')
 #' snp <- SNPsites(tree)
-#' allSitesPos(snp)
-allSitesPos <- function(x, ...) {
-    UseMethod("allSitesPos")
+#' allSitesName(snp)
+allSitesName <- function(x, ...) {
+    UseMethod("allSitesName")
 }
 
-#' @rdname allSitesPos
+#' @rdname allSitesName
 #' @export
-allSitesPos.SNPsites <- function(x, ...) {
-    as.integer(x)
+allSitesName.SNPsites <- function(x, ...) {
+    as.character(as.integer(x))
 }
 
-#' @rdname allSitesPos
+#' @rdname allSitesName
 #' @export
-allSitesPos.fixationSites <- function(x, ...) {
-    as.integer(names(x))
+allSitesName.fixationSites <- function(x, ...) {
+    names(x)
 }
 
-#' @rdname allSitesPos
+#' @rdname allSitesName
 #' @export
-allSitesPos.parallelSites <- function(x, ...) {
-    as.integer(names(x))
+allSitesName.parallelSites <- function(x, ...) {
+    names(x)
 }

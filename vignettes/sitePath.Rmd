@@ -113,10 +113,10 @@ fixations <- fixationSites(minEntropy)
 fixations
 ```
 
-To get the position of all the resulting sites, `allSitesPos` can be used on the return of `fixationSites` and also other functions like `SNPsites` and `parallelSites`. 
+To get the position of all the resulting sites, `allSitesName` can be used on the return of `fixationSites` and also other functions like `SNPsites` and `parallelSites`. 
 
 ```{r}
-allSites <- allSitesPos(fixations)
+allSites <- allSitesName(fixations)
 allSites
 ```
 
