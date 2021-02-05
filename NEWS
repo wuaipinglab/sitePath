@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.7.5
+-------------------------
+    o Treat 'phyMSAmatched' object as 'lineagePath' class for simplicity.
+    o Improved multiprocessing.
+    o Fix: repeated cluster name by '.assignClusterNames' internal function.
+    o Rename 'allSitesPos' to 'allSitesName'.
+    o Add 'plotMutSites' support for 'lineagePath' and 'fixationSites' objects.
+
 CHANGES IN VERSION 1.7.4
 -------------------------
     o 'cl.cores' option for turning multiprocessing on and off.
