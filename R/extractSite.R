@@ -35,8 +35,8 @@ extractSite.fixationSites <- function(x, site, ...) {
 }
 
 .checkSite <- function(site) {
-    if (!is.numeric(site) ||
-        any(site <= 0) || as.integer(site) != site) {
+    site <- as.integer(site)
+    if (!is.numeric(site) || any(site <= 0)) {
         stop("Please enter positive integer value for \"site\"")
     }
     if (length(site) != 1) {
