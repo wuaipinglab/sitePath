@@ -3,11 +3,17 @@
 \name{plotMutSites}
 \alias{plotMutSites}
 \alias{plotMutSites.SNPsites}
+\alias{plotMutSites.lineagePath}
+\alias{plotMutSites.fixationSites}
 \title{Plot tree and mutation sites}
 \usage{
 plotMutSites(x, ...)
 
 \method{plotMutSites}{SNPsites}(x, showTips = FALSE, ...)
+
+\method{plotMutSites}{lineagePath}(x, ...)
+
+\method{plotMutSites}{fixationSites}(x, ...)
 }
 \arguments{
 \item{x}{An \code{\link{SNPsites}} object.}

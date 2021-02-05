@@ -103,7 +103,8 @@ plot.fixationSites <- function(x,
             fill = "lightgreen",
             color = "black",
             min.segment.length = 0,
-            na.rm = TRUE
+            na.rm = TRUE,
+            ...
         )
     }
     return(p)

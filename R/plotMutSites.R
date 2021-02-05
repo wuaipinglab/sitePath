@@ -23,10 +23,22 @@ plotMutSites <- function(x, ...) {
 #' @rdname plotMutSites
 #' @export
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
-    allSNP <- attr(x, "allSNP")
     phyMSAmatched <- attr(x, "phyMSAmatched")
+    # Use 'ggtree' to make tree plot
+    treePlot <- ggtree(as.phylo(phyMSAmatched))
+    if (showTips) {
+        treePlot <- treePlot + geom_tiplab()
+    }
+    allSNP <- attr(x, "allSNP")
+    seqType <- attr(phyMSAmatched, "seqType")
+    snpPlot <- .createSNPplot(allSNP, seqType)
+    # Combine the two plots and return
+    return(insert_left(snpPlot, treePlot, 2))
+}
+
+.createSNPplot <- function(allSNP, seqType) {
     # Specify the color of mutations by pre-defined color set.
-    snpColors <- .siteColorScheme(attr(phyMSAmatched, "seqType"))
+    snpColors <- .siteColorScheme(seqType)
     # Use 'ggplot' to make SNP plot as dots
     snpPlot <- ggplot(allSNP, aes(x = Pos,
                                   y = Accession,
@@ -47,11 +59,24 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             panel.background = element_rect(fill = "white"),
             legend.position = "none"
         )
-    # Use 'ggtree' to make tree plot
-    treePlot <- plot(phyMSAmatched)
-    if (showTips) {
-        treePlot <- treePlot + geom_tiplab()
-    }
-    # Combine the two plots and return
+    return(snpPlot)
+}
+
+#' @rdname plotMutSites
+#' @export
+plotMutSites.lineagePath <- function(x, ...) {
+    snpPlot <- .createSNPplot(allSNP = attr(x, "allSNP"),
+                              seqType = attr(x, "seqType"))
+    treePlot <- plot(x, ...)
+    return(insert_left(snpPlot, treePlot, 2))
+}
+
+#' @rdname plotMutSites
+#' @export
+plotMutSites.fixationSites <- function(x, ...) {
+    paths <- attr(x, "paths")
+    snpPlot <- .createSNPplot(allSNP = attr(paths, "allSNP"),
+                              seqType = attr(paths, "seqType"))
+    treePlot <- plot(x, ...)
     return(insert_left(snpPlot, treePlot, 2))
 }
