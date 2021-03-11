@@ -5,6 +5,7 @@
 \alias{plot.lineagePath}
 \alias{plot.fixationSites}
 \alias{plot.sitePath}
+\alias{plot.fixationIndels}
 \alias{plot.fixationPath}
 \title{Visualize the results}
 \usage{
@@ -15,6 +16,8 @@
 \method{plot}{fixationSites}(x, y = TRUE, ...)
 
 \method{plot}{sitePath}(x, y = NULL, select = NULL, showTips = FALSE, ...)
+
+\method{plot}{fixationIndels}(x, y = TRUE, ...)
 
 \method{plot}{fixationPath}(x, y = TRUE, ...)
 }
@@ -58,6 +61,9 @@ A \code{\link{fixationSites}} object will be plotted as original
 
 A \code{sitePath} object can be extracted by using
   \code{\link{extractSite}} on the return of \code{\link{fixationSites}}.
+
+A \code{\link{fixationIndels}} object will be plotted as original
+  phylogenetic tree marked with indel fixation.
 
 A \code{\link{fixationPath}} object will be plotted as a
   \code{phylo} object. The tips are clustered according to the fixation

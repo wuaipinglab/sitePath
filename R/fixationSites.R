@@ -9,13 +9,6 @@
 #'   least one fixation mutation to be reported.
 #' @param paths A \code{lineagePath} object returned from
 #'   \code{\link{lineagePath}} function.
-#' @param minEffectiveSize The minimum number of tips in a group.
-#' @param searchDepth The function uses heuristic search but the termination of
-#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
-#'   tell the search when to stop.
-#' @param method The strategy for predicting the fixation. The basic approach is
-#'   entropy minimization and can be achieved by adding or removing fixation
-#'   point, or by comparing the two.
 #' @param ... further arguments passed to or from other methods.
 #' @return A \code{fixationSites} object.
 #' @seealso \code{\link{as.data.frame.fixationSites}}
@@ -30,6 +23,13 @@ fixationSites <- function(paths, ...) {
 }
 
 #' @rdname fixationSites
+#' @param minEffectiveSize The minimum number of tips in a group.
+#' @param searchDepth The function uses heuristic search but the termination of
+#'   the search cannot be intrinsically decided. \code{searchDepth} is needed to
+#'   tell the search when to stop.
+#' @param method The strategy for predicting the fixation. The basic approach is
+#'   entropy minimization and can be achieved by adding or removing fixation
+#'   point, or by comparing the two.
 #' @export
 fixationSites.lineagePath <- function(paths,
                                       minEffectiveSize = NULL,
@@ -76,10 +76,6 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
                         )
                         return(tips)
                     })
-                    attr(res[[site]], "site") <- i
-                    attr(res[[site]], "tree") <- tree
-                    attr(res[[site]], "seqType") <- seqType
-                    class(res[[site]]) <- "sitePath"
                 } else {
                     # Assume a new 'mutPath' is to add (not combined by default)
                     targetIndex <- length(res[[site]]) + 1
@@ -123,11 +119,11 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
                         return(tips)
                     })
                     res[[site]][[targetIndex]] <- seg
-                    attr(res[[site]], "site") <- i
-                    attr(res[[site]], "tree") <- tree
-                    attr(res[[site]], "seqType") <- seqType
-                    class(res[[site]]) <- "sitePath"
                 }
+                attr(res[[site]], "site") <- i
+                attr(res[[site]], "tree") <- tree
+                attr(res[[site]], "seqType") <- seqType
+                class(res[[site]]) <- "sitePath"
             }
         }
     }

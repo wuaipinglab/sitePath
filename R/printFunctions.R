@@ -10,7 +10,7 @@ print.lineagePath <- function(x, ...) {
         length(x),
         " lineage paths using ",
         attr(x, "minSize"),
-        "% as \"major SNP\" threshold \n",
+        " as \"major SNP\" threshold \n",
         sep = ""
     )
 }
@@ -120,6 +120,37 @@ print.sitePara <- function(x, ...) {
         "\n\nIn the bracket are the number of tips",
         "involved in the mutation\n"
     )
+}
+
+print.fixationIndels <- function(x, ...) {
+    cat("This is a 'fixationIndels' object.\n\nResult for",
+        length(attr(x, "paths")),
+        "paths:\n\n")
+    if (length(x) == 0) {
+        cat("No multi-fixation found\n")
+    } else {
+        cat(paste(names(x), collapse = " "), "\n")
+        refSeqName <- attr(x, "reference")
+        if (is.null(refSeqName)) {
+            cat("No reference sequence specified.",
+                "Using alignment numbering\n")
+        } else {
+            cat("Reference sequence: ", refSeqName, "\n", sep = "")
+        }
+    }
+}
+
+print.indelPath <- function(x, ...) {
+    cat("Site(s)",
+        attr(x, "indelSites"),
+        "may experience fixation on",
+        length(x),
+        "group(s) of tips:\n\n")
+    for (i in x) {
+        cat("(", length(i), ") ", sep = "")
+    }
+    cat("\nIn the bracket are the number of tips",
+        "involved in the fixation\n")
 }
 
 #' @export

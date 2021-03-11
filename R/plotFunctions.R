@@ -205,6 +205,11 @@ plot.sitePath <- function(x,
 }
 
 #' @rdname plotFunctions
+#' @description A \code{\link{fixationIndels}} object will be plotted as original
+#'   phylogenetic tree marked with indel fixation.
+plot.fixationIndels <- function(x, y = TRUE, ...) {}
+
+#' @rdname plotFunctions
 #' @description A \code{\link{fixationPath}} object will be plotted as a
 #'   \code{phylo} object. The tips are clustered according to the fixation
 #'   sites. The transition of fixation sites will be plotted as a phylogenetic

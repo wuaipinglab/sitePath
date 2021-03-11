@@ -33,6 +33,12 @@ as.phylo.fixationSites <- function(x, ...) {
     return(res)
 }
 
+as.phylo.fixationIndels <- function(x, ...) {
+    paths <- attr(x, "paths")
+    res <- as.phylo(paths)
+    return(res)
+}
+
 #' @export
 tidytree::as.treedata
 
@@ -46,6 +52,12 @@ as.treedata.fixationSites <- function(tree, ...) {
                      groupTips.fixationSites(tree))
     tree <- .annotateSNPonTree(tree, transMut)
     return(tree)
+}
+
+as.treedata.fixationIndels <- function(tree, ...) {
+    for (sites in names(tree)) {
+        indelPath <- tree[[sites]]
+    }
 }
 
 #' @export
