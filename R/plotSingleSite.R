@@ -93,6 +93,7 @@ plotSingleSite.lineagePath <- function(x,
         groupColors <- NT_COLORS
     }
     names(groupColors) <- toupper(names(groupColors))
+    groupColors[["hide"]] <- NA
     return(groupColors)
 }
 

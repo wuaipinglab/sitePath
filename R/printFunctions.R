@@ -122,6 +122,16 @@ print.sitePara <- function(x, ...) {
     )
 }
 
+#' @export
+print.paraFixSites <- function(x, ...) {
+    sites <- as.integer(x)
+    if (length(sites)) {
+        print(sites)
+    } else {
+        cat("No qualified sites found.\n")
+    }
+}
+
 print.fixationIndels <- function(x, ...) {
     cat("This is a 'fixationIndels' object.\n\nResult for",
         length(attr(x, "paths")),

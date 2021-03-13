@@ -5,6 +5,7 @@
 \alias{plotMutSites.SNPsites}
 \alias{plotMutSites.lineagePath}
 \alias{plotMutSites.fixationSites}
+\alias{plotMutSites.paraFixSites}
 \title{Plot tree and mutation sites}
 \usage{
 plotMutSites(x, ...)
@@ -14,6 +15,8 @@ plotMutSites(x, ...)
 \method{plotMutSites}{lineagePath}(x, ...)
 
 \method{plotMutSites}{fixationSites}(x, ...)
+
+\method{plotMutSites}{paraFixSites}(x, ...)
 }
 \arguments{
 \item{x}{An \code{\link{SNPsites}} object.}

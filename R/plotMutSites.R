@@ -1,4 +1,5 @@
 #' @importFrom ggplot2 ggplot geom_point theme element_blank element_rect
+#' @importFrom ggplot2 scale_color_manual scale_fill_manual
 #' @importFrom aplot insert_left
 #' @importFrom ggtree geom_tiplab
 
@@ -25,18 +26,41 @@ plotMutSites <- function(x, ...) {
 plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     phyMSAmatched <- attr(x, "phyMSAmatched")
     # Use 'ggtree' to make tree plot
-    treePlot <- ggtree(as.phylo(phyMSAmatched))
+    tree <- as.phylo(phyMSAmatched)
+    treePlot <- ggtree(tree)
     if (showTips) {
         treePlot <- treePlot + geom_tiplab()
     }
     allSNP <- attr(x, "allSNP")
     seqType <- attr(phyMSAmatched, "seqType")
-    snpPlot <- .createSNPplot(allSNP, seqType)
+    snpPlot <- .createSNPplot(
+        allSNP = allSNP,
+        seqType = seqType,
+        allTreeTips = tree[["tip.label"]],
+        allSiteNames = attr(phyMSAmatched, "msaNumbering")
+    )
     # Combine the two plots and return
     return(insert_left(snpPlot, treePlot, 2))
 }
 
-.createSNPplot <- function(allSNP, seqType) {
+.createSNPplot <- function(allSNP,
+                           seqType,
+                           allTreeTips,
+                           allSiteNames) {
+    placeHolder <- data.frame("Accession" = allTreeTips,
+                              "Pos" = 0,
+                              "SNP" = "hide")
+    allSNP <- rbind(allSNP, placeHolder)
+    placeHolderTip <- allTreeTips[1]
+    existingSites <-
+        allSNP[which(allSNP[["Accession"]] == placeHolderTip), "Pos"]
+    allSites <- seq_along(allSiteNames)
+    placeHolder <- data.frame(
+        "Accession" = placeHolderTip,
+        "Pos" = setdiff(allSites, existingSites),
+        "SNP" = "hide"
+    )
+    allSNP <- rbind(allSNP, placeHolder)
     # Specify the color of mutations by pre-defined color set.
     snpColors <- .siteColorScheme(seqType)
     # Use 'ggplot' to make SNP plot as dots
@@ -46,9 +70,10 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
         geom_point(
             shape = 23,
             size = 1,
-            stroke = 0,
-            color = snpColors[allSNP[, "SNP"]]
+            color = "white",
+            stroke = 0
         ) +
+        scale_fill_manual(values = snpColors) +
         theme(
             axis.title.x = element_blank(),
             axis.text.x = element_blank(),
@@ -65,8 +90,12 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
 #' @rdname plotMutSites
 #' @export
 plotMutSites.lineagePath <- function(x, ...) {
-    snpPlot <- .createSNPplot(allSNP = attr(x, "allSNP"),
-                              seqType = attr(x, "seqType"))
+    snpPlot <- .createSNPplot(
+        allSNP = attr(x, "allSNP"),
+        seqType = attr(x, "seqType"),
+        allTreeTips = as.phylo(x)[["tip.label"]],
+        allSiteNames = attr(x, "msaNumbering")
+    )
     treePlot <- plot(x, ...)
     return(insert_left(snpPlot, treePlot, 2))
 }
@@ -75,8 +104,51 @@ plotMutSites.lineagePath <- function(x, ...) {
 #' @export
 plotMutSites.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
-    snpPlot <- .createSNPplot(allSNP = attr(paths, "allSNP"),
-                              seqType = attr(paths, "seqType"))
+    snpPlot <- .createSNPplot(
+        allSNP = attr(paths, "allSNP"),
+        seqType = attr(paths, "seqType"),
+        allTreeTips = as.phylo(paths)[["tip.label"]],
+        allSiteNames = attr(paths, "msaNumbering")
+    )
     treePlot <- plot(x, ...)
     return(insert_left(snpPlot, treePlot, 2))
+}
+
+#' @rdname plotMutSites
+#' @export
+plotMutSites.paraFixSites <- function(x, ...) {
+    paths <- attr(x, "paths")
+    seqType <- attr(paths, "seqType")
+    tree <- as.phylo(paths)
+    # Assume there is no result
+    treePlot <- NULL
+    snpPlot <- NULL
+    # Test if 'x' contains 'fixSites' or 'paraSites'
+    fixSites <- attr(x, "fixSites")
+    if (!is.null(fixSites)) {
+        treePlot <- plot.fixationSites(fixSites)
+    }
+    allSNP <- attr(x, "allSNP")
+    if (!is.null(allSNP)) {
+        snpPlot <- .createSNPplot(
+            allSNP = allSNP,
+            seqType = seqType,
+            allTreeTips = tree[["tip.label"]],
+            allSiteNames = attr(paths, "msaNumbering")
+        )
+    }
+    if (is.null(treePlot)) {
+        treePlot <- plot.lineagePath(paths)
+        if (is.null(snpPlot)) {
+            return(treePlot)
+        } else {
+            return(insert_left(snpPlot, treePlot, 2))
+        }
+    } else {
+        if (is.null(snpPlot)) {
+            return(treePlot)
+        } else {
+            return(insert_left(snpPlot, treePlot, 2))
+        }
+    }
 }
