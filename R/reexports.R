@@ -44,12 +44,16 @@ tidytree::as.treedata
 
 #' @export
 as.treedata.fixationSites <- function(tree, ...) {
+    extraArgs <- list(...)
     mutTable <- .mutationTable(tree)
     transMut <- lapply(X = split(mutTable, mutTable[, "node"]),
                        FUN = "[[",
                        i = "mutation")
-    tree <- groupOTU(as.phylo.fixationSites(tree),
-                     groupTips.fixationSites(tree))
+    .node <- extraArgs[[".node"]]
+    if (is.null(.node)) {
+        .node <- groupTips.fixationSites(tree)
+    }
+    tree <- groupOTU(as.phylo.fixationSites(tree), .node)
     tree <- .annotateSNPonTree(tree, transMut)
     return(tree)
 }

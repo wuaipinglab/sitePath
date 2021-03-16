@@ -13,7 +13,7 @@
 
 \method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
 
-\method{plot}{fixationSites}(x, y = TRUE, ...)
+\method{plot}{fixationSites}(x, y = TRUE, tipsGrouping = NULL, ...)
 
 \method{plot}{sitePath}(x, y = NULL, select = NULL, showTips = FALSE, ...)
 
@@ -33,6 +33,9 @@ no longer have effect since 1.5.4.}
 \code{plot.phylo} will no longer work.}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
+
+\item{tipsGrouping}{A \code{list} to hold the grouping of tips for how the
+tree will be colored.}
 
 \item{select}{For a \code{sitePath} object, it can have result on more than
 one evolution pathway. This is to select which path to plot. The default is

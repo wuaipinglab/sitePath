@@ -1,5 +1,6 @@
-#' @importFrom ggplot2 ggplot geom_point theme element_blank element_rect
-#' @importFrom ggplot2 scale_color_manual scale_fill_manual
+#' @importFrom ggplot2 ggplot geom_point theme
+#' @importFrom ggplot2 element_blank element_rect element_line
+#' @importFrom ggplot2 scale_color_manual scale_fill_manual scale_x_continuous
 #' @importFrom aplot insert_left
 #' @importFrom ggtree geom_tiplab
 
@@ -46,7 +47,9 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
 .createSNPplot <- function(allSNP,
                            seqType,
                            allTreeTips,
-                           allSiteNames) {
+                           allSiteNames,
+                           snpColors = NULL) {
+    allSNPsites <- sort(unique(allSNP[["Pos"]]))
     placeHolder <- data.frame("Accession" = allTreeTips,
                               "Pos" = 0,
                               "SNP" = "hide")
@@ -62,7 +65,9 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
     )
     allSNP <- rbind(allSNP, placeHolder)
     # Specify the color of mutations by pre-defined color set.
-    snpColors <- .siteColorScheme(seqType)
+    if (is.null(snpColors)) {
+        snpColors <- .siteColorScheme(seqType)
+    }
     # Use 'ggplot' to make SNP plot as dots
     snpPlot <- ggplot(allSNP, aes(x = Pos,
                                   y = Accession,
@@ -74,6 +79,7 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             stroke = 0
         ) +
         scale_fill_manual(values = snpColors) +
+        scale_x_continuous(breaks = allSNPsites) +
         theme(
             axis.title.x = element_blank(),
             axis.text.x = element_blank(),
@@ -82,6 +88,8 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             axis.text.y = element_blank(),
             axis.ticks.y = element_blank(),
             panel.background = element_rect(fill = "white"),
+            panel.grid.major.x = element_line(colour = "grey",
+                                              linetype = 3, size = 0.5),
             legend.position = "none"
         )
     return(snpPlot)
@@ -120,21 +128,52 @@ plotMutSites.paraFixSites <- function(x, ...) {
     paths <- attr(x, "paths")
     seqType <- attr(paths, "seqType")
     tree <- as.phylo(paths)
+    # The grouping of the tips by lineages
+    .node <- groupTips.lineagePath(paths)
+    grp <- names(.node)
+    grp <- grp[which(grp != "0")]
+    groupColors <-
+        colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
+    names(groupColors) <- grp
+    groupColors["0"] <- "black"
+    groupColors["hide"] <- NA
     # Assume there is no result
     treePlot <- NULL
     snpPlot <- NULL
     # Test if 'x' contains 'fixSites' or 'paraSites'
     fixSites <- attr(x, "fixSites")
     if (!is.null(fixSites)) {
-        treePlot <- plot.fixationSites(fixSites)
+        fixSites <- as.treedata.fixationSites(fixSites, .node = .node)
+        treePlot <- ggtree(fixSites, aes(color = group)) +
+            scale_color_manual(values = groupColors) +
+            theme(legend.position = "none") +
+            geom_label_repel(
+                aes(x = branch, label = SNPs),
+                fill = "lightgreen",
+                color = "black",
+                min.segment.length = 0,
+                na.rm = TRUE,
+                ...
+            )
     }
-    allSNP <- attr(x, "allSNP")
+    allSNP <- attr(x, "allSNP")[, c("Accession", "Pos")]
     if (!is.null(allSNP)) {
+        snpGroup <- do.call(rbind, lapply(names(.node), function(n) {
+            data.frame("Accession" = .node[[n]],
+                       "SNP" = n)
+        }))
+        allSNP <- merge.data.frame(
+            x = allSNP,
+            y = snpGroup,
+            by = "Accession",
+            all.x = TRUE
+        )
         snpPlot <- .createSNPplot(
             allSNP = allSNP,
             seqType = seqType,
             allTreeTips = tree[["tip.label"]],
-            allSiteNames = attr(paths, "msaNumbering")
+            allSiteNames = attr(paths, "msaNumbering"),
+            snpColors = groupColors
         )
     }
     if (is.null(treePlot)) {

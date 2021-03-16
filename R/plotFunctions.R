@@ -78,14 +78,17 @@ plot.lineagePath <- function(x,
 #' @rdname plotFunctions
 #' @description A \code{\link{fixationSites}} object will be plotted as original
 #'   phylogenetic tree marked with fixation substitutions.
+#' @param tipsGrouping A \code{list} to hold the grouping of tips for how the
+#'   tree will be colored.
 #' @examples
 #' fixations <- fixationSites(paths)
 #' plot(fixations)
 #' @export
 plot.fixationSites <- function(x,
                                y = TRUE,
+                               tipsGrouping = NULL,
                                ...) {
-    tree <- as.treedata.fixationSites(x)
+    tree <- as.treedata.fixationSites(x, .node = tipsGrouping)
     grp <- levels(tree@data[["group"]])
     grp <- grp[which(grp != "0")]
     groupColors <-
@@ -207,7 +210,8 @@ plot.sitePath <- function(x,
 #' @rdname plotFunctions
 #' @description A \code{\link{fixationIndels}} object will be plotted as original
 #'   phylogenetic tree marked with indel fixation.
-plot.fixationIndels <- function(x, y = TRUE, ...) {}
+plot.fixationIndels <- function(x, y = TRUE, ...) {
+}
 
 #' @rdname plotFunctions
 #' @description A \code{\link{fixationPath}} object will be plotted as a
