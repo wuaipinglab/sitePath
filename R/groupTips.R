@@ -69,10 +69,13 @@ groupTips.lineagePath <- function(tree, tipnames = TRUE, ...) {
             tips <- c(tips, pathNodeTips[[as.character(currNode)]])
             # Stop adding the tips to the group and take the group out
             if (nextNode %in% divNodes) {
-                res[[aNode]] <- tips
+                if (length(tips)) {
+                    res[[aNode]] <- tips
+                }
                 # The node next to the divergent node is the new ancestral node
                 aNode <- as.character(p[[i + 2]])
                 tips <- integer()
+                next
             }
         }
         # Add the tips of the final node to the group and take the final group
