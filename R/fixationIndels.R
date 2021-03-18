@@ -4,6 +4,7 @@
 #' @param x The return from \code{\link{sitesMinEntropy}} function.
 #' @param ... Other arguments.
 #' @return A \code{fixationIndels} object.
+#' @export
 #' @examples
 #' data(zikv_tree_reduced)
 #' data(zikv_align_reduced)
@@ -14,6 +15,7 @@ fixationIndels <- function(x, ...) {
 }
 
 #' @rdname fixationIndels
+#' @export
 fixationIndels.sitesMinEntropy <- function(x, ...) {
     paths <- attr(x, "paths")
     tree <- attr(paths, "tree")

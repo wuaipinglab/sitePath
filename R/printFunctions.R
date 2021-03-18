@@ -132,6 +132,7 @@ print.paraFixSites <- function(x, ...) {
     }
 }
 
+#' @export
 print.fixationIndels <- function(x, ...) {
     cat("This is a 'fixationIndels' object.\n\nResult for",
         length(attr(x, "paths")),
@@ -150,6 +151,7 @@ print.fixationIndels <- function(x, ...) {
     }
 }
 
+#' @export
 print.indelPath <- function(x, ...) {
     cat("Site(s)",
         attr(x, "indelSites"),

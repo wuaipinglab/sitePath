@@ -26,6 +26,13 @@ paraFixSites <- function(x, ...) {
 #' @param method The strategy for predicting the fixation. The basic approach is
 #'   entropy minimization and can be achieved by adding or removing fixation
 #'   point, or by comparing the two.
+#' @param minSNP The minimum number of mutations to be qualified as parallel on
+#'   at least two lineages. The default is 1.
+#' @param mutMode The strategy for finding parallel site. The default \code{all}
+#'   is to consider any mutation regardless of the amino acid/nucleotide before
+#'   and after mutation; Or \code{exact} to force mutation to be the same; Or
+#'   \code{pre}/\code{post} to select the site having amino acid/nucleotide
+#'   before/after mutation.
 #' @export
 paraFixSites.lineagePath <- function(x,
                                      category = c("intersect", "union",
@@ -37,7 +44,7 @@ paraFixSites.lineagePath <- function(x,
                                      mutMode = c("all", "exact",
                                                  "pre", "post"),
                                      ...) {
-    minEntropy <- sitesMinEntropy.lineagePath(paths,
+    minEntropy <- sitesMinEntropy.lineagePath(x,
                                               minEffectiveSize,
                                               searchDepth,
                                               method)

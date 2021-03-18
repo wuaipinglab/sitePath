@@ -45,6 +45,15 @@ tell the search when to stop.}
 \item{method}{The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.}
+
+\item{minSNP}{The minimum number of mutations to be qualified as parallel on
+at least two lineages. The default is 1.}
+
+\item{mutMode}{The strategy for finding parallel site. The default \code{all}
+is to consider any mutation regardless of the amino acid/nucleotide before
+and after mutation; Or \code{exact} to force mutation to be the same; Or
+\code{pre}/\code{post} to select the site having amino acid/nucleotide
+before/after mutation.}
 }
 \value{
 A \code{paraFixSites} object.
