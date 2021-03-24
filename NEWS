@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.7.6
+-------------------------
+    o Bug fix: empty groups produced by 'groupTips' function.
+    o Create 'paraFixSites' and 'fixationIndel' functions.
+
 CHANGES IN VERSION 1.7.5
 -------------------------
     o Treat 'phyMSAmatched' object as 'lineagePath' class for simplicity.
