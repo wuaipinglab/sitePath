@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fixation sites prediction — fixationSites • sitePath</title>
+<title>Fixation indels prediction — fixationIndels • sitePath</title>
 
 
 <!-- jquery -->
@@ -39,14 +39,8 @@
 
 
 
-<meta property="og:title" content="Fixation sites prediction — fixationSites" />
-<meta property="og:description" content="After finding the lineagePath of a phylogenetic
-  tree, fixationSites uses the result to find those sites that show
-  fixation on some, if not all, of the lineages. The number of tips before
-  and after the fixation mutation is expected to be more than
-  minEffectiveSize. Also, the fixation will be skipped if the amino
-  acid/nucleotide is gap or ambiguous character. A lineage has to have at
-  least one fixation mutation to be reported." />
+<meta property="og:title" content="Fixation indels prediction — fixationIndels" />
+<meta property="og:description" content="The fixation of insertions of deletions." />
 
 
 
@@ -122,83 +116,47 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fixation sites prediction</h1>
-    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/fixationSites.R'><code>R/fixationSites.R</code></a></small>
-    <div class="hidden name"><code>fixationSites.Rd</code></div>
+    <h1>Fixation indels prediction</h1>
+    <small class="dont-index">Source: <a href='https://github.com/wuaipinglab/sitePath/blob/master/R/fixationIndels.R'><code>R/fixationIndels.R</code></a></small>
+    <div class="hidden name"><code>fixationIndels.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>After finding the <code><a href='lineagePath.html'>lineagePath</a></code> of a phylogenetic
-  tree, <code>fixationSites</code> uses the result to find those sites that show
-  fixation on some, if not all, of the lineages. The number of tips before
-  and after the fixation mutation is expected to be more than
-  <code>minEffectiveSize</code>. Also, the fixation will be skipped if the amino
-  acid/nucleotide is gap or ambiguous character. A lineage has to have at
-  least one fixation mutation to be reported.</p>
+    <p>The fixation of insertions of deletions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fixationSites</span><span class='op'>(</span><span class='va'>paths</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for lineagePath</span>
-<span class='fu'>fixationSites</span><span class='op'>(</span>
-  <span class='va'>paths</span>,
-  minEffectiveSize <span class='op'>=</span> <span class='cn'>NULL</span>,
-  searchDepth <span class='op'>=</span> <span class='fl'>1</span>,
-  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"compare"</span>, <span class='st'>"insert"</span>, <span class='st'>"delete"</span><span class='op'>)</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
+    <pre class="usage"><span class='fu'>fixationIndels</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sitesMinEntropy</span>
-<span class='fu'>fixationSites</span><span class='op'>(</span><span class='va'>paths</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>fixationIndels</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>paths</th>
-      <td><p>A <code>lineagePath</code> object returned from
-<code><a href='lineagePath.html'>lineagePath</a></code> function.</p></td>
+      <th>x</th>
+      <td><p>The return from <code><a href='sitesMinEntropy.html'>sitesMinEntropy</a></code> function.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>further arguments passed to or from other methods.</p></td>
-    </tr>
-    <tr>
-      <th>minEffectiveSize</th>
-      <td><p>The minimum number of tips in a group.</p></td>
-    </tr>
-    <tr>
-      <th>searchDepth</th>
-      <td><p>The function uses heuristic search but the termination of
-the search cannot be intrinsically decided. <code>searchDepth</code> is needed to
-tell the search when to stop.</p></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>The strategy for predicting the fixation. The basic approach is
-entropy minimization and can be achieved by adding or removing fixation
-point, or by comparing the two.</p></td>
+      <td><p>Other arguments.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>fixationSites</code> object.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='as.data.frame.fixationSites.html'>as.data.frame.fixationSites</a></code></p></div>
+    <p>A <code>fixationIndels</code> object.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
 <span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
-<span class='fu'>fixationSites</span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; This is a 'fixationSites' object.
+<span class='fu'>fixationIndels</span><span class='op'>(</span><span class='fu'><a href='sitesMinEntropy.html'>sitesMinEntropy</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; This is a 'fixationIndels' object.
 #&gt; 
 #&gt; Result for 2 paths:
 #&gt; 
-#&gt; 196 988 139 894 1542 2074 2086 2634 3045 
-#&gt; No reference sequence specified. Using alignment numbering</div></pre>
+#&gt; No multi-fixation found</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

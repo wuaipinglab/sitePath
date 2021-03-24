@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -34,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.6</span>
       </span>
     </div>
 
@@ -72,44 +74,44 @@
 <div id="getting-help" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-help" class="anchor"></a>Getting help</h2>
-<p>Post on Bioconductor <a href="https://support.bioconductor.org/">support site</a> if having trouble using <code>sitePath</code>. Or open an <a href="https://github.com/wuaipinglab/sitePath/issues/new?assignees=&amp;labels=&amp;template=bug_report.md&amp;title=">issue</a> if a bug is found.</p>
+<p>Post on Bioconductor <a href="https://support.bioconductor.org/" class="external-link">support site</a> if having trouble using <code>sitePath</code>. Or open an <a href="https://github.com/wuaipinglab/sitePath/issues/new?assignees=&amp;labels=&amp;template=bug_report.md&amp;title=" class="external-link">issue</a> if a bug is found.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p><a href="https://cran.r-project.org/">R programming language</a> &gt;= 4.0.0 is required to use <code>sitePath</code>.</p>
-<p>The stable release is available on <a href="https://bioconductor.org/packages/release/bioc/html/sitePath.html">Bioconductor</a>.</p>
+<p><a href="https://cran.r-project.org/" class="external-link">R programming language</a> &gt;= 4.0.0 is required to use <code>sitePath</code>.</p>
+<p>The stable release is available on <a href="https://bioconductor.org/packages/release/bioc/html/sitePath.html" class="external-link">Bioconductor</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
 
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"sitePath"</span><span class="op">)</span></code></pre></div>
-<p>The installation from <a href="https://github.com/wuaipinglab/sitePath/">GitHub</a> is in experimental stage but gives the newest feature:</p>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"sitePath"</span><span class="op">)</span></code></pre></div>
+<p>The installation from <a href="https://github.com/wuaipinglab/sitePath/" class="external-link">GitHub</a> is in experimental stage but gives the newest feature:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
 
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"wuaipinglab/sitePath"</span><span class="op">)</span></code></pre></div>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"wuaipinglab/sitePath"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="quickstart" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quickstart" class="anchor"></a>QuickStart</h2>
 <p>Both the phylogenetic tree and the matching multiple sequence alignment files are required.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wuaipinglab.github.io/sitePath/">sitePath</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wuaipinglab.github.io/sitePath/" class="external-link">sitePath</a></span><span class="op">)</span>
 
 <span class="co"># The file names of your tree and multiple sequence alignment</span>
-<span class="va">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
-<span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
+<span class="va">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
+<span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
 
-<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span>
+<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html" class="external-link">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span>
 <span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phyMSAmatched.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">alignment_file</span>, <span class="st">"fasta"</span><span class="op">)</span></code></pre></div>
 <p>Use the <code>lineagePath</code> function to resolve major lineages (the choice of threshold really depends). Then use the <code>fixationSites</code> function to detect fixation sites.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span>
 
 <span class="va">fixations</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fixationSites.html">fixationSites</a></span><span class="op">(</span><span class="va">paths</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">fixations</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fixations</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This is a 'fixationSites' object.</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Result for 4 paths:</span></span>
@@ -122,7 +124,7 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li>Download from BIOC at <br><a href="https://www.bioconductor.org/packages/sitePath">https://​www.bioconductor.org/​packages/​sitePath</a>
 </li>
@@ -132,32 +134,39 @@
 </li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
 <a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Chengyang Ji <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0001-9258-5453" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html">More on authors...</a></li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Chengyang Ji.</p>
+  <p></p>
+<p>Developed by Chengyang Ji.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -165,6 +174,8 @@
 
   
 
+
+  
 
   </body>
 </html>
