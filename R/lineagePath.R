@@ -227,15 +227,37 @@ sneakPeek <- function(tree,
     rangeOfResults <- attr(x, "rangeOfResults")
     rangeOfResults <-
         rangeOfResults[which(lengths(rangeOfResults) != 1)]
-    sizeRange <-
-        range(vapply(rangeOfResults, attr, integer(1), "minSize"))
+    # Number of paths in each result
+    nPaths <- lengths(rangeOfResults)
+    # All unique number of paths
+    dupPathNums <- unique(nPaths[which(duplicated(nPaths))])
+    uniqueIndices <-
+        which(!duplicated(nPaths) & nPaths %in% dupPathNums)
+    if (length(uniqueIndices) > 1) {
+        groupedIndices <-
+            split(uniqueIndices, cut(seq_along(uniqueIndices), step))
+        groupedIndices <- vapply(
+            X = seq_len(step),
+            FUN = function(i) {
+                res <- groupedIndices[[i]]
+                if (length(res)) {
+                    return(res[1])
+                } else {
+                    return(groupedIndices[[i - 1]])
+                }
+            },
+            FUN.VALUE = integer(1)
+        )
+    } else {
+        groupedIndices <-
+            head(as.list(which(!duplicated(nPaths))), step)
+    }
     # Try every 'similarity'
     similarity <- numeric()
     pathNum <- integer()
     allPaths <- list()
-    for (s in seq(from = sizeRange[1],
-                  to = sizeRange[2],
-                  length.out = step)) {
+    for (index in groupedIndices) {
+        s <- attr(rangeOfResults[[index]], "minSize")
         paths <- lineagePath(x,
                              similarity = s,
                              forbidTrivial = FALSE)
