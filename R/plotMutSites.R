@@ -48,7 +48,9 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
                            seqType,
                            allTreeTips,
                            allSiteNames,
-                           snpColors = NULL) {
+                           snpColors = NULL,
+                           dotSize = 1,
+                           lineSize = 0.5) {
     allSNPsites <- sort(unique(allSNP[["Pos"]]))
     placeHolder <- data.frame("Accession" = allTreeTips,
                               "Pos" = 0,
@@ -74,7 +76,7 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
                                   fill = SNP)) +
         geom_point(
             shape = 23,
-            size = 1,
+            size = dotSize,
             color = "white",
             stroke = 0
         ) +
@@ -88,8 +90,11 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             axis.text.y = element_blank(),
             axis.ticks.y = element_blank(),
             panel.background = element_rect(fill = "white"),
-            panel.grid.major.x = element_line(colour = "grey",
-                                              linetype = 3, size = 0.5),
+            panel.grid.major.x = element_line(
+                colour = "grey",
+                linetype = 3,
+                size = lineSize
+            ),
             legend.position = "none"
         )
     return(snpPlot)
@@ -124,7 +129,12 @@ plotMutSites.fixationSites <- function(x, ...) {
 
 #' @rdname plotMutSites
 #' @export
-plotMutSites.paraFixSites <- function(x, ...) {
+plotMutSites.paraFixSites <- function(x,
+                                      widthRatio = 0.75,
+                                      fontSize = 3.88,
+                                      dotSize = 1,
+                                      lineSize = 0.5,
+                                      ...) {
     paths <- attr(x, "paths")
     seqType <- attr(paths, "seqType")
     tree <- as.phylo(paths)
@@ -153,6 +163,7 @@ plotMutSites.paraFixSites <- function(x, ...) {
                 color = "black",
                 min.segment.length = 0,
                 na.rm = TRUE,
+                size = fontSize,
                 ...
             )
     }
@@ -173,7 +184,9 @@ plotMutSites.paraFixSites <- function(x, ...) {
             seqType = seqType,
             allTreeTips = tree[["tip.label"]],
             allSiteNames = attr(paths, "msaNumbering"),
-            snpColors = groupColors
+            snpColors = groupColors,
+            dotSize = dotSize,
+            lineSize = lineSize
         )
     }
     if (is.null(treePlot)) {
@@ -181,13 +194,13 @@ plotMutSites.paraFixSites <- function(x, ...) {
         if (is.null(snpPlot)) {
             return(treePlot)
         } else {
-            return(insert_left(snpPlot, treePlot, 2))
+            return(insert_left(snpPlot, treePlot, widthRatio))
         }
     } else {
         if (is.null(snpPlot)) {
             return(treePlot)
         } else {
-            return(insert_left(snpPlot, treePlot, 2))
+            return(insert_left(snpPlot, treePlot, widthRatio))
         }
     }
 }

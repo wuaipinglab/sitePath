@@ -16,7 +16,14 @@ plotMutSites(x, ...)
 
 \method{plotMutSites}{fixationSites}(x, ...)
 
-\method{plotMutSites}{paraFixSites}(x, ...)
+\method{plotMutSites}{paraFixSites}(
+  x,
+  widthRatio = 0.75,
+  fontSize = 3.88,
+  dotSize = 1,
+  lineSize = 0.5,
+  ...
+)
 }
 \arguments{
 \item{x}{An \code{\link{SNPsites}} object.}
