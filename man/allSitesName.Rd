@@ -5,6 +5,7 @@
 \alias{allSitesName.SNPsites}
 \alias{allSitesName.fixationSites}
 \alias{allSitesName.parallelSites}
+\alias{allSitesName.paraFixSites}
 \title{Retrieve position of all the sites}
 \usage{
 allSitesName(x, ...)
@@ -14,6 +15,8 @@ allSitesName(x, ...)
 \method{allSitesName}{fixationSites}(x, ...)
 
 \method{allSitesName}{parallelSites}(x, ...)
+
+\method{allSitesName}{paraFixSites}(x, ...)
 }
 \arguments{
 \item{x}{The object containing the sites from analysis}

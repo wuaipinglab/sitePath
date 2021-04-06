@@ -35,3 +35,9 @@ allSitesName.fixationSites <- function(x, ...) {
 allSitesName.parallelSites <- function(x, ...) {
     names(x)
 }
+
+#' @rdname allSitesName
+#' @export
+allSitesName.paraFixSites <- function(x, ...) {
+    names(as.integer(x))
+}

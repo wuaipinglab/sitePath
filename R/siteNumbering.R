@@ -193,3 +193,16 @@ setSiteNumbering.fixationPath <- function(x,
     )
     return(x)
 }
+
+setSiteNumbering.paraFixSites <- function(x,
+                                          reference = NULL,
+                                          gapChar = '-',
+                                          ...) {
+    fixedSites <- attr(x, "fixSites")
+    attr(x, "fixSites") <-
+        setSiteNumbering.fixationSites(fixedSites,
+                                       reference,
+                                       gapChar,
+                                       ...)
+    return(x)
+}
