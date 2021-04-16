@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.7.7
+-------------------------
+    o Fix: Add 'rmarkdown' in 'Suggests'.
+    o Only plot paths with duplication in number for 'sneakPeek' function.
+
 CHANGES IN VERSION 1.7.6
 -------------------------
     o Bug fix: empty groups produced by 'groupTips' function.
