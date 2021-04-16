@@ -1,4 +1,5 @@
 #' @importFrom stats sd quantile
+#' @importFrom utils head
 #' @importFrom ape nodepath getMRCA node.depth.edgelength Ntip
 #' @importFrom gridExtra arrangeGrob grid.arrange
 
@@ -236,18 +237,10 @@ sneakPeek <- function(tree,
     if (length(uniqueIndices) > 1) {
         groupedIndices <-
             split(uniqueIndices, cut(seq_along(uniqueIndices), step))
-        groupedIndices <- vapply(
-            X = seq_len(step),
-            FUN = function(i) {
-                res <- groupedIndices[[i]]
-                if (length(res)) {
-                    return(res[1])
-                } else {
-                    return(groupedIndices[[i - 1]])
-                }
-            },
-            FUN.VALUE = integer(1)
-        )
+        groupedIndices <-
+            groupedIndices[which(lengths(groupedIndices) != 0)]
+        groupedIndices <-
+            vapply(groupedIndices, "[[", integer(1), 1)
     } else {
         groupedIndices <-
             head(as.list(which(!duplicated(nPaths))), step)

@@ -31,6 +31,14 @@ plotMutSites(x, ...)
 \item{...}{Other arguments}
 
 \item{showTips}{Whether to plot the tip labels. The default is \code{FALSE}.}
+
+\item{widthRatio}{The width ratio between tree plot and SNP plot}
+
+\item{fontSize}{The font size of the mutation label in tree plot}
+
+\item{dotSize}{The dot size of SNP in SNP plot}
+
+\item{lineSize}{The background line size in SNP plot}
 }
 \value{
 A tree plot with SNP as dots for each tip.

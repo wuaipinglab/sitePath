@@ -128,6 +128,10 @@ plotMutSites.fixationSites <- function(x, ...) {
 }
 
 #' @rdname plotMutSites
+#' @param widthRatio The width ratio between tree plot and SNP plot
+#' @param fontSize The font size of the mutation label in tree plot
+#' @param dotSize The dot size of SNP in SNP plot
+#' @param lineSize The background line size in SNP plot
 #' @export
 plotMutSites.paraFixSites <- function(x,
                                       widthRatio = 0.75,
