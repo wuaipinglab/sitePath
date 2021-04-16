@@ -103,7 +103,7 @@ A fixationPath object will be plotted as a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.7</span>
       </span>
     </div>
 
@@ -147,7 +147,7 @@ A fixationPath object will be plotted as a
   function name <code>plot</code> is used to keep the compatibility with previous
   versions, but they do not behave like the generic <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>
   function since 1.5.4.</p>
-<p>A <code><a href='phyMSAmatched.html'>phyMSAmatched</a></code> object will be plotted as a tree
+<p>A <code><a href='addMSA.html'>phyMSAmatched</a></code> object will be plotted as a tree
   diagram.</p>
 <p>A <code><a href='lineagePath.html'>lineagePath</a></code> object will be plotted as a tree
   diagram and paths are black solid line while the trimmed nodes and tips
@@ -227,7 +227,7 @@ in <code><a href='plotSingleSite.html'>plotSingleSite</a></code>.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align</span><span class='op'>)</span>
-<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='phyMSAmatched.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span>
+<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 </div><div class='img'><img src='plotFunctions-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>paths</span><span class='op'>)</span>
