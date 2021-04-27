@@ -19,7 +19,7 @@ test_that("The function works", {
     expect_type(sites, "character")
     expect_equal(length(sites), length(zikv_fixed))
 
-    zikv_para <- parallelSites(zikv_entropy)
+    zikv_para <- parallelSites(zikv_entropy, minSNP = 1)
     sites <- allSitesName(zikv_para)
     expect_type(sites, "character")
     expect_equal(length(sites), length(zikv_para))

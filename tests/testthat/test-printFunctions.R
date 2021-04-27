@@ -27,7 +27,7 @@ test_that("The print functions work", {
     fp <- fixationPath(fixedSites)
     expect_error(capture.output(print(fp)), NA)
 
-    paraSites <- parallelSites(minEntropy)
+    paraSites <- parallelSites(minEntropy, minSNP = 1)
     expect_error(capture.output(print(paraSites)), NA)
 
     para <- extractSite(paraSites, 106)

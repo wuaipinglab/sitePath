@@ -150,7 +150,7 @@ plot(fixations)
 Parallel mutation can be found by the `parallelSites` function. There are four ways of defining the parallel mutation: `all`, `exact`, `pre` and `post`. Here `exact` is used as an example.
 
 ```{r}
-paraSites <- parallelSites(minEntropy, mutMode = "exact")
+paraSites <- parallelSites(minEntropy, minSNP = 1, mutMode = "exact")
 paraSites
 ```
 

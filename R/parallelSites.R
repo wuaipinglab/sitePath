@@ -79,7 +79,7 @@ parallelSites.sitesMinEntropy <- function(x,
     }
     # Set the 'minSNP' constrain
     if (is.null(minSNP)) {
-        minSNP <- 1
+        minSNP <- attr(attr(x, "paths"), "minSize")
     } else if (!is.numeric(minSNP)) {
         stop("\"minSNP\" only accepts numeric")
     }
