@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.7.8
+-------------------------
+    o Change default 'minSNP' value for 'parallelSites' function.
+
 CHANGES IN VERSION 1.7.7
 -------------------------
     o Fix: Add 'rmarkdown' in 'Suggests'.
