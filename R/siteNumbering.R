@@ -33,21 +33,31 @@ setSiteNumbering.phyMSAmatched <- function(x,
                                            gapChar = "-",
                                            minSkipSize = NULL,
                                            ...) {
+    extraArgs <- list(...)
+    usedSites <- extraArgs[["usedSites"]]
     x <- .phyMSAmatch(x)
     align <- attr(x, "align")
     if (is.null(reference)) {
         # Use numbering of MSA when now reference provided
-        attr(x, "msaNumbering") <- seq_len(nchar(align[1]))
+        msaNumbering <- seq_len(nchar(align[1]))
     } else if (!is.character(gapChar) || length(gapChar) != 1 ||
                nchar(gapChar) != 1) {
         stop("\"gapChar\" only accepts one single character")
     } else {
         # The length of 'msaNumbering' is same as the reference sequence and the
-        # numbers are the site indices of MSA
-        attr(x, "msaNumbering") <-
-            getReference(align[reference], gapChar)
+        # numbers are the site indexes of MSA
+        msaNumbering <- getReference(align[reference], gapChar)
         attr(x, "reference") <- reference
     }
+    if (!is.null(usedSites)) {
+        if (any(!is.numeric(usedSites)) || any(usedSites <= 0)) {
+            stop("Please enter positive number for \"usedSites\"")
+        } else if (any(usedSites > max(msaNumbering))) {
+            stop("\"usedSites\" exceed length of the reference.")
+        }
+        msaNumbering <- msaNumbering[usedSites]
+    }
+    attr(x, "msaNumbering") <- msaNumbering
     attr(x, "gapChar") <- gapChar
     # Check and set the minimum size to remove a site
     if (is.null(minSkipSize)) {
