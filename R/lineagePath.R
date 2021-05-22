@@ -46,12 +46,8 @@ lineagePath.phyMSAmatched <- function(tree,
         max(vapply(rangeOfResults, attr, integer(1), "minSize"))
     # Set the number of lineage paths
     if (is.null(similarity)) {
-        pathNums <- lengths(rangeOfResults)
-        pathNums <- pathNums[which(pathNums != 1)]
-        fourthQuantile <- quantile(pathNums)[[4]]
-        paths <-
-            rangeOfResults[[which.min(abs(pathNums - fourthQuantile))]]
-        minSNP <- attr(paths, "minSize")
+        index <- .stablePathIndex(rangeOfResults, 9)[[1]]
+        minSNP <- attr(rangeOfResults[[index]], "minSize")
         similarity <- minSNP / nTips
     } else {
         if (!is.numeric(similarity) || similarity <= 0) {
@@ -72,14 +68,14 @@ lineagePath.phyMSAmatched <- function(tree,
             }
         }
         similarity <- minSNP / nTips
-        paths <- rangeOfResults[[which.min(vapply(
-            X = rangeOfResults,
-            FUN = function(ps) {
-                abs(attr(ps, "minSize") - minSNP)
-            },
-            FUN.VALUE = numeric(1)
-        ))]]
     }
+    paths <- rangeOfResults[[which.min(vapply(
+        X = rangeOfResults,
+        FUN = function(ps) {
+            abs(attr(ps, "minSize") - minSNP)
+        },
+        FUN.VALUE = numeric(1)
+    ))]]
     # Transfer attributes
     attributes(paths) <- attributes(x)
     # Set attributes 'similarity' and 'minSNP'
@@ -91,91 +87,22 @@ lineagePath.phyMSAmatched <- function(tree,
     return(paths)
 }
 
-.dropLessDiverged <- function(paths, tree) {
-    allTipsNum <- Ntip(tree)
-    toKeep <- vapply(
-        X = seq_along(paths),
-        FUN = function(i) {
-            refPath <- paths[[i]]
-            # All tips at the terminal
-            endTipsNum <-
-                length(.childrenTips(tree, tail(refPath, 1)))
-            # The diverged part from all other lineage
-            divPath <- setdiff(refPath, unlist(paths[-i]))
-            divTipsNum <- length(.childrenTips(tree, divPath[1]))
-            # If the diverged part (terminal tips excluded) has larger
-            # proportion
-            div <- (divTipsNum - endTipsNum) / divTipsNum
-            all <- endTipsNum / allTipsNum
-            div > all
-        },
-        FUN.VALUE = logical(1)
-    )
-    paths <- paths[which(toKeep)]
-    return(paths)
-}
-
-.mergeDivergedPaths <- function(tree, zValue, rootNode) {
-    edgeLength <- node.depth.edgelength(tree)
-    res <- nodepath(tree)
-    # Iterate each path to see if diverged from all other paths
-    i <- 1
-    while (i <= length(res)) {
-        # The target lineage path excluding the terminal node
-        refPath <- res[[i]]
-        endNode <- refPath[length(refPath)]
-        # Assume the current terminal tips are to keep
-        toDrop <- FALSE
-        # Compare with rest of the paths to decide if to keep
-        for (p in res[-i]) {
-            if (edgeLength[endNode] > edgeLength[p[length(p)]]) {
-                # Always keep the longer path
-                next
-            }
-            # Pair up the two paths for comparison
-            pathPair <- list(refPath, p)
-            # The intersection of the two paths
-            commonNodes <- intersect(refPath, p)
-            if (length(commonNodes) == 1 &&
-                commonNodes == rootNode) {
-                # The two paths diverged at the root
-                divNodes <- rootNode
-            } else {
-                divNodes <- divergentNode(pathPair)
-            }
-            attr(pathPair, "tree") <- tree
-            # Fake the 'align' attribute, so the function will work even without
-            # the actual sequence
-            attr(pathPair, "align") <- tree[["tip.label"]]
-            # The tips and the corresponding ancestral node. Because the tree
-            # was forced to be bifurcated, there won't be any tips on the
-            # divergent node
-            pathNodeTips <-
-                .tipSeqsAlongPathNodes(pathPair, divNodes)
-            # The genetic distance of all tips to the path
-            allDist <- vapply(
-                X = names(pathNodeTips),
-                FUN = function(n) {
-                    an <- as.integer(n)
-                    tips <- pathNodeTips[[n]]
-                    tipsDist <- edgeLength[tips] - edgeLength[an]
-                    mean(tipsDist)
-                },
-                FUN.VALUE = numeric(1)
-            )
-            divThreshold <- mean(allDist) + sd(allDist) * zValue
-            # The diverged part of the current path compared with the other path
-            divDist <- edgeLength[endNode] - edgeLength[divNodes]
-            if (divDist < divThreshold) {
-                toDrop <- TRUE
-                break
-            }
-        }
-        if (toDrop) {
-            res <- res[-i]
-        } else {
-            i <- i + 1
-        }
+.stablePathIndex <- function(rangeOfResults, step) {
+    # Number of paths in each result
+    nPaths <- lengths(rangeOfResults)
+    # All unique number of paths
+    dupPathNums <- unique(nPaths[which(duplicated(nPaths))])
+    # The indexes of the stable path
+    stable <- which(!duplicated(nPaths) & nPaths %in% dupPathNums)
+    if (length(stable) > 1) {
+        # Split the indexed into 'step' number of groups
+        res <- split(stable, cut(seq_along(stable), step))
+        # Remove the empty group if any
+        res <- res[which(lengths(res) != 0)]
+        # Select the first index for each group
+        res <- vapply(res, "[[", integer(1), 1)
+    } else {
+        res <- head(as.list(which(!duplicated(nPaths))), step)
     }
     return(res)
 }
@@ -228,28 +155,11 @@ sneakPeek <- function(tree,
     rangeOfResults <- attr(x, "rangeOfResults")
     rangeOfResults <-
         rangeOfResults[which(lengths(rangeOfResults) != 1)]
-    # Number of paths in each result
-    nPaths <- lengths(rangeOfResults)
-    # All unique number of paths
-    dupPathNums <- unique(nPaths[which(duplicated(nPaths))])
-    uniqueIndices <-
-        which(!duplicated(nPaths) & nPaths %in% dupPathNums)
-    if (length(uniqueIndices) > 1) {
-        groupedIndices <-
-            split(uniqueIndices, cut(seq_along(uniqueIndices), step))
-        groupedIndices <-
-            groupedIndices[which(lengths(groupedIndices) != 0)]
-        groupedIndices <-
-            vapply(groupedIndices, "[[", integer(1), 1)
-    } else {
-        groupedIndices <-
-            head(as.list(which(!duplicated(nPaths))), step)
-    }
     # Try every 'similarity'
     similarity <- numeric()
     pathNum <- integer()
     allPaths <- list()
-    for (index in groupedIndices) {
+    for (index in .stablePathIndex(rangeOfResults, step)) {
         s <- attr(rangeOfResults[[index]], "minSize")
         paths <- lineagePath(x,
                              similarity = s,

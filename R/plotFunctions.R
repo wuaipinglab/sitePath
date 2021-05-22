@@ -75,6 +75,33 @@ plot.lineagePath <- function(x,
     return(p)
 }
 
+.plotSubPaths <- function(paths,
+                          select = NULL,
+                          pathColor = "black",
+                          pathSize = 2) {
+    tree <- attr(paths, "tree")
+    nNodes <- ape::Nnode(tree, internal.only = FALSE)
+    if (is.null(select)) {
+        pathNodes <- unique(unlist(paths))
+    } else {
+        pathNodes <- unique(unlist(paths[select]))
+    }
+    group <- rep(1, times = nNodes)
+    group[pathNodes] <- 0
+    group <- factor(group)
+    size <- rep(1, times = nNodes)
+    size[pathNodes] <- 2
+    p <- ggtree(tree, aes(
+        color = group,
+        linetype = group,
+        size = size
+    )) +
+        scale_size(range = c(0.5, pathSize)) +
+        scale_color_manual(values = c(pathColor, "gainsboro")) +
+        theme(legend.position = "none")
+    p
+}
+
 #' @rdname plotFunctions
 #' @description A \code{\link{fixationSites}} object will be plotted as original
 #'   phylogenetic tree marked with fixation substitutions.
