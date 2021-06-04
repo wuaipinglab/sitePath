@@ -112,6 +112,7 @@ sitesMinEntropy.lineagePath <- function(x,
                 # The path with fewer tips will use smaller threshold
                 scaledSize <- ceiling(minEffectiveSize * scaledSize)
                 attr(pathNodeAlign, "scaledSize") <- scaledSize
+                attr(pathNodeAlign, "scaledSize") <- minEffectiveSize
                 segs <- lapply(
                     X = siteIndices,
                     FUN = .runEntropyMinimization,
@@ -136,6 +137,7 @@ sitesMinEntropy.lineagePath <- function(x,
                 # The path with fewer tips will use smaller threshold
                 scaledSize <- ceiling(minEffectiveSize * scaledSize)
                 attr(pathNodeAlign, "scaledSize") <- scaledSize
+                attr(pathNodeAlign, "scaledSize") <- minEffectiveSize
                 # Entropy minimization result for every locus
                 segs <- parLapply(
                     cl = cl,

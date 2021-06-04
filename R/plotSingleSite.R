@@ -97,6 +97,66 @@ plotSingleSite.lineagePath <- function(x,
     return(groupColors)
 }
 
+plotSingleSite.sitesMinEntropy <- function(x,
+                                           site,
+                                           ...) {
+    tree <- as.phylo.sitesMinEntropy(x)
+    # Specify the color of mutations by pre-defined color set.
+    sitePaths <- lapply(x, "[[", as.character(site))
+    groupColors <- .siteColorScheme(attr(x, "seqType"))
+    g <- lapply(allPaths, function(path) {
+        plot(path) + ggtitle(
+            label = paste0(
+                attr(path, "minSize"),
+                " (",
+                round(attr(path, "similarity") * 100, 2),
+                "%)"
+            ),
+            subtitle = paste0(length(path), " path(s)")
+        )
+    })
+    grid.arrange(arrangeGrob(grobs = g))
+    # Collect the fixation mutation for each evolutionary pathway
+    fixationMut <- character()
+    group <- list()
+    for (sp in sitePaths) {
+        # The first group is separately done
+        tips <- sp[[1]]
+        prevAA <- toupper(attr(tips, "AA"))
+        aaName <- prevAA
+        group[[prevAA]] <- c(group[[prevAA]], tips)
+        # Do the rest
+        for (i in seq_along(sp)[-1]) {
+            tips <- sp[[i]]
+            aa <- toupper(attr(tips, "AA"))
+            aaName <- c(aaName, aa)
+            group[[aa]] <- c(group[[aa]], tips)
+            fixationMut[names(sp[i])] <- paste0(prevAA,
+                                                site,
+                                                aa)
+            prevAA <- aa
+        }
+    }
+    tree <- groupOTU(tree, group)
+    # Color the excluded branch gray as the excluded lineage
+    excludedLabel <- ".excluded"
+    groupColors[[excludedLabel]] <- "#dcdcdc"
+    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
+        excludedLabel
+    # Use dashed line for excluded branches
+    linetype <- as.integer(attr(tree, "group") == excludedLabel)
+    linetype <- factor(linetype)
+    # Just in case the fixation mutation name is too long
+    # Annotate the mutation on the tree
+    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
+        scale_color_manual(values = groupColors) +
+        guides(linetype = FALSE,
+               color = guide_legend(override.aes = list(size = 3))) +
+        theme(legend.position = "left") +
+        ggtitle(site)
+    return(p)
+}
+
 #' @rdname plotSingleSite
 #' @description For \code{\link{parallelSites}}, the tree will be colored
 #'   according to the amino acid of the site if the mutation is not fixed.
