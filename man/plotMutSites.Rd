@@ -4,6 +4,7 @@
 \alias{plotMutSites}
 \alias{plotMutSites.SNPsites}
 \alias{plotMutSites.lineagePath}
+\alias{plotMutSites.parallelSites}
 \alias{plotMutSites.fixationSites}
 \alias{plotMutSites.paraFixSites}
 \title{Plot tree and mutation sites}
@@ -13,6 +14,8 @@ plotMutSites(x, ...)
 \method{plotMutSites}{SNPsites}(x, showTips = FALSE, ...)
 
 \method{plotMutSites}{lineagePath}(x, ...)
+
+\method{plotMutSites}{parallelSites}(x, ...)
 
 \method{plotMutSites}{fixationSites}(x, ...)
 

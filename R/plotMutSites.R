@@ -115,6 +115,12 @@ plotMutSites.lineagePath <- function(x, ...) {
 
 #' @rdname plotMutSites
 #' @export
+plotMutSites.parallelSites <- function(x, ...) {
+    return(plot.parallelSites(x, ...))
+}
+
+#' @rdname plotMutSites
+#' @export
 plotMutSites.fixationSites <- function(x, ...) {
     paths <- attr(x, "paths")
     snpPlot <- .createSNPplot(

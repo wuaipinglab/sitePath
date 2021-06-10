@@ -3,6 +3,7 @@
 \name{plot.phyMSAmatched}
 \alias{plot.phyMSAmatched}
 \alias{plot.lineagePath}
+\alias{plot.parallelSites}
 \alias{plot.fixationSites}
 \alias{plot.sitePath}
 \alias{plot.fixationIndels}
@@ -12,6 +13,8 @@
 \method{plot}{phyMSAmatched}(x, y = TRUE, ...)
 
 \method{plot}{lineagePath}(x, y = TRUE, showTips = FALSE, ...)
+
+\method{plot}{parallelSites}(x, y = TRUE, ...)
 
 \method{plot}{fixationSites}(x, y = TRUE, tipsGrouping = NULL, ...)
 
@@ -59,14 +62,17 @@ A \code{\link{lineagePath}} object will be plotted as a tree
   diagram and paths are black solid line while the trimmed nodes and tips
   will use gray dashed line.
 
+A \code{\link{parallelSites}} object will be plotted as original
+  phylogenetic tree marked with parallel mutations attached as dot plot.
+
 A \code{\link{fixationSites}} object will be plotted as original
   phylogenetic tree marked with fixation substitutions.
 
 A \code{sitePath} object can be extracted by using
   \code{\link{extractSite}} on the return of \code{\link{fixationSites}}.
 
-A \code{\link{fixationIndels}} object will be plotted as original
-  phylogenetic tree marked with indel fixation.
+A \code{\link{fixationIndels}} object will be plotted as
+  original phylogenetic tree marked with indel fixation.
 
 A \code{\link{fixationPath}} object will be plotted as a
   \code{phylo} object. The tips are clustered according to the fixation
@@ -81,6 +87,8 @@ tree <- addMSA(zikv_tree, alignment = zikv_align)
 plot(tree)
 paths <- lineagePath(tree)
 plot(paths)
+parallel <- parallelSites(paths)
+plot(parallel)
 fixations <- fixationSites(paths)
 plot(fixations)
 sp <- extractSite(fixations, 139)

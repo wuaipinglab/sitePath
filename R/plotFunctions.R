@@ -80,7 +80,7 @@ plot.lineagePath <- function(x,
                           pathColor = "black",
                           pathSize = 2) {
     tree <- attr(paths, "tree")
-    nNodes <- ape::Nnode(tree, internal.only = FALSE)
+    nNodes <- Nnode(tree, internal.only = FALSE)
     if (is.null(select)) {
         pathNodes <- unique(unlist(paths))
     } else {
@@ -100,6 +100,60 @@ plot.lineagePath <- function(x,
         scale_color_manual(values = c(pathColor, "gainsboro")) +
         theme(legend.position = "none")
     p
+}
+
+#' @rdname plotFunctions
+#' @description A \code{\link{parallelSites}} object will be plotted as original
+#'   phylogenetic tree marked with parallel mutations attached as dot plot.
+#' @examples
+#' parallel <- parallelSites(paths)
+#' plot(parallel)
+#' @export
+plot.parallelSites <- function(x, y = TRUE, ...) {
+    paths <- attr(x, "paths")
+    tree <- as.phylo(paths)
+    fixationMut <- character()
+    for (site in allSitesName.parallelSites(x)) {
+        parallelMut <- extractTips.parallelSites(x, site)
+        for (node in names(parallelMut)) {
+            tips <- parallelMut[[node]]
+            if (attr(tips, "fixed")) {
+                fixationMut[node] <- attr(tips, "mutName")[4]
+            }
+        }
+    }
+    if (y) {
+        attr(paths, "tree") <- .annotateSNPonTree(tree, fixationMut)
+        treePlot <- plot.lineagePath(paths) +
+            geom_label_repel(
+                aes(x = branch, label = SNPs),
+                fill = 'lightgreen',
+                color = "black",
+                min.segment.length = 0,
+                na.rm = TRUE,
+                size = GeomText[["default_aes"]][["size"]]
+            )
+    } else {
+        treePlot <- plot.lineagePath(paths)
+    }
+    allSNP <- unlist(x, recursive = FALSE, use.names = FALSE)
+    allSNP <- unlist(allSNP, recursive = FALSE, use.names = FALSE)
+    allSNP <- do.call(rbind, lapply(allSNP, function(tips) {
+        Pos <- as.integer(rep(attr(tips, "mutName")[2], length(tips)))
+        SNP <- rep(attr(tips, "mutName")[3], length(tips))
+        data.frame(
+            "Accession" = tips,
+            "Pos" = Pos,
+            "SNP" = SNP
+        )
+    }))
+    snpPlot <- .createSNPplot(
+        allSNP = allSNP,
+        seqType = attr(paths, "seqType"),
+        allTreeTips = tree[["tip.label"]],
+        allSiteNames = attr(paths, "msaNumbering")
+    )
+    return(insert_left(snpPlot, treePlot, 2))
 }
 
 #' @rdname plotFunctions
@@ -235,8 +289,8 @@ plot.sitePath <- function(x,
 }
 
 #' @rdname plotFunctions
-#' @description A \code{\link{fixationIndels}} object will be plotted as original
-#'   phylogenetic tree marked with indel fixation.
+#' @description A \code{\link{fixationIndels}} object will be plotted as
+#'   original phylogenetic tree marked with indel fixation.
 plot.fixationIndels <- function(x, y = TRUE, ...) {
 }
 
