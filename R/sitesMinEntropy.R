@@ -125,7 +125,7 @@ sitesMinEntropy.lineagePath <- function(x,
             }
         )
         # Calibrate the result from all paths
-        res <- .unifyEntropyGrouping(res, paths, NULL)
+        res <- .unifyEntropyGrouping(res, paths, siteIndices, NULL)
         # Cluster tips according to fixation sites
         clustersByPath <- lapply(res, .clusterByFixation)
     } else {
@@ -152,7 +152,7 @@ sitesMinEntropy.lineagePath <- function(x,
             }
         )
         # Calibrate the result from all paths
-        res <- .unifyEntropyGrouping(res, paths, cl)
+        res <- .unifyEntropyGrouping(res, paths, siteIndices, cl)
         # Cluster tips according to fixation sites
         clustersByPath <- parLapply(cl, res, .clusterByFixation)
         stopCluster(cl)
@@ -228,7 +228,7 @@ sitesMinEntropy.lineagePath <- function(x,
     return(seg)
 }
 
-.unifyEntropyGrouping <- function(res, paths, cl) {
+.unifyEntropyGrouping <- function(res, paths, siteIndices, cl) {
     align <- attr(paths, "align")
     if (is.null(cl)) {
         allMergedGroupings <- lapply(
@@ -250,7 +250,7 @@ sitesMinEntropy.lineagePath <- function(x,
     # Iterate each locus
     for (locus in names(res[[1]])) {
         # The index for C++
-        locusIndex <- as.integer(locus) - 1
+        locusIndex <- siteIndices[[locus]]
         # Get the merged groupings of each path for the locus
         mergedGroupings <- allMergedGroupings[[locus]]
         # Link the merged groupings for each lineage path to calibrate and

@@ -55,28 +55,6 @@ parallelSites.sitesMinEntropy <- function(x,
     align <- attr(paths, "align")
     reference <- attr(paths, "msaNumbering")
     unambiguous <- .unambiguousChars(paths)
-    # There must be at least two lineages to have mutations and one of the fixed
-    # amino acids/nucleotides should be unambiguous
-    hasParallelMut <- Reduce("+", lapply(x, function(segs) {
-        # If the amino acid/nucleotide on the lineage for each site is qualified
-        vapply(
-            X = segs,
-            FUN = function(seg) {
-                # All amino acid/nucleotide on the 'mutPath'
-                allSiteChars <- character()
-                for (tips in seg) {
-                    allSiteChars <- c(allSiteChars,
-                                      names(attr(tips, "aaSummary")))
-                }
-                as.integer(sum(allSiteChars %in% unambiguous) >= 2)
-            },
-            FUN.VALUE = integer(1)
-        )
-    }))
-    hasParallelMut <- names(which(hasParallelMut >= 2))
-    if (length(hasParallelMut) == 0) {
-        stop("There doesn't seem to have any mutation in parallel lineages")
-    }
     # Set the 'minSNP' constrain
     if (is.null(minSNP)) {
         minSNP <- attr(attr(x, "paths"), "minSize")
@@ -105,7 +83,7 @@ parallelSites.sitesMinEntropy <- function(x,
         sporadicMut <- list()
         fixationMut <- list()
         # The site have mutated on at least two lineages
-        for (siteName in hasParallelMut) {
+        for (siteName in names(segs)) {
             # Convert the site to index of multiple sequence alignment
             site <- reference[as.integer(siteName)]
             # The entropy minimization of a single site on the lineage
