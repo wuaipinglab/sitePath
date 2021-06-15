@@ -1,19 +1,33 @@
 test_that("The plot functions work", {
-    data(zikv_align)
-    data(zikv_tree)
-    tr <- addMSA(zikv_tree,
-                 alignment = zikv_align)
+    data(h3n2_align_reduced)
+    data(h3n2_tree_reduced)
 
-    p <- lineagePath(tr)
-    expect_error(plot(p), NA)
+    paths <- addMSA(h3n2_tree_reduced,
+                    alignment = h3n2_align_reduced)
+    expect_error(plot(paths), NA)
+    expect_error(plotMutSites(paths), NA)
 
-    fixedSites <- fixationSites(p)
+    minEntropy <- sitesMinEntropy(paths)
+
+    fixedSites <- fixationSites(minEntropy)
     expect_error(plot(fixedSites), NA)
+    expect_error(plotMutSites(fixedSites), NA)
 
     # Test the constrain for 'sitePath'
-    sp <- extractSite(fixedSites, 139)
-    nSP <- length(sp)
-    expect_error(plot(sp, select = nSP + 1))
+    for (site in allSitesName(fixedSites)) {
+        sp <- extractSite(fixedSites, site)
+        expect_error(plot(sp, select = length(sp) + 1))
+    }
+
+    paraSites <- parallelSites(minEntropy)
+    expect_error(plot(paraSites), NA)
+    expect_error(plotMutSites(paraSites), NA)
+
+    categories <- c("intersect", "union", "parallelOnly", "fixationOnly")
+    for (mutMode in categories) {
+        pf <- paraFixSites(minEntropy)
+        expect_error(plotMutSites(pf), NA)
+    }
 
     fp <- fixationPath(fixedSites)
     expect_error(plot(fp), NA)

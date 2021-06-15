@@ -141,11 +141,9 @@ plot.parallelSites <- function(x, y = TRUE, ...) {
     allSNP <- do.call(rbind, lapply(allSNP, function(tips) {
         Pos <- as.integer(rep(attr(tips, "mutName")[2], length(tips)))
         SNP <- rep(attr(tips, "mutName")[3], length(tips))
-        data.frame(
-            "Accession" = tips,
-            "Pos" = Pos,
-            "SNP" = SNP
-        )
+        data.frame("Accession" = tips,
+                   "Pos" = Pos,
+                   "SNP" = SNP)
     }))
     snpPlot <- .createSNPplot(
         allSNP = allSNP,

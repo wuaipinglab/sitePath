@@ -35,8 +35,10 @@ paraFixSites <- function(x, ...) {
 #'   before/after mutation.
 #' @export
 paraFixSites.lineagePath <- function(x,
-                                     category = c("intersect", "union",
-                                                  "parallelOnly", "fixationOnly"),
+                                     category = c("intersect",
+                                                  "union",
+                                                  "parallelOnly",
+                                                  "fixationOnly"),
                                      minEffectiveSize = NULL,
                                      searchDepth = 1,
                                      method = c("compare", "insert", "delete"),
@@ -58,8 +60,10 @@ paraFixSites.lineagePath <- function(x,
 #' @rdname paraFixSites
 #' @export
 paraFixSites.sitesMinEntropy <- function(x,
-                                         category = c("intersect", "union",
-                                                      "parallelOnly", "fixationOnly"),
+                                         category = c("intersect",
+                                                      "union",
+                                                      "parallelOnly",
+                                                      "fixationOnly"),
                                          minSNP = NULL,
                                          mutMode = c("all", "exact",
                                                      "pre", "post"),
@@ -103,11 +107,9 @@ paraFixSites.sitesMinEntropy <- function(x,
         allSNP <- do.call(rbind, lapply(allSNP, function(tips) {
             Pos <- as.integer(rep(attr(tips, "mutName")[2], length(tips)))
             SNP <- rep(attr(tips, "mutName")[3], length(tips))
-            data.frame(
-                "Accession" = tips,
-                "Pos" = Pos,
-                "SNP" = SNP
-            )
+            data.frame("Accession" = tips,
+                       "Pos" = Pos,
+                       "SNP" = SNP)
         }))
         attr(res, "allSNP") <- allSNP
     }
