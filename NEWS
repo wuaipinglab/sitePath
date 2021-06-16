@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.9.1
+-------------------------
+    o Add 'useSites' argument to 'setSiteNumbering' function.
+    o First 'stable' path as default 'lineagePath'.
+    o Enable plot functions for 'parallelSites'.
+
 CHANGES IN VERSION 1.7.8
 -------------------------
     o Change default 'minSNP' value for 'parallelSites' function.
