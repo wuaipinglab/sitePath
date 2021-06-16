@@ -14,15 +14,17 @@ test_minSNPandSiteSkipping <- function(minEntropy, unambiguous) {
                 for (tips in mutTips) {
                     mutName <- attr(tips, "mutName")[i]
                     mutModeTips[[mutName]] <-
-                        c(mutModeTips[[mutName]],
-                          list(tips))
+                        c(mutModeTips[[mutName]], list(tips))
                 }
                 for (tips in mutModeTips) {
-                    mutChars <- unlist(lapply(tips, function(i) {
-                        attr(i, "mutName")[c(1, 3)]
+                    mutCharsValid <- unlist(lapply(tips, function(i) {
+                        if (attr(i, "fixed")) {
+                            return(TRUE)
+                        }
+                        attr(i, "mutName")[c(1, 3)] %in% unambiguous
                     }), use.names = FALSE)
                     # The gap and ambiguous character should have been ignored
-                    expect_true(all(mutChars %in% unambiguous),
+                    expect_true(all(mutCharsValid),
                                 label = paste(site, mutModes[i], minSNP))
                     tipNum <- length(unlist(tips))
                     isFixed <- vapply(
@@ -49,10 +51,9 @@ test_minSNPandSiteSkipping <- function(minEntropy, unambiguous) {
 test_that("The function works for amino acid", {
     data(h3n2_tree_reduced)
     data(h3n2_align_reduced)
-    tr <- addMSA(tree = h3n2_tree_reduced,
-                 alignment = h3n2_align_reduced)
+    p <- addMSA(tree = h3n2_tree_reduced,
+                alignment = h3n2_align_reduced)
     gapChar <- "S"
-    p <- lineagePath(tr)
     p <- setSiteNumbering(p, gapChar = gapChar)
     # Test the input of 'minSNP' and 'mutMode'
     expect_error(parallelSites(p, minSNP = "a"))
