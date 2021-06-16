@@ -65,9 +65,6 @@ For parallelSites and sitePara object, the
 
 
 
-<!-- dependencies from examples -->
-
-
   
 
   
@@ -90,7 +87,7 @@ For parallelSites and sitePara object, the
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.0</span>
       </span>
     </div>
 
@@ -139,7 +136,7 @@ For parallelSites and sitePara object, the
   function <code>extractTips</code> retrieve all the tips with parallel mutation.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for lineagePath</span>
 <span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>site</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -154,7 +151,7 @@ For parallelSites and sitePara object, the
 <span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>site</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sitePara</span>
-<span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -184,35 +181,36 @@ fixation of a site. The default is the first fixation of the site.</p></td>
     <p>Tree tips grouped as <code><a href='https://rdrr.io/r/base/list.html'>list</a></code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span>
-<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span>
-<span class='va'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>mutations</span>, <span class='fl'>139</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
-#&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
-#&gt; [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
-#&gt; [19] "ATL14618" "AUF35021"
-#&gt; attr(,"AA")
-#&gt; [1] "S"
-#&gt; 
-#&gt; [[2]]
-#&gt;  [1] "ANO46307" "AVG19275" "ANN44857" "ANO46302" "ANO46301" "AMD16557"
-#&gt;  [7] "APB03018" "AWH65849" "AMC13911" "APB03019" "ARB07953" "ARU07076"
-#&gt; [13] "ARU07074" "AMX81919" "AMB37295" "ANC90426" "ALU33341" "ASB32509"
-#&gt; [19] "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087" "AMA12084"
-#&gt; [25] "AOY08538" "AOG18295" "AOY08517" "AOY08541" "AMM39805" "ARX97119"
-#&gt; [31] "AMK79468" "AML82110" "AMR39831" "AMX81918" "APY24200" "AOO19564"
-#&gt; [37] "AUI42194" "AOG18296" "AQZ41954" "AOY08533" "ATI21641" "ATG29291"
-#&gt; [43] "ATG29301" "APO08503" "AOW32303" "AMC13913" "AMC13912" "AOC50654"
-#&gt; [49] "ATG29292" "ATG29295" "AOY08536" "ASL68974" "AMQ48986" "ATG29315"
-#&gt; [55] "ATG29307" "ATG29270" "AQZ41952" "AQZ41955" "ARI68105" "ASU55505"
-#&gt; [61] "AQM74762" "AUD54964" "ART29828" "AWF93617" "APC60215" "ATG29306"
-#&gt; [67] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"
-#&gt; attr(,"AA")
-#&gt; [1] "N"
-#&gt; </div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align_reduced</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree_reduced</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align_reduced</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>mutations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fixationSites.html'>fixationSites</a></span><span class='op'>(</span><span class='fu'><a href='lineagePath.html'>lineagePath</a></span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>extractTips</span><span class='op'>(</span><span class='va'>mutations</span>, <span class='fl'>139</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "ATL14618" "AUF35021"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> attr(,"AA")</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "S"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ANO46307" "AVG19275" "ANN44857" "ANO46302" "ANO46301" "AMD16557"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "APB03018" "AWH65849" "AMC13911" "APB03019" "ARB07953" "ARU07076"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "ARU07074" "AMX81919" "AMB37295" "ANC90426" "ALU33341" "ASB32509"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087" "AMA12084"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "AOY08538" "AOG18295" "AOY08517" "AOY08541" "AMM39805" "ARX97119"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "AMK79468" "AML82110" "AMR39831" "AMX81918" "APY24200" "AOO19564"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "AUI42194" "AOG18296" "AQZ41954" "AOY08533" "ATI21641" "ATG29291"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [43] "ATG29301" "APO08503" "AOW32303" "AMC13913" "AMC13912" "AOC50654"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [49] "ATG29292" "ATG29295" "AOY08536" "ASL68974" "AMQ48986" "ATG29315"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [55] "ATG29307" "ATG29270" "AQZ41952" "AQZ41955" "ARI68105" "ASU55505"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [61] "AQM74762" "AUD54964" "ART29828" "AWF93617" "APC60215" "ATG29306"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [67] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> attr(,"AA")</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "N"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -59,9 +59,6 @@
 
 
 
-<!-- dependencies from examples -->
-
-
   
 
   
@@ -84,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.0</span>
       </span>
     </div>
 
@@ -127,7 +124,7 @@
   lineages are each gathered as group.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for phyMSAmatched</span>
 <span class='fu'>groupTips</span><span class='op'>(</span>
@@ -149,7 +146,7 @@
 <span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for fixationPath</span>
-<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span>, tipnames <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,89 +187,102 @@ number will be <code>similariy</code>. The default <code>similariy</code> is 0.0
     <p><code>groupTips</code> returns grouping of tips.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align</span><span class='op'>)</span>
-<span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span>
-<span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $`363`
-#&gt;  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"
-#&gt;  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"
-#&gt; [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"
-#&gt; [19] "ATL14618" "AUF35021"
-#&gt; 
-#&gt; $`513`
-#&gt;  [1] "APG56499" "ASW34302" "AOL02459" "APH11552" "APH11574" "APH11550"
-#&gt;  [7] "APH11586" "APH11535" "APH11544" "AWK27349" "APH11545" "APH11554"
-#&gt; [13] "APH11553" "APH11509" "APH11584" "APH11567" "APH11548" "APH11558"
-#&gt; [19] "APH11564" "APH11537" "APH11521" "APH11572" "APH11575" "APH11555"
-#&gt; [25] "APH11577" "APH11525" "APH11568" "APH11561" "APH11533" "APH11523"
-#&gt; [31] "APH11570" "APH11565" "APH11541" "APH11583" "APH11501" "APH11546"
-#&gt; [37] "APH11524" "APH11505" "APH11582" "APH11585" "APH11542" "APH11557"
-#&gt; [43] "APH11563" "APH11504" "APH11587" "APH11579" "APH11540" "APH11495"
-#&gt; [49] "AOO19565" "APH11511" "APH11547" "APH11569" "AVG19202" "APH11530"
-#&gt; [55] "APH11580" "APH11500" "APH11502" "APH11539" "APH11534" "APH11576"
-#&gt; [61] "APH11503" "APH11578" "APH11590" "APH11559" "APH11531" "APH11499"
-#&gt; [67] "APH11498" "APH11506" "APH11592" "APH11594" "APH11532" "APH11593"
-#&gt; [73] "APH11507" "APH11497" "APH11517" "APH11527" "APH11518" "APH11549"
-#&gt; [79] "APH11512" "APH11538" "APH11514" "APH11515" "APH11551" "APH11571"
-#&gt; [85] "APH11581" "APH11566" "APH11529" "APH11508" "APH11516" "APH11543"
-#&gt; [91] "APH11573" "APH11560" "APH11536" "APH11493" "APH11528" "APH11562"
-#&gt; [97] "APH11595"
-#&gt; 
-#&gt; $`493`
-#&gt;  [1] "AVV62004" "BAX00477" "BAV89190" "AOI20067" "AMM43325" "AMM43326"
-#&gt;  [7] "ANC90425" "AUI42329" "AUI42330" "AMR68932" "ANF16414" "AMT75536"
-#&gt; [13] "AMV49165" "AMO03410" "ANA12599" "AMM39806" "AMR39830" "ANO46307"
-#&gt; [19] "AVG19275" "ANN44857" "ANO46306" "ANO46309" "ANO46305" "ANO46303"
-#&gt; [25] "ANO46302" "ANO46301" "ARB08102" "AHZ13508" "ANO46304" "ANO46308"
-#&gt; [31] "AMD16557" "AMK49165" "ARB07976" "APB03018" "AMC13911" "APB03019"
-#&gt; [37] "ASU55416" "ANK57897" "AWH65849" "ASU55417" "ANW07476" "AMZ03556"
-#&gt; 
-#&gt; $`402`
-#&gt; [1] "ALX35659" "APY24198" "APO36913" "ANQ92019" "AOX49264" "AOX49265"
-#&gt; 
-#&gt; $`400`
-#&gt;  [1] "APY24199" "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087"
-#&gt;  [7] "AMA12084" "AML81028" "AOY08518" "ARB07962" "AOY08538" "AOG18295"
-#&gt; [13] "AOY08517" "AOY08541" "AMM39805" "ARX97119" "AMK79468" "AML82110"
-#&gt; [19] "AMR39831" "AMX81918" "APY24200" "AOO19564" "AUI42194" "AOG18296"
-#&gt; [25] "ATG29267" "ART29828" "AQX32985" "AWF93617" "APC60215" "AQZ41948"
-#&gt; [31] "ATG29306" "AQZ41954" "AOY08533" "ASL68978" "AQZ41953" "AQZ41947"
-#&gt; [37] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"
-#&gt; [43] "AVZ25033" "ATG29291" "ATG29301" "ASL68979" "ATG29299" "AQZ41949"
-#&gt; [49] "AQZ41950" "AQZ41951" "ATI21641" "ANO46297" "ANO46298" "APO08503"
-#&gt; [55] "ANG09399" "ARU07183" "AQZ41956" "ATG29276" "AOW32303" "ATG29292"
-#&gt; [61] "ATG29295" "AOY08536" "ASL68974" "AMQ48986" "ATG29315" "ATG29307"
-#&gt; [67] "ATG29270" "AOC50654" "AMC13913" "AMC13912" "APO39243" "APO39229"
-#&gt; [73] "AQZ41952" "AQZ41955" "ARI68105" "ASU55505" "AQM74762" "AUD54964"
-#&gt; 
-#&gt; $`628`
-#&gt;  [1] "ARU07074"     "AMX81919"     "AMB37295"     "ANC90426"     "ALU33341"    
-#&gt;  [6] "ASB32509"     "ARU07076"     "ATB53752"     "AOR82893"     "ARU07075"    
-#&gt; [11] "AMQ48982"     "AMK49164"     "APG56457"     "ANH10698"     "AOR82892"    
-#&gt; [16] "AMB18850"     "YP_009428568" "ART29823"     "ASK51714"     "ARB07953"    
-#&gt; [21] "AOY08537"     "AOY08523"     "ASW34087"     "AOS90224"     "BAV82373"    
-#&gt; [26] "ART29826"     "ART29825"     "AOY08525"     "AOY08535"     "APW84875"    
-#&gt; [31] "APW84874"     "APW84873"     "APW84876"     "ANH22038"     "APW84877"    
-#&gt; [36] "APW84872"     "AMN14620"     "AVZ25035"     "AOY08542"     "ARB07932"    
-#&gt; [41] "AOS90223"     "AOS90220"     "APO39232"     "APO39233"     "AOO85388"    
-#&gt; [46] "AOO53981"     "AOS90222"     "APO39228"     "AOS90221"     "AOY08546"    
-#&gt; [51] "AOY08521"     "AOY08516"     "APB03021"     "APO39236"     "APO39237"    
-#&gt; [56] "APB03020"    
-#&gt; 
-#&gt; $`409`
-#&gt;  [1] "AQU12485" "AMQ48981" "APH11492" "AOO54270" "AND01116" "AMS00611"
-#&gt;  [7] "ARB07967" "ANF04752" "AOE22997" "ASU55403" "ASU55393" "ANB66184"
-#&gt; [13] "AMC33116" "ASU55400" "ASU55409" "AMQ34003" "AMQ34004" "AMM39804"
-#&gt; [19] "ASU55411" "ASU55395" "AMZ03557" "APQ41784" "ASU55391" "ASU55396"
-#&gt; [25] "ASU55392" "AOY08524" "ASU55394" "APQ41782" "ASU55399" "APQ41783"
-#&gt; [31] "ANS60026" "ASU55408" "ANC90428" "ASU55418" "ASU55424" "AQX32987"
-#&gt; [37] "APB03017" "ASU55410" "ASU55397" "ASU55413" "ASU55420" "ASU55404"
-#&gt; [43] "ASU55423" "ANB66182" "ASU55425" "ASU55406" "ASU55398" "ASU55407"
-#&gt; [49] "ASU55414" "ASU55405" "ASU55401" "ASU55402" "ASU55421" "ASU55415"
-#&gt; [55] "ASU55426" "ASU55412" "ASU55419" "APQ41786" "ASU55390" "AQX32986"
-#&gt; [61] "ASU55422" "ARM59239" "ANB66183"
-#&gt; </div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_tree</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>zikv_align</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addMSA.html'>addMSA</a></span><span class='op'>(</span><span class='va'>zikv_tree</span>, alignment <span class='op'>=</span> <span class='va'>zikv_align</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>groupTips</span><span class='op'>(</span><span class='va'>tree</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`363`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ANK57896" "AMD61711" "AQS26698" "APG56458" "AUI42289" "AMR39834"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "AWH65848" "APO08504" "AMX81917" "AVZ47169" "AMX81916" "AMD61710"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "AMK49492" "AMX81915" "AOC50652" "APH11611" "BBC70847" "AUF35022"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "ATL14618" "AUF35021"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`513`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "APG56499" "ASW34302" "AOL02459" "APH11552" "APH11574" "APH11550"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "APH11586" "APH11535" "APH11544" "AWK27349" "APH11584" "APH11567"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "APH11548" "APH11572" "APH11575" "APH11568" "APH11561" "APH11533"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "APH11523" "APH11545" "APH11554" "APH11553" "APH11558" "APH11564"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "APH11509" "APH11537" "APH11521" "APH11555" "APH11577" "APH11525"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "APH11570" "APH11565" "APH11541" "APH11583" "APH11501" "APH11524"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "APH11505" "APH11546" "APH11582" "APH11585" "APH11557" "APH11579"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [43] "APH11540" "APH11495" "AOO19565" "APH11511" "APH11547" "APH11542"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [49] "APH11563" "APH11504" "APH11587" "APH11569"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`567`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "APH11580" "APH11576" "APH11531" "APH11593" "APH11517" "APH11527"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "APH11530" "APH11590" "APH11559" "APH11592" "APH11594" "APH11532"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "APH11518" "APH11549" "APH11512" "APH11514" "APH11515" "APH11581"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "APH11508" "APH11516" "APH11538" "APH11551" "APH11571" "APH11566"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "APH11529" "APH11543" "APH11573" "APH11560" "APH11536" "APH11493"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "APH11528" "APH11562" "APH11595"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`556`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "AVG19202" "APH11539" "APH11534" "APH11500" "APH11502" "APH11503"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "APH11578" "APH11499" "APH11498" "APH11506" "APH11507" "APH11497"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`493`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "AVV62004" "BAX00477"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`610`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "BAV89190" "AOI20067" "AMM43325" "AMM43326" "ANC90425" "AUI42329"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "AUI42330" "AMR68932" "ANF16414" "AMT75536" "AMV49165" "AMO03410"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "ANA12599" "AMM39806" "AMR39830"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`489`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ANO46307" "AVG19275" "ANN44857" "ANO46306" "ANO46309" "ANO46305"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "ANO46303" "ANO46302" "ANO46301" "ARB08102" "AHZ13508" "ANO46304"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "ANO46308" "AMD16557"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`402`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "ALX35659" "APY24198" "APO36913" "ANQ92019" "AOX49264" "AOX49265"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`400`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "APY24199" "AMH87239" "AMA12086" "AMA12085" "AMU04506" "AMA12087"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "AMA12084" "AML81028" "AOY08518" "ARB07962" "AOY08538" "AOG18295"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "AOY08517" "AOY08541" "AMM39805" "ARX97119" "AMK79468" "AML82110"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "AMR39831" "AMX81918" "APY24200" "AOO19564" "AUI42194" "AOG18296"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "ATG29267" "AQX32985" "AQZ41948" "AQZ41954" "AOY08533" "ASL68978"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "AQZ41953" "AQZ41947" "AVZ25033" "ATG29291" "ATG29301" "ASL68979"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "ATG29299" "AQZ41949" "AQZ41950" "AQZ41951" "ATI21641" "ANO46297"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [43] "ANO46298" "APO08503" "ANG09399" "ARU07183" "AQZ41956" "ATG29276"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [49] "AOW32303" "ATG29292" "ATG29295" "AOY08536" "ASL68974" "AMQ48986"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [55] "ATG29315" "ATG29307" "ATG29270" "AOC50654" "AMC13913" "AMC13912"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [61] "APO39243" "APO39229" "AQZ41952" "AQZ41955" "ARI68105" "ASU55505"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [67] "AQM74762" "AUD54964" "ART29828" "AWF93617" "APC60215" "ATG29306"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [73] "ATG29284" "AQM74761" "ATG29287" "ATG29303" "AWF93619" "AWF93618"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`472`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "AMK49165" "ARB07976" "APB03018" "AMC13911" "APB03019" "ASU55416"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "ANK57897" "AWH65849" "ASU55417" "ANW07476" "AMZ03556"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`628`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ARU07074"     "AMX81919"     "AMB37295"     "ANC90426"     "ALU33341"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [6] "ASB32509"     "ARU07076"     "ATB53752"     "AOR82893"     "ARU07075"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [11] "AMQ48982"     "AMK49164"     "APG56457"     "ANH10698"     "AOR82892"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "AMB18850"     "YP_009428568" "ART29823"     "ASK51714"     "ARB07953"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "AOY08537"     "AOY08523"     "ASW34087"     "AOS90224"     "BAV82373"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [26] "ART29826"     "ART29825"     "AOY08525"     "AOY08535"     "APW84875"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "APW84874"     "APW84873"     "APW84876"     "ANH22038"     "APW84877"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [36] "APW84872"     "AMN14620"     "AVZ25035"     "AOY08542"     "ARB07932"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "AOS90223"     "AOS90220"     "APO39232"     "APO39233"     "AOO85388"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [46] "AOO53981"     "AOS90222"     "APO39228"     "AOS90221"     "AOY08546"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [51] "AOY08521"     "AOY08516"     "APB03021"     "APO39236"     "APO39237"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [56] "APB03020"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $`409`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "AQU12485" "AMQ48981" "APH11492" "AOO54270" "AND01116" "AMS00611"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "ARB07967" "ANF04752" "AOE22997" "ASU55403" "ASU55393" "ANB66184"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "AMC33116" "ASU55400" "ASU55409" "AMQ34003" "AMQ34004" "AMM39804"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "ASU55411" "ASU55395" "AMZ03557" "APQ41784" "ASU55391" "ASU55396"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "ASU55392" "AOY08524" "ASU55394" "APQ41782" "ASU55399" "APQ41783"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "ANS60026" "ASU55408" "ANC90428" "ASU55418" "ASU55424" "AQX32987"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "APB03017" "ASU55410" "ASU55397" "ASU55413" "ASU55420" "ASU55404"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [43] "ASU55423" "ANB66182" "ASU55425" "ASU55406" "ASU55398" "ASU55407"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [49] "ASU55414" "ASU55405" "ASU55401" "ASU55402" "ASU55421" "ASU55415"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [55] "ASU55426" "ASU55412" "ASU55419" "APQ41786" "ASU55390" "AQX32986"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [61] "ASU55422" "ARM59239" "ANB66183"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
