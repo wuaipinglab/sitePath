@@ -82,8 +82,6 @@ lineagePath.phyMSAmatched <- function(tree,
     attr(paths, "similarity") <- similarity
     attr(paths, "minSize") <- minSNP
     class(paths) <- c("lineagePath", "phyMSAmatched")
-    snp <- SNPsites(paths)
-    attr(paths, "allSNP") <- attr(snp, "allSNP")
     return(paths)
 }
 

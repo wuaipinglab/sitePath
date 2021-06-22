@@ -276,7 +276,7 @@ plot.sitePath <- function(x,
     }
     # Make the plot
     p <- p + scale_color_manual(values = groupColors) +
-        guides(linetype = FALSE,
+        guides(linetype = "none",
                color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(label = siteName, subtitle = subtitle)

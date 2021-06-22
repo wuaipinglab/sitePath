@@ -69,7 +69,7 @@ plotSingleSite.lineagePath <- function(x,
         size[pathNodes] <- 2
     }
     p <- ggtree(tree, aes(color = group, size = size)) +
-        scale_size(range = sizeRange, guide = FALSE) +
+        scale_size(range = sizeRange, guide = "none") +
         scale_color_manual(values = groupColors) +
         guides(color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
@@ -101,6 +101,7 @@ plotSingleSite.sitesMinEntropy <- function(x,
                                            site,
                                            ...) {
     tree <- as.phylo.sitesMinEntropy(x)
+    allPaths <- attr(x, "paths")
     # Specify the color of mutations by pre-defined color set.
     sitePaths <- lapply(x, "[[", as.character(site))
     groupColors <- .siteColorScheme(attr(x, "seqType"))

@@ -1,8 +1,11 @@
-#' @importFrom ggplot2 ggplot geom_point theme
+#' @importFrom stats median
+#' @importFrom ape getMRCA Nnode
+#' @importFrom ggplot2 ggplot geom_point geom_tile theme
 #' @importFrom ggplot2 element_blank element_rect element_line
 #' @importFrom ggplot2 scale_color_manual scale_fill_manual scale_x_continuous
+#' @importFrom ggplot2 scale_size GeomSegment
 #' @importFrom aplot insert_left
-#' @importFrom ggtree geom_tiplab
+#' @importFrom ggtree geom_tiplab geom_point2
 
 #' @rdname plotMutSites
 #' @title Plot tree and mutation sites
@@ -49,8 +52,14 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
                            allTreeTips,
                            allSiteNames,
                            snpColors = NULL,
-                           dotSize = 1,
-                           lineSize = 0.5) {
+                           dotSize = NULL,
+                           lineSize = NULL) {
+    if (is.null(dotSize)) {
+        dotSize <- 1
+    }
+    if (is.null(lineSize)) {
+        lineSize <- 0.2
+    }
     allSNPsites <- sort(unique(allSNP[["Pos"]]))
     placeHolder <- data.frame("Accession" = allTreeTips,
                               "Pos" = 0,
@@ -80,7 +89,7 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             color = "white",
             stroke = 0
         ) +
-        scale_fill_manual(values = snpColors) +
+        scale_fill_manual(values = snpColors, na.translate = FALSE) +
         scale_x_continuous(breaks = allSNPsites) +
         theme(
             axis.title.x = element_blank(),
@@ -91,7 +100,7 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
             axis.ticks.y = element_blank(),
             panel.background = element_rect(fill = "white"),
             panel.grid.major.x = element_line(
-                colour = "grey",
+                color = "grey",
                 linetype = 3,
                 size = lineSize
             ),
@@ -103,14 +112,68 @@ plotMutSites.SNPsites <- function(x, showTips = FALSE, ...) {
 #' @rdname plotMutSites
 #' @export
 plotMutSites.lineagePath <- function(x, ...) {
+    extraArgs <- list(...)
+    rootNode <- attr(x, "rootNode")
+    allSiteNames <- seq_along(attr(x, "msaNumbering"))
+    tree <- as.phylo(x)
+    allTreeTips <- tree[["tip.label"]]
+    snp <- SNPsites(x, useAllSites = TRUE)
     snpPlot <- .createSNPplot(
-        allSNP = attr(x, "allSNP"),
+        allSNP = attr(snp, "allSNP"),
         seqType = attr(x, "seqType"),
-        allTreeTips = as.phylo(x)[["tip.label"]],
-        allSiteNames = attr(x, "msaNumbering")
+        allTreeTips = allTreeTips,
+        allSiteNames = allSiteNames,
+        dotSize = extraArgs[["dotSize"]],
+        lineSize = extraArgs[["lineSize"]]
     )
-    treePlot <- plot(x, ...)
-    return(insert_left(snpPlot, treePlot, 2))
+    terminalNodes <- vapply(
+        X = x,
+        FUN = function(path) {
+            tips <- attr(path, "tips")
+            getMRCA(tree, tips)
+        },
+        FUN.VALUE = integer(1)
+    )
+    terminalTips <- lapply(terminalNodes, function(node) {
+        tips <- .childrenTips(tree, node)
+        allTreeTips[tips]
+    })
+    relevantTips <- unlist(terminalTips)
+    middlePos <- rep(median(allSiteNames), length(relevantTips))
+    snpPlot <- snpPlot +
+        geom_tile(
+            data = data.frame("middlePos" = middlePos,
+                              "relevantTips" = relevantTips),
+            mapping = aes(
+                x = middlePos,
+                y = relevantTips,
+                width = max(allSiteNames)
+            ),
+            fill = "red",
+            alpha = 0.5,
+            inherit.aes = FALSE
+        )
+    nNodes <- Nnode(tree, internal.only = FALSE)
+    pathNodes <- unique(unlist(x))
+    # Set lineage nodes and non-lineage nodes as separate group
+    group <- rep(1, times = nNodes)
+    group[pathNodes] <- 0
+    group <- factor(group)
+    # Set line size
+    size <- rep(1, times = nNodes)
+    size[pathNodes] <- 2
+    treePlot <- ggtree(tree, aes(color = group, size = size)) +
+        geom_point2(aes(subset = node %in% c(rootNode, terminalNodes)),
+                    color = c("blue", rep("red", length(terminalNodes))),
+                    size = 3) +
+        scale_color_manual(values = c("blue", "black")) +
+        scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
+        theme(legend.position = "none")
+    widthRatio <- extraArgs[["widthRatio"]]
+    if (is.null(widthRatio)) {
+        widthRatio <- 2
+    }
+    return(insert_left(snpPlot, treePlot, widthRatio))
 }
 
 #' @rdname plotMutSites

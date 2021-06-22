@@ -25,11 +25,12 @@ SNPsites <- function(tree, ...) {
 #' @rdname SNPsites
 #' @export
 SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
+    extraArgs <- list(...)
     x <- .phyMSAmatch(tree)
     nTips <- Ntip(attr(x, "tree"))
     # Set default 'minSNP' value
     if (is.null(minSNP)) {
-        minSNP <-  nTips * 0.01
+        minSNP <- attr(x, "minSize")
     } else if (!is.numeric(minSNP)) {
         stop("\"minSNP\" only accepts numeric")
     } else if (minSNP >= nTips / 2) {
@@ -40,6 +41,9 @@ SNPsites.phyMSAmatched <- function(tree, minSNP = NULL, ...) {
     }
     align <- attr(x, "align")
     msaNumbering <- attr(x, "msaNumbering")
+    if (!is.null(extraArgs[["useAllSites"]])) {
+        msaNumbering <- seq_len(nchar(align[[1]]))
+    }
     refSeqName <- attr(x, "reference")
     unambiguous <- .unambiguousChars(x)
     # Find SNP for each tree tip by comparing with the consensus sequence or the
