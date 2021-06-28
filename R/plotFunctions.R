@@ -50,56 +50,48 @@ plot.lineagePath <- function(x,
                              y = TRUE,
                              showTips = FALSE,
                              ...) {
+    extraArgs <- list(...)
+    select <- extraArgs[["select"]]
+    if (is.null(select)) {
+        pathNodes <- unique(unlist(x))
+    } else {
+        pathNodes <- unique(unlist(x[select]))
+    }
     tree <- attr(x, "tree")
     # Get number of ancestral nodes plus tip nodes
     nNodes <- Nnode(tree, internal.only = FALSE)
     # Set lineage nodes and non-lineage nodes as separate group
     group <- rep(1, times = nNodes)
-    group[unique(unlist(x))] <- 0
+    group[pathNodes] <- 0
     group <- factor(group)
+    pathColor <- extraArgs[["pathColor"]]
+    if (is.null(pathColor)) {
+        pathColor <- "black"
+    }
     # Set line size
     size <- rep(1, times = nNodes)
-    size[unique(unlist(x))] <- 2
+    size[pathNodes] <- 2
+    pathSize <- extraArgs[["pathSize"]]
+    if (is.null(pathSize)) {
+        pathSize <- 1
+    }
+    branchSize <- extraArgs[["branchSize"]]
+    if (is.null(branchSize)) {
+        branchSize <- GeomSegment[["default_aes"]][["size"]]
+    }
     # Tree plot
     p <- ggtree(tree, aes(
         color = group,
         linetype = group,
         size = size
     )) +
-        scale_size(range = c(GeomSegment[["default_aes"]][["size"]], 1.5)) +
-        scale_color_manual(values = c("black", "gainsboro")) +
+        scale_size(range = c(branchSize, pathSize)) +
+        scale_color_manual(values = c(pathColor, "gainsboro")) +
         theme(legend.position = "none")
     if (showTips) {
         p <- p + geom_tiplab()
     }
     return(p)
-}
-
-.plotSubPaths <- function(paths,
-                          select = NULL,
-                          pathColor = "black",
-                          pathSize = 2) {
-    tree <- attr(paths, "tree")
-    nNodes <- Nnode(tree, internal.only = FALSE)
-    if (is.null(select)) {
-        pathNodes <- unique(unlist(paths))
-    } else {
-        pathNodes <- unique(unlist(paths[select]))
-    }
-    group <- rep(1, times = nNodes)
-    group[pathNodes] <- 0
-    group <- factor(group)
-    size <- rep(1, times = nNodes)
-    size[pathNodes] <- 2
-    p <- ggtree(tree, aes(
-        color = group,
-        linetype = group,
-        size = size
-    )) +
-        scale_size(range = c(0.5, pathSize)) +
-        scale_color_manual(values = c(pathColor, "gainsboro")) +
-        theme(legend.position = "none")
-    p
 }
 
 #' @rdname plotFunctions
@@ -173,10 +165,15 @@ plot.fixationSites <- function(x,
     groupColors <-
         colorRampPalette(brewer.pal(9, "Set1"))(length(grp))
     names(groupColors) <- grp
-    groupColors["0"] <- "black"
+    groupColors["0"] <- NA
 
     p <- ggtree(tree, aes(color = group)) +
-        scale_color_manual(values = groupColors) +
+        scale_color_manual(
+            values = as.list(groupColors),
+            limits = setdiff(names(groupColors), "0"),
+            na.translate = TRUE,
+            na.value = "black"
+        ) +
         guides(color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left")
     if (y) {
