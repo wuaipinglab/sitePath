@@ -39,5 +39,5 @@ allSitesName.parallelSites <- function(x, ...) {
 #' @rdname allSitesName
 #' @export
 allSitesName.paraFixSites <- function(x, ...) {
-    names(as.integer(x))
+    as.character(as.integer(x))
 }

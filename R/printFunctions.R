@@ -17,8 +17,9 @@ print.lineagePath <- function(x, ...) {
 
 #' @export
 print.SNPsites <- function(x, ...) {
-    x <- as.integer(x)
-    print(x)
+    cat("This is a 'SNPsites' object.", "\n\n")
+    x <- allSitesName(x)
+    cat(paste(x, collapse = " "))
 }
 
 #' @export
