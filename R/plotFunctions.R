@@ -272,7 +272,8 @@ plot.sitePath <- function(x,
             )
     }
     # Make the plot
-    p <- p + scale_color_manual(values = groupColors) +
+    p <- p + scale_color_manual(values = groupColors,
+                                limits = c(names(group), excludedLabel)) +
         guides(linetype = "none",
                color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +

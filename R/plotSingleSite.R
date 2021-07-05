@@ -70,7 +70,8 @@ plotSingleSite.lineagePath <- function(x,
     }
     p <- ggtree(tree, aes(color = group, size = size)) +
         scale_size(range = sizeRange, guide = "none") +
-        scale_color_manual(values = groupColors) +
+        scale_color_manual(values = groupColors,
+                           limits = unique(group)) +
         guides(color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(site)
@@ -150,7 +151,8 @@ plotSingleSite.sitesMinEntropy <- function(x,
     # Just in case the fixation mutation name is too long
     # Annotate the mutation on the tree
     p <- ggtree(tree, aes(color = group, linetype = linetype)) +
-        scale_color_manual(values = groupColors) +
+        scale_color_manual(values = groupColors,
+                           limits = c(names(group), excludedLabel)) +
         guides(linetype = FALSE,
                color = guide_legend(override.aes = list(size = 3))) +
         theme(legend.position = "left") +
