@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.9.2
+-------------------------
+    o Allow partially plot 'lineagePath'.
+    o Improved 'plotMutSites' function for 'lineagePath'.
+
 CHANGES IN VERSION 1.9.1
 -------------------------
     o Add 'useSites' argument to 'setSiteNumbering' function.
