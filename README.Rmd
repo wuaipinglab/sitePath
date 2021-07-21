@@ -4,7 +4,7 @@ output:
         variant: gfm
 ---
 
-# sitePath: an R package for detection of site fixation in molecular evolution
+# sitePath: Phylogenetic pathway–dependent recognition of fixed substitutions and parallel mutations
 
 ## Getting help
 
@@ -12,9 +12,9 @@ Post on Bioconductor [support site](https://support.bioconductor.org/) if having
 
 ## Installation
 
-[R programming language](https://cran.r-project.org/) >= 4.0.0 is required to use `sitePath`.
+[R programming language](https://cran.r-project.org/) >= 4.1.0 is required to use `sitePath`.
 
-The stable release is available on [Bioconductor](https://bioconductor.org/packages/release/bioc/html/sitePath.html).
+The stable release is available on [Bioconductor](https://bioconductor.org/packages/sitePath/).
 ```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -28,28 +28,4 @@ if (!requireNamespace("remotes", quietly = TRUE))
     install.packages("remotes")
 
 remotes::install_github("wuaipinglab/sitePath")
-```
-
-## QuickStart
-
-Both the phylogenetic tree and the matching multiple sequence alignment files are required.
-
-```{r import_data, message=FALSE}
-library(sitePath)
-
-# The file names of your tree and multiple sequence alignment
-tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
-alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
-
-tree <- read.tree(tree_file)
-tree <- addMSA(tree, alignment_file, "fasta")
-```
-
-Use the `lineagePath` function to resolve major lineages (the choice of threshold really depends). Then use the `fixationSites` function to detect fixation sites.
-
-```{r fixation_sites}
-paths <- lineagePath(tree)
-
-fixations <- fixationSites(paths)
-print(fixations)
 ```

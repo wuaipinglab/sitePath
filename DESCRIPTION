@@ -1,18 +1,21 @@
 Package: sitePath
 Type: Package
-Title: Detection of site fixation in molecular evolution
+Title: Phylogenetic pathway–dependent recognition of fixed substitutions and 
+    parallel mutations
 Version: 1.9.2
 Authors@R: c(person("Chengyang", "Ji",
                     email = "chengyang.ji12@alumni.xjtlu.edu.cn",
                     role = c("aut", "cre", "cph"),
                     comment = c(ORCID = "0000-0001-9258-5453")),
+             person("Hangyu", "Zhou",
+                    email = "zhy@ism.cams.cn",
+                    role = c("ths")),
              person("Aiping", "Wu",
                     email = "wap@ism.cams.cn",
                     role = c("ths")))
-Description: The package does hierarchical search for fixation mutations given
-    multiple sequence alignment and phylogenetic tree. These fixation mutations
-    can be specific to a phylogenetic lineages or shared by multiple lineages.
-    The package also provides visualization of these mutations on the tree.
+Description: The package does hierarchical search for fixation and parallel
+    mutations given multiple sequence alignment and phylogenetic tree. The
+    package also provides visualization of these mutations on the tree.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.1)
