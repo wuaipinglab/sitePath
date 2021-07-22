@@ -6,7 +6,7 @@ output:
     BiocStyle::html_document:
         toc_float: false
 abstract: >
-    Detection of site fixation in molecular evolution.
+    In viral evolution, fixed substitutions in the nucleic acid or protein level are closely associated with maintaining viral function, while parallel mutation reflects the competitive nature in adaptive selection. The continued accumulation of large-scale viral sequence data enhances the challenge of identifying important mutations in a quick and accurate manner. In sitePath, the phylogenetic tree was separated into a set of inheritable phylogenetic pathways via an automated pathway-division method. Then, for each phylogenetic pathway, the identification of fixed substitutions was transformed into a local-optimal-solution problem directed by a minimal entropy algorithm. Finally, the parallel mutation was determined based on the recurrence of mutations among at least two phylogenetic pathways.
 vignette: >
   %\VignetteIndexEntry{An introduction to sitePath}
   %\VignetteEngine{knitr::rmarkdown}
@@ -22,19 +22,19 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The `sitePath` package does hierarchical search for fixation events given multiple sequence alignment and phylogenetic tree. These fixation events can be specific to a phylogenetic lineages or shared by multiple lineages. This is achieved by three major steps:
+The `sitePath` package is made for the high-throughput identification of fixed substitutions and parallel mutations in viruses from a single phylogenetic tree. This is achieved by three major steps:
 
-1. Import tree and sequence alignment
-2. Resolve phylogenetic lineages
-3. Hierarchical search for fixation and parallel mutations
+1. Clustering phylogenetic terminals
+2. Identifying phylogenetic pathways
+3. Finding fixed and parallel mutations
 
-# Import data
+# Clustering phylogenetic terminals
 
-There're various R packages for parsing phylogenetic tree and multiple sequence alignment files. For now, `sitepath` accepts `phylo` object and `alignment` object. Functions from `ggtree` and `seqinr` are able to handle most file formats.
+The firs step is to import phylogenetic tree and multiple sequence alignment files. For now, `sitePath` accepts `phylo` object and `alignment` object. Functions from `ggtree` and `seqinr` are able to handle most file formats.
 
-## Parse phylogenetic tree
+## Import tree file
 
-The S3 phylo class is a common data structure for phylogenetic analysis in R. The CRAN package [ape](https://cran.r-project.org/web/packages/ape/index.html) provides basic parsing function for reading tree files. The Bioconductor package [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html) provides more comprehensive parsing utilities.
+The S3 `phylo` class is a common data structure for phylogenetic analysis in R. The CRAN package [ape](https://cran.r-project.org/web/packages/ape/index.html) provides basic parsing function for reading tree files. The Bioconductor package [treeio](https://bioconductor.org/packages/release/bioc/html/treeio.html) provides more comprehensive parsing utilities.
 
 
 ```{r import_tree, message=FALSE}
@@ -44,9 +44,7 @@ tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
 tree <- read.tree(tree_file)
 ```
 
-It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult. 
-
-Also, we expect the tree to have no super long branches. A bad example is shown below:
+It is highly recommended that the file stores a rooted tree as R would consider the tree is rooted by default and re-rooting the tree in R is difficult. Also, we expect the tree to have no super long branches. A bad example is shown below:
 
 ```{r bad_tree_example, echo=FALSE}
 bad_tree <- read.tree(system.file("extdata", "WNV.newick", package = "sitePath"))
@@ -55,7 +53,7 @@ ggtree::ggtree(bad_tree) + ggplot2::ggtitle("Do not use a tree like this")
 ```
 
 
-## Parse and match sequence alignment
+## Import sequence alignment file
 
 Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). There is a wrapper function for parsing and adding the sequence alignment.
 
@@ -64,13 +62,17 @@ alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 tree <- addMSA(tree, alignment_file, "fasta")
 ```
 
-# Phylogenetic lineages
+## Clustering using site polymorphism
 
-The names in tree and alignment must be matched. We exploit polymorphism of each site to find the major branches. Before finding putative phylogenetic lineages, there involves a few more steps to evaluate the impact of threshold on result.
+The `addMSA` function will match the sequence names in tree and alignment. Also, the function uses polymorphism of each site to cluster sequences for identifying phylogenetic pathways.
+
+# Identifying phylogenetic pathways
+
+After importing the tree and sequence file, `sitePath` is ready to identify phylogenetic pathways.
 
 ## The impact of threshold on resolving lineages
 
-In the current version, the resolving function only takes sequence similarity as one single threshold. The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can be of great help in choosing the threshold.*
+The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can help choose the threshold.*
 
 ```{r sneakPeek_plot}
 preassessment <- sneakPeek(tree, makePlot = TRUE)
@@ -78,10 +80,10 @@ preassessment <- sneakPeek(tree, makePlot = TRUE)
 
 ## Choose a threshold
 
-Use the return of the function `lineagePath` for downstream analysis. The choice of the threshold really depends. You can use the result from `sneakPeak` as a reference for threshold choosing. Here 0.05 is used as an example.
+The default threshold is the first 'stable' value to produce the same number of phylogenetic pathways. You can directly use the return of `addMSA` if you want the default or choose other threshold by using function `lineagePath`. The choice of the threshold really depends. Here 0.05 is used as an example.
 
 ```{r get_lineagePath}
-paths <- lineagePath(preassessment, similarity = 0.05)
+paths <- lineagePath(preassessment, 0.05)
 paths
 ```
 
@@ -91,7 +93,7 @@ You can visualize the result.
 plot(paths)
 ```
 
-# Mutation detection
+# Finding fixed and parallel mutations
 
 Now you're ready to find fixation and parallel mutations.
 
@@ -102,7 +104,6 @@ The `sitesMinEntropy` function perform entropy minimization on every site for ea
 ```{r min_entropy}
 minEntropy <- sitesMinEntropy(paths)
 ```
-
 
 ## Fixation mutations
 
@@ -139,13 +140,13 @@ plot(sp)
 plotSingleSite(fixations, 139)
 ```
 
-To have an overall view of the transition of fixation mutation, use `plot` on an `fixationSites` object.
+To have an overall view of the transition of fixation mutation:
 
 ```{r plot_fixations}
 plot(fixations)
 ```
 
-## Parallel mutation
+## Parallel mutations
 
 Parallel mutation can be found by the `parallelSites` function. There are four ways of defining the parallel mutation: `all`, `exact`, `pre` and `post`. Here `exact` is used as an example.
 
@@ -158,6 +159,12 @@ The result of a single site can be visualized by `plotSingleSite` function.
 
 ```{r}
 plotSingleSite(paraSites, 105)
+```
+
+To have an overall view of the parallel mutations:
+
+```{r plot_parallel}
+plot(paraSites)
 ```
 
 # Additional functions

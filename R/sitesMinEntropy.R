@@ -112,7 +112,8 @@ sitesMinEntropy.lineagePath <- function(x,
                 # The path with fewer tips will use smaller threshold
                 scaledSize <- ceiling(minEffectiveSize * scaledSize)
                 attr(pathNodeAlign, "scaledSize") <- scaledSize
-                attr(pathNodeAlign, "scaledSize") <- minEffectiveSize
+                attr(pathNodeAlign, "scaledSize") <-
+                    minEffectiveSize
                 segs <- lapply(
                     X = siteIndices,
                     FUN = .runEntropyMinimization,
@@ -137,7 +138,8 @@ sitesMinEntropy.lineagePath <- function(x,
                 # The path with fewer tips will use smaller threshold
                 scaledSize <- ceiling(minEffectiveSize * scaledSize)
                 attr(pathNodeAlign, "scaledSize") <- scaledSize
-                attr(pathNodeAlign, "scaledSize") <- minEffectiveSize
+                attr(pathNodeAlign, "scaledSize") <-
+                    minEffectiveSize
                 # Entropy minimization result for every locus
                 segs <- parLapply(
                     cl = cl,
@@ -235,6 +237,7 @@ sitesMinEntropy.lineagePath <- function(x,
             X = names(res[[1]]),
             FUN = .calibrateFixedAA,
             fixations = res,
+            tree = as.phylo(paths),
             align = align
         )
     } else {
@@ -243,6 +246,7 @@ sitesMinEntropy.lineagePath <- function(x,
             X = names(res[[1]]),
             fun = .calibrateFixedAA,
             fixations = res,
+            tree = as.phylo(paths),
             align = align
         )
     }
@@ -303,7 +307,7 @@ sitesMinEntropy.lineagePath <- function(x,
     return(res)
 }
 
-.calibrateFixedAA <- function(locus, fixations, align) {
+.calibrateFixedAA <- function(locus, fixations, tree, align) {
     # The original entropy minimization result for the locus
     unMergedGroupings <- lapply(fixations, function(segs) {
         res <- segs[[locus]]
@@ -405,6 +409,47 @@ sitesMinEntropy.lineagePath <- function(x,
                     }
                 }
                 attr(res[[pathIndex]][[gIndex]], "AA") <- refAA
+            }
+        }
+    }
+    # Change the ancestral node to one node deeper if necessary to avoid fake
+    # parallel fixed mutation for the site
+    for (pathIndex in seq_along(res)) {
+        mGrouping <- res[[pathIndex]]
+        for (gIndex in seq_along(mGrouping)) {
+            tips <- mGrouping[[gIndex]]
+            toMerge <- attr(tips, "toMerge")
+            if (!is.null(toMerge) && length(mGrouping) > gIndex) {
+                otherIndex <- as.integer(names(toMerge))
+                descendantAA <- vapply(
+                    X = otherIndex,
+                    FUN = function(index) {
+                        attr(res[[index]][[1]], "AA")
+                    },
+                    FUN.VALUE = character(1)
+                )
+                descendantAA <- c(descendantAA,
+                                  attr(mGrouping[[gIndex + 1]], "AA"))
+                descendantAA <- unique(descendantAA)
+                if (length(descendantAA) == 1 &&
+                    descendantAA != attr(tips, "AA")) {
+                    descendantNode <- vapply(
+                        X = otherIndex,
+                        FUN = function(index) {
+                            attr(res[[index]][[1]], "node")
+                        },
+                        FUN.VALUE = character(1)
+                    )
+                    descendantNode <- c(descendantNode,
+                                        attr(mGrouping[[gIndex + 1]], "node"))
+                    ancestralNode <-
+                        as.character(getMRCA(tree, as.integer(descendantNode)))
+                    attr(res[[pathIndex]][[gIndex + 1]], "node") <-
+                        ancestralNode
+                    for (toMergeIndex in otherIndex) {
+                        attr(res[[toMergeIndex]][[1]], "node") <- ancestralNode
+                    }
+                }
             }
         }
     }
