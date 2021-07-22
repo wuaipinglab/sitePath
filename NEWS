@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.9.3
+-------------------------
+    o Fix: invalid parallel mutations at divergent node.
+    o Update DESCRIPTION, README and vignettes.
+
 CHANGES IN VERSION 1.9.2
 -------------------------
     o Allow partially plot 'lineagePath'.
