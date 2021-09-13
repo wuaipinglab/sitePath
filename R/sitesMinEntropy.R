@@ -358,6 +358,9 @@ sitesMinEntropy.lineagePath <- function(x,
                                 maxOverlapNum <- length(overlapNum)
                             }
                         }
+                        if (length(majorFixedAA) == 0) {
+                            return(attr(tips, "AA"))
+                        }
                         return(majorFixedAA)
                     },
                     FUN.VALUE = character(1)
@@ -442,8 +445,14 @@ sitesMinEntropy.lineagePath <- function(x,
                     )
                     descendantNode <- c(descendantNode,
                                         attr(mGrouping[[gIndex + 1]], "node"))
+                    descendantNode <- unique(descendantNode)
                     ancestralNode <-
-                        as.character(getMRCA(tree, as.integer(descendantNode)))
+                        getMRCA(tree, as.integer(descendantNode))
+                    if (is.null(ancestralNode)) {
+                        ancestralNode <- as.character(ancestralNode)
+                    } else {
+                        ancestralNode <- descendantNode
+                    }
                     attr(res[[pathIndex]][[gIndex + 1]], "node") <-
                         ancestralNode
                     for (toMergeIndex in otherIndex) {
@@ -592,11 +601,12 @@ sitesMinEntropy.lineagePath <- function(x,
         gp <- clustersByPath[[gpIndex]]
         # Assume there is no overlapped tips
         t <- integer()
-        # The index of 'res' which to merge with 'gp'
-        toMergeIndex <- NULL
+        # The index of 'res' to merge with 'gp'
+        toMergeIndex <- 1L
+        # toMergeIndex <- NULL
         # The index of 'gp' where the divergent point is. Each truncated 'gp' in
         # 'res' will have one but only the deepest will be used
-        divergedIndex <- 0L
+        divergedIndex <- 1L
         # The number of shared tips at divergent point will be used to decide if
         # the two clusters are completely diverged or not
         sharedAtDiv <- integer()
@@ -612,7 +622,7 @@ sitesMinEntropy.lineagePath <- function(x,
             for (j in seq_along(gp)) {
                 # Once a potential divergent point having being found (the tip
                 # cluster in 'gp' containing cannot-be-found tips), safeguard
-                # the current 'gp' have actual overlap with all tips in 'res'
+                # the current 'gp' to have actual overlap with all tips in 'res'
                 # with index 'j'
                 if (any(!gp[[j]] %in% allTips) &&
                     any(unlist(gp) %in% unlist(res[[i]]))) {
@@ -678,9 +688,16 @@ sitesMinEntropy.lineagePath <- function(x,
                 toMergeRefSites[[as.character(gpIndex)]] <- refSites
                 if (length(sharedTips) == 0) {
                     # There is at least one group of tips before divergence
-                    attr(toMerge[[i - 1]], "toMerge") <-
+                    mergeIndex <- max(1, i - 1)
+                    attr(toMerge[[mergeIndex]], "toMerge") <-
                         c(toMergeRefSites,
-                          attr(toMerge[[i - 1]], "toMerge"))
+                          attr(toMerge[[mergeIndex]], "toMerge"))
+                    if (i == 1) {
+                        # The 'divergedTips' and the most related group are
+                        # probably diverged at root
+                        res[[toMergeIndex]] <- toMerge
+                        break
+                    }
                     sharedTips <- list()
                 } else {
                     # When 'sharedTips' is not empty, the site and node should
