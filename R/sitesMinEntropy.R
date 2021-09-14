@@ -579,7 +579,20 @@ sitesMinEntropy.lineagePath <- function(x,
                         # Go for the next new coming tips
                         break
                     } else {
-                        stop("Something's not right")
+                        # Special case at root I guess. Treated the same as if
+                        # 'common' is identical to 'gp'
+                        tips <- setdiff(tips, gp)
+                        # The rest of the 'tips' should all be included in
+                        # 'res'? (be on the same descending path)
+                        if (i == 1 &&
+                            length(setdiff(tips, unlist(res))) == 0) {
+                            # Update the SNP site info for the current group
+                            attr(gp, "AA") <-
+                                c(attr(gp, "AA"), site)
+                            newGrouping <- c(newGrouping, list(gp))
+                        } else {
+                            stop("Something's not right")
+                        }
                     }
                 }
             }
