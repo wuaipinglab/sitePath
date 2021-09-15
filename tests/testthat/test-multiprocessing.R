@@ -6,7 +6,7 @@ test_that("Multiprocessing works", {
     p <- lineagePath(tr)
     minEntropy <- sitesMinEntropy(p)
 
-    options(cl.cores = "auto")
+    options(cl.cores = 2)
     tr_mp <- addMSA(tree = h3n2_tree, alignment = h3n2_align)
     p_mp <- lineagePath(tr)
     minEntropy_mp <- sitesMinEntropy(p_mp)
