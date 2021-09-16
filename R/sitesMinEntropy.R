@@ -449,9 +449,9 @@ sitesMinEntropy.lineagePath <- function(x,
                     ancestralNode <-
                         getMRCA(tree, as.integer(descendantNode))
                     if (is.null(ancestralNode)) {
-                        ancestralNode <- as.character(ancestralNode)
-                    } else {
                         ancestralNode <- descendantNode
+                    } else {
+                        ancestralNode <- as.character(ancestralNode)
                     }
                     attr(res[[pathIndex]][[gIndex + 1]], "node") <-
                         ancestralNode
