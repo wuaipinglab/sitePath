@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.9.4
+-------------------------
+    o Fix: special case when tree root has more than one lineage path
+
 CHANGES IN VERSION 1.9.3
 -------------------------
     o Fix: invalid parallel mutations at divergent node.
