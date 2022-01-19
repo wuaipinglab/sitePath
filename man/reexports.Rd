@@ -4,6 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{read.tree}
+\alias{read.alignment}
 \alias{as.phylo}
 \alias{as.treedata}
 \title{Objects exported from other packages}
@@ -14,6 +15,8 @@ below to see their documentation.
 
 \describe{
   \item{ape}{\code{\link[ape]{as.phylo}}, \code{\link[ape]{read.tree}}}
+
+  \item{seqinr}{\code{\link[seqinr]{read.alignment}}}
 
   \item{tidytree}{\code{\link[tidytree]{as.treedata}}}
 }}

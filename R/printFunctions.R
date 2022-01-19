@@ -1,4 +1,12 @@
 #' @export
+print.alignment <- function(x, ...) {
+    cat("MSA with", length(x[["seq"]]), "sequences.\n\n")
+    cat("Sequence names:\n")
+    cat("  ", paste(head(x[["nam"]]), collapse = ", "), ", ...\n\n")
+    cat("Sequence length:", nchar(x[["seq"]][[1]]), "\n")
+}
+
+#' @export
 print.phyMSAmatched <- function(x, ...) {
     cat("This is a 'phyMSAmatched' object.\n")
 }
@@ -154,11 +162,13 @@ print.fixationIndels <- function(x, ...) {
 
 #' @export
 print.indelPath <- function(x, ...) {
-    cat("Site(s)",
+    cat(
+        "Site(s)",
         attr(x, "indelSites"),
         "may experience fixation on",
         length(x),
-        "group(s) of tips:\n\n")
+        "group(s) of tips:\n\n"
+    )
     for (i in x) {
         cat("(", length(i), ") ", sep = "")
     }

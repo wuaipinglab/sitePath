@@ -174,8 +174,12 @@ plot.fixationSites <- function(x,
             na.translate = TRUE,
             na.value = "black"
         ) +
-        guides(color = guide_legend(override.aes = list(size = 3))) +
-        theme(legend.position = "left")
+        guides(color = guide_legend(override.aes = list(size = 3)))
+    if (!is.null(tipsGrouping)) {
+        p <- p + theme(legend.position = "left")
+    } else {
+        p <- p + theme(legend.position = "none")
+    }
     if (y) {
         p <- p + geom_label_repel(
             aes(x = branch, label = SNPs),

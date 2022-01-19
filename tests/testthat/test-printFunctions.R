@@ -2,6 +2,8 @@ test_that("The print functions work", {
     data(zikv_align_reduced)
     data(zikv_tree_reduced)
 
+    expect_error(capture.output(print(zikv_align_reduced)), NA)
+
     tr <- addMSA(zikv_tree_reduced,
                  alignment = zikv_align_reduced)
     expect_error(capture.output(print(tr)), NA)

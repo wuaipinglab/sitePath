@@ -126,7 +126,19 @@ setSiteNumbering.phyMSAmatched <- function(x,
     # Map the names between tree and alignment
     m <- match(tree[["tip.label"]], names(align))
     if (any(is.na(m))) {
-        stop("Tree tips and alignment names are not matched.")
+        seqMiss <- setdiff(tree[["tip.label"]], names(align))
+        treeMiss <- setdiff(names(align), tree[["tip.label"]])
+        stop(
+            "Tree tips and alignment names are not matched: \n",
+            seqMiss[1],
+            " and other ",
+            length(seqMiss) - 1,
+            " not found in sequence\n",
+            treeMiss[1],
+            " and other ",
+            length(treeMiss) - 1,
+            " not found in tree"
+        )
     }
     # Update 'align' attribute as matched with tree tips
     attr(x, "align") <- align[m]

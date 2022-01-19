@@ -5,6 +5,9 @@
 ape::read.tree
 
 #' @export
+seqinr::read.alignment
+
+#' @export
 ape::as.phylo
 
 #' @export

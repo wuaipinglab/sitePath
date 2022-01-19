@@ -2,20 +2,29 @@
 % Please edit documentation in R/paraFixSites.R
 \name{paraFixSites}
 \alias{paraFixSites}
+\alias{paraFixSites.phylo}
 \alias{paraFixSites.lineagePath}
 \alias{paraFixSites.sitesMinEntropy}
 \title{The fixation sites with mutation on parallel lineage}
 \usage{
 paraFixSites(x, ...)
 
+\method{paraFixSites}{phylo}(
+  x,
+  alignment = NULL,
+  seqType = c("AA", "DNA", "RNA"),
+  Nmin = NULL,
+  reference = NULL,
+  gapChar = "-",
+  minSkipSize = NULL,
+  ...
+)
+
 \method{paraFixSites}{lineagePath}(
   x,
-  category = c("intersect", "union", "parallelOnly", "fixationOnly"),
   minEffectiveSize = NULL,
   searchDepth = 1,
   method = c("compare", "insert", "delete"),
-  minSNP = NULL,
-  mutMode = c("all", "exact", "pre", "post"),
   ...
 )
 
@@ -33,8 +42,27 @@ function.}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{category}{Could be \code{parallelOnly}, \code{fixationOnly},
-\code{intersect} or \code{union}.}
+\item{alignment}{An \code{alignment} object. This commonly can be from
+sequence parsing function in the \code{\link{seqinr}} package. Sequence
+names in the alignment should include all \code{tip.label} in the tree}
+
+\item{seqType}{The type of the sequence in the alignment file. The default is
+"AA" for amino acid. The other options are "DNA" and "RNA".}
+
+\item{Nmin}{The parameter for identifying phylogenetic pathway using SNP. If
+provided as fraction between 0 and 1, then the minimum number of SNP will
+be total tips times \code{Nmin}. If provided as integer greater than 1, the
+minimum number will be \code{Nmin}.}
+
+\item{reference}{Name of reference for site numbering. The name has to be one
+of the sequences' name. The default uses the intrinsic alignment numbering}
+
+\item{gapChar}{The character to indicate gap. The numbering will skip the
+\code{gapChar} for the reference sequence.}
+
+\item{minSkipSize}{The minimum number of tips to have gap or ambiguous amino
+acid/nucleotide for a site to be ignored in other analysis. This will not
+affect the numbering. The default is 0.8.}
 
 \item{minEffectiveSize}{The minimum number of tips in a group.}
 
@@ -45,6 +73,9 @@ tell the search when to stop.}
 \item{method}{The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.}
+
+\item{category}{Could be \code{parallelOnly}, \code{fixationOnly},
+\code{intersect} or \code{union}.}
 
 \item{minSNP}{The minimum number of mutations to be qualified as parallel on
 at least two lineages. The default is 1.}
@@ -65,6 +96,5 @@ The operation between the results of \code{\link{fixationSites}}
 \examples{
 data(zikv_tree_reduced)
 data(zikv_align_reduced)
-tree <- addMSA(zikv_tree_reduced, alignment = zikv_align_reduced)
-paraFixSites(lineagePath(tree))
+paraFixSites(zikv_tree_reduced, alignment = zikv_align_reduced)
 }
