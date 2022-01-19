@@ -4,6 +4,12 @@ output:
         variant: gfm
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.path = "inst/"
+)
+```
+
 # sitePath: Phylogenetic pathway–dependent recognition of fixed substitutions and parallel mutations
 
 ## Getting help
@@ -30,6 +36,57 @@ if (!requireNamespace("remotes", quietly = TRUE))
 remotes::install_github("wuaipinglab/sitePath")
 ```
 
-## Tutorial
 
-Click https://wuaipinglab.github.io/sitePath/articles/sitePath.html for a tutorial on using the package
+## Data preparation
+You need a _tree_ and a _MSA_ (multiple sequence alignment) file and the sequence names have to be matched!
+```{r data_prep}
+library(sitePath) # Load the sitePath package
+
+# The path to your tree and MSA files
+tree_file <- system.file("extdata", "ZIKV.newick", package = "sitePath")
+alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
+
+
+tree <- read.tree(tree_file) # Read the tree file into R
+align <- read.alignment(alignment_file, format = "fasta") # Read the MSA file into R
+
+```
+
+## Run analysis
+Use `paraFixSites` function to find fixation and parallel sites.
+
+```{r run_analysis}
+options(list("cl.cores" = 1)) # Set this bigger than 1 to use multiprocessing
+
+paraFix <- paraFixSites(tree, alignment = align) # Run analysis to find fixation and parallel sites
+paraFix
+```
+
+## Fixation sites
+Use `allSitesName` and set `type` as "fixation" to retrieve fixation sites name
+``` {r fixSites_name}
+allSitesName(paraFix, type = "fixation")
+```
+
+Use `plotFixationSites` to view fixation sites
+```{r plot_fixSites}
+plotFixationSites(paraFix) # View all fixation sites on the tree
+plotFixationSites(paraFix, site = 139) # View a single site
+
+```
+
+## Parallel sites
+Use `allSitesName` and set `type` as "parallel" to retrieve parallel sites name
+``` {r paraSites_name}
+allSitesName(paraFix, type = "parallel")
+```
+
+Use `plotParallelSites` to view parallel sites
+```{r}
+plotParallelSites(paraFix) # View all parallel sites on the tree
+plotParallelSites(paraFix, site = 1118) # View a single site
+```
+
+## A more detailed demo
+
+Click [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html) for a more detailed tutorial
