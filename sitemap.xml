@@ -67,10 +67,16 @@
     <loc>/reference/parallelSites.html</loc>
   </url>
   <url>
+    <loc>/reference/plotFixationSites.html</loc>
+  </url>
+  <url>
     <loc>/reference/plotFunctions.html</loc>
   </url>
   <url>
     <loc>/reference/plotMutSites.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotParallelSites.html</loc>
   </url>
   <url>
     <loc>/reference/plotSingleSite.html</loc>
