@@ -100,7 +100,7 @@ addMSA.phylo <- function(tree,
     siteIndices <- attr(res, "msaNumbering")[loci] - 1L
     # Test if multiprocessing is turned on
     mc <- getOption("cl.cores")
-    if (is.null(mc)) {
+    if (is.null(mc) || mc == 1) {
         # Sequence similarity matrix
         simMatrix <- getSimilarityMatrix(align)
         dimnames(simMatrix) <- list(tree[["tip.label"]],

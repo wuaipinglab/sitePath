@@ -104,7 +104,7 @@ sitesMinEntropy.lineagePath <- function(x,
     maxPathTipNum <- tail(pathTipNums[tipNumRank], 1)
     # Test if multiprocessing is turned on
     mc <- getOption("cl.cores")
-    if (is.null(mc)) {
+    if (is.null(mc) || mc == 1) {
         res <- lapply(
             X = pathsWithSeqs[tipNumRank],
             FUN = function(pathNodeAlign) {
