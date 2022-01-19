@@ -29,3 +29,7 @@ if (!requireNamespace("remotes", quietly = TRUE))
 
 remotes::install_github("wuaipinglab/sitePath")
 ```
+
+## Tutorial
+
+Click https://wuaipinglab.github.io/sitePath/articles/sitePath.html for a tutorial on using the package

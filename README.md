@@ -9,7 +9,7 @@ if a bug is found.
 
 ## Installation
 
-[R programming language](https://cran.r-project.org/) &gt;= 4.1.0 is
+[R programming language](https://cran.r-project.org/) \>= 4.1.0 is
 required to use `sitePath`.
 
 The stable release is available on
@@ -31,3 +31,8 @@ if (!requireNamespace("remotes", quietly = TRUE))
 
 remotes::install_github("wuaipinglab/sitePath")
 ```
+
+## Tutorial
+
+Click <https://wuaipinglab.github.io/sitePath/articles/sitePath.html>
+for a tutorial on using the package

@@ -1,5 +1,5 @@
 ---
-title: "An introduction to sitePath"
+title: "Use sitePath to find fixation and parallel sites"
 author: "Chengyang Ji"
 package: sitePath
 output: 
@@ -55,11 +55,14 @@ ggtree::ggtree(bad_tree) + ggplot2::ggtitle("Do not use a tree like this")
 
 ## Import sequence alignment file
 
-Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). There is a wrapper function for parsing and adding the sequence alignment.
+Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r-project.org/web/packages/seqinr/index.html). There is a wrapper function for parsing and adding the sequence alignment. Set "cl.cores" in `options` to the number of cores you want to use for multiprocessing.
 
 ```{r add_alignment, message=FALSE}
 alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
-tree <- addMSA(tree, alignment_file, "fasta")
+
+# options(list("cl.cores" = 10))
+
+paths <- addMSA(tree, alignment_file, "fasta")
 ```
 
 ## Clustering using site polymorphism
@@ -75,15 +78,15 @@ After importing the tree and sequence file, `sitePath` is ready to identify phyl
 The impact of threshold depends on the tree topology hence there is no universal choice. The function `sneakPeak` samples thresholds and calculates the resulting number of paths. *The use of this function can help choose the threshold.*
 
 ```{r sneakPeek_plot}
-preassessment <- sneakPeek(tree, makePlot = TRUE)
+preassessment <- sneakPeek(paths, makePlot = TRUE)
 ```
 
 ## Choose a threshold
 
-The default threshold is the first 'stable' value to produce the same number of phylogenetic pathways. You can directly use the return of `addMSA` if you want the default or choose other threshold by using function `lineagePath`. The choice of the threshold really depends. Here 0.05 is used as an example.
+The default threshold is the first 'stable' value to produce the same number of phylogenetic pathways. You can directly use the return of `addMSA` if you want the default or choose other threshold by using function `lineagePath`. The choice of the threshold really depends. Here 18 is used as an example.
 
 ```{r get_lineagePath}
-paths <- lineagePath(preassessment, 0.05)
+paths <- lineagePath(preassessment, 18)
 paths
 ```
 
@@ -185,7 +188,7 @@ plotSingleSite(paths, 763)
 An SNP site could potentially undergo fixation event. The `SNPsites` function predicts possible SNP sites and the result could be what you'll expect to be fixation mutation. Also, a tree plot with mutation could be visualized with `plotMutSites` function.
 
 ```{r find_SNP}
-snps <- SNPsites(tree)
+snps <- SNPsites(paths)
 plotMutSites(snps)
 plotSingleSite(paths, snps[4])
 plotSingleSite(paths, snps[5])
