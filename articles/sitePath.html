@@ -114,9 +114,9 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
 
-<span class="co"># options(list("cl.cores" = 10))</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cl.cores"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Set this bigger than 1 to use multiprocessing</span>
 
-<span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">alignment_file</span>, <span class="st">"fasta"</span><span class="op">)</span></code></pre></div>
+<span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">tree</span>, msaPath <span class="op">=</span> <span class="va">alignment_file</span>, msaFormat <span class="op">=</span> <span class="st">"fasta"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="clustering-using-site-polymorphism">Clustering using site polymorphism<a class="anchor" aria-label="anchor" href="#clustering-using-site-polymorphism"></a>
@@ -284,7 +284,7 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="additional-functions">Additional functions<a class="anchor" aria-label="anchor" href="#additional-functions"></a>
+<h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a>
 </h2>
 <p>This part is extra and experimental but might be useful when pre-assessing your data. We’ll use an example to demonstrate.</p>
 <div class="section level3">

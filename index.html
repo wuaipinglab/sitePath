@@ -95,9 +95,71 @@
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"wuaipinglab/sitePath"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="tutorial">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial"></a>
+<h2 id="data-preparation">Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h2>
-<p>Click <a href="https://wuaipinglab.github.io/sitePath/articles/sitePath.html" class="external-link uri">https://wuaipinglab.github.io/sitePath/articles/sitePath.html</a> for a tutorial on using the package</p>
+<p>You need a <em>tree</em> and a <em>MSA</em> (multiple sequence alignment) file and the sequence names have to be matched!</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wuaipinglab.github.io/sitePath/" class="external-link">sitePath</a></span><span class="op">)</span> <span class="co"># Load the sitePath package</span>
+
+<span class="co"># The path to your tree and MSA files</span>
+<span class="va">tree_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.newick"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
+<span class="va">alignment_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZIKV.fasta"</span>, package <span class="op">=</span> <span class="st">"sitePath"</span><span class="op">)</span>
+
+
+<span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ape/man/read.tree.html" class="external-link">read.tree</a></span><span class="op">(</span><span class="va">tree_file</span><span class="op">)</span> <span class="co"># Read the tree file into R</span>
+<span class="va">align</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/seqinr/man/read.alignment.html" class="external-link">read.alignment</a></span><span class="op">(</span><span class="va">alignment_file</span>, format <span class="op">=</span> <span class="st">"fasta"</span><span class="op">)</span> <span class="co"># Read the MSA file into R</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="run-analysis">Run analysis<a class="anchor" aria-label="anchor" href="#run-analysis"></a>
+</h2>
+<p>Use <code>paraFixSites</code> function to find fixation and parallel sites.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cl.cores"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Set this bigger than 1 to use multiprocessing</span>
+
+<span class="va">paraFix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/paraFixSites.html">paraFixSites</a></span><span class="op">(</span><span class="va">tree</span>, alignment <span class="op">=</span> <span class="va">align</span><span class="op">)</span> <span class="co"># Run analysis to find fixation and parallel sites</span>
+<span class="va">paraFix</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This is a 'paraFixSites' object</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## fixationsites:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 106, 109, 139, 709, 1118, 2086, 3144, 3190, 80, 2611, 2634, 894, 1542, 2074, 3045, 784, 988, 196, 1143, 2842, 3328, 3398, 107, 3353</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## parallelsites:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1118</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="do">## paraFixsites:</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 1118</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="fixation-sites">Fixation sites<a class="anchor" aria-label="anchor" href="#fixation-sites"></a>
+</h2>
+<p>Use <code>allSitesName</code> and set <code>type</code> as “fixation” to retrieve fixation sites name</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/allSitesName.html">allSitesName</a></span><span class="op">(</span><span class="va">paraFix</span>, type <span class="op">=</span> <span class="st">"fixation"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] "106"  "109"  "139"  "709"  "1118" "2086" "3144" "3190" "80"   "2611"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] "2634" "894"  "1542" "2074" "3045" "784"  "988"  "196"  "1143" "2842"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [21] "3328" "3398" "107"  "3353"</span></span></code></pre></div>
+<p>Use <code>plotFixationSites</code> to view fixation sites</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/plotFixationSites.html">plotFixationSites</a></span><span class="op">(</span><span class="va">paraFix</span><span class="op">)</span> <span class="co"># View all fixation sites on the tree</span></code></pre></div>
+<p><img src="inst/plot_fixSites-1.png"><!-- --></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/plotFixationSites.html">plotFixationSites</a></span><span class="op">(</span><span class="va">paraFix</span>, site <span class="op">=</span> <span class="fl">139</span><span class="op">)</span> <span class="co"># View a single site</span></code></pre></div>
+<p><img src="inst/plot_fixSites-2.png"><!-- --></p>
+</div>
+<div class="section level2">
+<h2 id="parallel-sites">Parallel sites<a class="anchor" aria-label="anchor" href="#parallel-sites"></a>
+</h2>
+<p>Use <code>allSitesName</code> and set <code>type</code> as “parallel” to retrieve parallel sites name</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/allSitesName.html">allSitesName</a></span><span class="op">(</span><span class="va">paraFix</span>, type <span class="op">=</span> <span class="st">"parallel"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "1118"</span></span></code></pre></div>
+<p>Use <code>plotParallelSites</code> to view parallel sites</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/plotParallelSites.html">plotParallelSites</a></span><span class="op">(</span><span class="va">paraFix</span><span class="op">)</span> <span class="co"># View all parallel sites on the tree</span></code></pre></div>
+<p><img src="inst/unnamed-chunk-1-1.png"><!-- --></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/plotParallelSites.html">plotParallelSites</a></span><span class="op">(</span><span class="va">paraFix</span>, site <span class="op">=</span> <span class="fl">1118</span><span class="op">)</span> <span class="co"># View a single site</span></code></pre></div>
+<p><img src="inst/unnamed-chunk-1-2.png"><!-- --></p>
 </div>
 </div>
   </div>
