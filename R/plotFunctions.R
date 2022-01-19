@@ -219,8 +219,9 @@ plot.sitePath <- function(x,
     }
     tree <- attr(x, "tree")
     siteName <- attr(x, "site")
+    seqType <- attr(x, "seqType")
     # Specify the color of mutations by pre-defined color set.
-    groupColors <- .siteColorScheme(attr(x, "seqType"))
+    groupColors <- .siteColorScheme(seqType)
     # Collect the fixation mutation for each evolutionary pathway
     subtitle <- character()
     fixationMut <- character()
@@ -276,10 +277,16 @@ plot.sitePath <- function(x,
             )
     }
     # Make the plot
+    if (seqType == "AA") {
+        legendTitle <- "Amino acid"
+    } else {
+        legendTitle <- "Nucleotide"
+    }
     p <- p + scale_color_manual(values = groupColors,
                                 limits = c(names(group), excludedLabel)) +
         guides(linetype = "none",
-               color = guide_legend(override.aes = list(size = 3))) +
+               color = guide_legend(title = legendTitle,
+                                    override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(label = siteName, subtitle = subtitle)
     if (showTips) {
@@ -292,6 +299,7 @@ plot.sitePath <- function(x,
 #' @description A \code{\link{fixationIndels}} object will be plotted as
 #'   original phylogenetic tree marked with indel fixation.
 plot.fixationIndels <- function(x, y = TRUE, ...) {
+
 }
 
 #' @rdname plotFunctions

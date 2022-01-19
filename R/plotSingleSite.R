@@ -45,10 +45,11 @@ plotSingleSite.lineagePath <- function(x,
                                        showPath = TRUE,
                                        showTips = FALSE,
                                        ...) {
+    seqType <- attr(x, "seqType")
     group <- extractTips.lineagePath(x, site)
     # Use different color scheme depending on the sequence type
     names(group) <- toupper(names(group))
-    groupColors <- .siteColorScheme(attr(x, "seqType"))
+    groupColors <- .siteColorScheme(seqType)
     tree <- attr(x, "tree")
     group <- groupOTU(as_tibble(tree), group)
     group <- group[["group"]]
@@ -68,11 +69,17 @@ plotSingleSite.lineagePath <- function(x,
         size <- rep(1, times = length(group))
         size[pathNodes] <- 2
     }
+    if (seqType == "AA") {
+        legendTitle <- "Amino acid"
+    } else {
+        legendTitle <- "Nucleotide"
+    }
     p <- ggtree(tree, aes(color = group, size = size)) +
         scale_size(range = sizeRange, guide = "none") +
         scale_color_manual(values = groupColors,
                            limits = unique(group)) +
-        guides(color = guide_legend(override.aes = list(size = 3))) +
+        guides(color = guide_legend(title = legendTitle,
+                                    override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(site)
     if (showTips) {
@@ -108,12 +115,12 @@ plotSingleSite.sitesMinEntropy <- function(x,
     groupColors <- .siteColorScheme(attr(x, "seqType"))
     g <- lapply(allPaths, function(path) {
         plot(path) + ggtitle(
-            label = paste0(
-                attr(path, "minSize"),
-                " (",
-                round(attr(path, "similarity") * 100, 2),
-                "%)"
-            ),
+            label = paste0(attr(path, "minSize"),
+                           " (",
+                           round(attr(
+                               path, "similarity"
+                           ) * 100, 2),
+                           "%)"),
             subtitle = paste0(length(path), " path(s)")
         )
     })

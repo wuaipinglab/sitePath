@@ -1,12 +1,12 @@
 ---
-title: "Use sitePath to find fixation and parallel sites"
+title: "Breakdown of the sitePath analysis"
 author: "Chengyang Ji"
 package: sitePath
 output: 
     BiocStyle::html_document:
         toc_float: false
 abstract: >
-    In viral evolution, fixed substitutions in the nucleic acid or protein level are closely associated with maintaining viral function, while parallel mutation reflects the competitive nature in adaptive selection. The continued accumulation of large-scale viral sequence data enhances the challenge of identifying important mutations in a quick and accurate manner. In sitePath, the phylogenetic tree was separated into a set of inheritable phylogenetic pathways via an automated pathway-division method. Then, for each phylogenetic pathway, the identification of fixed substitutions was transformed into a local-optimal-solution problem directed by a minimal entropy algorithm. Finally, the parallel mutation was determined based on the recurrence of mutations among at least two phylogenetic pathways.
+    More detailed steps using sitePath.
 vignette: >
   %\VignetteIndexEntry{An introduction to sitePath}
   %\VignetteEngine{knitr::rmarkdown}
@@ -60,9 +60,9 @@ Most multiple sequence alignment format can be parsed by [seqinr](https://cran.r
 ```{r add_alignment, message=FALSE}
 alignment_file <- system.file("extdata", "ZIKV.fasta", package = "sitePath")
 
-# options(list("cl.cores" = 10))
+options(list("cl.cores" = 1)) # Set this bigger than 1 to use multiprocessing
 
-paths <- addMSA(tree, alignment_file, "fasta")
+paths <- addMSA(tree, msaPath = alignment_file, msaFormat = "fasta")
 ```
 
 ## Clustering using site polymorphism
@@ -170,7 +170,7 @@ To have an overall view of the parallel mutations:
 plot(paraSites)
 ```
 
-# Additional functions
+# Miscellaneous
 
 This part is extra and experimental but might be useful when pre-assessing your data. We'll use an example to demonstrate.
 

@@ -133,11 +133,17 @@ print.sitePara <- function(x, ...) {
 
 #' @export
 print.paraFixSites <- function(x, ...) {
-    sites <- as.integer(x)
-    if (length(sites)) {
-        print(sites)
-    } else {
-        cat("No qualified sites found.\n")
+    cat("This is a 'paraFixSites' object\n\n")
+    for (type in c("fixation", "parallel", "paraFix")) {
+        sites <- allSitesName.paraFixSites(x, type = type)
+        if (length(sites)) {
+            cat(type,
+                "sites:\n",
+                paste0(sites, collapse = ", "),
+                "\n\n", sep = "")
+        } else {
+            cat("No", type, "sites found.\n\n")
+        }
     }
 }
 

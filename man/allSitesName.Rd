@@ -16,12 +16,14 @@ allSitesName(x, ...)
 
 \method{allSitesName}{parallelSites}(x, ...)
 
-\method{allSitesName}{paraFixSites}(x, ...)
+\method{allSitesName}{paraFixSites}(x, type = c("paraFix", "fixation", "parallel"), ...)
 }
 \arguments{
 \item{x}{The object containing the sites from analysis}
 
 \item{...}{Other arguments}
+
+\item{type}{Return fixation or parallel sites}
 }
 \value{
 An integer vector for sites position

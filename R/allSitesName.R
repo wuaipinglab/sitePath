@@ -37,7 +37,16 @@ allSitesName.parallelSites <- function(x, ...) {
 }
 
 #' @rdname allSitesName
+#' @param type Return fixation or parallel sites
 #' @export
-allSitesName.paraFixSites <- function(x, ...) {
-    as.character(as.integer(x))
+allSitesName.paraFixSites <- function(x,
+                                      type = c("paraFix", "fixation", "parallel"),
+                                      ...) {
+    res <- switch(
+        match.arg(type),
+        "paraFix" = as.character(as.integer(x)),
+        "fixation" = allSitesName(attr(x, "allFixSites")),
+        "parallel" = allSitesName(attr(x, "allParaSites"))
+    )
+    return(res)
 }
