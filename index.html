@@ -70,13 +70,8 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="sitepath-phylogenetic-pathwaydependent-recognition-of-fixed-substitutions-and-parallel-mutations">sitePath: Phylogenetic pathway–dependent recognition of fixed substitutions and parallel mutations<a class="anchor" aria-label="anchor" href="#sitepath-phylogenetic-pathwaydependent-recognition-of-fixed-substitutions-and-parallel-mutations"></a>
+<div class="page-header"><h1 id="sitepath-finding-phylogeny-dependent-fixation-and-parallel-mutations">sitePath: finding phylogeny-dependent fixation and parallel mutations<a class="anchor" aria-label="anchor" href="#sitepath-finding-phylogeny-dependent-fixation-and-parallel-mutations"></a>
 </h1></div>
-<div class="section level2">
-<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
-</h2>
-<p>Post on Bioconductor <a href="https://support.bioconductor.org/" class="external-link">support site</a> if having trouble using <code>sitePath</code>. Or open an <a href="https://github.com/wuaipinglab/sitePath/issues/new?assignees=&amp;labels=&amp;template=bug_report.md&amp;title=" class="external-link">issue</a> if a bug is found.</p>
-</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -112,22 +107,22 @@
 <div class="section level2">
 <h2 id="run-analysis">Run analysis<a class="anchor" aria-label="anchor" href="#run-analysis"></a>
 </h2>
-<p>Use <code>paraFixSites</code> function to find fixation and parallel sites.</p>
+<p><code>Nmin</code> and <code>minSNP</code> are the respective parameters for finding fixation and parallel sites (18 and 1 are used as an example for this dataset). The default values will be used if you don’t specify them.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cl.cores"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Set this bigger than 1 to use multiprocessing</span>
 
-<span class="va">paraFix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/paraFixSites.html">paraFixSites</a></span><span class="op">(</span><span class="va">tree</span>, alignment <span class="op">=</span> <span class="va">align</span><span class="op">)</span> <span class="co"># Run analysis to find fixation and parallel sites</span>
+<span class="va">paraFix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/paraFixSites.html">paraFixSites</a></span><span class="op">(</span><span class="va">tree</span>, alignment <span class="op">=</span> <span class="va">align</span>, Nmin <span class="op">=</span> <span class="fl">18</span>, minSNP <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># Run analysis to find fixation and parallel sites</span>
 <span class="va">paraFix</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This is a 'paraFixSites' object</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## fixationsites:</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 106, 109, 139, 709, 1118, 2086, 3144, 3190, 80, 2611, 2634, 894, 1542, 2074, 3045, 784, 988, 196, 1143, 2842, 3328, 3398, 107, 3353</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## fixation sites:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 139, 894, 2074, 2086, 2634, 3045, 988, 1143, 2842, 3398, 107, 1118, 3353</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## parallelsites:</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1118</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## parallel sites:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 105, 2292, 1264, 918, 1226, 1717, 988, 2611, 2787, 2749, 3328, 3162, 1857, 2445, 358, 1404, 3046, 791, 1180, 1016, 1171, 1327, 3076, 106, 2357, 916, 1303, 969, 573, 2909, 2122, 940</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="do">## paraFixsites:</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 1118</span></span></code></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="do">## paraFix sites:</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 988</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="fixation-sites">Fixation sites<a class="anchor" aria-label="anchor" href="#fixation-sites"></a>
@@ -135,9 +130,8 @@
 <p>Use <code>allSitesName</code> and set <code>type</code> as “fixation” to retrieve fixation sites name</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/allSitesName.html">allSitesName</a></span><span class="op">(</span><span class="va">paraFix</span>, type <span class="op">=</span> <span class="st">"fixation"</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] "106"  "109"  "139"  "709"  "1118" "2086" "3144" "3190" "80"   "2611"</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] "2634" "894"  "1542" "2074" "3045" "784"  "988"  "196"  "1143" "2842"</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [21] "3328" "3398" "107"  "3353"</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] "139"  "894"  "2074" "2086" "2634" "3045" "988"  "1143" "2842" "3398"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] "107"  "1118" "3353"</span></span></code></pre></div>
 <p>Use <code>plotFixationSites</code> to view fixation sites</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/plotFixationSites.html">plotFixationSites</a></span><span class="op">(</span><span class="va">paraFix</span><span class="op">)</span> <span class="co"># View all fixation sites on the tree</span></code></pre></div>
@@ -152,14 +146,27 @@
 <p>Use <code>allSitesName</code> and set <code>type</code> as “parallel” to retrieve parallel sites name</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/allSitesName.html">allSitesName</a></span><span class="op">(</span><span class="va">paraFix</span>, type <span class="op">=</span> <span class="st">"parallel"</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "1118"</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] "105"  "2292" "1264" "918"  "1226" "1717" "988"  "2611" "2787" "2749"</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [11] "3328" "3162" "1857" "2445" "358"  "1404" "3046" "791"  "1180" "1016"</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [21] "1171" "1327" "3076" "106"  "2357" "916"  "1303" "969"  "573"  "2909"</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [31] "2122" "940"</span></span></code></pre></div>
 <p>Use <code>plotParallelSites</code> to view parallel sites</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/plotParallelSites.html">plotParallelSites</a></span><span class="op">(</span><span class="va">paraFix</span><span class="op">)</span> <span class="co"># View all parallel sites on the tree</span></code></pre></div>
 <p><img src="inst/unnamed-chunk-1-1.png"><!-- --></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/plotParallelSites.html">plotParallelSites</a></span><span class="op">(</span><span class="va">paraFix</span>, site <span class="op">=</span> <span class="fl">1118</span><span class="op">)</span> <span class="co"># View a single site</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="reference/plotParallelSites.html">plotParallelSites</a></span><span class="op">(</span><span class="va">paraFix</span>, site <span class="op">=</span> <span class="fl">105</span><span class="op">)</span> <span class="co"># View a single site</span></code></pre></div>
 <p><img src="inst/unnamed-chunk-1-2.png"><!-- --></p>
+</div>
+<div class="section level2">
+<h2 id="read-more">Read more<a class="anchor" aria-label="anchor" href="#read-more"></a>
+</h2>
+<p>The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click <a href="https://wuaipinglab.github.io/sitePath/articles/sitePath.html" class="external-link">here</a> for a detailed breakdown of the functionality.</p>
+</div>
+<div class="section level2">
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
+<p>Post on Bioconductor <a href="https://support.bioconductor.org/" class="external-link">support site</a> if having trouble using <code>sitePath</code>. Or open an <a href="https://github.com/wuaipinglab/sitePath/issues/new?assignees=&amp;labels=&amp;template=bug_report.md&amp;title=" class="external-link">issue</a> if a bug is found.</p>
 </div>
 </div>
   </div>
