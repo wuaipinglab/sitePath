@@ -15,8 +15,16 @@
 <script src="pkgdown.js"></script><meta property="og:title" content="Phylogenetic pathway–dependent recognition of fixed substitutions and 
     parallel mutations">
 <meta property="og:description" content="The package does hierarchical search for fixation and parallel
-    mutations given multiple sequence alignment and phylogenetic tree. The
-    package also provides visualization of these mutations on the tree.">
+    mutations given multiple sequence alignment and phylogenetic tree. In viral
+    evolution, fixed substitutions in the nucleic acid or protein level are
+    closely associated with maintaining viral function, while parallel mutation
+    reflects the competitive nature in adaptive selection. In sitePath, the
+    phylogenetic tree was separated into a set of inheritable phylogenetic
+    pathways via an automated pathway-division method. Then, for each
+    phylogenetic pathway, the identification of fixed substitutions was
+    transformed into a local-optimal-solution problem directed by a minimal
+    entropy algorithm. Finally, the parallel mutation was determined based on
+    the recurrence of mutations among at least two phylogenetic pathways">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -37,7 +45,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
       </span>
     </div>
 
