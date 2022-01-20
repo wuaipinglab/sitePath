@@ -138,7 +138,7 @@ print.paraFixSites <- function(x, ...) {
         sites <- allSitesName.paraFixSites(x, type = type)
         if (length(sites)) {
             cat(type,
-                "sites:\n",
+                " sites:\n",
                 paste0(sites, collapse = ", "),
                 "\n\n", sep = "")
         } else {

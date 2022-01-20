@@ -10,11 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# sitePath: Phylogenetic pathway–dependent recognition of fixed substitutions and parallel mutations
-
-## Getting help
-
-Post on Bioconductor [support site](https://support.bioconductor.org/) if having trouble using `sitePath`. Or open an [issue](https://github.com/wuaipinglab/sitePath/issues/new?assignees=&labels=&template=bug_report.md&title=) if a bug is found.
+# sitePath: finding phylogeny-dependent fixation and parallel mutations
 
 ## Installation
 
@@ -53,12 +49,12 @@ align <- read.alignment(alignment_file, format = "fasta") # Read the MSA file in
 ```
 
 ## Run analysis
-Use `paraFixSites` function to find fixation and parallel sites.
+`Nmin` and `minSNP` are the respective parameters for finding fixation and parallel sites (18 and 1 are used as an example for this dataset). The default values will be used if you don't specify them.
 
 ```{r run_analysis}
 options(list("cl.cores" = 1)) # Set this bigger than 1 to use multiprocessing
 
-paraFix <- paraFixSites(tree, alignment = align) # Run analysis to find fixation and parallel sites
+paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Run analysis to find fixation and parallel sites
 paraFix
 ```
 
@@ -84,9 +80,13 @@ allSitesName(paraFix, type = "parallel")
 Use `plotParallelSites` to view parallel sites
 ```{r}
 plotParallelSites(paraFix) # View all parallel sites on the tree
-plotParallelSites(paraFix, site = 1118) # View a single site
+plotParallelSites(paraFix, site = 105) # View a single site
 ```
 
-## A more detailed demo
+## Read more
 
-Click [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html) for a more detailed tutorial
+The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html) for a detailed breakdown of the functionality.
+
+## Getting help
+
+Post on Bioconductor [support site](https://support.bioconductor.org/) if having trouble using `sitePath`. Or open an [issue](https://github.com/wuaipinglab/sitePath/issues/new?assignees=&labels=&template=bug_report.md&title=) if a bug is found.
