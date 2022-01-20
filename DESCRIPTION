@@ -2,7 +2,7 @@ Package: sitePath
 Type: Package
 Title: Phylogenetic pathway–dependent recognition of fixed substitutions and 
     parallel mutations
-Version: 1.11.0
+Version: 1.11.1
 Authors@R: c(person("Chengyang", "Ji",
                     email = "chengyang.ji12@alumni.xjtlu.edu.cn",
                     role = c("aut", "cre", "cph"),
@@ -14,11 +14,19 @@ Authors@R: c(person("Chengyang", "Ji",
                     email = "wap@ism.cams.cn",
                     role = c("ths")))
 Description: The package does hierarchical search for fixation and parallel
-    mutations given multiple sequence alignment and phylogenetic tree. The
-    package also provides visualization of these mutations on the tree.
+    mutations given multiple sequence alignment and phylogenetic tree. In viral
+    evolution, fixed substitutions in the nucleic acid or protein level are
+    closely associated with maintaining viral function, while parallel mutation
+    reflects the competitive nature in adaptive selection. In sitePath, the
+    phylogenetic tree was separated into a set of inheritable phylogenetic
+    pathways via an automated pathway-division method. Then, for each
+    phylogenetic pathway, the identification of fixed substitutions was
+    transformed into a local-optimal-solution problem directed by a minimal
+    entropy algorithm. Finally, the parallel mutation was determined based on
+    the recurrence of mutations among at least two phylogenetic pathways
 License: MIT + file LICENSE
 Depends:
-    R (>= 4.1)
+    R (>= 4.2)
 Imports:
     RColorBrewer,
     Rcpp,

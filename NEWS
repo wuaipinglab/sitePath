@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.11.1
+-------------------------
+    o Wrapper function for finding fixation and parallel sites
+    o Core number set to 1 will disable multiprocessing
+
 CHANGES IN VERSION 1.9.4
 -------------------------
     o Fix: special case when tree root has more than one lineage path
