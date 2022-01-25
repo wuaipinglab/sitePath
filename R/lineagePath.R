@@ -48,27 +48,19 @@ lineagePath.phyMSAmatched <- function(tree,
     if (is.null(similarity)) {
         index <- .stablePathIndex(rangeOfResults, 9)[[1]]
         minSNP <- attr(rangeOfResults[[index]], "minSize")
-        similarity <- minSNP / nTips
     } else {
-        if (!is.numeric(similarity) || similarity <= 0) {
-            stop("\"similarity\" only accepts positive numeric")
-        } else if (similarity > 1) {
-            minSNP <- ceiling(similarity)
-        } else {
-            minSNP <- nTips * similarity
+        minSNP <- .checkMinEffectiveSize(
+            x = similarity,
+            varName = "similarity",
+            totalSize = nTips,
+            maxSize = maxSize,
+            forbidTrivial = forbidTrivial
+        )
+        if (minSNP == 1) {
+            stop("'similarity' cannot be 1.")
         }
-        if (minSNP > maxSize) {
-            if (forbidTrivial) {
-                minSNP <- maxSize
-            } else {
-                stop(
-                    "\"similarity\" cannot be greater than total tips. ",
-                    "And better not be equal to 1."
-                )
-            }
-        }
-        similarity <- minSNP / nTips
     }
+    similarity <- minSNP / nTips
     paths <- rangeOfResults[[which.min(vapply(
         X = rangeOfResults,
         FUN = function(ps) {
@@ -83,6 +75,28 @@ lineagePath.phyMSAmatched <- function(tree,
     attr(paths, "minSize") <- minSNP
     class(paths) <- c("lineagePath", "phyMSAmatched")
     return(paths)
+}
+
+.checkMinEffectiveSize <- function(x,
+                                   varName,
+                                   totalSize,
+                                   maxSize,
+                                   forbidTrivial = TRUE) {
+    if (!is.numeric(x) || x <= 0) {
+        stop(varName, " only accepts positive numeric")
+    } else if (x >= 1) {
+        minSNP <- ceiling(x)
+    } else {
+        minSNP <- ceiling(totalSize * x)
+    }
+    if (minSNP > maxSize) {
+        if (forbidTrivial) {
+            minSNP <- maxSize
+        } else {
+            stop("'", varName, "' cannot be greater than total tips.")
+        }
+    }
+    return(minSNP)
 }
 
 .stablePathIndex <- function(rangeOfResults, step) {
@@ -212,4 +226,13 @@ sneakPeek <- function(tree,
 lineagePath.sneakPeekedPaths <- function(tree, similarity, ...) {
     tr <- attr(tree, "phyMSAmatched")
     lineagePath.phyMSAmatched(tr, similarity, ...)
+}
+
+#' @rdname lineagePath
+#' @description \code{similarity} has no effect when using on
+#'   \code{\link{paraFixSites}} object
+#' @export
+lineagePath.paraFixSites <- function(tree, similarity = NULL, ...) {
+    paths <- attr(tree, "paths")
+    return(paths)
 }

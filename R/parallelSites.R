@@ -1,3 +1,5 @@
+#' @importFrom ape Ntip
+
 #' @rdname parallelSites
 #' @title Mutation across multiple phylogenetic lineages
 #' @description A site may have mutated on parallel lineages. Mutation can occur
@@ -58,10 +60,16 @@ parallelSites.sitesMinEntropy <- function(x,
     # Set the 'minSNP' constrain
     if (is.null(minSNP)) {
         minSNP <- attr(attr(x, "paths"), "minSize")
-    } else if (!is.numeric(minSNP)) {
-        stop("\"minSNP\" only accepts numeric")
+    } else if (minSNP != 1) {
+        tree <- as.phylo.phyMSAmatched(paths)
+        nTips <- Ntip(tree)
+        minSNP <- .checkMinEffectiveSize(
+            x = minSNP,
+            varName = "minSNP",
+            totalSize = nTips,
+            maxSize = nTips
+        )
     }
-    minSNP <- ceiling(minSNP)
     # The index of 'mutName' attribute to be used for applying constrains
     mutNameIndex <- switch(
         match.arg(mutMode),
@@ -312,4 +320,11 @@ parallelSites.sitesMinEntropy <- function(x,
         FUN.VALUE = character(1)
     )
     res[which(!is.na(res))]
+}
+
+#' @rdname parallelSites
+#' @export
+parallelSites.paraFixSites <- function(x, ...) {
+    res <- attr(x, "allParaSites")
+    return(res)
 }

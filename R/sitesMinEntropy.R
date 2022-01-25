@@ -41,13 +41,15 @@ sitesMinEntropy.lineagePath <- function(x,
     # Set the minimal size of the group during the search
     if (is.null(minEffectiveSize)) {
         minEffectiveSize <- attr(x, "minSize")
-    } else if (!is.numeric(minEffectiveSize) ||
-               minEffectiveSize < 0) {
-        stop("'minEffectiveSize' (",
-             minEffectiveSize,
-             ") is not positive numeric")
     } else {
-        minEffectiveSize <- ceiling(minEffectiveSize)
+        tree <- as.phylo.phyMSAmatched(paths)
+        nTips <- Ntip(tree)
+        minEffectiveSize <- .checkMinEffectiveSize(
+            x = minEffectiveSize,
+            varName = "minEffectiveSize",
+            totalSize = nTips,
+            maxSize = nTips
+        )
     }
     # Set the search depth for heuristic search
     if (searchDepth < 1) {

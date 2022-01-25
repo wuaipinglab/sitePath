@@ -5,6 +5,7 @@
 \alias{lineagePath.phyMSAmatched}
 \alias{sneakPeek}
 \alias{lineagePath.sneakPeekedPaths}
+\alias{lineagePath.paraFixSites}
 \title{Resolving lineage paths using SNP}
 \usage{
 lineagePath(tree, similarity, ...)
@@ -20,6 +21,8 @@ lineagePath(tree, similarity, ...)
 sneakPeek(tree, step = 9, maxPath = NULL, minPath = 0, makePlot = TRUE)
 
 \method{lineagePath}{sneakPeekedPaths}(tree, similarity, ...)
+
+\method{lineagePath}{paraFixSites}(tree, similarity = NULL, ...)
 }
 \arguments{
 \item{tree}{The return from \code{\link{addMSA}} or \code{sneakPeek}
@@ -74,6 +77,9 @@ Lineage path represent by node number.
 When used on the return of \code{sneakPeek}, a
   \code{lineagePath} with the closest \code{similarity} will be retrieved
   from the returned value.
+
+\code{similarity} has no effect when using on
+  \code{\link{paraFixSites}} object
 }
 \examples{
 data('zikv_tree')

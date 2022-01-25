@@ -4,6 +4,7 @@
 \alias{parallelSites}
 \alias{parallelSites.lineagePath}
 \alias{parallelSites.sitesMinEntropy}
+\alias{parallelSites.paraFixSites}
 \title{Mutation across multiple phylogenetic lineages}
 \usage{
 parallelSites(x, ...)
@@ -21,6 +22,8 @@ parallelSites(x, ...)
   mutMode = c("all", "exact", "pre", "post"),
   ...
 )
+
+\method{parallelSites}{paraFixSites}(x, ...)
 }
 \arguments{
 \item{x}{A \code{\link{lineagePath}} or a \code{\link{sitesMinEntropy}}

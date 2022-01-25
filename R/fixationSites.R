@@ -143,3 +143,10 @@ fixationSites.sitesMinEntropy <- function(paths, ...) {
     ))
     sum(siteChars %in% unambiguous) >= 2
 }
+
+#' @rdname fixationSites
+#' @export
+fixationSites.paraFixSites <- function(paths, ...) {
+    res <- attr(paths, "allFixSites")
+    return(res)
+}
