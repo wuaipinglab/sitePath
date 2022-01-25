@@ -175,10 +175,10 @@ plot.fixationSites <- function(x,
             na.value = "black"
         ) +
         guides(color = guide_legend(override.aes = list(size = 3)))
-    if (!is.null(tipsGrouping)) {
-        p <- p + theme(legend.position = "left")
-    } else {
+    if (is.null(tipsGrouping)) {
         p <- p + theme(legend.position = "none")
+    } else {
+        p <- p + theme(legend.position = "left")
     }
     if (y) {
         p <- p + geom_label_repel(

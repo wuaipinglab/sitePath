@@ -80,7 +80,7 @@ lineagePath.phyMSAmatched <- function(tree,
 .checkMinEffectiveSize <- function(x,
                                    varName,
                                    totalSize,
-                                   maxSize,
+                                   maxSize = NULL,
                                    forbidTrivial = TRUE) {
     if (!is.numeric(x) || x <= 0) {
         stop(varName, " only accepts positive numeric")
@@ -88,6 +88,9 @@ lineagePath.phyMSAmatched <- function(tree,
         minSNP <- ceiling(x)
     } else {
         minSNP <- ceiling(totalSize * x)
+    }
+    if (is.null(maxSize)) {
+        maxSize <- totalSize
     }
     if (minSNP > maxSize) {
         if (forbidTrivial) {

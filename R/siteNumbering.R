@@ -62,10 +62,12 @@ setSiteNumbering.phyMSAmatched <- function(x,
     # Check and set the minimum size to remove a site
     if (is.null(minSkipSize)) {
         minSkipSize <- 0.8 * length(align)
-    } else if (minSkipSize <= 0) {
-        stop("'minSkipSize' cannot be zero or negative.")
-    } else if (minSkipSize < 1 && minSkipSize > 0) {
-        minSkipSize <- minSkipSize * length(align)
+    } else {
+        minSkipSize <- .checkMinEffectiveSize(
+            x = minSkipSize,
+            varName = "minSkipSize",
+            totalSize = length(align)
+        )
     }
     unambiguous <- .unambiguousChars(x)
     attr(x, "loci") <- which(vapply(

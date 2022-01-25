@@ -3,6 +3,7 @@
 \name{allSitesName}
 \alias{allSitesName}
 \alias{allSitesName.SNPsites}
+\alias{allSitesName.sitesMinEntropy}
 \alias{allSitesName.fixationSites}
 \alias{allSitesName.parallelSites}
 \alias{allSitesName.paraFixSites}
@@ -11,6 +12,8 @@
 allSitesName(x, ...)
 
 \method{allSitesName}{SNPsites}(x, ...)
+
+\method{allSitesName}{sitesMinEntropy}(x, ...)
 
 \method{allSitesName}{fixationSites}(x, ...)
 

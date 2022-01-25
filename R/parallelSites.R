@@ -66,8 +66,7 @@ parallelSites.sitesMinEntropy <- function(x,
         minSNP <- .checkMinEffectiveSize(
             x = minSNP,
             varName = "minSNP",
-            totalSize = nTips,
-            maxSize = nTips
+            totalSize = nTips
         )
     }
     # The index of 'mutName' attribute to be used for applying constrains

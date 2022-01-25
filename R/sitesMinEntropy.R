@@ -47,8 +47,7 @@ sitesMinEntropy.lineagePath <- function(x,
         minEffectiveSize <- .checkMinEffectiveSize(
             x = minEffectiveSize,
             varName = "minEffectiveSize",
-            totalSize = nTips,
-            maxSize = nTips
+            totalSize = nTips
         )
     }
     # Set the search depth for heuristic search

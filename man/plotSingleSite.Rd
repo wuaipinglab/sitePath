@@ -3,6 +3,7 @@
 \name{plotSingleSite}
 \alias{plotSingleSite}
 \alias{plotSingleSite.lineagePath}
+\alias{plotSingleSite.sitesMinEntropy}
 \alias{plotSingleSite.parallelSites}
 \alias{plotSingleSite.fixationSites}
 \title{Color the tree by a single site}
@@ -10,6 +11,8 @@
 plotSingleSite(x, site, ...)
 
 \method{plotSingleSite}{lineagePath}(x, site, showPath = TRUE, showTips = FALSE, ...)
+
+\method{plotSingleSite}{sitesMinEntropy}(x, site, ...)
 
 \method{plotSingleSite}{parallelSites}(x, site, showPath = TRUE, ...)
 

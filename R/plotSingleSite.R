@@ -105,6 +105,8 @@ plotSingleSite.lineagePath <- function(x,
     return(groupColors)
 }
 
+#' @rdname plotSingleSite
+#' @export
 plotSingleSite.sitesMinEntropy <- function(x,
                                            site,
                                            ...) {
@@ -112,56 +114,33 @@ plotSingleSite.sitesMinEntropy <- function(x,
     allPaths <- attr(x, "paths")
     # Specify the color of mutations by pre-defined color set.
     sitePaths <- lapply(x, "[[", as.character(site))
-    groupColors <- .siteColorScheme(attr(x, "seqType"))
-    g <- lapply(allPaths, function(path) {
-        plot(path) + ggtitle(
-            label = paste0(attr(path, "minSize"),
-                           " (",
-                           round(attr(
-                               path, "similarity"
-                           ) * 100, 2),
-                           "%)"),
-            subtitle = paste0(length(path), " path(s)")
-        )
-    })
-    grid.arrange(arrangeGrob(grobs = g))
+    seqType <- attr(allPaths, "seqType")
+    groupColors <- .siteColorScheme(seqType)
+    if (seqType == "AA") {
+        legendTitle <- "Amino acid"
+    } else {
+        legendTitle <- "Nucleotide"
+    }
     # Collect the fixation mutation for each evolutionary pathway
-    fixationMut <- character()
     group <- list()
-    for (sp in sitePaths) {
-        # The first group is separately done
-        tips <- sp[[1]]
-        prevAA <- toupper(attr(tips, "AA"))
-        aaName <- prevAA
-        group[[prevAA]] <- c(group[[prevAA]], tips)
-        # Do the rest
-        for (i in seq_along(sp)[-1]) {
-            tips <- sp[[i]]
-            aa <- toupper(attr(tips, "AA"))
-            aaName <- c(aaName, aa)
-            group[[aa]] <- c(group[[aa]], tips)
-            fixationMut[names(sp[i])] <- paste0(prevAA,
-                                                site,
-                                                aa)
-            prevAA <- aa
+    for (seg in sitePaths) {
+        for (tips in seg) {
+            fixedAA <- attr(tips, "AA")
+            if (fixedAA %in% names(group)) {
+                group[[fixedAA]] <- c(group[[fixedAA]], tips)
+            } else {
+                group[[fixedAA]] <- tips
+            }
         }
     }
     tree <- groupOTU(tree, group)
-    # Color the excluded branch gray as the excluded lineage
-    excludedLabel <- ".excluded"
-    groupColors[[excludedLabel]] <- "#dcdcdc"
-    levels(attr(tree, "group"))[which(levels(attr(tree, "group")) == "0")] <-
-        excludedLabel
-    # Use dashed line for excluded branches
-    linetype <- as.integer(attr(tree, "group") == excludedLabel)
-    linetype <- factor(linetype)
     # Just in case the fixation mutation name is too long
     # Annotate the mutation on the tree
-    p <- ggtree(tree, aes(color = group, linetype = linetype)) +
-        scale_color_manual(values = groupColors,
-                           limits = c(names(group), excludedLabel)) +
-        guides(linetype = FALSE,
-               color = guide_legend(override.aes = list(size = 3))) +
+    p <- ggtree(tree, aes(color = group)) +
+        scale_color_manual(values = groupColors, limits = names(group)) +
+        guides(linetype = "none",
+               color = guide_legend(title = legendTitle,
+                                    override.aes = list(size = 3))) +
         theme(legend.position = "left") +
         ggtitle(site)
     return(p)

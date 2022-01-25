@@ -26,6 +26,12 @@ allSitesName.SNPsites <- function(x, ...) {
 
 #' @rdname allSitesName
 #' @export
+allSitesName.sitesMinEntropy <- function(x, ...) {
+    names(x[[1]])
+}
+
+#' @rdname allSitesName
+#' @export
 allSitesName.fixationSites <- function(x, ...) {
     names(x)
 }

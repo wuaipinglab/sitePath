@@ -32,7 +32,9 @@ print.SNPsites <- function(x, ...) {
 
 #' @export
 print.sitesMinEntropy <- function(x, ...) {
-    cat("This is a 'sitesMinEntropy' object.", "\n")
+    cat("This is a 'sitesMinEntropy' object.", "\n\n")
+    loci <- allSitesName.sitesMinEntropy(x)
+    cat("There are", length(loci), "sites with enough variation.\n")
 }
 
 #' @export
