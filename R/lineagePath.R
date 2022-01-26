@@ -30,12 +30,71 @@ lineagePath <- function(tree, similarity, ...) {
 }
 
 #' @rdname lineagePath
+#' @param alignment An \code{alignment} object. This commonly can be from
+#'   sequence parsing function in the \code{\link{seqinr}} package. Sequence
+#'   names in the alignment should include all \code{tip.label} in the tree
+#' @param seqType The type of the sequence in the alignment file. The default is
+#'   "AA" for amino acid. The other options are "DNA" and "RNA".
+#' @param similarity The parameter for identifying phylogenetic pathway using SNP. If
+#'   provided as fraction between 0 and 1, then the minimum number of SNP will
+#'   be total tips times \code{Nmin}. If provided as integer greater than 1, the
+#'   minimum number will be \code{Nmin}.
+#' @param reference Name of reference for site numbering. The name has to be one
+#'   of the sequences' name. The default uses the intrinsic alignment numbering
+#' @param gapChar The character to indicate gap. The numbering will skip the
+#'   \code{gapChar} for the reference sequence.
+#' @param minSkipSize The minimum number of tips to have gap or ambiguous amino
+#'   acid/nucleotide for a site to be ignored in other analysis. This will not
+#'   affect the numbering. The default is 0.8.
+#' @export
+lineagePath.phylo <- function(tree,
+                              similarity = NULL,
+                              alignment = NULL,
+                              seqType = c("AA", "DNA", "RNA"),
+                              reference = NULL,
+                              gapChar = "-",
+                              minSkipSize = NULL,
+                              ...) {
+    paths <- addMSA.phylo(tree = tree,
+                          alignment = alignment,
+                          seqType = seqType)
+    extraArgs <- list(...)
+    nMin <- extraArgs[["Nmin"]]
+    if (!is.null(nMin)) {
+        similarity <- nMin
+    }
+    paths <- lineagePath.phyMSAmatched(tree = paths,
+                                       similarity = similarity,
+                                       ...)
+    paths <- setSiteNumbering.phyMSAmatched(
+        x = paths,
+        reference = reference,
+        gapChar = gapChar,
+        minSkipSize = minSkipSize
+    )
+    return(paths)
+}
+
+#' @rdname lineagePath
+#' @export
+lineagePath.treedata <- function(tree, ...) {
+    tree <- as.phylo(tree)
+    res <- lineagePath(tree, ...)
+    return(res)
+}
+
+#' @rdname lineagePath
 #' @export
 lineagePath.phyMSAmatched <- function(tree,
                                       similarity = NULL,
                                       simMatrix = NULL,
                                       forbidTrivial = TRUE,
                                       ...) {
+    extraArgs <- list(...)
+    nMin <- extraArgs[["Nmin"]]
+    if (!is.null(nMin)) {
+        similarity <- nMin
+    }
     x <- .phyMSAmatch(tree)
     tree <- attr(x, "tree")
     # Find total number of tree tips

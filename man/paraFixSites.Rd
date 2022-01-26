@@ -3,6 +3,7 @@
 \name{paraFixSites}
 \alias{paraFixSites}
 \alias{paraFixSites.phylo}
+\alias{paraFixSites.treedata}
 \alias{paraFixSites.lineagePath}
 \alias{paraFixSites.sitesMinEntropy}
 \title{The fixation sites with mutation on parallel lineage}
@@ -19,6 +20,8 @@ paraFixSites(x, ...)
   minSkipSize = NULL,
   ...
 )
+
+\method{paraFixSites}{treedata}(x, ...)
 
 \method{paraFixSites}{lineagePath}(
   x,

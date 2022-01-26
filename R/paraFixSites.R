@@ -41,20 +41,24 @@ paraFixSites.phylo <- function(x,
                                gapChar = "-",
                                minSkipSize = NULL,
                                ...) {
-    paths <- addMSA.phylo(
+    paths <- lineagePath.phylo(
         tree = x,
         alignment = alignment,
-        seqType = seqType
-    )
-    paths <- lineagePath.phyMSAmatched(tree = paths,
-                                       similarity = Nmin)
-    paths <- setSiteNumbering.phyMSAmatched(
-        x = paths,
+        seqType = seqType,
+        Nmin = Nmin,
         reference = reference,
         gapChar = gapChar,
         minSkipSize = minSkipSize
     )
     res <- paraFixSites.lineagePath(paths, ...)
+    return(res)
+}
+
+#' @rdname paraFixSites
+#' @export
+paraFixSites.treedata <- function(x, ...) {
+    tree <- as.phylo(x)
+    res <- paraFixSites.phylo(tree)
     return(res)
 }
 

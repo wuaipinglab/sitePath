@@ -1,4 +1,35 @@
-# sitePath: finding phylogeny-dependent fixation and parallel mutations
+# sitePath: phylogeny-based sequence clustering using site polymorphism
+
+``` r
+library(sitePath)
+
+data(h3n2_align)
+data(h3n2_tree)
+
+options(list("cl.cores" = 10)) # Use 10 cores for multiprocessing
+
+paths <- lineagePath(h3n2_tree, alignment = h3n2_align, Nmin = 0.05)
+```
+
+    ## The "tree" object is not bifurcated and resolved by "multi2di" function.
+
+    ## Using 10 cores..
+    ## Multiprocessing ended.
+
+``` r
+minEntropy <- sitesMinEntropy(paths)
+```
+
+    ## Using 10 cores..
+    ## Multiprocessing ended.
+
+``` r
+p1 <- plotSingleSite(paths, site = 208)
+p2 <- plotSingleSite(minEntropy, site = 208)
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+![](inst/example-1.png)<!-- -->
 
 ## Installation
 

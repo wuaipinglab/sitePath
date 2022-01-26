@@ -1,7 +1,10 @@
 test_that("Using SNP to get phylogenetic lineages", {
     data(zikv_align)
     data(zikv_tree)
+
     tr <- addMSA(zikv_tree, alignment = zikv_align)
+    tr2 <- lineagePath(zikv_tree, alignment = zikv_align)
+    expect_identical(tr, tr2)
     expect_true(is(tr, "phyMSAmatched"))
     tipNames <- zikv_tree[["tip.label"]]
     nTips <- length(tipNames)
