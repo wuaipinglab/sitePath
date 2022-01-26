@@ -12,8 +12,8 @@ library(sitePath)
     ## register S3 method.
 
 ``` r
-data(h3n2_align)
-data(h3n2_tree)
+data(h3n2_align) # load the H3N2 sequences
+data(h3n2_tree) # load the corresponding phylogenetic tree
 
 options(list("cl.cores" = 10)) # Use 10 cores for multiprocessing
 
@@ -33,12 +33,17 @@ minEntropy <- sitesMinEntropy(paths)
     ## Multiprocessing ended.
 
 ``` r
-p1 <- plotSingleSite(paths, site = 208)
-p2 <- plotSingleSite(minEntropy, site = 208)
+p1 <- plotSingleSite(paths, site = 208) # The site polymorphism of site 208 on the tree
+p2 <- plotSingleSite(minEntropy, site = 208) # The result of clustering using site 208
 gridExtra::grid.arrange(p1, p2, ncol = 2)
 ```
 
 ![](inst/example-1.png)<!-- -->
+
+``` r
+grp1 <- extractTips(paths, 208) # Grouping result using site polymorphism only
+grp2 <- extractTips(minEntropy, 208) # Phylogeny-based clustering result
+```
 
 # Installation
 
