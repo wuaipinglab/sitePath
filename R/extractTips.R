@@ -51,6 +51,31 @@ extractTips.lineagePath <- function(x, site, ...) {
 
 #' @rdname extractTips
 #' @export
+extractTips.sitesMinEntropy <- function(x, site, ...) {
+    tree <- as.phylo.sitesMinEntropy(x)
+    site <- as.character(site)
+    sitePaths <- lapply(x, function(segs) {
+        pathNodeTips <- attr(segs, "pathNodeTips")
+        res <- segs[site]
+        attr(res, "pathNodeTips") <- pathNodeTips
+        return(res)
+    })
+    clustersByPath <- .mergeClusters(lapply(sitePaths,
+                                            .clusterByFixation))
+    res <- list()
+    for (gp in clustersByPath) {
+        for (tips in gp) {
+            attrs <- attributes(tips)[c("AA", "node")]
+            tips <- tree[["tip.label"]][tips]
+            attributes(tips) <- attrs
+            res <- c(res, list(tips))
+        }
+    }
+    return(res)
+}
+
+#' @rdname extractTips
+#' @export
 extractTips.fixationSites <- function(x,
                                       site,
                                       select = 1,

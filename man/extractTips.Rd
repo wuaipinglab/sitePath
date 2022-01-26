@@ -3,6 +3,7 @@
 \name{extractTips}
 \alias{extractTips}
 \alias{extractTips.lineagePath}
+\alias{extractTips.sitesMinEntropy}
 \alias{extractTips.fixationSites}
 \alias{extractTips.sitePath}
 \alias{extractTips.parallelSites}
@@ -12,6 +13,8 @@
 extractTips(x, ...)
 
 \method{extractTips}{lineagePath}(x, site, ...)
+
+\method{extractTips}{sitesMinEntropy}(x, site, ...)
 
 \method{extractTips}{fixationSites}(x, site, select = 1, ...)
 
