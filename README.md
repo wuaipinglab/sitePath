@@ -1,8 +1,17 @@
-# sitePath: phylogeny-based sequence clustering using site polymorphism
+sitePath: phylogeny-based sequence clustering using site polymorphism
+================
+
+The below demonstrates the result of phylogeny-based sequence clustering
+for a H3N2 virus dataset (included in the package)
 
 ``` r
 library(sitePath)
+```
 
+    ## Warning in register(): Can't find generic `scale_type` in package ggplot2 to
+    ## register S3 method.
+
+``` r
 data(h3n2_align)
 data(h3n2_tree)
 
@@ -31,7 +40,7 @@ gridExtra::grid.arrange(p1, p2, ncol = 2)
 
 ![](inst/example-1.png)<!-- -->
 
-## Installation
+# Installation
 
 [R programming language](https://cran.r-project.org/) \>= 4.1.0 is
 required to use `sitePath`.
@@ -56,7 +65,13 @@ if (!requireNamespace("remotes", quietly = TRUE))
 remotes::install_github("wuaipinglab/sitePath")
 ```
 
-## Data preparation
+# QuickStart
+
+The following is a quick tutorial on how to use `sitePath` to find
+fixation and parallel sites including how to import data, run analysis
+and visualization of the results.
+
+## 1. Data preparation
 
 You need a *tree* and a *MSA* (multiple sequence alignment) file and the
 sequence names have to be matched!
@@ -73,7 +88,7 @@ tree <- read.tree(tree_file) # Read the tree file into R
 align <- read.alignment(alignment_file, format = "fasta") # Read the MSA file into R
 ```
 
-## Run analysis
+## 2. Run analysis
 
 `Nmin` and `minSNP` are the respective parameters for finding fixation
 and parallel sites (18 and 1 are used as an example for this dataset).
@@ -97,7 +112,7 @@ paraFix
     ## paraFix sites:
     ## 988
 
-## Fixation sites
+## 3. Fixation sites
 
 Use `allSitesName` and set `type` as “fixation” to retrieve fixation
 sites name
@@ -123,7 +138,7 @@ plotFixationSites(paraFix, site = 139) # View a single site
 
 ![](inst/plot_fixSites-2.png)<!-- -->
 
-## Parallel sites
+## 4. Parallel sites
 
 Use `allSitesName` and set `type` as “parallel” to retrieve parallel
 sites name
@@ -151,7 +166,7 @@ plotParallelSites(paraFix, site = 105) # View a single site
 
 ![](inst/unnamed-chunk-1-2.png)<!-- -->
 
-## Read more
+# Read more
 
 The above uses wrapper functions but the analysis can be dissembled into
 step functions (so you can view the result of each step and modify
@@ -159,7 +174,7 @@ parameters). Click
 [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html)
 for a detailed breakdown of the functionality.
 
-## Getting help
+# Getting help
 
 Post on Bioconductor [support site](https://support.bioconductor.org/)
 if having trouble using `sitePath`. Or open an

@@ -1,7 +1,6 @@
 ---
-output: 
-    rmarkdown::md_document:
-        variant: gfm
+title: "sitePath: phylogeny-based sequence clustering using site polymorphism"
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# sitePath: phylogeny-based sequence clustering using site polymorphism
+The below demonstrates the result of phylogeny-based sequence clustering for a H3N2 virus dataset (included in the package)
 
 ```{r example}
 library(sitePath)
@@ -28,7 +27,7 @@ p2 <- plotSingleSite(minEntropy, site = 208)
 gridExtra::grid.arrange(p1, p2, ncol = 2)
 ```
 
-## Installation
+# Installation
 
 [R programming language](https://cran.r-project.org/) >= 4.1.0 is required to use `sitePath`.
 
@@ -48,8 +47,11 @@ if (!requireNamespace("remotes", quietly = TRUE))
 remotes::install_github("wuaipinglab/sitePath")
 ```
 
+# QuickStart
 
-## Data preparation
+The following is a quick tutorial on how to use `sitePath` to find fixation and parallel sites including how to import data, run analysis and visualization of the results.
+
+## 1. Data preparation
 You need a _tree_ and a _MSA_ (multiple sequence alignment) file and the sequence names have to be matched!
 ```{r data_prep}
 library(sitePath) # Load the sitePath package
@@ -64,7 +66,7 @@ align <- read.alignment(alignment_file, format = "fasta") # Read the MSA file in
 
 ```
 
-## Run analysis
+## 2. Run analysis
 `Nmin` and `minSNP` are the respective parameters for finding fixation and parallel sites (18 and 1 are used as an example for this dataset). The default values will be used if you don't specify them.
 
 ```{r run_analysis}
@@ -74,7 +76,7 @@ paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Run an
 paraFix
 ```
 
-## Fixation sites
+## 3. Fixation sites
 Use `allSitesName` and set `type` as "fixation" to retrieve fixation sites name
 ``` {r fixSites_name}
 allSitesName(paraFix, type = "fixation")
@@ -87,7 +89,7 @@ plotFixationSites(paraFix, site = 139) # View a single site
 
 ```
 
-## Parallel sites
+## 4. Parallel sites
 Use `allSitesName` and set `type` as "parallel" to retrieve parallel sites name
 ``` {r paraSites_name}
 allSitesName(paraFix, type = "parallel")
@@ -99,10 +101,10 @@ plotParallelSites(paraFix) # View all parallel sites on the tree
 plotParallelSites(paraFix, site = 105) # View a single site
 ```
 
-## Read more
+# Read more
 
 The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html) for a detailed breakdown of the functionality.
 
-## Getting help
+# Getting help
 
 Post on Bioconductor [support site](https://support.bioconductor.org/) if having trouble using `sitePath`. Or open an [issue](https://github.com/wuaipinglab/sitePath/issues/new?assignees=&labels=&template=bug_report.md&title=) if a bug is found.
