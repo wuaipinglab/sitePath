@@ -5,7 +5,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  fig.path = "man/figures"
+  fig.path = "man/figures/"
 )
 ```
 
@@ -82,7 +82,7 @@ align <- read.alignment(alignment_file, format = "fasta") # Read the MSA file in
 ```{r run_analysis}
 options(list("cl.cores" = 1)) # Set this bigger than 1 to use multiprocessing
 
-paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Run analysis to find fixation and parallel sites
+paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Find paraFix sites
 paraFix
 ```
 
@@ -119,7 +119,7 @@ plotParallelSites(paraFix, site = 105) # View a single site
 
 # Read more
 
-The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click [here](https://bioconductor.org/packages/release/bioc/vignettes/sitePath/inst/doc/sitePath.html) for a more detailed tutorial.
+The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click [here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html) for a more detailed tutorial.
 
 # Getting help
 

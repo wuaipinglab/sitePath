@@ -33,7 +33,7 @@ p2 <- plotSingleSite(minEntropy, site = 208) # The result of clustering using si
 gridExtra::grid.arrange(p1, p2, ncol = 2)
 ```
 
-![](man/figuresexample-1.png)<!-- -->
+![](man/figures/example-1.png)<!-- -->
 
 ``` r
 grp1 <- extractTips(paths, 208) # Grouping result using site polymorphism only
@@ -97,7 +97,7 @@ The default values will be used if you don’t specify them.
 ``` r
 options(list("cl.cores" = 1)) # Set this bigger than 1 to use multiprocessing
 
-paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Run analysis to find fixation and parallel sites
+paraFix <- paraFixSites(tree, alignment = align, Nmin = 18, minSNP = 1) # Find paraFix sites
 paraFix
 ```
 
@@ -130,13 +130,13 @@ Use `plotFixationSites` to view fixation sites
 plotFixationSites(paraFix) # View all fixation sites on the tree
 ```
 
-![](man/figuresplot_fixSites-1.png)<!-- -->
+![](man/figures/plot_fixSites-1.png)<!-- -->
 
 ``` r
 plotFixationSites(paraFix, site = 139) # View a single site
 ```
 
-![](man/figuresplot_fixSites-2.png)<!-- -->
+![](man/figures/plot_fixSites-2.png)<!-- -->
 
 ## 4. Parallel sites
 
@@ -158,20 +158,20 @@ Use `plotParallelSites` to view parallel sites
 plotParallelSites(paraFix) # View all parallel sites on the tree
 ```
 
-![](man/figuresunnamed-chunk-1-1.png)<!-- -->
+![](man/figures/unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
 plotParallelSites(paraFix, site = 105) # View a single site
 ```
 
-![](man/figuresunnamed-chunk-1-2.png)<!-- -->
+![](man/figures/unnamed-chunk-1-2.png)<!-- -->
 
 # Read more
 
 The above uses wrapper functions but the analysis can be dissembled into
 step functions (so you can view the result of each step and modify
 parameters). Click
-[here](https://bioconductor.org/packages/release/bioc/vignettes/sitePath/inst/doc/sitePath.html)
+[here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html)
 for a more detailed tutorial.
 
 # Getting help
