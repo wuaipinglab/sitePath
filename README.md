@@ -6,12 +6,7 @@ for a H3N2 virus dataset (included in the package)
 
 ``` r
 library(sitePath)
-```
 
-    ## Warning in register(): Can't find generic `scale_type` in package ggplot2 to
-    ## register S3 method.
-
-``` r
 data(h3n2_align) # load the H3N2 sequences
 data(h3n2_tree) # load the corresponding phylogenetic tree
 
@@ -176,8 +171,8 @@ plotParallelSites(paraFix, site = 105) # View a single site
 The above uses wrapper functions but the analysis can be dissembled into
 step functions (so you can view the result of each step and modify
 parameters). Click
-[here](https://wuaipinglab.github.io/sitePath/articles/sitePath.html)
-for a detailed breakdown of the functionality.
+[here](https://bioconductor.org/packages/release/bioc/vignettes/sitePath/inst/doc/sitePath.html)
+for a more detailed tutorial.
 
 # Getting help
 
