@@ -21,7 +21,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -61,10 +61,10 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">x</span>, <span class="va">reference</span>, <span class="va">gapChar</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for phyMSAmatched</span>
-<span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">x</span>, reference <span class="op">=</span> <span class="cn">NULL</span>, gapChar <span class="op">=</span> <span class="st">"-"</span>, minSkipSize <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">x</span>, <span class="va">reference</span>, <span class="va">gapChar</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for phyMSAmatched</span></span>
+<span><span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">x</span>, reference <span class="op">=</span> <span class="cn">NULL</span>, gapChar <span class="op">=</span> <span class="st">"-"</span>, minSkipSize <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -72,30 +72,41 @@
     <dl><dt>x</dt>
 <dd><p>The object to set site numbering. It could be a
 <code><a href="addMSA.html">phyMSAmatched</a></code> or a <code><a href="lineagePath.html">lineagePath</a></code> object.</p></dd>
+
+
 <dt>reference</dt>
 <dd><p>Name of reference for site numbering. The name has to be one
 of the sequences' name. The default uses the intrinsic alignment numbering</p></dd>
+
+
 <dt>gapChar</dt>
 <dd><p>The character to indicate gap. The numbering will skip the
 <code>gapChar</code> for the reference sequence.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed to or from other methods.</p></dd>
+
+
 <dt>minSkipSize</dt>
 <dd><p>The minimum number of tips to have gap or ambiguous amino
 acid/nucleotide for a site to be ignored in other analysis. This will not
 affect the numbering. The default is 0.8.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The input <code>x</code> with numbering mapped to <code>reference</code>.</p>
+    
+
+<p>The input <code>x</code> with numbering mapped to <code>reference</code>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">msaPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'ZIKV.fasta'</span>, package <span class="op">=</span> <span class="st">'sitePath'</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree</span>, msaPath <span class="op">=</span> <span class="va">msaPath</span>, msaFormat <span class="op">=</span> <span class="st">'fasta'</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">msaPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'ZIKV.fasta'</span>, package <span class="op">=</span> <span class="st">'sitePath'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree</span>, msaPath <span class="op">=</span> <span class="va">msaPath</span>, msaFormat <span class="op">=</span> <span class="st">'fasta'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">setSiteNumbering</span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> This is a 'lineagePath' object.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7 lineage paths using 8 as "major SNP" threshold </span>
@@ -113,7 +124,7 @@ affect the numbering. The default is 0.8.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -55,59 +55,74 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for SNPsites</span>
-<span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, showTips <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for lineagePath</span>
-<span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for parallelSites</span>
-<span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for fixationSites</span>
-<span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for paraFixSites</span>
-<span class="fu">plotMutSites</span><span class="op">(</span>
-  <span class="va">x</span>,
-  widthRatio <span class="op">=</span> <span class="fl">0.75</span>,
-  fontSize <span class="op">=</span> <span class="fl">3.88</span>,
-  dotSize <span class="op">=</span> <span class="fl">1</span>,
-  lineSize <span class="op">=</span> <span class="fl">0.5</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for SNPsites</span></span>
+<span><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, showTips <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for lineagePath</span></span>
+<span><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for parallelSites</span></span>
+<span><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for fixationSites</span></span>
+<span><span class="fu">plotMutSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for paraFixSites</span></span>
+<span><span class="fu">plotMutSites</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  widthRatio <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  fontSize <span class="op">=</span> <span class="fl">3.88</span>,</span>
+<span>  dotSize <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lineSize <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>An <code><a href="SNPsites.html">SNPsites</a></code> object.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments</p></dd>
+
+
 <dt>showTips</dt>
 <dd><p>Whether to plot the tip labels. The default is <code>FALSE</code>.</p></dd>
+
+
 <dt>widthRatio</dt>
 <dd><p>The width ratio between tree plot and SNP plot</p></dd>
+
+
 <dt>fontSize</dt>
 <dd><p>The font size of the mutation label in tree plot</p></dd>
+
+
 <dt>dotSize</dt>
 <dd><p>The dot size of SNP in SNP plot</p></dd>
+
+
 <dt>lineSize</dt>
 <dd><p>The background line size in SNP plot</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tree plot with SNP as dots for each tip.</p>
+    
+
+<p>A tree plot with SNP as dots for each tip.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plotMutSites</span><span class="op">(</span><span class="fu"><a href="SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotMutSites</span><span class="op">(</span><span class="fu"><a href="SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotMutSites-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
@@ -123,7 +138,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

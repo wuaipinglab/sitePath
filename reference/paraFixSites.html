@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -55,37 +55,40 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">paraFixSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for phylo</span>
-<span class="fu">paraFixSites</span><span class="op">(</span>
-  <span class="va">x</span>,
-  alignment <span class="op">=</span> <span class="cn">NULL</span>,
-  seqType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AA"</span>, <span class="st">"DNA"</span>, <span class="st">"RNA"</span><span class="op">)</span>,
-  Nmin <span class="op">=</span> <span class="cn">NULL</span>,
-  reference <span class="op">=</span> <span class="cn">NULL</span>,
-  gapChar <span class="op">=</span> <span class="st">"-"</span>,
-  minSkipSize <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for lineagePath</span>
-<span class="fu">paraFixSites</span><span class="op">(</span>
-  <span class="va">x</span>,
-  minEffectiveSize <span class="op">=</span> <span class="cn">NULL</span>,
-  searchDepth <span class="op">=</span> <span class="fl">1</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compare"</span>, <span class="st">"insert"</span>, <span class="st">"delete"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for sitesMinEntropy</span>
-<span class="fu">paraFixSites</span><span class="op">(</span>
-  <span class="va">x</span>,
-  category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intersect"</span>, <span class="st">"union"</span>, <span class="st">"parallelOnly"</span>, <span class="st">"fixationOnly"</span><span class="op">)</span>,
-  minSNP <span class="op">=</span> <span class="cn">NULL</span>,
-  mutMode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"exact"</span>, <span class="st">"pre"</span>, <span class="st">"post"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">paraFixSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for phylo</span></span>
+<span><span class="fu">paraFixSites</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  alignment <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seqType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AA"</span>, <span class="st">"DNA"</span>, <span class="st">"RNA"</span><span class="op">)</span>,</span>
+<span>  Nmin <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  reference <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  gapChar <span class="op">=</span> <span class="st">"-"</span>,</span>
+<span>  minSkipSize <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for treedata</span></span>
+<span><span class="fu">paraFixSites</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for lineagePath</span></span>
+<span><span class="fu">paraFixSites</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  minEffectiveSize <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  searchDepth <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compare"</span>, <span class="st">"insert"</span>, <span class="st">"delete"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sitesMinEntropy</span></span>
+<span><span class="fu">paraFixSites</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intersect"</span>, <span class="st">"union"</span>, <span class="st">"parallelOnly"</span>, <span class="st">"fixationOnly"</span><span class="op">)</span>,</span>
+<span>  minSNP <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mutMode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"exact"</span>, <span class="st">"pre"</span>, <span class="st">"post"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -93,63 +96,92 @@
     <dl><dt>x</dt>
 <dd><p>A <code>lineagePath</code> object returned from <code><a href="lineagePath.html">lineagePath</a></code>
 function.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>further arguments passed to or from other methods.</p></dd>
+
+
 <dt>alignment</dt>
 <dd><p>An <code>alignment</code> object. This commonly can be from
 sequence parsing function in the <code>seqinr</code> package. Sequence
 names in the alignment should include all <code>tip.label</code> in the tree</p></dd>
+
+
 <dt>seqType</dt>
 <dd><p>The type of the sequence in the alignment file. The default is
 "AA" for amino acid. The other options are "DNA" and "RNA".</p></dd>
+
+
 <dt>Nmin</dt>
 <dd><p>The parameter for identifying phylogenetic pathway using SNP. If
 provided as fraction between 0 and 1, then the minimum number of SNP will
 be total tips times <code>Nmin</code>. If provided as integer greater than 1, the
 minimum number will be <code>Nmin</code>.</p></dd>
+
+
 <dt>reference</dt>
 <dd><p>Name of reference for site numbering. The name has to be one
 of the sequences' name. The default uses the intrinsic alignment numbering</p></dd>
+
+
 <dt>gapChar</dt>
 <dd><p>The character to indicate gap. The numbering will skip the
 <code>gapChar</code> for the reference sequence.</p></dd>
+
+
 <dt>minSkipSize</dt>
 <dd><p>The minimum number of tips to have gap or ambiguous amino
 acid/nucleotide for a site to be ignored in other analysis. This will not
 affect the numbering. The default is 0.8.</p></dd>
+
+
 <dt>minEffectiveSize</dt>
 <dd><p>The minimum number of tips in a group.</p></dd>
+
+
 <dt>searchDepth</dt>
 <dd><p>The function uses heuristic search but the termination of
 the search cannot be intrinsically decided. <code>searchDepth</code> is needed to
 tell the search when to stop.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.</p></dd>
+
+
 <dt>category</dt>
 <dd><p>Could be <code>parallelOnly</code>, <code>fixationOnly</code>,
 <code>intersect</code> or <code>union</code>.</p></dd>
+
+
 <dt>minSNP</dt>
 <dd><p>The minimum number of mutations to be qualified as parallel on
 at least two lineages. The default is 1.</p></dd>
+
+
 <dt>mutMode</dt>
 <dd><p>The strategy for finding parallel site. The default <code>all</code>
 is to consider any mutation regardless of the amino acid/nucleotide before
 and after mutation; Or <code>exact</code> to force mutation to be the same; Or
 <code>pre</code>/<code>post</code> to select the site having amino acid/nucleotide
 before/after mutation.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>paraFixSites</code> object.</p>
+    
+
+<p>A <code>paraFixSites</code> object.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">paraFixSites</span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">paraFixSites</span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> This is a 'paraFixSites' object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fixation sites:</span>
@@ -173,7 +205,7 @@ before/after mutation.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

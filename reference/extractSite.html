@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -57,10 +57,10 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">extractSite</span><span class="op">(</span><span class="va">x</span>, <span class="va">site</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for fixationSites</span>
-<span class="fu">extractSite</span><span class="op">(</span><span class="va">x</span>, <span class="va">site</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">extractSite</span><span class="op">(</span><span class="va">x</span>, <span class="va">site</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for fixationSites</span></span>
+<span><span class="fu">extractSite</span><span class="op">(</span><span class="va">x</span>, <span class="va">site</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -68,23 +68,30 @@
     <dl><dt>x</dt>
 <dd><p>A <code>fixationSites</code> or a <code>parallelSites</code> object. More type
 will be supported in the later version.</p></dd>
+
+
 <dt>site</dt>
 <dd><p>A site included in the result.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The predicted result of a single site</p>
+    
+
+<p>The predicted result of a single site</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">mutations</span> <span class="op">&lt;-</span> <span class="fu"><a href="fixationSites.html">fixationSites</a></span><span class="op">(</span><span class="fu"><a href="lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">extractSite</span><span class="op">(</span><span class="va">mutations</span>, <span class="fl">139</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mutations</span> <span class="op">&lt;-</span> <span class="fu"><a href="fixationSites.html">fixationSites</a></span><span class="op">(</span><span class="fu"><a href="lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">extractSite</span><span class="op">(</span><span class="va">mutations</span>, <span class="fl">139</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Site 139 may experience fixation on 1 path(s):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> S139N (20-&gt;72) </span>
@@ -104,7 +111,7 @@ will be supported in the later version.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -59,42 +59,52 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for SNPsites</span>
-<span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for fixationSites</span>
-<span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for parallelSites</span>
-<span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for paraFixSites</span>
-<span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"paraFix"</span>, <span class="st">"fixation"</span>, <span class="st">"parallel"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for SNPsites</span></span>
+<span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sitesMinEntropy</span></span>
+<span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for fixationSites</span></span>
+<span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for parallelSites</span></span>
+<span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for paraFixSites</span></span>
+<span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"paraFix"</span>, <span class="st">"fixation"</span>, <span class="st">"parallel"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>The object containing the sites from analysis</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Return fixation or parallel sites</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An integer vector for sites position</p>
+    
+
+<p>An integer vector for sites position</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">msaPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'ZIKV.fasta'</span>, package <span class="op">=</span> <span class="st">'sitePath'</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree</span>, msaPath <span class="op">=</span> <span class="va">msaPath</span>, msaFormat <span class="op">=</span> <span class="st">'fasta'</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">allSitesName</span><span class="op">(</span><span class="va">snp</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">msaPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'ZIKV.fasta'</span>, package <span class="op">=</span> <span class="st">'sitePath'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree</span>, msaPath <span class="op">=</span> <span class="va">msaPath</span>, msaFormat <span class="op">=</span> <span class="st">'fasta'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="SNPsites.html">SNPsites</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">allSitesName</span><span class="op">(</span><span class="va">snp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "80"   "106"  "107"  "109"  "123"  "139"  "196"  "709"  "784"  "894" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] "988"  "1118" "1143" "1542" "2074" "2086" "2611" "2634" "2787" "2842"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [21] "3045" "3144" "3162" "3190" "3328" "3353" "3398"</span>
@@ -112,7 +122,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

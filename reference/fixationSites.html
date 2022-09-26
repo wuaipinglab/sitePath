@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sitePath</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -65,19 +65,22 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fixationSites</span><span class="op">(</span><span class="va">paths</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for lineagePath</span>
-<span class="fu">fixationSites</span><span class="op">(</span>
-  <span class="va">paths</span>,
-  minEffectiveSize <span class="op">=</span> <span class="cn">NULL</span>,
-  searchDepth <span class="op">=</span> <span class="fl">1</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compare"</span>, <span class="st">"insert"</span>, <span class="st">"delete"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for sitesMinEntropy</span>
-<span class="fu">fixationSites</span><span class="op">(</span><span class="va">paths</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fixationSites</span><span class="op">(</span><span class="va">paths</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for lineagePath</span></span>
+<span><span class="fu">fixationSites</span><span class="op">(</span></span>
+<span>  <span class="va">paths</span>,</span>
+<span>  minEffectiveSize <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  searchDepth <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compare"</span>, <span class="st">"insert"</span>, <span class="st">"delete"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sitesMinEntropy</span></span>
+<span><span class="fu">fixationSites</span><span class="op">(</span><span class="va">paths</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for paraFixSites</span></span>
+<span><span class="fu">fixationSites</span><span class="op">(</span><span class="va">paths</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -85,22 +88,33 @@
     <dl><dt>paths</dt>
 <dd><p>A <code>lineagePath</code> object returned from
 <code><a href="lineagePath.html">lineagePath</a></code> function.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>further arguments passed to or from other methods.</p></dd>
+
+
 <dt>minEffectiveSize</dt>
 <dd><p>The minimum number of tips in a group.</p></dd>
+
+
 <dt>searchDepth</dt>
 <dd><p>The function uses heuristic search but the termination of
 the search cannot be intrinsically decided. <code>searchDepth</code> is needed to
 tell the search when to stop.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>The strategy for predicting the fixation. The basic approach is
 entropy minimization and can be achieved by adding or removing fixation
 point, or by comparing the two.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>fixationSites</code> object.</p>
+    
+
+<p>A <code>fixationSites</code> object.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -109,10 +123,10 @@ point, or by comparing the two.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">fixationSites</span><span class="op">(</span><span class="fu"><a href="lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="addMSA.html">addMSA</a></span><span class="op">(</span><span class="va">zikv_tree_reduced</span>, alignment <span class="op">=</span> <span class="va">zikv_align_reduced</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">fixationSites</span><span class="op">(</span><span class="fu"><a href="lineagePath.html">lineagePath</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> This is a 'fixationSites' object.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Result for 3 paths:</span>
@@ -133,7 +147,7 @@ point, or by comparing the two.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
