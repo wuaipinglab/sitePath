@@ -147,7 +147,7 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cl.cores"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Set this bigger than 1 to use multiprocessing</span></span>
 <span></span>
-<span><span class="va">paraFix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/paraFixSites.html">paraFixSites</a></span><span class="op">(</span><span class="va">tree</span>, alignment <span class="op">=</span> <span class="va">align</span>, Nmin <span class="op">=</span> <span class="fl">18</span>, minSNP <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># Run analysis to find fixation and parallel sites</span></span>
+<span><span class="va">paraFix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/paraFixSites.html">paraFixSites</a></span><span class="op">(</span><span class="va">tree</span>, alignment <span class="op">=</span> <span class="va">align</span>, Nmin <span class="op">=</span> <span class="fl">18</span>, minSNP <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># Find paraFix sites</span></span>
 <span><span class="va">paraFix</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This is a 'paraFixSites' object</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
@@ -198,7 +198,7 @@
 <div class="section level1">
 <h1 id="read-more">Read more<a class="anchor" aria-label="anchor" href="#read-more"></a>
 </h1>
-<p>The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click <a href="https://bioconductor.org/packages/release/bioc/vignettes/sitePath/inst/doc/sitePath.html" class="external-link">here</a> for a more detailed tutorial.</p>
+<p>The above uses wrapper functions but the analysis can be dissembled into step functions (so you can view the result of each step and modify parameters). Click <a href="https://wuaipinglab.github.io/sitePath/articles/sitePath.html" class="external-link">here</a> for a more detailed tutorial.</p>
 </div>
 <div class="section level1">
 <h1 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
