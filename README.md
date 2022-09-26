@@ -33,7 +33,7 @@ p2 <- plotSingleSite(minEntropy, site = 208) # The result of clustering using si
 gridExtra::grid.arrange(p1, p2, ncol = 2)
 ```
 
-![](inst/example-1.png)<!-- -->
+![](man/figuresexample-1.png)<!-- -->
 
 ``` r
 grp1 <- extractTips(paths, 208) # Grouping result using site polymorphism only
@@ -130,13 +130,13 @@ Use `plotFixationSites` to view fixation sites
 plotFixationSites(paraFix) # View all fixation sites on the tree
 ```
 
-![](inst/plot_fixSites-1.png)<!-- -->
+![](man/figuresplot_fixSites-1.png)<!-- -->
 
 ``` r
 plotFixationSites(paraFix, site = 139) # View a single site
 ```
 
-![](inst/plot_fixSites-2.png)<!-- -->
+![](man/figuresplot_fixSites-2.png)<!-- -->
 
 ## 4. Parallel sites
 
@@ -158,13 +158,13 @@ Use `plotParallelSites` to view parallel sites
 plotParallelSites(paraFix) # View all parallel sites on the tree
 ```
 
-![](inst/unnamed-chunk-1-1.png)<!-- -->
+![](man/figuresunnamed-chunk-1-1.png)<!-- -->
 
 ``` r
 plotParallelSites(paraFix, site = 105) # View a single site
 ```
 
-![](inst/unnamed-chunk-1-2.png)<!-- -->
+![](man/figuresunnamed-chunk-1-2.png)<!-- -->
 
 # Read more
 
