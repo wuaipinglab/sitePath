@@ -183,7 +183,7 @@ plotSingleSite.parallelSites <- function(x,
                 color = "black",
                 min.segment.length = 0,
                 na.rm = TRUE,
-                size = GeomText[["default_aes"]][["size"]]
+                # size = GeomText[["default_aes"]][["size"]]
             )
     } else {
         p <- plotSingleSite.lineagePath(
@@ -195,7 +195,8 @@ plotSingleSite.parallelSites <- function(x,
     }
     if (any(sporadicTip)) {
         p <- p + geom_point2(aes(subset = sporadicTip,
-                                 size = GeomPoint[["default_aes"]][["size"]]))
+                                 # size = GeomPoint[["default_aes"]][["size"]])
+                                 ))
     }
     return(p)
 }

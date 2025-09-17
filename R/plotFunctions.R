@@ -123,7 +123,7 @@ plot.parallelSites <- function(x, y = TRUE, ...) {
                 color = "black",
                 min.segment.length = 0,
                 na.rm = TRUE,
-                size = GeomText[["default_aes"]][["size"]]
+                # size = GeomText[["default_aes"]][["size"]]
             )
     } else {
         treePlot <- plot.lineagePath(paths)
@@ -273,7 +273,7 @@ plot.sitePath <- function(x,
                 color = "black",
                 min.segment.length = 0,
                 na.rm = TRUE,
-                size = GeomText[["default_aes"]][["size"]]
+                # size = GeomText[["default_aes"]][["size"]]
             )
     }
     # Make the plot
@@ -318,7 +318,7 @@ plot.fixationPath <- function(x,
     tr <- attr(x, "SNPtracing")
     p <- ggtree(tr) +
         geom_tiplab(hjust = 0.5,
-                    align = TRUE,
+                    # align = TRUE,
                     offset = 0.5) +
         theme_tree2()
     if (y) {

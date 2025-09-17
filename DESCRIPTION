@@ -1,7 +1,7 @@
 Package: sitePath
 Type: Package
 Title: Phylogeny-based sequence clustering with site polymorphism
-Version: 1.25.0
+Version: 1.25.1
 Authors@R: c(person("Chengyang", "Ji",
                     email = "chengyang.ji12@alumni.xjtlu.edu.cn",
                     role = c("aut", "cre", "cph"),
